@@ -8,23 +8,20 @@ class StockProductionLot(models.Model):
     _inherit = "stock.production.lot"
 
     is_article_actif = fields.Boolean('Article actif', related='product_id.active')
+    is_dlc_ddm       = fields.Date('DLC / DDM')
 
-
-    @api.constrains('name','product_id','is_company_id')
+    @api.constrains('name','product_id','is_dlc_ddm')
     def _check_lot_unique(self):
         for obj in self:
             filtre=[
-                ('name', '=' , obj.name),
-                ('id'  , '!=', obj.id),
-                ('product_id'  , '=', obj.product_id.id),
-                ('is_company_id', '=', obj.is_company_id.id),
+                ('name'      , '=' , obj.name),
+                ('id'        , '!=', obj.id),
+                ('product_id', '=' , obj.product_id.id),
+                ('is_dlc_ddm', '=' , obj.is_dlc_ddm),
             ]
             lots = self.env['stock.production.lot'].search(filtre, limit=1)
-
             for lot in lots:
                 print(lot.name)
-
-
             if lots:
                 raise Warning("Ce lot existe déjà !") 
 
@@ -63,12 +60,12 @@ class StockMove(models.Model):
                         if state=='assigned' and date<datetime.now().date():
                             date=datetime.now().date()
                         alerte=[]
-                        for line in obj.move_line_ids:
-                            date_due = line.life_use_date
-                            if date_due and date_due.date() < date:
-                                alerte.append("Le lot "+str(line.lot_id.name)+" de l'article "+str(obj.product_id.display_name)+" est expiré !")
-                            if date_due and date_due.date() ==date:
-                                alerte.append("Le lot "+str(line.lot_id.name)+" de l'article "+str(obj.product_id.display_name)+" expire aujourd'hui !")
+                        # for line in obj.move_line_ids:
+                        #     date_due = line.life_use_date
+                        #     if date_due and date_due.date() < date:
+                        #         alerte.append("Le lot "+str(line.lot_id.name)+" de l'article "+str(obj.product_id.display_name)+" est expiré !")
+                        #     if date_due and date_due.date() ==date:
+                        #         alerte.append("Le lot "+str(line.lot_id.name)+" de l'article "+str(obj.product_id.display_name)+" expire aujourd'hui !")
                         if len(alerte)>0:
                             alerte='\n'.join(alerte)
                         else:

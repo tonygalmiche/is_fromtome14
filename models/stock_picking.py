@@ -20,6 +20,7 @@ class Picking(models.Model):
 
     @api.onchange('move_ids_without_package')
     def _compute_is_alerte(self):
+        print(self)
         for obj in self:
             obj.is_alerte=str(len(obj.move_ids_without_package))
             alerte=[]
@@ -31,6 +32,7 @@ class Picking(models.Model):
             else:
                 alerte=False
             obj.is_alerte=alerte
+            obj.is_info=False
 
 
     is_alerte  = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)

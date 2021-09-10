@@ -11,7 +11,7 @@ class is_sale_order_line(models.Model):
 
     company_id              = fields.Many2one('res.company', 'Société')
     date_order              = fields.Datetime('Date Commande')
-    #delivery_date           = fields.Datetime('Date Livraison')
+    is_date_livraison       = fields.Date('Date Livraison')
     is_commande_soldee      = fields.Boolean('Commande soldée')
     partner_id              = fields.Many2one('res.partner', 'Client')
     product_id              = fields.Many2one('product.product', 'Article')
@@ -43,7 +43,7 @@ class is_sale_order_line(models.Model):
                     sol.order_id,
                     so.is_commande_soldee,
                     so.date_order,
-                    -- so.delivery_date,
+                    so.is_date_livraison,
                     so.partner_id, 
                     sol.product_id, 
                     pp.barcode,

@@ -48,8 +48,8 @@ class SaleOrderLine(models.Model):
     @api.onchange('product_id','is_livraison_directe')
     def onchange_product_id_for_date_reception(self):
         if self.is_livraison_directe:
-            if self.order_id.delivery_date:
-                self.is_date_reception = str(self.order_id.delivery_date)[:10]
+            if self.order_id.is_date_livraison:
+                self.is_date_reception = self.order_id.is_date_livraison
         else:
             partner = self.get_fournisseur_par_defaut()
             if partner and partner.is_date_reception:
@@ -82,6 +82,8 @@ class SaleOrderLine(models.Model):
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
+
+    is_date_livraison  = fields.Date('Date Livraison')
     is_commande_soldee = fields.Boolean(string=u'Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
 
     @api.depends('order_line')
