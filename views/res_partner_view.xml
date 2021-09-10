@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="is_view_partner_form" model="ir.ui.view" >
+        <field name="name">is_view_partner_form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- <field name="property_product_pricelist" position="after">
+                <field name="is_iln"/>
+                <field name="is_gln"/>
+
+            </field> -->
+            <xpath expr="//notebook" position="after">
+                <group>
+                    <field name="is_product_supplierinfo_ids" nolabel="1">
+                        <tree default_order="product_tmpl_id">
+                            <field name="product_tmpl_id"/>
+                            <field name="product_code"/>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="prix_brut"/>
+                            <!-- <field name="x_r1"/>
+                            <field name="x_r2"/> -->
+                            <field name="price"/>
+                        </tree>
+                    </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="l10n_fr_siret.res_partner_form_l10n_fr">
+        <field name="name">res.partner.form.siret</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="l10n_fr.res_partner_form_l10n_fr"/>
+        <field name="arch" type="xml">
+            <field name="siret" position="after">
+                <field name="siren" attrs="{'invisible': [('is_company', '=', False)]}" />
+                <field name="nic" attrs="{'invisible': [('is_company', '=', False)]}" />
+                <field name="company_registry" attrs="{'invisible': [('is_company', '=', False)]}"/>
+                <!-- <field name="mode_facturation"/> -->
+            </field>
+
+        </field>
+    </record>
+
+
+
+</odoo>

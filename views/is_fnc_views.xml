@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+
+    <!-- is.fnc -->
+    <record id="is_fnc_seq" model="ir.sequence">
+        <field name="name">N°FNC</field>
+        <field name="code">is.fnc</field>
+        <field name="prefix"></field>
+        <field name="padding">5</field>
+        <field eval="False" name="company_id"/>
+    </record>
+    <record id="is_fnc_form" model="ir.ui.view">
+        <field name="name">is.fnc.form</field>
+        <field name="model">is.fnc</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" clickable="true"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="move_line_id"/>
+                            <field name="partner_id"/>
+                            <field name="picking_id"/>
+                            <field name="product_id"/>
+                            <field name="lot_id"/>
+                            <field name="dlc_ddm"/>
+                        </group>
+                        <group>
+                            <field name="company_id"/>
+                            <field name="emetteur_id"/>
+                            <field name="date_creation"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="status_move"/>
+                        <field name="description"/>
+                        <field name="cause"/>
+                        <field name="action_immediate"/>
+                        <field name="decision"/>
+                        <field name="analyse"/>
+                        <field name="action_corrective"/>
+                        <field name="date_cloture"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_fnc_tree" model="ir.ui.view">
+        <field name="name">is.fnc.tree</field>
+        <field name="model">is.fnc</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="picking_id"/>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="dlc_ddm"/>
+                <field name="emetteur_id"/>
+                <field name="date_creation"/>
+                <field name="status_move"/>
+                <field name="description"/>
+                <field name="cause"/>
+                <field name="date_cloture"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_fnc_search" model="ir.ui.view">
+        <field name="name">is.fnc.search</field>
+        <field name="model">is.fnc</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="picking_id"/>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="emetteur_id"/>
+                <field name="status_move"/>
+                <field name="description"/>
+                <field name="cause"/>
+                <field name="state"/>
+           </search>
+        </field>
+    </record>
+
+    <record id="is_fnc_pivot" model="ir.ui.view">
+        <field name="name">is_fnc_pivot</field>
+        <field name="model">is.fnc</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="date_creation"  type="col"/>
+                <field name="partner_id"     type="row"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="is_fnc_graph" model="ir.ui.view">
+        <field name="name">is_fnc_graph</field>
+        <field name="model">is.fnc</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="False">
+                <field name="date_creation"   type="row"/>
+            </graph>
+        </field>
+    </record>
+
+
+
+    <record  id="is_fnc_action" model="ir.actions.act_window">
+        <field name="name">FNC</field>
+        <field name="res_model">is.fnc</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_fnc_main_menu"
+        name="FNC"
+        parent="stock.menu_stock_root"
+        sequence="4"
+    />
+    <menuitem
+        id="is_fnc_menu"
+        name="FNC"
+        parent="is_fnc_main_menu"
+        sequence="10"
+        action="is_fnc_action"
+    />
+
+
+
+    <!-- <record id="is_view_stock_move_line_operation_tree_fnc" model="ir.ui.view">
+        <field name="name">is_view_stock_move_line_operation_tree_fnc</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="b2c_cheese_base.view_stock_move_line_operation_tree_inherit"/>
+        <field name="arch" type="xml">
+            <field name="status_move" position="before">
+                <field name="is_creer_fnc_vsb" invisible="1"/>
+                <button 
+                    string="Créer FNC" 
+                    name="creer_fnc_action" 
+                    type="object" icon="fa-plus" 
+                    attrs="{'invisible': [('is_creer_fnc_vsb', '=', False)]}"
+                />
+                <button 
+                    string="Accès FNC" 
+                    name="acces_fnc_action" 
+                    type="object" icon="fa-search-plus" 
+                    attrs="{'invisible': [('is_creer_fnc_vsb', '=', True)]}"
+                />
+            </field>
+        </field>
+    </record> -->
+</odoo>

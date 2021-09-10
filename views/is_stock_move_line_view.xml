@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="is_stock_move_line_form" model="ir.ui.view">
+        <field name="name">is.stock.move.line.form</field>
+        <field name="model">is.stock.move.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="picking_id"/>
+                        <field name="picking_type_id"/>
+                        <field name="partner_id"/>
+                        <field name="product_id"/>
+                        <field name="product_tmpl_id"/>
+                        <field name="move_id"/>
+                        <field name="move_line_id"/>
+                        <field name="lot_id"/>
+                        <field name="is_type_tracabilite"/>
+                        <!-- <field name="life_use_date"/> -->
+                        <field name="product_uom_id"/>
+                        <field name="product_uom_qty"/>
+                        <field name="qty_done"/>
+                        <!-- <field name="weight"/> -->
+                        <field name="status_move"/>
+                        <field name="create_date"/>
+                        <field name="write_date"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_stock_move_line_tree" model="ir.ui.view">
+        <field name="name">is.stock.move.line.tree</field>
+        <field name="model">is.stock.move.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="picking_id"/>
+                <field name="picking_type_id"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="is_type_tracabilite"/>
+                <!-- <field name="life_use_date"/> -->
+                <field name="product_uom_id"/>
+                <field name="product_uom_qty"/>
+                <field name="qty_done"/>
+                <!-- <field name="weight"/> -->
+                <field name="create_date"/>
+                <field name="write_date"/>
+                <field name="creer_fnc_vsb" invisible="1"/>
+                <button 
+                    string="Créer FNC" 
+                    name="creer_fnc_action" 
+                    type="object" icon="fa-plus" 
+                    attrs="{'invisible': [('creer_fnc_vsb', '=', False)]}"
+                />
+               <button 
+                    string="Accès FNC" 
+                    name="acces_fnc_action" 
+                    type="object" icon="fa-search-plus" 
+                    attrs="{'invisible': [('creer_fnc_vsb', '=', True)]}"
+                />
+                <field name="status_move"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_stock_move_line_search" model="ir.ui.view">
+        <field name="name">is.stock.move.line.search</field>
+        <field name="model">is.stock.move.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="picking_id"/>
+                <field name="picking_type_id"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="product_tmpl_id"/>
+                <field name="move_id"/>
+                <field name="is_type_tracabilite"/>
+                <field name="lot_id"/>
+                <field name="status_move"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_stock_move_line_action" model="ir.actions.act_window">
+        <field name="name">Lignes des Mouvements</field>
+        <field name="res_model">is.stock.move.line</field>
+        <field name="limit">100</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <record model="ir.rule" id="is_stock_move_line_rule">
+        <field name="name">is_stock_move_line_rule</field>
+        <field name="model_id" ref="model_is_stock_move_line"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', '=', user.company_id.id)]</field>
+    </record>
+    <menuitem
+        id="is_stock_move_line_menu"
+        name="Lignes des Mouvements"
+        parent="stock.menu_stock_inventory_control"
+        sequence="909"
+        action="is_stock_move_line_action"
+    />
+
+
+</odoo>

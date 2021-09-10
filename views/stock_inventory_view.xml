@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- <record id="view_inventory_form_inherit" model="ir.ui.view">
+        <field name="name">stock.inventory.form.inherit</field>
+        <field name="model">stock.inventory</field>
+        <field name="inherit_id" ref="stock.view_inventory_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='line_ids']//tree//field[@name='prod_lot_id']" position="after">
+                <field name="life_use_date" />
+            </xpath>
+             <xpath expr="//field[@name='line_ids']//tree//field[@name='prod_lot_id']" position="attributes">
+                     <attribute name="context">{'default_product_id': product_id, 'default_life_use_date':life_use_date}</attribute>
+             </xpath>
+        </field>
+    </record> -->
+</odoo>

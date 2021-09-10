@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="is_sale_order_line_form" model="ir.ui.view">
+        <field name="name">is.sale.order.line.form</field>
+        <field name="model">is.sale.order.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="order_id"/>
+                        <field name="date_order"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="partner_id"/>
+                        <field name="product_id"/>
+                        <field name="barcode"/>
+                        <field name="description"/>
+                        <!-- <field name="delivery_date"/> -->
+                        <field name="product_uom_qty"/>
+                        <field name="qty_delivered"/>
+                        <field name="qty_invoiced"/>
+                        <field name="product_uom"/>
+                        <field name="is_commande_soldee"/>
+                        <field name="state"/>
+                        <field name="order_line_id"/>
+                        <field name="purchase_order_id"/>
+                        <field name="is_purchase_line_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_sale_order_line_tree" model="ir.ui.view">
+        <field name="name">is.sale.order.line.tree</field>
+        <field name="model">is.sale.order.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="company_id" invisible="1"/>
+                <field name="order_id"/>
+                <field name="date_order"/>
+                <field name="partner_id"/>
+                <field name="description"/>
+                <field name="barcode"/>
+                <!-- <field name="delivery_date"/> -->
+                <field name="product_uom_qty" sum="Total"/>
+                <field name="qty_delivered" sum="Total"/>
+                <field name="qty_invoiced" sum="Total"/>
+                <field name="product_uom"/>
+                <field name="is_commande_soldee"/>
+                <field name="purchase_order_id"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_sale_order_line_search" model="ir.ui.view">
+        <field name="name">is.sale.order.line.search</field>
+        <field name="model">is.sale.order.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="barcode"/>
+                <field name="is_commande_soldee"/>
+                <field name="state"/>
+                <field name="purchase_order_id"/>
+           </search>
+        </field>
+    </record>
+    <record id="is_sale_order_line_pivot" model="ir.ui.view">
+        <field name="name">is_sale_order_line_pivot</field>
+        <field name="model">is.sale.order.line</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="state"   type="col"/>
+                <field name="product_id"     type="row"/>
+                <field name="product_uom_qty" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="is_sale_order_line_graph" model="ir.ui.view">
+        <field name="name">is_sale_order_line_graph</field>
+        <field name="model">is.sale.order.line</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="False">
+                <field name="partner_id"   type="row"/>
+                <field name="product_uom_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record  id="is_sale_order_line_action" model="ir.actions.act_window">
+        <field name="name">Lignes des commandes</field>
+        <field name="res_model">is.sale.order.line</field>
+        <field name="limit">100</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">[]</field>
+    </record>
+    <record model="ir.rule" id="is_sale_order_line_rule">
+        <field name="name">is_sale_order_line_rule</field>
+        <field name="model_id" ref="model_is_sale_order_line"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', '=', user.company_id.id)]</field>
+    </record>
+    <menuitem
+        id="is_sale_order_line_menu"
+        name="Lignes des commandes"
+        parent="sale.sale_order_menu"
+        sequence="2"
+        action="is_sale_order_line_action"
+    />
+</odoo>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- <record id="view_production_lot_form_simple_inherit" model="ir.ui.view">
+        <field name="model">stock.production.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form_simple"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='removal_date']" position="attributes">
+              <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='alert_date']" position="attributes">
+              <attribute name="invisible">1</attribute>
+            </xpath>
+             <xpath expr="//field[@name='ref']" position="after">
+                     <field name="type_traçabilite" readonly="1"/>
+             </xpath>
+            <xpath expr="//field[@name='use_date']" position="attributes">
+              <attribute name="attrs">{'readonly': [('type_traçabilite', '=', 'dlc')], 'required': [('type_traçabilite', '=', 'ddm')]}</attribute>
+            </xpath>
+             <xpath expr="//field[@name='life_date']" position="attributes">
+              <attribute name="attrs">{'readonly': [('type_traçabilite', '=', 'ddm')], 'required': [('type_traçabilite', '=', 'dlc')]}</attribute>
+            </xpath>
+        </field>
+    </record>
+ -->
+    <record id="view_production_lot_form_inherit" model="ir.ui.view">
+        <field name="model">stock.production.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='removal_date']" position="attributes">
+              <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='alert_date']" position="attributes">
+              <attribute name="invisible">1</attribute>
+            </xpath>
+             <!-- <xpath expr="//field[@name='ref']" position="after">
+                     <field name="type_traçabilite" readonly="1"/>
+             </xpath>
+            <xpath expr="//field[@name='use_date']" position="attributes">
+              <attribute name="attrs">{'readonly': [('type_traçabilite', '=', 'dlc')], 'required': [('type_traçabilite', '=', 'ddm')]}</attribute>
+            </xpath>
+             <xpath expr="//field[@name='life_date']" position="attributes">
+              <attribute name="attrs">{'readonly': [('type_traçabilite', '=', 'ddm')], 'required': [('type_traçabilite', '=', 'dlc')]}</attribute>
+            </xpath> -->
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- is.imprimer.etiquette.gs1 -->
+    <record id="is_imprimer_etiquette_gs1_form" model="ir.ui.view">
+        <field name="name">is.imprimer.etiquette.gs1.form</field>
+        <field name="model">is.imprimer.etiquette.gs1</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="imprimer_etiquette_action"
+                        type="object"
+                        string="Imprimer les étiquettes"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="code_gs1"/>
+                        <field name="code_ean"/>
+                        <field name="product_id"/>
+                        <field name="lot"/>
+                        <field name="dluo"/>
+                        <field name="dlc"/>
+                        <field name="poids"/>
+                        <field name="nb_pieces"/>
+                        <field name="qt_imprime"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_imprimer_etiquette_gs1_tree" model="ir.ui.view">
+        <field name="name">is.imprimer.etiquette.gs1.tree</field>
+        <field name="model">is.imprimer.etiquette.gs1</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="product_id"/>
+                <field name="code_ean"/>
+                <field name="lot"/>
+                <field name="dluo"/>
+                <field name="dlc"/>
+                <field name="poids"      sum="Total"/>
+                <field name="nb_pieces"  sum="Total"/>
+                <field name="qt_imprime" sum="Total"/>
+                <field name="create_date" string="Créée le"/>
+                <field name="write_date"  string="Modifiée le"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_imprimer_etiquette_gs1_search" model="ir.ui.view">
+        <field name="name">is.imprimer.etiquette.gs1.search</field>
+        <field name="model">is.imprimer.etiquette.gs1</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+                <field name="code_ean"/>
+                <field name="lot"/>
+                <field name="nb_pieces"/>
+           </search>
+        </field>
+    </record>
+
+    <record id="is_imprimer_etiquette_gs1c_pivot" model="ir.ui.view">
+        <field name="name">is_imprimer_etiquette_gs1c_pivot</field>
+        <field name="model">is.imprimer.etiquette.gs1</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="create_date" type="row" interval="week"/>
+                <field name="qt_imprime"  type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="is_imprimer_etiquette_gs1_graph" model="ir.ui.view">
+        <field name="name">is_imprimer_etiquette_gs1_graph</field>
+        <field name="model">is.imprimer.etiquette.gs1</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="False">
+                <field name="create_date"   type="row" interval="week"/>
+                <field name="qt_imprime"  type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record  id="is_imprimer_etiquette_gs1_action" model="ir.actions.act_window">
+        <field name="name">Impression étiquette GS1</field>
+        <field name="res_model">is.imprimer.etiquette.gs1</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_imprimer_etiquette_gs1_menu"
+        name="Impression étiquette GS1"
+        parent="stock.menu_stock_inventory_control"
+        sequence="910"
+        action="is_imprimer_etiquette_gs1_action"
+
+    />
+
+<!--
+
+-->
+
+</odoo>

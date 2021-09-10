@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+
+        <record id="is_product_pricelist_view" model="ir.ui.view">
+            <field name="name">is_product_pricelist_view</field>
+            <field name="model">product.pricelist</field>
+            <field name="inherit_id" ref="product.product_pricelist_view"/>
+            <field name="arch" type="xml">
+
+               <field name="currency_id" position="before">
+                    <field name="partner_id"/>
+                </field>
+
+
+                <xpath expr="//field[@name='item_ids']/.." position="after">
+                    <group col="4">
+                        <label for="is_augmentation" string="Pourcentage d'augmentation à appliquer"/>
+                        <div class="o_row">
+                            <field name="is_augmentation" nolabel="1"/>
+                            <span>%%</span>
+                            <button
+                                name="appliquer_augmentation_action"
+                                type="object"
+                                string="Appliquer l'augmentation"
+                                confirm="Êtes-vous certain de vouloir appliquer l'augmentation sur toutes les lignes ?"
+                            />
+                        </div>
+                    </group>
+                </xpath>
+                <!-- <field name="product_tmpl_id" position="before">
+                    <field name="is_archive" invisible="1"/>
+                    <button 
+                        class="oe_stat_button" name="#" type="object" 
+                        icon="fa-exclamation-triangle" 
+                        title="Article archivé"
+                        attrs="{'invisible': [('is_archive', '=', False)]}"
+                    />
+                </field> -->
+            </field>
+        </record>
+
+
+        <!-- <record id="is_product_pricelist_item_tree_view" model="ir.ui.view">
+            <field name="name">is_product_pricelist_item_tree_view</field>
+            <field name="model">product.pricelist.item</field>
+            <field name="inherit_id" ref="product.product_pricelist_item_tree_view"/>
+            <field name="arch" type="xml">
+                <field name="product_tmpl_id" position="before">
+                    <field name="is_archive" invisible="1"/>
+                    <button 
+                        class="oe_stat_button" name="#" type="object" 
+                        icon="fa-exclamation-triangle" 
+                        title="Article archivé"
+                        attrs="{'invisible': [('is_archive', '=', False)]}"
+                    />
+                </field>
+            </field>
+        </record>
+ -->
+    </data>
+</odoo>

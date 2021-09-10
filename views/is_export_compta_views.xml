@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <!-- is.export.compta.ligne -->
+    <record id="is_export_compta_ligne_form" model="ir.ui.view">
+        <field name="name">is.export.compta.ligne.form</field>
+        <field name="model">is.export.compta.ligne</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="ligne"/>
+                        <field name="journal_code"/>
+                        <field name="ecriture_num"/>
+                        <field name="ecriture_date"/>
+                        <field name="compte_num"/>
+                        <field name="comp_aux_num"/>
+                        <field name="piece_ref"/>
+                        <field name="piece_date"/>
+                        <field name="ecriture_lib"/>
+                        <field name="debit"/>
+                        <field name="credit"/>
+                        <field name="invoice_id"/>
+                        <field name="payment_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_export_compta_ligne_tree" model="ir.ui.view">
+        <field name="name">is.export.compta.ligne.tree</field>
+        <field name="model">is.export.compta.ligne</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="ligne"/>
+                <field name="journal_code"/>
+                <field name="ecriture_num"/>
+                <field name="ecriture_date"/>
+                <field name="compte_num"/>
+                <field name="comp_aux_num"/>
+                <field name="piece_ref"/>
+                <field name="piece_date"/>
+                <field name="ecriture_lib"/>
+                <field name="debit"  sum="Total"/>
+                <field name="credit" sum="Total"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_export_compta_ligne_search" model="ir.ui.view">
+        <field name="name">is.export.compta.ligne.search</field>
+        <field name="model">is.export.compta.ligne</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="ligne"/>
+                <field name="journal_code"/>
+                <field name="ecriture_num"/>
+                <field name="compte_num"/>
+                <field name="compte_lib"/>
+                <field name="comp_aux_num"/>
+                <field name="comp_aux_lib"/>
+                <field name="piece_ref"/>
+                <field name="ecriture_lib"/>
+                <field name="invoice_id"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_export_compta_ligne_action" model="ir.actions.act_window">
+        <field name="name">Détail des lignes à exporter</field>
+        <field name="res_model">is.export.compta.ligne</field>
+        <field name="limit">1000</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('export_compta_id','=',active_id)]</field>
+        <field name="context">{'default_export_compta_id': active_id}</field>
+    </record>
+
+
+
+
+
+    <!-- is.export.compta -->
+    <record id="is_export_compta_seq" model="ir.sequence">
+        <field name="name">Code Folio Export Compta</field>
+        <field name="code">is.export.compta</field>
+        <field name="prefix"></field>
+        <field name="padding">5</field>
+        <field eval="False" name="company_id"/>
+    </record>
+    <record id="is_export_compta_form" model="ir.ui.view">
+        <field name="name">is.export.compta.form</field>
+        <field name="model">is.export.compta</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="generer_lignes_action"
+                        type="object"
+                        string="Générer les lignes"
+                        confirm="Cela va écraser les lignes ?"
+                    />
+                    <button 
+                        name="%(is_export_compta_ligne_action)d"
+                        type="action"
+                        string="Voir les lignes"
+                        attrs="{'invisible': [('ligne_ids', '=', [])]}"
+                    />
+                    <button
+                        name="generer_fichier_action"
+                        type="object"
+                        string="Générer fichier à exporter"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="company_id" readonly="1"/>
+                        <field name="date_fin"/>
+                        <field name="escompte"/>
+                        <field 
+                            name="file_ids" 
+                            widget="many2many_binary"
+                            readonly="1"
+                        />
+                    </group>
+                    <field name="ligne_ids" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_export_compta_tree" model="ir.ui.view">
+        <field name="name">is.export.compta.tree</field>
+        <field name="model">is.export.compta</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="date_fin"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_export_compta_search" model="ir.ui.view">
+        <field name="name">is.export.compta.search</field>
+        <field name="model">is.export.compta</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="date_fin"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_export_compta_action" model="ir.actions.act_window">
+        <field name="name">Export Compta</field>
+        <field name="res_model">is.export.compta</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_export_compta_menu"
+        name="Export Compta"
+        parent="account.menu_finance_entries"
+        sequence="900"
+        action="is_export_compta_action"
+
+    />
+
+<!--
+
+-->
+
+</odoo>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_order_view_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet[1]" position="inside">
+                <style>
+                    .o_form_view .o_form_sheet_bg {
+                    background: #E46F78;
+                    border-bottom: 1px solid #dee2e6;
+                    position: relative;
+                    }
+                </style>
+            </xpath>
+
+            <button name="button_unlock" position="after">
+                <button
+                    name="creer_commande_fromtome_action"
+                    type="object"
+                    string="Créer commande dans Fromtome"
+                    class="oe_highlight"
+                />
+            </button>
+            <field name="date_order" position="after">
+                <field name="is_commande_soldee"/>
+            </field>
+
+
+
+             <!-- <xpath expr="//field[@name='order_line']/tree" position="inside">
+                <field name="echantillion"/>
+             </xpath> -->
+             <xpath expr="//field[@name='order_line']//tree//field[@name='price_subtotal']" position='attributes'>
+                <attribute name="invisible">1</attribute>
+             </xpath>
+            <xpath expr="//field[@name='order_line']//tree//field[@name='date_planned']" position='attributes'>
+                <attribute name="invisible">1</attribute>
+             </xpath>
+            <!-- <xpath expr="//field[@name='order_line']//tree//field[@name='company_id']" position='attributes'>
+                <attribute name="invisible">1</attribute>
+             </xpath> -->
+            <xpath expr="//page[1]/group[1]" position='attributes'>
+                 <attribute name="invisible">1</attribute>
+             </xpath>
+            <xpath expr="//field[@name='company_id']" position="after">
+                <!-- <field name="date_enlevelment"/> -->
+                <field name="date_planned"  string="Date Réception" readonly="0"/>
+            </xpath>
+            <!-- <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="delivery_adress" />
+            </xpath> -->
+
+            <xpath expr="//field[@name='order_line']//tree//field[@name='product_uom']" position='attributes'>
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

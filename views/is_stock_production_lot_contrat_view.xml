@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="is_stock_production_lot_contrat_form" model="ir.ui.view">
+        <field name="name">is.stock.production.lot.contrat.form</field>
+        <field name="model">is.stock.production.lot.contrat</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="product_id"/>
+                        <field name="product_tmpl_id"/>
+                        <field name="lot_id"/>
+                        <field name="product_qty"/>
+                        <field name="product_uom_id"/>
+                        <!-- <field name="life_date"/> -->
+                        <!-- <field name="use_date"/> -->
+                        <field name="contrat_id"/>
+                        <!-- <field name="date_limite"/> -->
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_stock_production_lot_contrat_tree" model="ir.ui.view">
+        <field name="name">is.stock.production.lot.contrat.tree</field>
+        <field name="model">is.stock.production.lot.contrat</field>
+        <field name="arch" type="xml">
+            <!-- <tree 
+                string="Lots avec contrat client" 
+                decoration-danger="date_limite and date_limite &lt; current_date" 
+            > -->
+            <tree>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="product_qty" sum="Total"/>
+                <field name="product_uom_id"/>
+                <!-- <field name="life_date"/> -->
+                <!-- <field name="use_date"/> -->
+                <field name="contrat_id"/>
+                <!-- <field name="date_limite"/> -->
+            </tree>
+        </field>
+    </record>
+    <record id="is_stock_production_lot_contrat_search" model="ir.ui.view">
+        <field name="name">is.stock.production.lot.contrat.search</field>
+        <field name="model">is.stock.production.lot.contrat</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <field name="partner_id"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_stock_production_lot_contrat_action" model="ir.actions.act_window">
+        <field name="name">Lots avec contrat client</field>
+        <field name="res_model">is.stock.production.lot.contrat</field>
+        <field name="limit">100</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <record model="ir.rule" id="is_stock_production_lot_contrat_rule">
+        <field name="name">is_stock_production_lot_contrat_rule</field>
+        <field name="model_id" ref="model_is_stock_production_lot_contrat"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">[('company_id', '=', user.company_id.id)]</field>
+    </record>
+    <menuitem
+        id="is_stock_production_lot_contrat_menu"
+        name="Lots avec contrat client"
+        parent="stock.menu_stock_inventory_control"
+        sequence="901"
+        action="is_stock_production_lot_contrat_action"
+    />
+
+
+</odoo>

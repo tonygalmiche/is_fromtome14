@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="is_account_invoice_line_form" model="ir.ui.view">
+        <field name="name">is.account.invoice.line.form</field>
+        <field name="model">is.account.invoice.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="company_id"/>
+                        <field name="invoice_id"/>
+                        <field name="number"/>
+                        <field name="date_invoice"/>
+                        <field name="partner_id"/>
+                        <field name="line_id"/>
+                        <field name="description"/>
+                        <field name="product_id"/>
+                        <field name="quantity"/>
+                        <field name="price_unit"/>
+                        <field name="discount"/>
+                        <field name="price_subtotal"/>
+                        <field name="invoice_type"/>
+                        <field name="state"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_account_invoice_line_tree" model="ir.ui.view">
+        <field name="name">is.account.invoice.line.tree</field>
+        <field name="model">is.account.invoice.line</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="company_id"/>
+                <field name="invoice_id"/>
+                <field name="number"/>
+                <field name="date_invoice"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="description"/>
+                <field name="quantity"       sum="Total"/>
+                <field name="price_unit"/>
+                <field name="discount"       sum="Total"/>
+                <field name="price_subtotal" sum="Total"/>
+                <field name="invoice_type"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_account_invoice_line_search" model="ir.ui.view">
+        <field name="name">is.account.invoice.line.search</field>
+        <field name="model">is.account.invoice.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="company_id"/>
+                <field name="invoice_id"/>
+                <field name="number"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="description"/>
+                <field name="invoice_type"/>
+                <field name="state"/>
+           </search>
+        </field>
+    </record>
+    <record id="is_account_invoice_line_pivot" model="ir.ui.view">
+        <field name="name">is_account_invoice_line_pivot</field>
+        <field name="model">is.account.invoice.line</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="date_invoice"   type="col"/>
+                <field name="partner_id"     type="row"/>
+                <field name="price_subtotal" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="is_account_invoice_line_graph" model="ir.ui.view">
+        <field name="name">is_account_invoice_line_graph</field>
+        <field name="model">is.account.invoice.line</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="False">
+                <field name="date_invoice"   type="row"/>
+                <field name="price_subtotal" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record  id="is_account_invoice_line_action" model="ir.actions.act_window">
+        <field name="name">Lignes des factures</field>
+        <field name="res_model">is.account.invoice.line</field>
+        <field name="view_type">form</field>
+        <field name="limit">100</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+    </record>
+    <menuitem
+        id="is_account_invoice_line_menu"
+        name="Lignes des factures"
+        parent="account.menu_finance_entries"
+        sequence="800"
+        action="is_account_invoice_line_action"
+    />
+</odoo>

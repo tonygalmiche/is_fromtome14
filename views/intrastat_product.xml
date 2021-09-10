@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<record id="intrastat_product_declaration_view_form" model="ir.ui.view">
+      <field name="name">intrastat.product.declaration.form</field>
+      <field name="model">intrastat.product.declaration</field>
+    <field name="inherit_id" ref="intrastat_product.intrastat_product_declaration_view_form"/>
+    <field name="arch" type="xml">
+         <xpath expr="//field[@name='computation_line_ids']" position="replace">
+<field name="computation_line_ids" context="{'type': type, 'reporting_level': reporting_level}" nolabel="1">
+            <tree string="Transactions">
+          <field name="parent_id"
+            invisible="not context.get('intrastat_product_computation_line_main_view')"/>
+          <field name="product_id"/>
+          <field name="hs_code_id"/>
+          <field name="src_dest_country_id" domain="[('intrastat', '=', True)]"/>
+          <field name="amount_company_currency"/>
+          <field name="amount_accessory_cost_company_currency"/>
+          <field name="transaction_id"/>
+              <field name="weight_net"/>
+          <field name="weight"/>
+          <!--<field name="suppl_unit_qty"
+            attrs="{'invisible': [('intrastat_unit_id', '=', False)], 'required': [('intrastat_unit_id', '!=', False)]}"/>
+         -->
+                <field name="intrastat_unit_id"/>
+          <field name="transport_id"
+            attrs="{'required': [('reporting_level', '=', 'extended')], 'invisible': [('reporting_level', '!=', 'extended')]}"/>
+          <field name="region_id" invisible="1"/>
+                <!-- <field name="fr_department_id"/>-->
+          <field name="product_origin_country_id" invisible="1" string="Product C/O"/>
+                 <!--<field name="fr_partner_id"/>-->
+          <field name="invoice_id"/>
+                <field name="date_invoice"/>
+          <field name="type" invisible="1"/>
+          <field name="reporting_level" invisible="1"/>
+        </tree>
+</field>
+
+        </xpath>
+  <xpath expr="//field[@name='declaration_line_ids']" position="replace">
+ <field name="declaration_line_ids" context="{'type': type, 'reporting_level': reporting_level}" nolabel="1">
+          <tree string="Intrastat Declaration Lines">
+          <field name="parent_id"
+            invisible="not context.get('intrastat_product_declaration_line_main_view')"/>
+          <field name="hs_code_id"/>
+          <field name="src_dest_country_id" domain="[('intrastat', '=', True)]"/>
+          <field name="amount_company_currency"/>
+          <field name="transaction_id"/>
+          <field name="weight_net"/>
+          <field name="weight"/>
+          <field name="suppl_unit_qty"/>
+          <field name="intrastat_unit_id"/>
+          <field name="type" invisible="1"/>
+          <field name="reporting_level" invisible="1"/>
+          <field name="transport_id"
+            attrs="{'required': [('reporting_level', '=', 'extended')], 'invisible': [('reporting_level', '!=', 'extended')]}"/>
+          <field name="region_id" invisible="1"/>
+          <field name="incoterm_id" invisible="1"/>
+          <field name="product_origin_country_id" invisible="1" string="Product C/O"/>
+        </tree>
+ </field>
+
+  </xpath>
+    </field>
+</record>
+
+</odoo>

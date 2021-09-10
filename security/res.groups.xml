@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="res.groups" id="is_fromtome_group" >
+        <field name="name">Fromtome</field>
+        <field name="comment"></field>
+    </record>
+    <record model="res.groups" id="is_fromelier_group" >
+        <field name="name">Fromelier</field>
+        <field name="comment"></field>
+    </record>
+</odoo>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- is.commande.fromtome.ligne -->
+    <record id="is_commande_fromtome_ligne_form" model="ir.ui.view">
+        <field name="name">is.commande.fromtome.ligne.form</field>
+        <field name="model">is.commande.fromtome.ligne</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="sequence"/>
+                        <field name="product_id"/>
+                        <field name="uom_id"/>
+                        <field name="stock_mini"/>
+                        <field name="stock"/>
+                        <field name="sale_qty"/>
+                        <field name="purchase_qty"/>
+                        <field name="product_qty"/>
+                        <field name="product_po_qty"/>
+                        <field name="uom_po_id"/>
+                        <field name="factor_inv"/>
+                        <field name="order_line_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_commande_fromtome_ligne_tree" model="ir.ui.view">
+        <field name="name">is.commande.fromtome.ligne.tree</field>
+        <field name="model">is.commande.fromtome.ligne</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="sequence"/>
+                <field name="product_id"/>
+                <field name="uom_id"/>
+                <field name="stock_mini"/>
+                <field name="stock"/>
+                <field name="sale_qty"/>
+                <field name="purchase_qty"/>
+                <field name="product_qty"/>
+                <field name="product_po_qty"/>
+                <field name="uom_po_id"/>
+                <field name="factor_inv"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_commande_fromtome_ligne_search" model="ir.ui.view">
+        <field name="name">is.commande.fromtome.ligne.search</field>
+        <field name="model">is.commande.fromtome.ligne</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="commande_id"/>
+                <field name="product_id"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_commande_fromtome_ligne_action" model="ir.actions.act_window">
+        <field name="name">Détail des lignes</field>
+        <field name="res_model">is.commande.fromtome.ligne</field>
+        <field name="limit">1000</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('commande_id','=',active_id)]</field>
+        <field name="context">{'default_commande_id': active_id}</field>
+    </record>
+
+
+    <!-- is.commande.fromtome -->
+    <record id="is_commande_fromtome_seq" model="ir.sequence">
+        <field name="name">Commande Fromtome</field>
+        <field name="code">is.commande.fromtome</field>
+        <field name="prefix"></field>
+        <field name="padding">5</field>
+        <field eval="False" name="company_id"/>
+    </record>
+    <record id="is_commande_fromtome_form" model="ir.ui.view">
+        <field name="name">is.commande.fromtome.form</field>
+        <field name="model">is.commande.fromtome</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="ligne_ids" invisible="1"/>
+                    <button
+                        name="calcul_besoins_action"
+                        type="object"
+                        string="Calcul des besoins"
+                        confirm="Confirmer ?"
+                    />
+                    <button 
+                        name="%(is_commande_fromtome_ligne_action)d"
+                        type="action"
+                        string="Voir les lignes"
+                        attrs="{'invisible': [('ligne_ids', '=', [])]}"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="partner_id"/>
+                        <field name="stock_mini"/>
+                        <field name="order_id" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_commande_fromtome_tree" model="ir.ui.view">
+        <field name="name">is.commande.fromtome.tree</field>
+        <field name="model">is.commande.fromtome</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="stock_mini"/>
+                <field name="order_id"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_commande_fromtome_search" model="ir.ui.view">
+        <field name="name">is.commande.fromtome.search</field>
+        <field name="model">is.commande.fromtome</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="order_id"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_commande_fromtome_action" model="ir.actions.act_window">
+        <field name="name">Commande Fromtome</field>
+        <field name="res_model">is.commande.fromtome</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_commande_fromtome_menu"
+        name="Commande Fromtome"
+        parent="purchase.menu_procurement_management"
+        sequence="900"
+        action="is_commande_fromtome_action"
+    />
+
+</odoo>
