@@ -77,6 +77,13 @@ font-weight: 500;
 padding: 1%;
 color: white;"/>
             </xpath>
+
+
+            <xpath expr="//field[@name='company_id']" position="attributes">
+                 <attribute name="invisible">1</attribute>
+            </xpath>
+
+
         </field>
     </record>
 
