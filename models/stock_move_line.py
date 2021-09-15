@@ -22,6 +22,26 @@ from odoo.tools import DEFAULT_SERVER_DATE_FORMAT, pycompat
 class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
 
+
+    @api.depends('product_id','qty_done')
+    def _compute_is_nb_pieces_par_colis(self):
+        for obj in self:
+            nb = obj.product_id.is_nb_pieces_par_colis
+            obj.is_nb_pieces_par_colis = obj.product_id.is_nb_pieces_par_colis
+            nb_colis = False
+            if nb>0:
+                nb_colis = obj.qty_done / nb
+            obj.is_nb_colis = nb_colis
+            obj.is_poids_net_estime = obj.qty_done * obj.product_id.is_poids_net_piece
+
+
+    status_move            = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'), ('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')], default='receptionne')
+    is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis'    , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
+    is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
+    is_poids_net_estime    = fields.Float(string='Poids net estimé', digits=(14,4), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
+    is_poids_net_reel      = fields.Float(string='Poids net réel', digits=(14,4), help="Poids net réel total (Kg)")
+
+
 #     def split_qty(self):
 #         move_lines_to_pack = self.env['stock.move.line']
 #         qty_done = 0
@@ -187,7 +207,6 @@ class StockMoveLine(models.Model):
 
 
 
-    status_move = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'), ('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')], default='receptionne')
 
 #     @api.onchange('lot_id')
 #     def onchage_lot_life_use_date(self):

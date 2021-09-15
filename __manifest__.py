@@ -42,10 +42,12 @@ InfoSaône - Module Odoo 14 pour Fromtome
 #        'security/res.groups.xml',
         'security/ir.model.access.csv',
 #        'security/ir.model.access.xml',
+        'views/assets.xml',
+
 
 #        'views/intrastat_product.xml',
 #        'views/invoice_view.xml',
-#        'views/account_invoice_view.xml',
+        'views/account_move_view.xml',
 
         'views/mail_views.xml',
         'views/product_view.xml',

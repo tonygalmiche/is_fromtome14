@@ -1,6 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+
+
+
+    <!-- Exporter cet article dans Fromelier  -->
+    <!--
+    <record id="exporter_article_fromelier_action_server" model="ir.actions.server">
+        <field name="name">Exporter cet article dans Fromelier</field>
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="is_fromtome.model_product_template"/>
+        <field name="binding_model_id" ref="is_fromtome.model_product_template"/>
+        <field name="code">
+records.exporter_article_fromelier_action()
+        </field>
+    </record>
+    -->
+
+
+
+
+    <record id="is_product_template_form_view" model="ir.ui.view">
+        <field name="name">is_product_template_form_view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <!--
+            <button name="toggle_active" position="before">
+                <button
+                    name="exporter_article_fromelier_action"
+                    type="object"
+                    string="Exporter dans Fromelier"
+                />
+            </button>
+            -->
+            <!-- <group name="group_lots_and_weight" string="Logistics" attrs="{'invisible': [('type', 'not in', ['product', 'consu'])]}"> -->
+            <group name="group_lots_and_weight" position="attributes">
+                <attribute name="invisible">1</attribute>
+                <attribute name="attrs">{}</attribute>
+            </group>
+
+            <field name="type" position="after">
+                <field name="is_stock_mini"/>
+            </field>
+            <xpath expr="//page/group/field[@name='description']/.." position="before">
+                <group>
+                    <field name="is_pricelist_item_ids" nolabel="1">
+                        <tree>
+                            <field name="pricelist_id" string="Liste de prix"/>
+                            <field name="fixed_price"  string="Prix de vente"/>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </tree>
+                    </field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+
+
+
+    <record id="is_product_template_kanban_view" model="ir.ui.view">
+        <field name="name">is_product_template_kanban_view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='lst_price']/../.." position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+    <record id="is_product_template_tree_view" model="ir.ui.view">
+        <field name="name">is_product_template_tree_view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='list_price']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- <xpath expr="//field[@name='website_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath> -->
+            <field name="type" position="after">
+                <field name="is_stock_mini"/>
+            </field>
+            <field name="name" position="after">
+                <field name="barcode"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="is_product_template_search_view" model="ir.ui.view">
+        <field name="name">is_product_template_search_view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+             <field name="name" position="after">
+                <field name="barcode"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="is_product_normal_form_view" model="ir.ui.view">
+        <field name="name">is_product_normal_form_view</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+             <field name="type" position="before">
+                <field name="product_tmpl_id"/>
+            </field>
+        </field>
+    </record>
+
+
+
+
 <!-- purchase.view_product_supplier_inherit -->
 
     <record id="is_view_product_supplier_inherit" model="ir.ui.view">
@@ -87,10 +203,9 @@
                 <attribute name="string">Unité d'achat</attribute>
             </field>
 
-            <field name="uom_po_id" position="after">
-                <hr/>
-                <hr/>
-
+            <!-- <field name="uom_po_id" position="after"> -->
+                <!-- <hr/>
+                <hr/> -->
                 <!-- <label for="product_weight" string="Poids Net / Colis"/>
                 <div class="o_row" name="product_weight">
                     <field name="product_weight"/>
@@ -98,16 +213,18 @@
                         Kg
                     </span>
                 </div> -->
-
-                <label for="weight" string="Nbr PC / Colis"/>
+                <!-- <label for="weight" string="Nbr PC / Colis"/>
                 <div class="o_row" name="weight">
                     <field name="weight"/>
                     <span> PC
                         <field name="weight_uom_name" invisible="1"/>
                     </span>
-                </div>
+                </div> -->
                 <!-- <field name="weight_uom_id" invisible="1"/> -->
-            </field>
+            <!-- </field> -->
+
+
+
             <!-- <button name="toggle_active" position="before">
                 <button class="oe_stat_button" name="#" type="object" icon="fa-cubes" help="Poids des colis en stock">
                     <div class="o_field_widget o_stat_info">
@@ -142,11 +259,9 @@
             <field name="barcode" position="attributes">
                 <attribute name="string">code barre interne</attribute>
             </field>
-
- <field name="uom_id" position="before">
-     <hr/>
-                <hr/>
- </field>
+            <field name="uom_id" position="before">
+                <hr/><hr/>
+            </field>
             <field name="uom_id" position="attributes">
                 <attribute name="string">Unité de Stockage</attribute>
             </field>
@@ -154,9 +269,10 @@
                 <attribute name="string">Unité d'achat</attribute>
             </field>
             <field name="uom_po_id" position="after">
-                <hr/>
-                <hr/>
-                <field name="mode_vente" />
+                <hr/><hr/>
+                <!-- <field name="mode_vente" /> -->
+                <field name="is_nb_pieces_par_colis"/>
+                <field name="is_poids_net_piece"/>
                 <!-- <label for="product_weight"  string="Poids Net / Colis"/>
                 <div class="o_row" name="product_weight">
                     <field name="product_weight"/>
@@ -164,18 +280,15 @@
                         Kg
                     </span>
                 </div> -->
-
-                <label for="weight" string="Nbr PC / Colis"/>
+                <!-- <label for="weight" string="Nbr PC / Colis"/>
                 <div class="o_row" name="weight">
                     <field name="weight"/>
                     <span> PC
                         <field name="weight_uom_name"  invisible="1"/>
                     </span>
-                </div>
+                </div> -->
                 <!-- <field name="weight_uom_id" invisible="1"/> -->
-
             </field>
-
             <xpath expr="//page[@name='sales']" position="inside">
                 <group string="Contrat Date ">
                     <field name="contrat_date_id">
@@ -186,7 +299,6 @@
                     </field>
                 </group>
             </xpath>
-
             <xpath expr="//form//sheet//notebook//page[1]" position="after">
                 <page string="Fiche technique">
                     <group>
@@ -250,8 +362,6 @@
                         </tree>
                     </field>
                     <button string="Recharger les germes" name="recharger_germes_action" type="object" confirm="Cela va remplacer les données ci-dessus"/>
-
-
                     <group string="Valeurs Nutritionnelles Moyennes pour 100g"/>
                     <field name="is_valeur_nutritionnelle_ids" nolabel="1" >
                         <tree editable="bottom">
@@ -263,7 +373,6 @@
                     <button string="Recharger les valeurs" name="recharger_valeurs_action" type="object" confirm="Cela va remplacer les données ci-dessus"/>
                 </page>
             </xpath>
-
         </field>
     </record>
 

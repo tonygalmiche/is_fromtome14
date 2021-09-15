@@ -42,7 +42,24 @@ class PurchaseOrder(models.Model):
 class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
 
-    is_sale_order_line_id = fields.Many2one('sale.order.line', string=u'Ligne commande client', index=True)
+    @api.depends('product_id','product_qty')
+    def _compute_is_nb_pieces_par_colis(self):
+        for obj in self:
+            nb = obj.product_id.is_nb_pieces_par_colis
+            obj.is_nb_pieces_par_colis = obj.product_id.is_nb_pieces_par_colis
+            nb_colis = False
+            if nb>0:
+                nb_colis = obj.product_qty / nb
+            obj.is_nb_colis = nb_colis
+            obj.is_poids_net = obj.product_qty * obj.product_id.is_poids_net_piece
+
+    is_sale_order_line_id  = fields.Many2one('sale.order.line', string=u'Ligne commande client', index=True)
+    is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis'     , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
+    is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2) , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
+    is_poids_net           = fields.Float(string='Poids net', digits=(14,4), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
+
+
+
 
 
 

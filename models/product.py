@@ -219,6 +219,8 @@ class ProductTemplate(models.Model):
     is_pricelist_item_ids = fields.One2many('product.pricelist.item', 'product_tmpl_id', 'Liste de prix')
 
 
+    is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis')
+    is_poids_net_piece     = fields.Float(string='Poids net pièce (Kg)', digits=(14,4))
 
 
 

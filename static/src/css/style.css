@@ -1,0 +1,4 @@
+/* Permet de changer la largeur par défaut des formulaires */
+.o_form_view .o_form_sheet_bg > .o_form_sheet{
+    max-width: 1600px;
+}

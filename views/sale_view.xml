@@ -5,16 +5,18 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <!-- <xpath expr="//sheet[1]" position="inside">
+            <xpath expr="//sheet[1]" position="inside">
                 <style>
                     .o_form_view .o_form_sheet_bg {
-                    background: #ffc107;
-                    border-bottom: 1px solid #dee2e6;
-                    position: relative;
+                        background: #ffc107;
+                        border-bottom: 1px solid #dee2e6;
+                        position: relative;
+                    }
+                    .o_form_view .o_form_sheet_bg > .o_form_sheet{
+                        max-width: 1800px;
                     }
                 </style>
-            </xpath> -->
-
+            </xpath>
             <field name="partner_id" position="attributes">
                 <attribute name="domain">[('is_company','=',True)]</attribute>
             </field>
@@ -24,9 +26,6 @@
             <field name="partner_shipping_id" position="attributes">
                 <attribute name="domain">['|',('id','=',partner_id),('parent_id','=',partner_id)]</attribute>
             </field>
-
-
-
              <!-- <xpath expr='//field[@name="order_line"]//tree//field[@name="price_subtotal"]' position='after'>
                 <field name="echantillion"/>
             </xpath> -->
@@ -50,9 +49,7 @@
             <!-- <field name="payment_term_id" position="after">
                 <field name="delivery_date"/>
             </field> -->
-
-
-            <!-- <xpath expr="//button[@name='action_unlock']" position="after">
+            <xpath expr="//button[@name='action_cancel']" position="before">
                 <field name="is_creer_commande_fournisseur_vsb" invisible="1"/>
                 <button
                     name="creer_commande_fournisseur_action"
@@ -60,21 +57,28 @@
                     string="Créer les commandes des fournisseurs"
                     class="oe_highlight"
                     attrs="{'invisible': [('is_creer_commande_fournisseur_vsb', '=', False)]}"
-                    groups="is_fromtome.is_fromtome_group"
                 />
-            </xpath> -->
+            </xpath>
             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_id']" position="before">
                 <field name="is_purchase_line_id" invisible="1"/>
                 <button 
-                    string="Commande fournisseur" 
+                    string="Cde fournisseur" 
                     name="acceder_commande_fournisseur" 
                     type="object" icon="fa-search-plus" 
                     attrs="{'invisible': [('is_purchase_line_id', '=', False)]}"
                 />
             </xpath>
             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='name']" position="after">
-                <field name="is_livraison_directe"/>
-                <field name="is_date_reception"/>
+                <field name="is_livraison_directe" optional="show"/>
+                <field name="is_date_reception"    optional="show"/>
+            </xpath>
+            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom_qty']" position="attributes">
+                <attribute name="sum">Total</attribute>
+            </xpath>
+             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='price_unit']" position="before">
+                <field name="is_nb_pieces_par_colis" optional="hide"/>
+                <field name="is_nb_colis" sum="Total"/>
+                <field name="is_poids_net"  sum="Total" optional="hide"/>
             </xpath>
             <xpath expr="//form/sheet/notebook/page/field/form/group/group/field[@name='tax_id']" position="before">
                 <field name="is_purchase_line_id"/>
@@ -82,10 +86,6 @@
             <field name="validity_date" position="before">
                 <field name="is_commande_soldee"/>
             </field>
-
-
-
-
         </field>
     </record>
 

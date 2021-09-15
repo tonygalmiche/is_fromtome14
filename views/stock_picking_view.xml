@@ -14,12 +14,43 @@
     </record> -->
 
 
+    <!-- stock.move.line -->
+    <record id="is_view_stock_move_line_detailed_operation_tree" model="ir.ui.view">
+        <field name="name">is_view_stock_move_line_detailed_operation_tree</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_stock_move_line_detailed_operation_tree"/>
+        <field name="arch" type="xml">
+            <field name="product_uom_id" position="after">
+                <field name="is_nb_pieces_par_colis"          optional="hide"/>
+                <field name="is_nb_colis"  sum="Total"        optional="show"/>
+                <field name="is_poids_net_estime" sum="Total" optional="show"/>
+                <field name="is_poids_net_reel"   sum="Total" optional="show"/>
+                <field name="status_move" optional="show"/>
+            </field>
+            <field name="qty_done" position="attributes">
+                <attribute name="sum">Total</attribute>
+            </field>
+        </field>
+    </record>
+
+
+
+
     <!-- stock.picking -->
     <record id="view_picking_form_inherit" model="ir.ui.view">
         <field name="name">stock.picking.form.inherit</field>
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//sheet[1]" position="inside">
+                <style>
+                    .o_form_view .o_form_sheet_bg > .o_form_sheet{
+                        max-width: 1800px;
+                    }
+                </style>
+            </xpath>
+
+
             <form position="inside">
                 <field name="_barcode_scanned" widget="barcode_handler"/>
             </form>
