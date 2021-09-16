@@ -34,6 +34,47 @@
     </record>
 
 
+    <!-- is.scan.picking -->
+    <record id="is_scan_picking_form" model="ir.ui.view">
+        <field name="name">is_scan_picking_form</field>
+        <field name="model">is.scan.picking</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <style>
+                        .o_form_view .o_form_sheet_bg > .o_form_sheet{
+                            max-width: 1800px;
+                        }
+                    </style>
+                    <group>
+                        <group>
+                            <field name="_barcode_scanned" widget="barcode_handler" />
+                            <field name="ean"/>
+                            <field name="product_id"/>
+                            <field name="lot"/>
+                            <field name="lot_id"/>
+                        </group>
+                       <group>
+                            <field name="picking_id"/>
+                            <field name="dlc"/>
+                            <field name="ddm"/>
+                            <field name="poids"/>
+                        </group>
+                    </group>
+                    <field name="line_ids" nolabel="1" >
+                        <tree editable="bottom" limit="500">
+                            <field name="product_id"/>
+                            <field name="lot_id"/>
+                            <field name="dlc"/>
+                            <field name="ddm"/>
+                            <field name="poids"/>
+                            <field name="info"        style="color:gray"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
 
 
     <!-- stock.picking -->
@@ -50,11 +91,55 @@
                 </style>
             </xpath>
 
+            <xpath expr="//button[@name='action_confirm']" position="before">
+                <field name="is_scan_vsb" invisible="1"/>
+                <button
+                    name="scan_picking_action"
+                    type="object"
+                    string="Scan"
+                    class="oe_highlight"
+                    attrs="{'invisible': [('is_scan_vsb', '=', False)]}"
+                />
+            </xpath>
 
-            <form position="inside">
+
+
+
+                <!-- <header>
+                    <button name="action_confirm" attrs="{'invisible': [('show_mark_as_todo', '=', False)]}" string="Mark as Todo" type="object" class="oe_highlight" groups="base.group_user"/>
+                    <button name="action_assign" att
+ -->
+
+            <!-- <form position="inside">
                 <field name="_barcode_scanned" widget="barcode_handler"/>
             </form>
-            <field name="name" position="before">
+ -->
+
+            <!-- <page name="note" position="after">
+                <page string="Scan" name="scan">
+                    <group>
+                        <group>
+                            <field name="is_scan_ean"/>
+                            <field name="is_scan_lot"/>
+                            <field name="is_scan_dlc"/>
+                            <field name="is_scan_ddm"/>
+                        </group>
+                        <group>
+                            <field name="is_scan_product_id"/>
+                            <field name="is_scan_lot_id"/>
+                            <field name="is_scan_poids"/>
+                        </group>
+                    </group>
+                    <field name="ligne_ids" nolabel="1" >
+                        <tree editable="bottom">
+                            <field name="description"/>
+                        </tree>
+                    </field>
+                </page>
+            </page> -->
+
+
+            <!-- <field name="name" position="before">
                 <field 
                     name="is_alerte"
                     style="background-color:orange;font-size:11pt" 
@@ -63,7 +148,7 @@
                     name="is_info"
                     style="background-color:chartreuse;font-size:13pt" 
                     attrs="{'invisible': [('is_info','=', False)],'readonly':True}"/>
-            </field>
+            </field> -->
             <!-- <xpath expr="//notebook//page[2]/field[@name='move_ids_without_package']" position="before">
                 <field name="purchase_id" invisible="1"/>
                 <field name="is_colis" invisible="0"/>
@@ -74,16 +159,16 @@
                 <field name="product_weight" string="Poids Estimé" attrs="{'column_invisible': [('parent.is_colis','=',False)]}"/>
                 <field name="vendor_id" attrs="{'column_invisible': [('parent.purchase_id', '!=', False)]}"  />
             </xpath> -->
-             <xpath expr="//notebook//page[1]" position="attributes">
+             <!-- <xpath expr="//notebook//page[1]" position="attributes">
                  <attribute name="invisible">1</attribute>
              </xpath>
             <field name="partner_id" position="after">
                 <field name="user_id" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                <!-- <field name="team_id" invisible="1"/> -->
+                <field name="team_id" invisible="1"/>
             </field>
              <xpath expr="//button[@name='do_print_picking']" position="attributes">
                      <attribute name="string">Imprimer Bon Prépa</attribute>
-             </xpath>
+             </xpath> -->
              <!-- <xpath expr="//button[@name='do_print_picking']" position="after">
                 <button name="do_print_pickingorder" string="Imprimer BL" groups="stock.group_stock_user" type="object" attrs="{'invisible': ['|', ('state', 'not in', ('assigned', 'partially_available')), ('is_locked', '=', False)]}"/>
              </xpath> -->
