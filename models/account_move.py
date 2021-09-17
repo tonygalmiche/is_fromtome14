@@ -25,6 +25,24 @@ class AccountMoveLine(models.Model):
 
 
 
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+
+
+    def _compute_is_alerte(self):
+        for obj in self:
+            alerte=''
+            for line in obj.invoice_line_ids:
+                if line.price_unit==0:
+                    alerte = "Prix facturé à 0"
+                if line.price_unit>=9999:
+                    alerte = "Prix facturé > 9999"
+            obj.is_alerte=alerte
+
+
+    is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
+    is_alerte           = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
+
 
 
 # class AccountInvoice(models.Model):
