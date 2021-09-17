@@ -117,81 +117,81 @@ class IsExportCompta(models.Model):
                 self.env['is.export.compta.ligne'].create(vals)
 
 
-            # if obj.escompte:
-            #     payments = self.env['account.payment'].search([('is_export_compta_id','=',obj.id)])
-            #     for payment in payments:
-            #         payment.is_export_compta_id=False
-            #     sql="""
-            #         SELECT  
-            #             aml.partner_id,
-            #             am.name,
-            #             am.date,
-            #             aa.code,
-            #             aa.name,
-            #             aml.name,
-            #             aml.debit,
-            #             aml.credit,
-            #             rp.name,
-            #             rp.ref,
-            #             aml.payment_id
-            #         FROM account_move_line aml inner join account_move am                on aml.move_id=am.id
-            #                                 inner join account_account aa             on aml.account_id=aa.id
-            #                                 left outer join res_partner rp            on aml.partner_id=rp.id
-            #                                 inner join account_journal aj             on aml.journal_id=aj.id
-            #                                 inner join account_payment ap             on aml.payment_id=ap.id
-            #         WHERE 
-            #             aml.date<='"""+str(obj.date_fin)+"""' and 
-            #             am.company_id="""+str(self.env.user.company_id.id)+""" and
-            #             aa.code='665100' and
-            #             ap.is_export_compta_id is null
-            #         ORDER BY aml.date
-            #     """
-            #     cr.execute(sql)
-            #     for row in cr.fetchall():
-            #         payment_id = row[10]
-            #         payments = self.env['account.payment'].search([('id','=',payment_id)])
-            #         partner=False
-            #         for payment in payments:
-            #             payment.is_export_compta_id = obj.id
-            #             partner = payment.partner_id
-            #         if partner:
-            #             journal_code  = 'ESC'
-            #             ecriture_num  = row[1]
-            #             ecriture_date = row[2]
-            #             compte_num = row[3]
-            #             ct=ct+1
-            #             vals={
-            #                 'export_compta_id': obj.id,
-            #                 'ligne'           : ct,
-            #                 'journal_code'           : journal_code,
-            #                 'ecriture_num'           : ecriture_num,
-            #                 'ecriture_date'          : ecriture_date,
-            #                 'compte_num'             : compte_num,
-            #                 'piece_ref'              : ecriture_num,
-            #                 'piece_date'             : ecriture_date,
-            #                 'ecriture_lib'           : row[5],
-            #                 'debit'                  : row[6],
-            #                 'credit'                 : row[7],
-            #                 'payment_id'             : payment_id,
-            #             }
-            #             self.env['is.export.compta.ligne'].create(vals)
-            #             ct=ct+1
-            #             compte_num = partner.property_account_receivable_id.code
-            #             vals={
-            #                 'export_compta_id': obj.id,
-            #                 'ligne'           : ct,
-            #                 'journal_code'           : journal_code,
-            #                 'ecriture_num'           : ecriture_num,
-            #                 'ecriture_date'          : ecriture_date,
-            #                 'compte_num'             : compte_num,
-            #                 'piece_ref'              : ecriture_num,
-            #                 'piece_date'             : ecriture_date,
-            #                 'ecriture_lib'           : row[5],
-            #                 'debit'                  : row[7],
-            #                 'credit'                 : row[6],
-            #                 'payment_id'             : payment_id,
-            #             }
-            #             self.env['is.export.compta.ligne'].create(vals)
+            if obj.escompte:
+                payments = self.env['account.payment'].search([('is_export_compta_id','=',obj.id)])
+                for payment in payments:
+                    payment.is_export_compta_id=False
+                sql="""
+                    SELECT  
+                        aml.partner_id,
+                        am.name,
+                        am.date,
+                        aa.code,
+                        aa.name,
+                        aml.name,
+                        aml.debit,
+                        aml.credit,
+                        rp.name,
+                        rp.ref,
+                        aml.payment_id
+                    FROM account_move_line aml inner join account_move am                on aml.move_id=am.id
+                                            inner join account_account aa             on aml.account_id=aa.id
+                                            left outer join res_partner rp            on aml.partner_id=rp.id
+                                            inner join account_journal aj             on aml.journal_id=aj.id
+                                            inner join account_payment ap             on aml.payment_id=ap.id
+                    WHERE 
+                        aml.date<='"""+str(obj.date_fin)+"""' and 
+                        am.company_id="""+str(self.env.user.company_id.id)+""" and
+                        aa.code='665100' and
+                        ap.is_export_compta_id is null
+                    ORDER BY aml.date
+                """
+                cr.execute(sql)
+                for row in cr.fetchall():
+                    payment_id = row[10]
+                    payments = self.env['account.payment'].search([('id','=',payment_id)])
+                    partner=False
+                    for payment in payments:
+                        payment.is_export_compta_id = obj.id
+                        partner = payment.partner_id
+                    if partner:
+                        journal_code  = 'ESC'
+                        ecriture_num  = row[1]
+                        ecriture_date = row[2]
+                        compte_num = row[3]
+                        ct=ct+1
+                        vals={
+                            'export_compta_id': obj.id,
+                            'ligne'           : ct,
+                            'journal_code'           : journal_code,
+                            'ecriture_num'           : ecriture_num,
+                            'ecriture_date'          : ecriture_date,
+                            'compte_num'             : compte_num,
+                            'piece_ref'              : ecriture_num,
+                            'piece_date'             : ecriture_date,
+                            'ecriture_lib'           : row[5],
+                            'debit'                  : row[6],
+                            'credit'                 : row[7],
+                            'payment_id'             : payment_id,
+                        }
+                        self.env['is.export.compta.ligne'].create(vals)
+                        ct=ct+1
+                        compte_num = partner.property_account_receivable_id.code
+                        vals={
+                            'export_compta_id': obj.id,
+                            'ligne'           : ct,
+                            'journal_code'           : journal_code,
+                            'ecriture_num'           : ecriture_num,
+                            'ecriture_date'          : ecriture_date,
+                            'compte_num'             : compte_num,
+                            'piece_ref'              : ecriture_num,
+                            'piece_date'             : ecriture_date,
+                            'ecriture_lib'           : row[5],
+                            'debit'                  : row[7],
+                            'credit'                 : row[6],
+                            'payment_id'             : payment_id,
+                        }
+                        self.env['is.export.compta.ligne'].create(vals)
 
 
     def generer_fichier_action(self):

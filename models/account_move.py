@@ -45,6 +45,15 @@ class AccountMove(models.Model):
 
 
 
+
+
+class AccountPayment(models.Model):
+    _inherit = 'account.payment'
+
+    is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
+
+
+
 # class AccountInvoice(models.Model):
 #     _inherit = 'account.invoice'
 
@@ -197,9 +206,3 @@ class AccountMove(models.Model):
 #     is_poids_net           = fields.Float(string='Poids net', digits=(14,4), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
 
 
-
-
-# class AccountPayment(models.Model):
-#     _inherit = 'account.payment'
-
-#     is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
