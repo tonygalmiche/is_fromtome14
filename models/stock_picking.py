@@ -123,6 +123,7 @@ class IsScanPicking(models.Model):
                     lot_id = lot.id
                 else:
                     vals={
+                        "company_id": obj.picking_id.company_id.id,
                         "name"      : obj.lot,
                         "product_id": obj.product_id.id,
                         "is_dlc_ddm": obj.dlc_ddm,
