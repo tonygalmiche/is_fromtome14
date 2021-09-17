@@ -18,13 +18,13 @@ class IsScanPickingLine(models.Model):
     _description = "Lignes Scan Picking"
     _order='id'
 
-    scan_id    = fields.Many2one('is.scan.picking', 'Picking', required=True, ondelete='cascade')
-    product_id = fields.Many2one('product.product', 'Article')
-    lot_id     = fields.Many2one('stock.production.lot', 'Lot')
-    dlc        = fields.Date("DLC")
-    ddm        = fields.Date("DDM")
-    poids      = fields.Float("Poids")
-    info       = fields.Char("Info")
+    scan_id          = fields.Many2one('is.scan.picking', 'Picking', required=True, ondelete='cascade')
+    product_id       = fields.Many2one('product.product', 'Article', required=True)
+    lot_id           = fields.Many2one('stock.production.lot', 'Lot', required=True)
+    type_tracabilite = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
+    dlc_ddm          = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
+    poids            = fields.Float("Poids")
+    info             = fields.Char("Info")
 
 
 class IsScanPicking(models.Model):
@@ -35,15 +35,35 @@ class IsScanPicking(models.Model):
     _rec_name = 'id'
 
 
+    @api.depends('ean','lot','product_id','lot_id')
+    def _compute_is_alerte(self):
+        for obj in self:
+            print(obj)
+            alertes=[]
+            if obj.ean and not obj.product_id:
+                alertes.append("Article non trouvé pour ce code ean")
+            obj.is_alerte = '\n'.join(alertes) or False
+            if obj.lot and not obj.lot_id:
+                alertes.append("Lot non trouvé")
+            obj.is_alerte = '\n'.join(alertes) or False
+
+
+    @api.onchange('ajouter')
+    def _onchange_ajouter(self):
+        for obj in self:
+            obj.ajouter_ligne()
+
 
     picking_id = fields.Many2one('stock.picking', 'Picking', required=True)
     ean        = fields.Char("EAN")
     product_id = fields.Many2one('product.product', 'Article')
     lot        = fields.Char("Lot scanné")
     lot_id     = fields.Many2one('stock.production.lot', 'Lot')
-    dlc        = fields.Date("DLC")
-    ddm        = fields.Date("DDM")
+    type_tracabilite = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
+    dlc_ddm          = fields.Date('DLC / DDM')
     poids      = fields.Float("Poids")
+    ajouter    = fields.Boolean("Ajouter", help="Ajouter cette ligne")
+    is_alerte  = fields.Text('Alerte', compute=_compute_is_alerte, readonly=True, store=False)
     line_ids   = fields.One2many('is.scan.picking.line', 'scan_id', 'Lignes')
 
 
@@ -53,9 +73,23 @@ class IsScanPicking(models.Model):
             obj.product_id = False
             obj.lot        = False
             obj.lot_id     = False
-            obj.dlc        = False
-            obj.ddm        = False
+            obj.dlc_ddm    = False
             obj.poids      = False
+
+
+    def ajouter_ligne(self):
+        for obj in self:
+            if obj.product_id and obj.lot_id and obj.dlc_ddm:
+                tz = pytz.timezone('Europe/Paris')
+                now = datetime.now(tz).strftime("%H:%M:%S")
+                vals={
+                    "product_id": obj.product_id.id,
+                    "lot_id"    : obj.lot_id.id,
+                    "poids"     : obj.poids,
+                    "info"      : now,
+                }
+                obj.write({"line_ids": [(0,0,vals)]})
+                obj.reset_scan()
 
 
     def on_barcode_scanned(self, barcode):
@@ -70,48 +104,79 @@ class IsScanPicking(models.Model):
                     obj.product_id = product.id
             if prefix=="10":
                 obj.lot = code
-                lot = self.env['stock.production.lot'].search([('name','=',code),('product_id','=',obj.product_id.id)],limit=1)
-                if lot:
-                    obj.lot_id = lot.id
-            if prefix=="15":
+            if prefix in ["15","17"]:
                 date = dateparser.parse(code, date_formats=['%y%m%d'])
-                obj.ddm = date.strftime('%Y-%m-%d')
-            if prefix=="17":
-                date = dateparser.parse(code, date_formats=['%y%m%d'])
-                obj.dlc = date.strftime('%Y-%m-%d')
+                obj.dlc_ddm = date.strftime('%Y-%m-%d')
             if prefix=="31":
                 decimal = int(str(barcode)[3])
                 poids    = float(str(barcode)[4:-decimal] + '.' + str(barcode)[-decimal:])
                 obj.poids = poids
-            if obj.product_id and obj.lot_id and (obj.ddm or obj.dlc):
-                tz = pytz.timezone('Europe/Paris')
-                now = datetime.now(tz).strftime("%H:%M:%S")
+
+            if obj.product_id and obj.lot and obj.dlc_ddm:
+                filtre=[
+                    ('name'      ,'=', obj.lot ),
+                    ('product_id','=', obj.product_id.id),
+                    ('is_dlc_ddm','=', obj.dlc_ddm),
+                ]
+                lot = self.env['stock.production.lot'].search(filtre,limit=1)
+                if lot:
+                    lot_id = lot.id
+                else:
+                    vals={
+                        "name"      : obj.lot,
+                        "product_id": obj.product_id.id,
+                        "is_dlc_ddm": obj.dlc_ddm,
+                    }
+                    lot = self.env['stock.production.lot'].create(vals)
+                    lot_id = lot.id
+                obj.lot_id = lot_id
+            obj.ajouter_ligne()
+
+
+
+
+
+
+
+    def maj_picking_action(self):
+        for obj in self:
+            print(obj)
+            obj.picking_id.move_line_ids_without_package.unlink()
+            for line in obj.line_ids:
+                print(line)
                 vals={
-                    "product_id": obj.product_id.id,
-                    "lot_id"    : obj.lot_id.id,
-                    "dlc"       : obj.dlc,
-                    "ddm"       : obj.ddm,
-                    "poids"     : obj.poids,
-                    "info"      : now,
+                    "picking_id"      : obj.picking_id.id,
+                    "product_id"      : line.product_id.id,
+                    "lot_id"          : line.lot_id.id,
+                    "company_id"      : obj.picking_id.company_id.id,
+                    "product_uom_id"  : line.product_id.uom_id.id,
+                    "location_id"     : obj.picking_id.location_id.id,
+                    "location_dest_id": obj.picking_id.location_dest_id.id,
+                    "qty_done"        : line.poids,
                 }
-                obj.write({"line_ids": [(0,0,vals)]})
-                obj.reset_scan()
+                res = self.env['stock.move.line'].create(vals)
+                print(res)
+
+#  id | picking_id | move_id | company_id | product_id | product_uom_id | product_qty | product_uom_qty | qty_done | package_id | package_level_id | lot_id | lot_name | result_package_id |        date         | owner_id | location_id | location_dest_id |  state   |  reference  | description_picking | create_uid |        create_date         | write_uid |         write_date         | workorder_id | production_id | status_move | is_nb_pieces_par_colis | is_nb_colis | is_poids_net_estime | is_poids_net_reel 
+# ----+------------+---------+------------+------------+----------------+-------------+-----------------+----------+------------+------------------+--------+----------+-------------------+---------------------+----------+-------------+------------------+----------+-------------+---------------------+------------+----------------------------+-----------+----------------------------+--------------+---------------+-------------+------------------------+-------------+---------------------+-------------------
+#  67 |          9 |      42 |          1 |         10 |              1 |         0.0 |            0.00 |     0.00 |            |                  |     47 |          |                   | 2021-09-17 08:02:49 |          |           4 |                8 | assigned | WH/IN/00004 |                     |          2 | 2021-09-17 08:02:49.062315 |         2 | 2021-09-17 08:02:49.062315 |              |               | receptionne |                      0 |        0.00 |              0.0000 |                  
+#  65 |          9 |      44 |          1 |          8 |              1 |         0.0 |            0.00 |     0.00 |            |                  |     45 |          |                   | 2021-09-17 08:02:49 |          |           4 |                8 | assigned | WH/IN/00004 |                     |          2 | 2021-09-17 08:02:49.062315 |         2 | 2021-09-17 08:02:49.062315 |              |               | receptionne |                      0 |        0.00 |              0.0000 |                  
+#  66 |          9 |      45 |          1 |          9 |              1 |         0.0 |            0.00 |     0.00 |            |                  |     46 |          |                   | 2021-09-17 08:02:49 |          |           4 |                8 | assigned | WH/IN/00004 |                     |          2 | 2021-09-17 08:02:49.062315 |         2 | 2021-09-17 08:02:49.062315 |              |               | receptionne |                      0 |        0.00 |              0.0000 |                  
+#  69 |          9 |      38 |          1 |          5 |              1 |         0.0 |            0.00 |     3.00 |            |                  |        |          |                   | 2021-09-17 08:04:43 |          |           4 |                8 | assigned | WH/IN/00004 |                     |          2 | 2021-09-17 08:04:43.356527 |         2 | 2021-09-17 08:04:43.356527 |              |               | receptionne |                      2 |        1.50 |              0.7500 |            0.0000
 
 
 class Picking(models.Model):
     _name = 'stock.picking'
     _inherit = 'stock.picking'
 
-    @api.depends('state')
-    def _compute_is_scan_vsb(self):
-        for obj in self:
-            vsb = False
-            if obj.state=='assigned':
-                vsb=True
-            obj.is_scan_vsb=vsb
-
-
-    is_scan_vsb = fields.Boolean(string=u'Scan', compute='_compute_is_scan_vsb', readonly=True, store=False)
+    # @api.depends('state')
+    # def _compute_is_scan_vsb(self):
+    #     for obj in self:
+    #         vsb = False
+    #         if obj.state=='assigned':
+    #             vsb=True
+    #         obj.is_scan_vsb=vsb
+    # is_scan_vsb = fields.Boolean(string=u'Scan', compute='_compute_is_scan_vsb', readonly=True, store=False)
 
 
     def scan_picking_action(self):

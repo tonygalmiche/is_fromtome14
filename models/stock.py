@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
-from odoo.exceptions import Warning
+from odoo.exceptions import UserError, ValidationError
 from datetime import datetime, timedelta
 
 
@@ -8,22 +8,44 @@ class StockProductionLot(models.Model):
     _inherit = "stock.production.lot"
 
     is_article_actif = fields.Boolean('Article actif', related='product_id.active')
-    is_dlc_ddm       = fields.Date('DLC / DDM')
+    is_dlc_ddm       = fields.Date('DLC / DDM', required=True)
 
-    @api.constrains('name','product_id','is_dlc_ddm')
-    def _check_lot_unique(self):
-        for obj in self:
-            filtre=[
-                ('name'      , '=' , obj.name),
-                ('id'        , '!=', obj.id),
-                ('product_id', '=' , obj.product_id.id),
-                ('is_dlc_ddm', '=' , obj.is_dlc_ddm),
-            ]
-            lots = self.env['stock.production.lot'].search(filtre, limit=1)
-            for lot in lots:
-                print(lot.name)
-            if lots:
-                raise Warning("Ce lot existe déjà !") 
+    # @api.constrains('name','product_id','is_dlc_ddm')
+    # def _check_lot_unique(self):
+    #     for obj in self:
+    #         filtre=[
+    #             ('name'      , '=' , obj.name),
+    #             ('id'        , '!=', obj.id),
+    #             ('product_id', '=' , obj.product_id.id),
+    #             ('is_dlc_ddm', '=' , obj.is_dlc_ddm),
+    #         ]
+    #         lots = self.env['stock.production.lot'].search(filtre, limit=1)
+    #         for lot in lots:
+    #             print(lot.name)
+    #         if lots:
+    #             raise Warning("Ce lot existe déjà !") 
+
+
+
+    @api.constrains('name', 'product_id', 'company_id', 'is_dlc_ddm')
+    def _check_unique_lot(self):
+        domain = [
+            ('product_id', 'in', self.product_id.ids),
+            ('company_id', 'in', self.company_id.ids),
+            ('name', 'in', self.mapped('name')),
+            ('is_dlc_ddm', 'in', self.mapped('is_dlc_ddm')),
+        ]
+        fields = ['company_id' , 'product_id', 'name', 'is_dlc_ddm']
+        groupby = ['company_id', 'product_id', 'name', 'is_dlc_ddm']
+        records = self.read_group(domain, fields, groupby, lazy=False)
+        error_message_lines = []
+        for rec in records:
+            if rec['__count'] != 1:
+                product_name = self.env['product.product'].browse(rec['product_id'][0]).display_name
+                error_message_lines.append(_(" - Product: %s, Serial Number: %s", product_name, rec['name']))
+        if error_message_lines:
+            raise ValidationError(_('The combination of serial number and product must be unique across a company.\nFollowing combination contains duplicates:\n') + '\n'.join(error_message_lines))
+
 
 
     # @api.depends('product_id')

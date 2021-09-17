@@ -35,6 +35,8 @@ class StockMoveLine(models.Model):
             obj.is_poids_net_estime = obj.qty_done * obj.product_id.is_poids_net_piece
 
 
+    is_type_tracabilite    = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
+    is_dlc_ddm             = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
     status_move            = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'), ('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')], default='receptionne')
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis'    , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)

@@ -20,6 +20,10 @@
         <field name="model">stock.move.line</field>
         <field name="inherit_id" ref="stock.view_stock_move_line_detailed_operation_tree"/>
         <field name="arch" type="xml">
+            <field name="lot_id" position="after">
+                <field name="is_type_tracabilite" optional="show"/>
+                <field name="is_dlc_ddm" optional="show"/>
+            </field>
             <field name="product_uom_id" position="after">
                 <field name="is_nb_pieces_par_colis"          optional="hide"/>
                 <field name="is_nb_colis"  sum="Total"        optional="show"/>
@@ -41,36 +45,40 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <style>
-                        .o_form_view .o_form_sheet_bg > .o_form_sheet{
-                            max-width: 1800px;
-                        }
-                    </style>
                     <group>
                         <group>
-                            <field name="_barcode_scanned" widget="barcode_handler" />
-                            <field name="ean"/>
-                            <field name="product_id"/>
-                            <field name="lot"/>
-                            <field name="lot_id"/>
+                            <field name="ean" readonly="1"/>
+                            <field name="lot" readonly="1"/>
+                            <field name="ajouter"/>
                         </group>
                        <group>
-                            <field name="picking_id"/>
-                            <field name="dlc"/>
-                            <field name="ddm"/>
+                            <field name="product_id"/>
+                            <field name="lot_id"/>
+                            <field name="type_tracabilite"/>
+                            <field name="dlc_ddm"/>
                             <field name="poids"/>
                         </group>
                     </group>
+                    <field 
+                        name="is_alerte"
+                        style="background-color:orange;font-size:11pt" 
+                        attrs="{'invisible': [('is_alerte','=', False)],'readonly':True}"
+                    />
                     <field name="line_ids" nolabel="1" >
                         <tree editable="bottom" limit="500">
                             <field name="product_id"/>
                             <field name="lot_id"/>
-                            <field name="dlc"/>
-                            <field name="ddm"/>
+                            <field name="type_tracabilite"/>
+                            <field name="dlc_ddm"/>
                             <field name="poids"/>
                             <field name="info"        style="color:gray"/>
                         </tree>
                     </field>
+                    <field name="picking_id" readonly="1"/>
+                    <field name="_barcode_scanned" widget="barcode_handler"/>
+                    <group>
+                        <button name="maj_picking_action" type="object" string="Mise à jour du Picking" confirm2="Attention, cela va supprimer et remplacer les lignes du picking"/>
+                    </group>
                 </sheet>
             </form>
         </field>
@@ -90,20 +98,11 @@
                     }
                 </style>
             </xpath>
-
-            <xpath expr="//button[@name='action_confirm']" position="before">
-                <field name="is_scan_vsb" invisible="1"/>
-                <button
-                    name="scan_picking_action"
-                    type="object"
-                    string="Scan"
-                    class="oe_highlight"
-                    attrs="{'invisible': [('is_scan_vsb', '=', False)]}"
-                />
-            </xpath>
-
-
-
+            <field name="move_line_ids_without_package" position="before">
+                <group>
+                    <button name="scan_picking_action" type="object" string="Scan"/>
+                </group>
+            </field>
 
                 <!-- <header>
                     <button name="action_confirm" attrs="{'invisible': [('show_mark_as_todo', '=', False)]}" string="Mark as Todo" type="object" class="oe_highlight" groups="base.group_user"/>
