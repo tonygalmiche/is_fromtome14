@@ -32,7 +32,7 @@ class StockMoveLine(models.Model):
             if nb>0:
                 nb_colis = obj.qty_done / nb
             obj.is_nb_colis = nb_colis
-            obj.is_poids_net_estime = obj.qty_done * obj.product_id.is_poids_net_piece
+            obj.is_poids_net_estime = obj.qty_done * obj.product_id.is_poids_net_colis
 
 
     is_type_tracabilite    = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")

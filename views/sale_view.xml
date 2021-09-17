@@ -26,6 +26,14 @@
             <field name="partner_shipping_id" position="attributes">
                 <attribute name="domain">['|',('id','=',partner_id),('parent_id','=',partner_id)]</attribute>
             </field>
+
+
+            <field name="payment_mode_id" position="after">
+                <field name="commitment_date"/>
+            </field>
+
+
+
              <!-- <xpath expr='//field[@name="order_line"]//tree//field[@name="price_subtotal"]' position='after'>
                 <field name="echantillion"/>
             </xpath> -->

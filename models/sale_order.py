@@ -37,7 +37,7 @@ class SaleOrderLine(models.Model):
             if nb>0:
                 nb_colis = obj.product_uom_qty / nb
             obj.is_nb_colis = nb_colis
-            obj.is_poids_net = obj.product_uom_qty * obj.product_id.is_poids_net_piece
+            obj.is_poids_net = obj.product_uom_qty * obj.product_id.is_poids_net_colis
 
 
     is_purchase_line_id       = fields.Many2one('purchase.order.line', string=u'Ligne commande fournisseur', index=True, copy=False)

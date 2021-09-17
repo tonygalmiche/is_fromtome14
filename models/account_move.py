@@ -15,7 +15,7 @@ class AccountMoveLine(models.Model):
             if nb>0:
                 nb_colis = obj.quantity / nb
             obj.is_nb_colis = nb_colis
-            obj.is_poids_net = obj.quantity * obj.product_id.is_poids_net_piece
+            obj.is_poids_net = obj.quantity * obj.product_id.is_poids_net_colis
 
 
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis'     , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
@@ -197,7 +197,7 @@ class AccountPayment(models.Model):
 #             if nb>0:
 #                 nb_colis = obj.quantity / nb
 #             obj.is_nb_colis = nb_colis
-#             obj.is_poids_net = obj.quantity * obj.product_id.is_poids_net_piece
+#             obj.is_poids_net = obj.quantity * obj.product_id.is_poids_net_colis
 
 
 #     is_colis = fields.Integer('Colis', compute=_compute_is_colise)
