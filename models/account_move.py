@@ -9,14 +9,15 @@ class AccountMoveLine(models.Model):
     @api.depends('product_id','quantity')
     def _compute_is_nb_pieces_par_colis(self):
         for obj in self:
-            nb = obj.product_id.is_nb_pieces_par_colis
             obj.is_nb_pieces_par_colis = obj.product_id.is_nb_pieces_par_colis
-            nb_colis = False
-            if nb>0:
-                nb_colis = obj.quantity / nb
+            poids_net = 0
+            nb_colis  = 0
+            if obj.purchase_line_id.move_ids:
+                for line in obj.purchase_line_id.move_ids.move_line_ids:
+                    poids_net+=line.is_poids_net_reel
+                    nb_colis+=line.is_nb_colis
+            obj.is_poids_net = poids_net
             obj.is_nb_colis = nb_colis
-            obj.is_poids_net = obj.quantity * obj.product_id.is_poids_net_colis
-
 
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis'     , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2) , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)

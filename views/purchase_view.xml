@@ -29,6 +29,14 @@
             <field name="date_order" position="after">
                 <field name="is_commande_soldee"/>
             </field>
+
+
+            <xpath expr="//field[@name='order_line']//tree//field[@name='product_qty']" position='attributes'>
+                <attribute name="sum">Total</attribute>
+            </xpath>
+
+
+
              <xpath expr="//field[@name='order_line']//tree//field[@name='price_unit']" position='before'>
                 <field name="is_nb_pieces_par_colis" optional="hide"/>
                 <field name="is_nb_colis"            optional="show" sum="Total"/>
@@ -39,25 +47,38 @@
              <!-- <xpath expr="//field[@name='order_line']/tree" position="inside">
                 <field name="echantillion"/>
              </xpath> -->
-             <xpath expr="//field[@name='order_line']//tree//field[@name='price_subtotal']" position='attributes'>
+             <!-- <xpath expr="//field[@name='order_line']//tree//field[@name='price_subtotal']" position='attributes'>
                 <attribute name="invisible">1</attribute>
-             </xpath>
+             </xpath> -->
             <xpath expr="//field[@name='order_line']//tree//field[@name='date_planned']" position='attributes'>
                 <attribute name="invisible">1</attribute>
              </xpath>
             <!-- <xpath expr="//field[@name='order_line']//tree//field[@name='company_id']" position='attributes'>
                 <attribute name="invisible">1</attribute>
              </xpath> -->
-            <xpath expr="//page[1]/group[1]" position='attributes'>
+            <!-- <xpath expr="//page[1]/group[1]" position='attributes'>
                  <attribute name="invisible">1</attribute>
              </xpath>
-            <xpath expr="//field[@name='company_id']" position="after">
-                <!-- <field name="date_enlevelment"/> -->
-                <field name="date_planned"  string="Date Réception" readonly="0"/>
-            </xpath>
-            <!-- <xpath expr="//field[@name='partner_ref']" position="after">
-                <field name="delivery_adress" />
+ -->
+            <div name="date_approve" position="attributes">
+                 <attribute name="invisible">1</attribute>
+             </div>
+            <label for="date_approve" position="attributes">
+                 <attribute name="invisible">1</attribute>
+             </label>
+
+
+            <field name="origin" position="before">
+               <field name="is_date_enlevement"/>
+            </field>
+
+
+            <!-- <xpath expr="//field[@name='date_planned']" position="after">
+                <field name="is_date_enlevement"/>
             </xpath> -->
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="is_adresse_livraison_id" />
+            </xpath>
 
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_uom']" position='attributes'>
                 <attribute name="readonly">1</attribute>

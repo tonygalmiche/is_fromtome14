@@ -23,24 +23,46 @@ class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
 
 
-    @api.depends('product_id','qty_done')
-    def _compute_is_nb_pieces_par_colis(self):
-        for obj in self:
-            nb = obj.product_id.is_nb_pieces_par_colis
-            obj.is_nb_pieces_par_colis = obj.product_id.is_nb_pieces_par_colis
-            nb_colis = False
+    def get_nb_colis(self):
+        nb        = self.product_id.is_nb_pieces_par_colis
+        poids_net = self.product_id.is_poids_net_colis
+        unite     = self.product_uom_id.category_id.name
+        nb_colis  = 0
+        if unite=="Poids":
+            if poids_net>0:
+                nb_colis = self.qty_done/poids_net
+        else:
             if nb>0:
-                nb_colis = obj.qty_done / nb
+                nb_colis = self.qty_done / nb
+        return round(nb_colis)
+
+
+    @api.onchange('product_id','qty_done')
+    def _onchange_product_id_qty_done(self):
+        for obj in self:
+            nb_colis = obj.get_nb_colis()
             obj.is_nb_colis = nb_colis
-            obj.is_poids_net_estime = obj.qty_done * obj.product_id.is_poids_net_colis
+            unite = self.product_uom_id.category_id.name
+            if unite=="Poids":
+                poids = obj.qty_done
+            else:
+                poids = nb_colis*obj.product_id.is_poids_net_colis
+            obj.is_poids_net_reel = poids
+
+
+    @api.depends('product_id','qty_done')
+    def _compute_is_poids_net_estime(self):
+        for obj in self:
+            nb_colis = obj.get_nb_colis()
+            obj.is_poids_net_estime = nb_colis * obj.product_id.is_poids_net_colis
 
 
     is_type_tracabilite    = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
     is_dlc_ddm             = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
     status_move            = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'), ('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')], default='receptionne')
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis'    , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
-    is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
-    is_poids_net_estime    = fields.Float(string='Poids net estimé', digits=(14,4), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
+    is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2))
+    is_poids_net_estime    = fields.Float(string='Poids net estimé', digits=(14,4), compute='_compute_is_poids_net_estime', readonly=True, store=True, help="Poids net total (Kg)")
     is_poids_net_reel      = fields.Float(string='Poids net réel', digits=(14,4), help="Poids net réel total (Kg)")
 
 

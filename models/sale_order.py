@@ -28,16 +28,33 @@ class SaleOrderLine(models.Model):
     # is_purchase_order_line_id = fields.Many2one('purchase.order.line', string=u'Ligne commande fournisseur', compute='_compute_purchase_order_line_id', readonly=True, store=False)
 
 
+
+    def get_nb_colis(self):
+        nb        = self.product_id.is_nb_pieces_par_colis
+        poids_net = self.product_id.is_poids_net_colis
+        unite     = self.product_uom.category_id.name
+        nb_colis  = 0
+        if unite=="Poids":
+            if poids_net>0:
+                nb_colis = self.product_uom_qty/poids_net
+        else:
+            if nb>0:
+                nb_colis = self.product_uom_qty / nb
+        return round(nb_colis)
+
+
     @api.depends('product_id','product_uom_qty')
     def _compute_is_nb_pieces_par_colis(self):
         for obj in self:
-            nb = obj.product_id.is_nb_pieces_par_colis
-            obj.is_nb_pieces_par_colis = obj.product_id.is_nb_pieces_par_colis
-            nb_colis = False
-            if nb>0:
-                nb_colis = obj.product_uom_qty / nb
+            nb_colis = obj.get_nb_colis()
             obj.is_nb_colis = nb_colis
-            obj.is_poids_net = obj.product_uom_qty * obj.product_id.is_poids_net_colis
+
+            unite = obj.product_uom.category_id.name
+            if unite=="Poids":
+                poids = obj.product_uom_qty
+            else:
+                poids = nb_colis*obj.product_id.is_poids_net_colis
+            obj.is_poids_net = poids
 
 
     is_purchase_line_id       = fields.Many2one('purchase.order.line', string=u'Ligne commande fournisseur', index=True, copy=False)

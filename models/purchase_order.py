@@ -45,13 +45,20 @@ class PurchaseOrderLine(models.Model):
     @api.depends('product_id','product_qty')
     def _compute_is_nb_pieces_par_colis(self):
         for obj in self:
-            nb = obj.product_id.is_nb_pieces_par_colis
-            obj.is_nb_pieces_par_colis = obj.product_id.is_nb_pieces_par_colis
-            nb_colis = False
-            if nb>0:
-                nb_colis = obj.product_qty / nb
+            print(obj.product_uom,obj.product_uom.category_id.name) #Poids
+            nb        = obj.product_id.is_nb_pieces_par_colis
+            poids_net = obj.product_id.is_poids_net_colis
+            unite     = obj.product_uom.category_id.name
+            obj.is_nb_pieces_par_colis = nb
+            nb_colis  = 0
+            if unite=="Poids":
+                if poids_net>0:
+                    nb_colis = obj.product_qty/poids_net
+            else:
+                if nb>0:
+                    nb_colis = obj.product_qty / nb
             obj.is_nb_colis = nb_colis
-            obj.is_poids_net = obj.product_qty * obj.product_id.is_poids_net_colis
+            obj.is_poids_net = nb_colis * poids_net
 
     is_sale_order_line_id  = fields.Many2one('sale.order.line', string=u'Ligne commande client', index=True)
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis'     , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
@@ -59,7 +66,17 @@ class PurchaseOrderLine(models.Model):
     is_poids_net           = fields.Float(string='Poids net', digits=(14,4), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
 
 
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
 
+    # @api.onchange('date_planned')
+    # @api.multi
+    # def _onchange_date_planned(self):
+    #     print('_onchange_date_planned')
+    #     self.action_set_date_planned()
+
+    is_date_enlevement      = fields.Date('Date Enlèvement')                          # était date_enlevelment
+    is_adresse_livraison_id = fields.Many2one('res.partner', 'Adresse Livraison')     # était delivery_adress
 
 
 
@@ -154,16 +171,3 @@ class PurchaseOrderLine(models.Model):
 #         self._onchange_quantity()
 
 #         return result
-
-# class PurchaseOrder(models.Model):
-#     _inherit = 'purchase.order'
-
-#     @api.onchange('date_planned')
-#     @api.multi
-#     def _onchange_date_planned(self):
-#         print('_onchange_date_planned')
-#         self.action_set_date_planned()
-
-
-#     date_enlevelment = fields.Date('Date Enlèvement')
-#     delivery_adress = fields.Many2one('res.partner', 'Adresse Livraison')

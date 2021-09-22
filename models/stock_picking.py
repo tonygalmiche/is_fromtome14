@@ -18,12 +18,16 @@ class IsScanPickingLine(models.Model):
     _description = "Lignes Scan Picking"
     _order='id'
 
-    scan_id          = fields.Many2one('is.scan.picking', 'Picking', required=True, ondelete='cascade')
-    product_id       = fields.Many2one('product.product', 'Article', required=True)
+    scan_id             = fields.Many2one('is.scan.picking', 'Picking', required=True, ondelete='cascade')
+    product_id          = fields.Many2one('product.product', 'Article', required=True)
+    uom_id              = fields.Many2one('uom.uom', 'Unité', related='product_id.uom_id')
+    nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis', related="product_id.is_nb_pieces_par_colis")
     lot_id           = fields.Many2one('stock.production.lot', 'Lot', required=True)
     type_tracabilite = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
     dlc_ddm          = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
-    poids            = fields.Float("Poids")
+    nb_pieces        = fields.Float('Nb pièces', digits=(14,2))
+    nb_colis         = fields.Float('Nb Colis' , digits=(14,2))
+    poids            = fields.Float("Poids"    , digits=(14,4))
     info             = fields.Char("Info")
 
 
@@ -82,10 +86,13 @@ class IsScanPicking(models.Model):
             if obj.product_id and obj.lot_id and obj.dlc_ddm:
                 tz = pytz.timezone('Europe/Paris')
                 now = datetime.now(tz).strftime("%H:%M:%S")
+                poids = obj.poids or obj.product_id.is_poids_net_colis
                 vals={
                     "product_id": obj.product_id.id,
                     "lot_id"    : obj.lot_id.id,
-                    "poids"     : obj.poids,
+                    "nb_pieces" : obj.product_id.is_nb_pieces_par_colis,
+                    "nb_colis"  : 1,
+                    "poids"     : poids,
                     "info"      : now,
                 }
                 obj.write({"line_ids": [(0,0,vals)]})
@@ -144,26 +151,24 @@ class IsScanPicking(models.Model):
             print(obj)
             obj.picking_id.move_line_ids_without_package.unlink()
             for line in obj.line_ids:
-                print(line)
+                unite = line.uom_id.category_id.name
+                if unite=="Poids":
+                    qty=line.poids
+                else:
+                    qty=line.nb_pieces
                 vals={
-                    "picking_id"      : obj.picking_id.id,
-                    "product_id"      : line.product_id.id,
-                    "lot_id"          : line.lot_id.id,
-                    "company_id"      : obj.picking_id.company_id.id,
-                    "product_uom_id"  : line.product_id.uom_id.id,
-                    "location_id"     : obj.picking_id.location_id.id,
-                    "location_dest_id": obj.picking_id.location_dest_id.id,
-                    "qty_done"        : line.poids,
+                    "picking_id"        : obj.picking_id.id,
+                    "product_id"        : line.product_id.id,
+                    "lot_id"            : line.lot_id.id,
+                    "company_id"        : obj.picking_id.company_id.id,
+                    "product_uom_id"    : line.product_id.uom_id.id,
+                    "location_id"       : obj.picking_id.location_id.id,
+                    "location_dest_id"  : obj.picking_id.location_dest_id.id,
+                    "qty_done"          : qty,
+                    "is_nb_colis"       : line.nb_colis,
+                    "is_poids_net_reel" : line.poids,
                 }
                 res = self.env['stock.move.line'].create(vals)
-                print(res)
-
-#  id | picking_id | move_id | company_id | product_id | product_uom_id | product_qty | product_uom_qty | qty_done | package_id | package_level_id | lot_id | lot_name | result_package_id |        date         | owner_id | location_id | location_dest_id |  state   |  reference  | description_picking | create_uid |        create_date         | write_uid |         write_date         | workorder_id | production_id | status_move | is_nb_pieces_par_colis | is_nb_colis | is_poids_net_estime | is_poids_net_reel 
-# ----+------------+---------+------------+------------+----------------+-------------+-----------------+----------+------------+------------------+--------+----------+-------------------+---------------------+----------+-------------+------------------+----------+-------------+---------------------+------------+----------------------------+-----------+----------------------------+--------------+---------------+-------------+------------------------+-------------+---------------------+-------------------
-#  67 |          9 |      42 |          1 |         10 |              1 |         0.0 |            0.00 |     0.00 |            |                  |     47 |          |                   | 2021-09-17 08:02:49 |          |           4 |                8 | assigned | WH/IN/00004 |                     |          2 | 2021-09-17 08:02:49.062315 |         2 | 2021-09-17 08:02:49.062315 |              |               | receptionne |                      0 |        0.00 |              0.0000 |                  
-#  65 |          9 |      44 |          1 |          8 |              1 |         0.0 |            0.00 |     0.00 |            |                  |     45 |          |                   | 2021-09-17 08:02:49 |          |           4 |                8 | assigned | WH/IN/00004 |                     |          2 | 2021-09-17 08:02:49.062315 |         2 | 2021-09-17 08:02:49.062315 |              |               | receptionne |                      0 |        0.00 |              0.0000 |                  
-#  66 |          9 |      45 |          1 |          9 |              1 |         0.0 |            0.00 |     0.00 |            |                  |     46 |          |                   | 2021-09-17 08:02:49 |          |           4 |                8 | assigned | WH/IN/00004 |                     |          2 | 2021-09-17 08:02:49.062315 |         2 | 2021-09-17 08:02:49.062315 |              |               | receptionne |                      0 |        0.00 |              0.0000 |                  
-#  69 |          9 |      38 |          1 |          5 |              1 |         0.0 |            0.00 |     3.00 |            |                  |        |          |                   | 2021-09-17 08:04:43 |          |           4 |                8 | assigned | WH/IN/00004 |                     |          2 | 2021-09-17 08:04:43.356527 |         2 | 2021-09-17 08:04:43.356527 |              |               | receptionne |                      2 |        1.50 |              0.7500 |            0.0000
 
 
 class Picking(models.Model):
@@ -192,6 +197,7 @@ class Picking(models.Model):
                 scan=self.env['is.scan.picking'].create(vals)
             context = dict(self.env.context)
             context['form_view_initial_mode'] = 'edit'
+            #context['default_company_id'] = obj.company_id.id,
             res= {
                 'name': 'Scan',
                 'view_mode': 'form',
@@ -203,6 +209,7 @@ class Picking(models.Model):
             return res
 
 
+        #<field name="context">{'display_complete': True, 'default_company_id': allowed_company_ids[0]}</field>
 
 
     # @api.onchange('move_ids_without_package')
