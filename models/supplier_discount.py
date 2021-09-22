@@ -45,7 +45,7 @@ class SupplierInfo(models.Model):
         required=True, help="The price to purchase a product", compute=compute_prix_net, store=True)
 
 
-    @api.onchange('product_tmpl_id','date_start','date_end','name','price')
+    @api.depends('product_tmpl_id','date_start','date_end','name','price')
     def fct_last_info(self):
         supp_info = self.env['product.supplierinfo'].search(
         [('name', '=', self.name.id), ('product_tmpl_id', '=', self.product_tmpl_id.id),
@@ -54,7 +54,7 @@ class SupplierInfo(models.Model):
             limit=1, order='date_start desc')
         self.last_supp_info = supp_info.id
 
-    last_supp_info = fields.Many2one('product.supplierinfo', compute=fct_last_info, string="Dernier Prix Fou    rnisseur")
+    last_supp_info = fields.Many2one('product.supplierinfo', compute=fct_last_info, string="Dernier Prix Fournisseur")
     last_discount_ids = fields.One2many('product.supplierdiscount','supplier_info_id',string='Anciens Taux de remises', related='last_supp_info.discount_ids')
     last_prix_brut = fields.Float('Dernier Prix Brut', related="last_supp_info.prix_brut")
     last_price = fields.Float('Dernier Prix Net', related="last_supp_info.price")
