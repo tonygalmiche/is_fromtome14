@@ -172,6 +172,7 @@ class ProductTemplate(models.Model):
     contrat_date_id = fields.One2many('contrat.date.client','product_id','Contrat Date')
 
     # Présentation / Conseils
+    is_enseigne_id   = fields.Many2one('is.enseigne.commerciale', 'Enseigne', help="Enseigne commerciale")
     is_creation_le   = fields.Date(string='Création le', default=lambda *a: fields.Date.today())
     is_mis_a_jour_le = fields.Date(string='Mise à jour le')
 

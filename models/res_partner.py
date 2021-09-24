@@ -8,6 +8,13 @@ class Pricelist(models.Model):
     partner_id = fields.Many2one('res.partner','Client')
 
 
+class IsEnseigneCommerciale(models.Model):
+    _name = 'is.enseigne.commerciale'
+    _description = "Enseigne commerciale"
+
+    name = fields.Many2one('res.partner', 'Enseigne commerciale', required=True)
+
+
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
@@ -15,6 +22,9 @@ class ResPartner(models.Model):
     is_product_supplierinfo_ids = fields.One2many('product.supplierinfo', 'name', 'Liste de prix')
     is_gln                      = fields.Char(string='GLN Client')
     is_iln                      = fields.Char(string='ILN Client')
+    is_enseigne_id              = fields.Many2one('is.enseigne.commerciale', 'Enseigne', help="Enseigne commerciale")
+
+
 
 
 # TODO : A revoir dans un deuxième temps

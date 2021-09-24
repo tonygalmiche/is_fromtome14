@@ -301,6 +301,7 @@ records.exporter_article_fromelier_action()
                     <group>
                         <group>
                             <field name="is_creation_le"/>
+                            <field name="is_enseigne_id"/>
                         </group>
                         <group>
                             <field name="is_mis_a_jour_le"/>

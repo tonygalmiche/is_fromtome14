@@ -15,13 +15,14 @@
                             font-size:10.5pt;
                         }
                         .table th, .table td {
+                            margin:0;
                             padding: 0.1em;
                             padding-left: 0.3em;
                             padding-right: 0.3em;
                             vertical-align: middle;
                             border: 1px solid;
                         }
-                        .table table {
+                        table {
                             border-collapse: collapse;
                         }
                         h1{
@@ -35,50 +36,44 @@
                         }
                     </style>
                     <div class="page">
-                        <table style="width:100%">
-                            <tr>
-                                <t t-if="doc.company_id.name=='FROMTOME'">
+                        
+
+                        <t t-if="doc.is_enseigne_id">
+                            <t t-set="enseigne" t-value="doc.is_enseigne_id.name"/>
+                            <table style="width:100%">
+                                <tr>
                                     <td style="width:45mm;text-align:left;vertical-align:top;border:0px solid">
                                         <img 
-                                            t-if="doc.company_id.logo" 
-                                            t-att-src="image_data_uri(doc.company_id.logo)" alt="Logo" 
+                                            t-if="enseigne.image_1920"
+                                            t-att-src="image_data_uri(enseigne.image_1920)" alt="Logo" 
                                             style="max-height:25mm;max-width:45mm"
                                         />
                                     </td>
-                                </t>
-                                <t t-if="doc.company_id.name!='FROMTOME'">
-                                    <td style="width:25mm;text-align:left;vertical-align:top;border:0px solid">
-                                        <img 
-                                            t-if="doc.company_id.logo" 
-                                            t-att-src="image_data_uri(doc.company_id.logo)" alt="Logo" 
-                                            style="max-height:25mm;max-width:25mm"
-                                        />
+                                    <td style="text-align:center;vertical-align:top">
+                                        <div style="font-size:24pt" t-field="enseigne.name"/>
+                                        <div style="font-size:9pt">
+                                            <span t-field="enseigne.street"/>
+                                            <span t-field="enseigne.street2"/> - 
+                                            <span t-field="enseigne.zip"/> 
+                                            <span t-field="enseigne.city"/>
+                                            <br />
+                                            <t t-if="res_company.name=='FROMTOME'">
+                                                TEL: 03 84 52 01 02 – email: info@fromtome.com
+                                            </t>
+                                            <t t-if="res_company.name!='FROMTOME'">
+                                                MOBILE: 06 52 34 73 63 – TEL: 03 84 52 01 02 – email: lefromelier@le-fromelier.fr
+                                            </t>
+                                        </div>
                                     </td>
-                                </t>
-                                <td style="text-align:center;vertical-align:top">
-                                    <div style="font-size:24pt" t-field="doc.company_id.name"/>
-                                    <div style="font-size:9pt">
-                                        <span t-field="doc.company_id.street"/>
-                                        <span t-field="doc.company_id.street2"/> - 
-                                        <span t-field="doc.company_id.zip"/> 
-                                        <span t-field="doc.company_id.city"/>
-                                        <br />
-                                        <t t-if="doc.company_id.name=='FROMTOME'">
-                                            TEL: 03 84 52 01 02 – email: info@fromtome.com
-                                        </t>
-                                        <t t-if="doc.company_id.name!='FROMTOME'">
-                                            MOBILE: 06 52 34 73 63 – TEL: 03 84 52 01 02 – email: lefromelier@le-fromelier.fr
-                                        </t>
-                                    </div>
-                                </td>
-                                <td style="width:45mm;text-align:left;vertical-align:middle;border:1px solid">
-                                    <div style="font-size:9pt;margin:0em;padding:2mm">
-                                        Création le :    <span t-field="doc.is_creation_le"/> <br />
-                                        Mise à jour le : <span t-field="doc.is_mis_a_jour_le"/>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
+                                    <td style="width:45mm;text-align:left;vertical-align:middle;border:1px solid">
+                                        <div style="font-size:9pt;margin:0em;padding:2mm">
+                                            Création le :    <span t-field="doc.is_creation_le"/> <br />
+                                            Mise à jour le : <span t-field="doc.is_mis_a_jour_le"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </t>
                         <row>
                             <table style="width:100%">
                                 <tr>
@@ -90,7 +85,7 @@
                                 <tr>
                                     <td style="vertical-align:middle">
                                         <br />
-                                        <img t-if="doc.image" t-att-src="image_data_uri(doc.image)" style="max-height:70mm;max-width:70mm;margin-right:10mm"/>
+                                        <img t-if="doc.image_1920" t-att-src="image_data_uri(doc.image_1920)" style="max-height:70mm;max-width:70mm;margin-right:10mm"/>
                                         <br />
                                     </td>
                                     <td style="vertical-align:middle">
@@ -119,7 +114,7 @@
                                     </td>
                                     <td style="width:48%;vertical-align:top">
                                          <table class="table" style="width:100%">
-                                            <tr><td><span t-field="doc.type_traçabilite"/>:</td><td><span t-field="doc.is_dluo"/></td></tr>
+                                            <tr><td><span t-field="doc.is_type_tracabilite"/>:</td><td><span t-field="doc.is_dluo"/></td></tr>
                                             <tr><td>Type de conditionnement:     </td><td><span t-field="doc.is_type_conditionnement"/></td></tr>
                                             <tr><td>Atelier de transformation:   </td><td><span t-field="doc.is_atelier_transformation"/></td></tr>
                                             <tr><td>Numéro d'agrément fabriquant:</td><td><span t-field="doc.no_agrement_sanitaire"/></td></tr>
@@ -184,8 +179,8 @@
                 string="Fiche Technique"
                 model="product.template"
                 report_type="qweb-pdf"
-                file="b2c_cheese_base.report_product_technical_document"
-                name="b2c_cheese_base.report_product_technical_document"
+                file="is_fromtome14.report_product_technical_document"
+                name="is_fromtome14.report_product_technical_document"
         />
     </data>
 
