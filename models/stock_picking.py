@@ -22,13 +22,27 @@ class IsScanPickingLine(models.Model):
     product_id          = fields.Many2one('product.product', 'Article', required=True)
     uom_id              = fields.Many2one('uom.uom', 'Unité', related='product_id.uom_id')
     nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis', related="product_id.is_nb_pieces_par_colis")
-    lot_id           = fields.Many2one('stock.production.lot', 'Lot', required=True)
-    type_tracabilite = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
-    dlc_ddm          = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
-    nb_pieces        = fields.Float('Nb pièces', digits=(14,2))
-    nb_colis         = fields.Float('Nb Colis' , digits=(14,2))
-    poids            = fields.Float("Poids"    , digits=(14,4))
-    info             = fields.Char("Info")
+    lot_id            = fields.Many2one('stock.production.lot', 'Lot', required=True)
+    type_tracabilite  = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
+    dlc_ddm           = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
+    nb_pieces         = fields.Float('Pièces'   , digits=(14,2), help="Nb pièces scannées")
+    nb_colis          = fields.Float('Colis'    , digits=(14,2), help="Nb Colis scannés")
+    nb_colis_prevues  = fields.Float('Prévu'    , digits=(14,2), help="Nb Colis prévus")
+    nb_colis_reste    = fields.Float('Reste'    , digits=(14,2), help="Nb Colis reste")
+    poids             = fields.Float("Poids"    , digits=(14,4))
+    info              = fields.Char("Info")
+
+
+class IsScanPickingLine(models.Model):
+    _name = 'is.scan.picking.product'
+    _description = "Articles à scanner du Picking"
+    _order='id'
+
+    scan_id    = fields.Many2one('is.scan.picking', 'Picking', required=True, ondelete='cascade')
+    product_id = fields.Many2one('product.product', 'Article', required=True)
+    nb_pieces  = fields.Float('Nb pièces prévues', digits=(14,2))
+    uom_id     = fields.Many2one('uom.uom', 'Unité', related='product_id.uom_id')
+    nb_colis   = fields.Float('Nb colis prévus', digits=(14,2))
 
 
 class IsScanPicking(models.Model):
@@ -65,10 +79,11 @@ class IsScanPicking(models.Model):
     lot_id     = fields.Many2one('stock.production.lot', 'Lot')
     type_tracabilite = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
     dlc_ddm          = fields.Date('DLC / DDM')
-    poids      = fields.Float("Poids")
-    ajouter    = fields.Boolean("Ajouter", help="Ajouter cette ligne")
-    is_alerte  = fields.Text('Alerte', compute=_compute_is_alerte, readonly=True, store=False)
-    line_ids   = fields.One2many('is.scan.picking.line', 'scan_id', 'Lignes')
+    poids       = fields.Float("Poids")
+    ajouter     = fields.Boolean("Ajouter", help="Ajouter cette ligne")
+    is_alerte   = fields.Text('Alerte', compute=_compute_is_alerte, readonly=True, store=False)
+    line_ids    = fields.One2many('is.scan.picking.line', 'scan_id', 'Lignes')
+    product_ids = fields.One2many('is.scan.picking.product', 'scan_id', 'Articles')
 
 
     def reset_scan(self):
@@ -84,14 +99,35 @@ class IsScanPicking(models.Model):
     def ajouter_ligne(self):
         for obj in self:
             if obj.product_id and obj.lot_id and obj.dlc_ddm:
+                nb_pieces=obj.product_id.is_nb_pieces_par_colis
+
+
+                #** Recherche de la quantité prévue ***************************
+                prevu=0.0
+                for line in obj.product_ids:
+                    if line.product_id==obj.product_id:
+                        prevu=line.nb_colis
+                #**************************************************************
+
+                #** Recherche quantité scannée ********************************
+                products={}
+                scanne=1
+                for line in obj.line_ids:
+                    if line.product_id==obj.product_id:
+                        scanne+=line.nb_colis
+                reste=prevu-scanne
+                #**************************************************************
+
                 tz = pytz.timezone('Europe/Paris')
                 now = datetime.now(tz).strftime("%H:%M:%S")
                 poids = obj.poids or obj.product_id.is_poids_net_colis
                 vals={
                     "product_id": obj.product_id.id,
                     "lot_id"    : obj.lot_id.id,
-                    "nb_pieces" : obj.product_id.is_nb_pieces_par_colis,
+                    "nb_pieces" : nb_pieces,
                     "nb_colis"  : 1,
+                    "nb_colis_prevues": prevu,
+                    "nb_colis_reste"  : reste,
                     "poids"     : poids,
                     "info"      : now,
                 }
@@ -141,11 +177,6 @@ class IsScanPicking(models.Model):
             obj.ajouter_ligne()
 
 
-
-
-
-
-
     def maj_picking_action(self):
         for obj in self:
             print(obj)
@@ -187,6 +218,21 @@ class Picking(models.Model):
 
     def scan_picking_action(self):
         for obj in self:
+
+
+            products={}
+            for line in obj.move_ids_without_package:
+                print(line)
+
+                nb_colis=line.get_nb_colis()
+
+                
+                if line.product_id not in products:
+                    products[line.product_id]=[0,0]
+                products[line.product_id][0]+=line.product_uom_qty
+                products[line.product_id][1]+=nb_colis
+            print(products)
+
             scans = self.env['is.scan.picking'].search([('picking_id','=',obj.id)],limit=1)
             if scans:
                 scan=scans[0]
@@ -195,6 +241,19 @@ class Picking(models.Model):
                     "picking_id": obj.id,
                 }
                 scan=self.env['is.scan.picking'].create(vals)
+
+
+            scan.product_ids.unlink()
+            for product in products:
+                vals={
+                    "scan_id"    : scan.id,
+                    "product_id" : product.id,
+                    "nb_pieces"  : products[product][0],
+                    "nb_colis"   : products[product][1],
+                }
+                res = self.env['is.scan.picking.product'].create(vals)
+
+
             context = dict(self.env.context)
             context['form_view_initial_mode'] = 'edit'
             #context['default_company_id'] = obj.company_id.id,

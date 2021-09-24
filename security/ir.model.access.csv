@@ -24,3 +24,4 @@ access_is_stock_production_lot_contrat,access_is_stock_production_lot_contrat,mo
 access_is_stock_move_line,access_is_stock_move_line,model_is_stock_move_line,base.group_user,1,1,1,1
 access_is_scan_picking,access_is_scan_picking,model_is_scan_picking,base.group_user,1,1,1,1
 access_is_scan_picking_line,access_is_scan_picking_line,model_is_scan_picking_line,base.group_user,1,1,1,1
+access_is_scan_picking_product,access_is_scan_picking_product,model_is_scan_picking_product,base.group_user,1,1,1,1

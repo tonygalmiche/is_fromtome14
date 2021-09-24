@@ -96,3 +96,19 @@ class StockMove(models.Model):
 
 
     is_alerte = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
+
+
+    def get_nb_colis(self):
+        nb        = self.product_id.is_nb_pieces_par_colis
+        poids_net = self.product_id.is_poids_net_colis
+        unite     = self.product_uom.category_id.name
+        nb_colis  = 0
+        if unite=="Poids":
+            if poids_net>0:
+                nb_colis = self.product_uom_qty/poids_net
+        else:
+            if nb>0:
+                nb_colis = self.product_uom_qty / nb
+        return round(nb_colis)
+
+

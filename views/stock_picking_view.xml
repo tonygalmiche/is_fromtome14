@@ -45,6 +45,11 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <style>
+                        .o_form_view .o_form_sheet_bg > .o_form_sheet{
+                            max-width: 1800px;
+                        }
+                    </style>
                     <group>
                         <group>
                             <field name="ean" readonly="1"/>
@@ -65,17 +70,34 @@
                         attrs="{'invisible': [('is_alerte','=', False)],'readonly':True}"
                     />
                     <field name="line_ids" nolabel="1" >
-                        <tree editable="bottom" limit="500">
+
+
+                        <tree 
+                            string="Lots avec DLC" 
+                            editable="bottom" limit="500"
+                            decoration-danger="nb_colis_reste &lt; 0" 
+                            decoration-success="nb_colis_reste==0" 
+                        >
                             <field name="product_id"/>
-                            <field name="uom_id"           optional="show"/>
                             <field name="lot_id"           />
                             <field name="type_tracabilite" optional="show"/>
                             <field name="dlc_ddm"/>
-                            <field name="nb_pieces"  sum="Total"/>
-                            <field name="nb_pieces_par_colis" optional="show"/>
-                            <field name="nb_colis"   sum="Total"/>
-                            <field name="poids"      sum="Total"/>
-                            <field name="info"        style="color:gray"/>
+                            <field name="nb_pieces"          sum="Total"/>
+                            <field name="uom_id"           optional="show"/>
+                            <field name="nb_pieces_par_colis"            optional="show"/>
+                            <field name="nb_colis"          sum="Total"  optional="show"/>
+                            <field name="nb_colis_prevues"  sum="Total"  optional="show"/>
+                            <field name="nb_colis_reste"    sum="Total"  optional="show"/>
+                            <field name="poids"             sum="Total"  optional="show"/>
+                            <field name="info"        style="color:gray" optional="show"/>
+                        </tree>
+                    </field>
+                    <field name="product_ids" nolabel="1" >
+                        <tree editable="bottom" limit="500">
+                            <field name="product_id"/>
+                            <field name="nb_pieces" sum="Total"/>
+                            <field name="uom_id"/>
+                            <field name="nb_colis" sum="Total"/>
                         </tree>
                     </field>
                     <field name="picking_id" readonly="1"/>
