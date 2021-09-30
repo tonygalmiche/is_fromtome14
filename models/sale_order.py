@@ -119,14 +119,17 @@ class SaleOrder(models.Model):
     is_date_livraison  = fields.Date('Date Livraison')
     is_commande_soldee = fields.Boolean(string=u'Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
 
-    @api.depends('order_line')
+    @api.depends('order_line','partner_id')
     def _compute_is_creer_commande_fournisseur_vsb(self):
         for obj in self:
-            vsb = False
-            for line in obj.order_line:
-                if not line.is_purchase_line_id.id:
-                    vsb=True
-                    break
+            if self.env.user.company_id.partner_id==obj.partner_id:
+                vsb=False
+            else:
+                vsb = False
+                for line in obj.order_line:
+                    if not line.is_purchase_line_id.id:
+                        vsb=True
+                        break
             obj.is_creer_commande_fournisseur_vsb=vsb
 
 
@@ -173,7 +176,6 @@ class SaleOrder(models.Model):
                             order.onchange_partner_id()
                             if line.is_livraison_directe:
                                 order.delivery_adress = obj.partner_shipping_id.id
-                    print(order,order.name)
 
                     #** Création des lignes ************************************
                     filtre=[
@@ -320,8 +322,6 @@ class SaleOrder(models.Model):
 #         uom = False
 #         if move_obj :
 #             uom = move_obj[0].weight_uom_id.id
-#         print('move_weight-------',move_weight)
-#         print('uomm------',uom)
 #         vals['name'] = vals['name'] + '\n' + lot_name
 #         vals['quantity']= move_weight
 #         vals['uom_id'] =  uom
@@ -333,7 +333,6 @@ class SaleOrder(models.Model):
 #     def product_id_change(self):
 #         vals = super(SaleOrderLine, self).product_id_change()
 #         if self.product_id:
-#             print('name=self.product_id.name',self.product_id.name)
 #             self.name = self.product_id.display_name
 
 
@@ -378,11 +377,8 @@ class SaleOrder(models.Model):
 #     @api.multi
 #     def onchage_pricelist(self):
 #         if self.pricelist_id and self.partner_id and not self.partner_id.property_product_pricelist:
-#             print('111ZZ')
 #             self.partner_id.write({'property_product_pricelist' : self.pricelist_id.id})
-#             print('--------p--',self.partner_id.property_product_pricelist)
 #         if not self.pricelist_id and self.partner_id and self.partner_id.property_product_pricelist:
-#             print('22ddd')
 #             self.pricelist_id = self.partner_id.property_product_pricelist.id
 
 #     invoice_status = fields.Selection([
@@ -477,7 +473,6 @@ class SaleOrder(models.Model):
 #         if no_reserved_quantities and no_quantities_done:
 #             # raise UserError(_(
 #             #     'You cannot validate a transfer if no quantites are reserved nor done. To force the transfer, switch in edit more and encode the done quantities.'))
-#             print('You cannot validate a transfer if no quantites are reserved nor done. To force the transfer, switch in edit more and encode the done quantities.')
 
 #         if picking_type.use_create_lots or picking_type.use_existing_lots:
 #             lines_to_check = self.move_line_ids

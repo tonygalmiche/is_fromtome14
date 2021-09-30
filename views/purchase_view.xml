@@ -24,6 +24,7 @@
                     type="object"
                     string="Créer commande dans Fromtome"
                     class="oe_highlight"
+                    attrs="{'invisible': [('is_fromtome_order_vsb', '=', False)]}"
                 />
             </button>
             <field name="date_order" position="after">
@@ -77,8 +78,12 @@
                 <field name="is_date_enlevement"/>
             </xpath> -->
             <xpath expr="//field[@name='partner_ref']" position="after">
-                <field name="is_adresse_livraison_id" />
+                <field name="is_adresse_livraison_id"/>
+                <field name="is_fromtome_order_id"/>
+                <field name="is_fromtome_order_vsb" invisible="1"/>
             </xpath>
+
+            
 
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_uom']" position='attributes'>
                 <attribute name="readonly">1</attribute>

@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+
+
+<!-- 
+
+
+
+
+    <template id="report_purchaseorder_document_inherit" inherit_id="purchase.report_purchaseorder_document">
+         <xpath expr="//div[@id='informations']" position="inside">
+            <div t-if="o.date_order" class="col-3 bm-2">
+                <strong>Date de livraison:</strong>
+                <p t-field="o.date_planned" class="m-0" t-options="{'widget': 'date'}"/>
+            </div>
+        </xpath>
+
+    </template>
+    <template id="purchase_stock.report_purchaseorder_document" inherit_id="purchase.report_purchaseorder_document"
+              active="False">
+        <xpath expr="//t[@t-if='o.dest_address_id']" position="after">
+            <t t-else="">
+                <t t-set="information_block">
+                    <strong>Shipping address:</strong>
+                    <div t-if="o.picking_type_id and o.picking_type_id.warehouse_id">
+                        <span t-field="o.picking_type_id.warehouse_id.name"/>
+                        <div t-field="o.picking_type_id.warehouse_id.partner_id"
+                             t-options='{"widget": "contact", "fields": ["address", "phone"], "no_marker": True, "phone_icons": True}'/>
+                    </div>
+                </t>
+            </t>
+        </xpath>
+    </template>
+
+    <template id="purchase_stock.report_purchasequotation_document"
+              inherit_id="purchase.report_purchasequotation_document" active="False">
+        <xpath expr="//t[@t-if='o.dest_address_id']" position="after">
+            <t t-else="">
+                <t t-set="information_block">
+                    <strong>Shipping address:</strong>
+                    <div t-if="o.picking_type_id and o.picking_type_id.warehouse_id">
+                        <span t-field="o.picking_type_id.warehouse_id.name"/>
+                        <div t-field="o.picking_type_id.warehouse_id.partner_id"
+                             t-options='{"widget": "contact", "fields": ["address", "phone"], "no_marker": True, "phone_icons": True}'/>
+                    </div>
+                </t>
+            </t>
+        </xpath>
+    </template>
+    <template id="purchase.report_purchaseorder_document">
+        <t t-call="web.external_layout">
+            <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
+            <t t-set="address">
+                <strong style="size=16px;">
+                    <span t-field="o.partner_id"/>
+                </strong>
+                <br/>
+                <span t-field="o.partner_id.street"/>
+                <br/>
+                <t t-if="o.partner_id.street2">
+                    <span t-field="o.partner_id.street2"/>
+                    <br/>
+                </t>
+                <span t-field="o.partner_id.zip"/>
+
+                    &amp;nbsp;
+
+                <span t-field="o.partner_id.city"/>
+                <br/>
+                <span t-field="o.partner_id.country_id"/>
+                <br/>
+                <i class="fa fa-phone"/>
+                <span t-field="o.partner_id.phone"/>
+
+                <p t-if="o.partner_id.vat"><t t-esc="o.company_id.country_id.vat_label or 'Tax ID'"/>:
+                    <span t-field="o.partner_id.vat"/>
+                </p>
+            </t>
+            <t t-if="o.delivery_adress">
+                <t t-set="information_block">
+                    <strong>Addresse Livraison:</strong>
+                    <strong style="size=16px;">
+                        <span t-field="o.delivery_adress"/>
+                    </strong>
+                    <br/>
+                    <span t-field="o.delivery_adress.street"/>
+                    <br/>
+                    <t t-if="o.delivery_adress.street2">
+                        <span t-field="o.delivery_adress.street2"/>
+                        <br/>
+                    </t>
+                    <span t-field="o.delivery_adress.zip"/>
+
+                    &amp;nbsp;
+
+                    <span t-field="o.delivery_adress.city"/>
+                    <br/>
+                    <span t-field="o.delivery_adress.country_id"/>
+
+
+                </t>
+            </t>
+            <div class="page">
+                <div class="oe_structure"/>
+                <br/>
+                <h5 t-if="o.state == 'draft'">Request for Quotation #
+                    <span t-field="o.name"/>
+                </h5>
+                <h5 t-if="o.state in ['sent', 'to approve']">Purchase Order #
+                    <span t-field="o.name"/>
+                </h5>
+                <h5 t-if="o.state in ['purchase', 'done']">Purchase Order Confirmation #
+                    <span t-field="o.name"/>
+                    -
+                    <span t-field="o.date_order" t-options="{'widget': 'date'}"/>
+                </h5>
+                <h5 t-if="o.state == 'cancel'">Cancelled Purchase Order #
+                    <span t-field="o.name"/>
+                </h5>
+                <h7 t-if="o.user_id">
+                    <strong>Votre Contact:</strong>
+                    <span class="m-0" t-field="o.user_id"/>
+                    <br/>
+                    <strong t-if="o.user_id.partner_id.mobile">Tel:</strong>
+                    <span class="m-0" t-field="o.user_id.partner_id.mobile"/>
+
+                    &amp;nbsp;
+
+                    <strong t-if="o.user_id.partner_id.email">Email :</strong>
+                    <span class="m-0" t-field="o.user_id.partner_id.email"/>
+                    <br/>
+                </h7>
+                <div id="informations" class="row mt32 mb32">
+                     <div t-if="o.date_order" class="col-3 bm-2">
+                        <strong>Date d'enlèvement:</strong>
+                        <p t-field="o.date_enlevelment" class="m-0" t-options="{'widget': 'date'}"/>
+                    </div>
+                </div>
+
+                <table class="table table-sm o_main_table">
+                    <thead>
+                        <tr>
+
+                            <th>
+                                <strong>Description</strong>
+                            </th>
+                            <th class="text-right">
+                                <strong>Nb Colis</strong>
+                            </th>
+                            <th class="text-right">
+                                <strong>PU</strong>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="o.order_line" t-as="line">
+
+                            <td>
+                                <span t-field="line.name"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-esc=" '%.0f' % line.product_qty"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-field="line.price_unit"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <br/>
+                <br/>
+                <br/>
+
+                <p t-field="o.notes" style="color:red; font-weight:500; font-size:16px;"/>
+                <div class="oe_structure"/>
+            </div>
+        </t>
+    </template>
+
+
+    <template id="purchase.report_purchasequotation_document">
+
+    
+        <t t-call="web.external_layout">
+            <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
+            <t t-set="address">
+                <strong style="size=16px;">
+                    <span t-field="o.partner_id"/>
+                </strong>
+                <br/>
+                <span t-field="o.partner_id.street"/>
+                <br/>
+                <t t-if="o.partner_id.street2">
+                    <span t-field="o.partner_id.street2"/>
+                    <br/>
+                </t>
+                <span t-field="o.partner_id.zip"/>
+
+                &amp;nbsp;
+
+                <span t-field="o.partner_id.city"/>
+                <br/>
+                <span t-field="o.partner_id.country_id"/>
+                <br/>
+                <i class="fa fa-phone"/>
+                <span t-field="o.partner_id.phone"/>
+
+                <p t-if="o.partner_id.vat"><t t-esc="o.company_id.country_id.vat_label or 'Tax ID'"/>:
+                    <span t-field="o.partner_id.vat"/>
+                </p>
+            </t>
+            <t t-if="o.delivery_adress">
+                <t t-set="information_block">
+                    <strong>Addresse Livraison:</strong>
+                    <strong style="size=16px;">
+                        <span t-field="o.delivery_adress"/>
+                    </strong>
+                    <br/>
+                    <span t-field="o.delivery_adress.street"/>
+                    <br/>
+                    <t t-if="o.delivery_adress.street2">
+                        <span t-field="o.delivery_adress.street2"/>
+                        <br/>
+                    </t>
+                    <span t-field="o.delivery_adress.zip"/>
+
+                    &amp;nbsp;
+
+                    <span t-field="o.delivery_adress.city"/>
+                    <br/>
+                    <span t-field="o.delivery_adress.country_id"/>
+
+
+                </t>
+            </t>
+            <div class="page">
+                <div class="oe_structure"/>
+                <br/>
+                <h5 t-if="o.state == 'draft'">Bon de commande #
+                    <span t-field="o.name"/>
+                    -
+                    <span t-field="o.date_order" t-options="{'widget': 'date'}"/>
+                </h5>
+                <h5 t-if="o.state in ['sent', 'to approve']">Bon de commande #
+                    <span t-field="o.name"/>
+                    -
+                    <span t-field="o.date_order" t-options="{'widget': 'date'}"/>
+                </h5>
+                <h5 t-if="o.state in ['purchase', 'done']">Bon de commande #
+                    <span t-field="o.name"/>
+                    -
+                    <span t-field="o.date_order" t-options="{'widget': 'date'}"/>
+                </h5>
+                <h5 t-if="o.state == 'cancel'">Annulation bon de commande #
+                    <span t-field="o.name"/>
+                </h5>
+                <h7 t-if="o.user_id">
+                    <strong>Votre Contact:</strong>
+                    <span class="m-0" t-field="o.user_id"/>
+                    <br/>
+                    <strong t-if="o.user_id.partner_id.mobile">Tel:</strong>
+                    <span class="m-0" t-field="o.user_id.partner_id.mobile"/>
+
+                    &amp;nbsp;
+
+                    <strong t-if="o.user_id.partner_id.email">Email :</strong>
+                    <span class="m-0" t-field="o.user_id.partner_id.email"/>
+                    <br/>
+                </h7>
+                <div id="informations" class="row mt32 mb32">
+                    <div t-if="o.date_order" class="col-3 bm-2">
+                        <strong>Date d'enlèvement:</strong>
+                        <p t-field="o.date_enlevelment" class="m-0" t-options="{'widget': 'date'}"/>
+                    </div>
+                    <div t-if="o.date_order" class="col-3 bm-2">
+                        <strong>Date de livraison:</strong>
+                        <p t-field="o.date_planned" class="m-0" t-options="{'widget': 'date'}"/>
+                    </div>
+                </div>
+
+                <table class="table table-sm o_main_table">
+                    <thead>
+                        <tr>
+
+                            <th>
+                                <strong>Description</strong>
+                            </th>
+                            <th class="text-right">
+                                <strong>Nb Colis</strong>
+                            </th>
+                            <th class="text-right">
+                                <strong>PU</strong>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="o.order_line" t-as="line">
+
+                            <td>
+                                <span t-field="line.name"/>
+                            </td>
+
+                            <td class="text-right">
+                                <span t-esc=" '%.0f' % line.product_qty"/>
+                            </td>
+                            <td class="text-right">
+                                <span t-field="line.price_unit"/>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+                <br/>
+                <br/>
+                <br/>
+
+                <p t-field="o.notes" style="color:red; font-weight:500; font-size:16px;"/>
+                <div class="oe_structure"/>
+            </div>
+        </t>
+    </template>
+ -->
+
+
+
+</odoo>

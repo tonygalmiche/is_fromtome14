@@ -10,22 +10,22 @@ from math import *
 
 class IsCommandeFromtomeLigne(models.Model):
     _name = 'is.commande.fromtome.ligne'
-    _description = u"Commande fromtome Lignes"
+    _description = "Commande fromtome Lignes"
     _order='sequence,id'
 
-    commande_id      = fields.Many2one('is.commande.fromtome', u'Commande Fromtome', required=True, ondelete='cascade')
-    sequence         = fields.Integer(u"Ordre")
-    product_id       = fields.Many2one('product.product', u'Article')
-    uom_id           = fields.Many2one('uom.uom', u"Unité de stock")
-    uom_po_id        = fields.Many2one('uom.uom', u"Unité d'achat")
-    factor_inv       = fields.Float(u"Multiple de", digits=(14,4))
-    sale_qty         = fields.Float(u"Qt commande client"          , digits=(14,4))
-    purchase_qty     = fields.Float(u"Qt Fromtome déja en commande (US)", digits=(14,4))
-    product_qty      = fields.Float(u"Qt Fromtome à commander (US)"     , digits=(14,4))
-    product_po_qty   = fields.Float(u"Qt Fromtome à commander (UA)"     , digits=(14,4))
-    stock            = fields.Float(u"Stock", digits=(14,2))
-    stock_mini       = fields.Float(u"Stock mini", digits=(14,2))
-    order_line_id    = fields.Many2one('purchase.order.line', u'Ligne commande fournisseur')
+    commande_id      = fields.Many2one('is.commande.fromtome', 'Commande Fromtome', required=True, ondelete='cascade')
+    sequence         = fields.Integer("Ordre")
+    product_id       = fields.Many2one('product.product', 'Article')
+    uom_id           = fields.Many2one('uom.uom', "Unité")
+    #uom_po_id        = fields.Many2one('uom.uom', "Unité d'achat")
+    #factor_inv       = fields.Float("Multiple de", digits=(14,4))
+    sale_qty         = fields.Float("Qt commande client"          , digits=(14,4))
+    purchase_qty     = fields.Float("Qt Fromtome déja en commande", digits=(14,4))
+    product_qty      = fields.Float("Qt Fromtome à commander"     , digits=(14,4))
+    #product_po_qty   = fields.Float(u"Qt Fromtome à commander (UA)"     , digits=(14,4))
+    stock            = fields.Float("Stock", digits=(14,2))
+    stock_mini       = fields.Float("Stock mini", digits=(14,2))
+    order_line_id    = fields.Many2one('purchase.order.line', 'Ligne commande fournisseur')
 
 
 class IsCommandeFromtome(models.Model):
@@ -48,7 +48,8 @@ class IsCommandeFromtome(models.Model):
 
 
     def calcul_besoins_action(self):
-        cr,uid,context = self.env.args
+        #cr,uid,context = self.env.args
+        cr,uid,context,su = self.env.args
         for obj in self:
 
             if obj.order_id and obj.order_id.state!='draft':
@@ -70,6 +71,7 @@ class IsCommandeFromtome(models.Model):
             order.order_line.unlink()
             now = datetime.date.today()
             products = self.env['product.product'].search([('sale_ok','=',True)],order='name')
+            print(products)
             sequence=0
             for product in products:
                 if product.default_code:
@@ -85,9 +87,8 @@ class IsCommandeFromtome(models.Model):
                                            inner join product_template pt on pp.product_tmpl_id=pt.id
                         WHERE 
                             so.state in ('draft','send','sale') and
-                            so.company_id=2 and 
                             (so.is_commande_soldee='f' or so.is_commande_soldee is null) and 
-                            so.delivery_date>='2020-10-01' and
+                            so.commitment_date>='2020-10-01' and
                             sol.product_id="""+str(product.id)+"""
                         GROUP BY pt.default_code,sol.product_id
                         ORDER BY pt.default_code,sol.product_id
@@ -116,17 +117,22 @@ class IsCommandeFromtome(models.Model):
                         WHERE 
                             po.state not in ('done','cancel','draft') and
                             po.date_planned>='2020-10-01' and
-                            pol.product_id="""+str(product.id)+""" and
-                            po.is_commande_soldee='f'
+                            pol.product_id=%s and
+                            po.is_commande_soldee='f' and
+                            po.partner_id=%s
                     """
                     #(select sum(product_uom_qty) from stock_move sm where sm.purchase_line_id=pol.id and state='done')
-                    cr.execute(sql)
+                    cr.execute(sql,[product.id,obj.partner_id.id])
                     purchase_qty = 0
                     for row in cr.fetchall():
                         qt = row[2]-(row[3] or 0)
                         if qt<0:
                             qt=0
                         purchase_qty += qt
+                        print(row,purchase_qty)
+
+
+
                     #***********************************************************
                     stock_mini=0
                     if obj.stock_mini==True:
@@ -139,12 +145,17 @@ class IsCommandeFromtome(models.Model):
                     if product_qty<0:
                         product_qty=0
 
-                    product_po_qty = product.uom_id._compute_quantity(product_qty, product.uom_po_id, round=True, rounding_method='UP', raise_if_failure=True)
+                    #product_po_qty = product.uom_id._compute_quantity(product_qty, product.uom_po_id, round=True, rounding_method='UP', raise_if_failure=True)
 
-                    factor_inv = product.uom_po_id.factor_inv
+                    #factor_inv = product.uom_po_id.factor_inv
                     #if factor_inv>0:
                     #    product_qty = factor_inv*ceil(product_qty/factor_inv)
                     order_line_id=False
+
+                    print(product.name,product_qty)
+
+
+
                     if product_qty>0:
                         sequence+=1
                         vals={
@@ -152,31 +163,36 @@ class IsCommandeFromtome(models.Model):
                             'sequence'    : sequence,
                             'product_id'  : product.id,
                             'name'        : product.name,
-                            'product_qty' : product_po_qty,
+                            'product_qty' : product_qty,
                             'product_uom' : product.uom_po_id.id,
                             'date_planned': str(now)+' 08:00:00',
                             'price_unit'  : 0,
                         }
                         order_line=self.env['purchase.order.line'].create(vals)
                         order_line.onchange_product_id()
-                        order_line.product_qty = product_po_qty
+                        order_line.product_qty = product_qty
                         order_line_id=order_line.id
+                        print(vals,order_line)
                     if sale_qty>0 or product_qty>0:
                         vals={
                             'commande_id'   : obj.id,
                             'sequence'      : sequence,
                             'product_id'    : product.id,
-                            'uom_po_id'     : product.uom_po_id.id,
-                            'factor_inv'    : factor_inv,
+                            #'uom_po_id'     : product.uom_po_id.id,
+                            #'factor_inv'    : factor_inv,
                             'uom_id'        : product.uom_id.id,
                             'sale_qty'      : sale_qty,
                             'purchase_qty'  : purchase_qty,
                             'product_qty'   : product_qty,
-                            'product_po_qty': product_po_qty,
+                            #'product_po_qty': product_po_qty,
                             'stock'         : product.qty_available,
                             'stock_mini'    : stock_mini,
                             'order_line_id' : order_line_id,
                         }
                         ligne=self.env['is.commande.fromtome.ligne'].create(vals)
+                        print(vals,ligne)
+
+
+
 
 

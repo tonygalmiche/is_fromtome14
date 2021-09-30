@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_picking_inherit" inherit_id="stock.report_picking">
+             <xpath expr="//table[1]/thead/tr/th[1]" position="before">
+
+                <th t-if="o.sale_id.client_order_ref">
+                    <strong>Cmde Client</strong>
+                </th>
+                <th t-if="o.sale_id.confirmation_date">
+                    <strong>Date Cmde</strong>
+                </th>
+            </xpath>
+            <xpath expr="//table[1]/tbody/tr/td[1]" position="before">
+
+                <td t-if="o.sale_id.client_order_ref">
+                    <span t-field="o.sale_id.client_order_ref"/>
+                </td>
+                <td t-if="o.sale_id.confirmation_date">
+                    <span t-field="o.sale_id.confirmation_date"/>
+                </td>
+            </xpath>
+            <xpath expr="//table[2]" position="replace">
+
+                <table class="table table-sm" t-if="o.move_line_ids">
+<!--                    <t t-set="has_barcode"-->
+<!--                       t-value="any([move_ids_without_package.product_id and move_ids_without_package.product_id.sudo().barcode or move_ids_without_package.package_id for move_ids_without_package in o.move_line_ids])"/>-->
+
+                    <!--                                <t t-set="has_serial_number" t-value="o.move_line_ids.filtered(lambda move_ids_without_package.move_line_ids[0]: move_ids_without_package.move_line_ids[0].lot_id or move_ids_without_package.move_line_ids[0].lot_name)" groups="stock.group_production_lot"/>-->
+                    <thead>
+                        <tr>
+                            <th>
+                                <strong>Article</strong>
+                            </th>
+                            <th>
+                                <strong>Quant. Cdés</strong>
+                            </th>
+                            <th>
+                                <strong>Quant. Prépa</strong>
+                            </th>
+                          <!--  <th>
+                                <strong>Quantité</strong>
+                            </th>-->
+                           <!-- <th>
+                                <strong>DLC/DDM</strong>
+                            </th>-->
+                            <!--<th width="20%" t-if="o.picking_type_id.code != 'incoming'" align="left"><strong>From</strong>
+                            </th>-->
+                            <!--<th t-if="o.picking_type_id.code != 'outgoing'"><strong>To</strong></th>-->
+                            <th width="30%" class="text-center">
+                                <strong>Lot</strong>
+                            </th>
+                            <th>
+                                <strong>DLC/DDM</strong>
+                            </th>
+                            <!--<th width="15%" class="text-center" t-if="has_barcode">
+                                <strong>
+                                    Product Barcode
+                                </strong>
+                            </th>-->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="o.move_ids_without_package" t-as="m">
+                            <tr>
+                                <td>
+                                    <span t-field="m.product_id.display_name"/>
+                                    <br/>
+                                    <span t-field="m.product_id.description_picking"/>
+                                    <t t-if="m.product_id.type_traçabilite">
+                                        -
+                                     <!--   <strong t-field="m.product_id.type_traçabilite"/>-->
+                                    </t>
+                                </td>
+                                <td>
+                                    <span t-field="m.product_uom_qty"/>
+                                </td>
+                                <td>
+                                <!--    <span t-field="m.quantity_done"/>-->
+
+                                </td>
+
+                              <!--  <td>
+                                    <span t-field="m.weight"/>
+
+                                </td>-->
+                                 <t t-set="lots" t-value="[]"/>
+                                    <t t-foreach="m.move_line_ids" t-as="ml">
+                                        <t t-esc="lots.append(ml.lot_id)"/>
+                                    </t>
+                                  <td width="30%" class=" text-center h6">
+
+                                    <t t-foreach="set(lots)" t-as="lot">
+                                        <p t-field="lot.name" style="margin:0 !important;"/>
+                                    </t>
+
+                                </td>
+                               <td>
+
+                                    <t t-foreach="set(lots)" t-as="lot">
+                                        <t t-if="lot.life_date">
+                                            <p t-esc="context_timestamp(lot.life_date).strftime('%Y-%m-%d')" t-options="{'widget': 'date'}" style="margin:0 !important;"/>
+                                        </t>
+                                        <t t-if="lot.use_date">
+                                            <p t-esc="context_timestamp(lot.use_date).strftime('%Y-%m-%d')" t-options="{'widget': 'date'}" style="margin:0 !important;"/>
+                                        </t>
+                                        <t t-if=" not lot.use_date and not lot.life_date">
+                                            <p/>
+                                        </t>
+                                    </t>
+                                </td>
+
+
+
+                               <!-- <td width="15%" class="text-center" t-if="has_barcode">
+                                    <t t-if="product_barcode != m.product_id.barcode">
+                                        <span t-if="m.product_id and m.product_id.barcode">
+                                            <img t-if="len(m.product_id.barcode) == 13"
+                                                 t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN13', m.product_id.barcode, 600, 100)"
+                                                 style="width:100%;height:35px" alt="Barcode"/>
+                                            <img t-elif="len(ù.product_id.barcode) == 8"
+                                                 t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN8', m.product_id.barcode, 600, 100)"
+                                                 style="width:100%;height:35px" alt="Barcode"/>
+                                            <img t-else=""
+                                                 t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', m.product_id.barcode, 600, 100)"
+                                                 style="width:100%;height:35px" alt="Barcode"/>
+
+                                        </span>
+                                        <t t-set="product_barcode" t-value="m.product_id.barcode"/>
+                                    </t>
+                                </td>-->
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+            </xpath>
+        </template>
+    </data>
+</odoo>

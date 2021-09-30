@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_fiche_palette_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="docc">
+                <t t-set="doc" t-value="docc.partner_id"/>
+                <div class="article o_report_layout_standard" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+                    <t t-call="web.address_layout"/>
+                    <t t-raw="0"/>
+                    <style>
+                        .row{
+                        margin-left:0 !important;
+                        margin-right:0 ! important;
+                        }
+                        .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11,
+                        .col-12,
+                        .col,
+                        .col-auto, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7,
+                        .col-sm-8,
+                        .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm, .col-sm-auto, .col-md-1, .col-md-2,
+                        .col-md-3,
+                        .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11,
+                        .col-md-12,
+                        .col-md, .col-md-auto, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6,
+                        .col-lg-7,
+                        .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg, .col-lg-auto, .col-xl-1,
+                        .col-xl-2,
+                        .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10,
+                        .col-xl-11,
+                        .col-xl-12, .col-xl, .col-xl-auto{
+
+                        padding:0 !important;
+                        }
+                        .table th, .table td {
+                        padding: 0.2rem 0.4rem;
+                        vertical-align: top;
+                        border-right: 1px solid #dee2e6;
+                        border-top: none !important;
+                        }
+                    </style>
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        <div class="main " style="border:1px solid; padding: 5px;font-family:Times New Roman; border:2px;">
+                            <div class="row" align="left">
+                                <span style=" font-size: 20px; font-family:Times New Roman;padding: 1px;" t-field="doc.company_id.name"/>
+                            </div>
+                            <div class="row" align="left">
+                                <span style="font-size: 20px;font-family:Times New Roman;padding: 1px;" t-field="doc.company_id.street"/>
+                            </div>
+                            <div class="row" align="left">
+                                <span style=" font-size: 20px;font-family:Times New Roman;padding: 1px;" t-field="doc.company_id.zip"/>
+                                <span style="font-size: 20px;font-family:Times New Roman;padding: 1px;" t-field="doc.company_id.city"/>
+                            </div>
+                            <div class="row" align="left">
+                                <span style=" font-size: 20px;font-family:Times New Roman;padding: 1px;" t-field="doc.company_id.country_id"/>
+                            </div>
+                            <div class="row" align="left">
+                                <strong style="font-size: 20px;font-family:Times New Roman;">Tel :</strong>
+                                <span style=" font-size: 18px;font-family:Times New Roman;padding: 1px;" t-field="doc.company_id.phone"/>
+                            </div>
+                            <br/>
+                            <br/>
+                            <div style="border:1px solid;">
+                                <br/>
+                                <br/>
+                                <div align="center" style="border: none !important;">
+                                    <strong style=" font-size: 20px; font-weight: bold; left:0;font-family:Times New Roman;padding: 1px;">
+                                        Adresse de Livraison:
+                                    </strong>
+                                </div>
+                                <br/>
+                                <div align="center" style="border: none !important;">
+                                    <span style=" font-size: 62px; font-weight: bold; left:0;font-family:Times New Roman;padding: 1px;" t-field="doc.name" t-if="doc.name"/>
+                                    <span style=" font-size: 62px; font-weight: bold; left:0;font-family:Times New Roman;padding: 1px;" t-field="doc.parent_name" t-if="not doc.name"/>
+                                </div>
+                                <div align="center" style="border: none !important;">
+                                    <span style="font-size: 32px; font-family:Times New Roman;padding: 1px;" t-field="doc.street"/>
+                                    <span style="font-size: 13px; font-family:Times New Roman;padding: 1px;" t-field="doc.street2"/>
+                                </div>
+                                <div align="center" style="border: none !important;">
+                                    <span style=" font-size: 32px; font-family:Times New Roman;padding: 1px;" t-field="doc.zip"/>
+                                    <span style=" font-size: 32px; font-family:Times New Roman;padding: 1px;" t-field="doc.city"/>
+                                </div>
+                                <br/>
+                                <div align="center" style="border: none !important;">
+                                    <span style=" font-size: 40px; font-weight: bold; left:0;font-family:Times New Roman;padding: 1px;" t-field="doc.country_id"/>
+                                </div>
+
+                                <br/>
+                                <br/>
+
+                            </div>
+                        </div>
+                        <div align="center" style="border: none !important;">
+                            <strong style="font-weight: bold;font-size: 24px; left:0;font-family:Times New Roman;padding: 1px;">
+                                Nbre Colis:
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="footer">
+                    </div>
+                </div>
+
+            </t>
+        </t>
+    </template>
+    <data>
+        <report
+                id="action_report_fiche_palette"
+                string="Fiche Palette"
+                model="stock.picking"
+                report_type="qweb-pdf"
+                file="b2c_cheese_base.report_fiche_palette_document"
+                name="b2c_cheese_base.report_fiche_palette_document"
+        />
+    </data>
+</odoo>

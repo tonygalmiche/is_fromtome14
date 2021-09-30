@@ -8,35 +8,62 @@ from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
 
-    is_commande_soldee = fields.Boolean(string=u'Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
+
+    @api.depends('partner_id','is_fromtome_order_id')
+    def _compute_is_fromtome_order_vsb(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            vsb=True
+            if self.env.user.company_id.partner_id!=obj.partner_id:
+                vsb=False
+            if obj.is_fromtome_order_id:
+                vsb=False
+            obj.is_fromtome_order_vsb=vsb
+
+
+    is_commande_soldee    = fields.Boolean(string='Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
+    is_fromtome_order_id  = fields.Many2one('sale.order', 'Commande Fromtome', copy=False,readonly=True)
+    is_fromtome_order_vsb = fields.Boolean(string='Créer commande dans Fromtome vsb', compute='_compute_is_fromtome_order_vsb')
 
 
     def creer_commande_fromtome_action(self):
+        cr,uid,context,su = self.env.args
         for obj in self:
             vals={
-                'company_id': 1,
-                'partner_id': 3779,
-                'user_id'   : 27,
+                #'company_id': 1,
+                'partner_id': obj.partner_id.id,
+                'user_id'   : uid,
             }
-            order=self.env['sale.order'].sudo().create(vals)
+            order=self.env['sale.order'].create(vals)
+            obj.is_fromtome_order_id=order.id
             if order:
                 for line in obj.order_line:
-                    default_code =  (line.product_id.default_code or '')[2:]
-                    filtre=[
-                        ('default_code','=', default_code),
-                        ('company_id'  ,'=', 1),
-                    ]
-                    products=self.env['product.product'].sudo().search(filtre,limit=1)
-                    for product in products:
-                        vals={
-                            'sequence'  : line.sequence,
-                            'product_id': product.id,
-                            'name'      : product.name,
-                            'product_uom_qty': line.product_qty,
-                            'order_id'       : order.id,
-                        }
-                        res=self.env['sale.order.line'].sudo().create(vals)
-                        line.price_unit = res.price_unit
+                    vals={
+                        'sequence'  : line.sequence,
+                        'product_id': line.product_id.id,
+                        'name'      : line.product_id.name,
+                        'product_uom_qty': line.product_qty,
+                        'order_id'       : order.id,
+                    }
+                    res=self.env['sale.order.line'].create(vals)
+                    line.price_unit = res.price_unit
+
+                    # default_code =  (line.product_id.default_code or '')[2:]
+                    # filtre=[
+                    #     ('default_code','=', default_code),
+                    #     ('company_id'  ,'=', 1),
+                    # ]
+                    # products=self.env['product.product'].search(filtre,limit=1)
+                    # for product in products:
+                    #     vals={
+                    #         'sequence'  : line.sequence,
+                    #         'product_id': product.id,
+                    #         'name'      : product.name,
+                    #         'product_uom_qty': line.product_qty,
+                    #         'order_id'       : order.id,
+                    #     }
+                    #     res=self.env['sale.order.line'].create(vals)
+                    #     line.price_unit = res.price_unit
 
 
 class PurchaseOrderLine(models.Model):
@@ -45,7 +72,6 @@ class PurchaseOrderLine(models.Model):
     @api.depends('product_id','product_qty')
     def _compute_is_nb_pieces_par_colis(self):
         for obj in self:
-            print(obj.product_uom,obj.product_uom.category_id.name) #Poids
             nb        = obj.product_id.is_nb_pieces_par_colis
             poids_net = obj.product_id.is_poids_net_colis
             unite     = obj.product_uom.category_id.name
@@ -72,7 +98,6 @@ class PurchaseOrder(models.Model):
     # @api.onchange('date_planned')
     # @api.multi
     # def _onchange_date_planned(self):
-    #     print('_onchange_date_planned')
     #     self.action_set_date_planned()
 
     is_date_enlevement      = fields.Date('Date Enlèvement')                          # était date_enlevelment

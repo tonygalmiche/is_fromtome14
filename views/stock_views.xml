@@ -79,7 +79,7 @@
                 <field name="is_dlc_ddm"/>
             </field>
             <field name="ref" position="replace">
-                <!-- <field name="company_id"/> -->
+                <field name="company_id"/>
                 <field name="active"/>
             </field>
             <notebook position="attributes">

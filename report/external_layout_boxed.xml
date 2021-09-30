@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- 
+<t t-name="web.external_layout_boxed">
+        <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+            <div class="o_boxed_header">
+            <div class="row mb8">
+                <div class="col-6">
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo"/>
+                </div>
+                <div class="col-6 text-right mb4">
+                    <h4 class="mt0" t-field="company.report_header"/>
+                    <div name="company_address" class="float-right mb4">
+                        <span class="company_address" t-field="company.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: true}"/>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <div t-attf-class="article o_report_layout_boxed o_company_#{company.id}_layout" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <div class="pt-5">
+                <t t-call="web.address_layout"/>
+            </div>
+            <t t-raw="0"/>
+        </div>
+
+        <div t-attf-class="footer o_boxed_footer o_company_#{company.id}_layout">
+            <div class="text-center">
+                <ul class="list-inline">
+                    <li t-if="company.phone" class="list-inline-item"><span class="o_force_ltr" t-field="company.phone"/></li>
+                    <li t-if="company.email" class="list-inline-item"><span t-field="company.email"/></li>
+                    <li t-if="company.website" class="list-inline-item"><span t-field="company.website"/></li>
+                    <li t-if="company.vat" class="list-inline-item"><t t-esc="company.country_id.vat_label or 'Tax ID'"/>: <span t-field="company.vat"/></li>
+                </ul>
+                <div t-field="company.report_footer"/>
+                <div t-if="report_type == 'pdf'">
+                    Page: <span class="page"/> / <span class="topage"/>
+                </div>
+            </div>
+        </div>
+    </t>
+-->
+
+
+   <template id="is_external_layout_boxed" inherit_id="web.external_layout_boxed">
+        <div class="o_boxed_header" position="replace">
+            <div class="o_boxed_header">
+                <div class="row mb8">
+                    <div class="col-6">
+                        <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)" alt="Logo"/>
+                    </div>
+                    <div class="col-6 text-right mb4">
+                        <h4 class="mt0" t-field="res_company.report_header"/>
+                        <div name="res_company" class="mb4">
+                            <h5 style="font-weight:700 !important;" t-field="res_company.name"/>
+                            <br/>
+                            <span t-field="res_company.street"/>
+                            <br/>
+                            <span t-field="res_company.zip"/>
+                            <![CDATA[
+                            &nbsp;
+                            ]]>
+                            <span t-field="res_company.city"/>
+                            <br/>
+                            <span t-field="res_company.country_id"/>
+                            <div t-if="res_company.is_gln">
+                                GLN:<span t-field="res_company.is_gln"/>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center"  position="replace">
+            <div class="text-center" style="font-size:10pt">
+                <div t-field="company.report_footer"/>
+                <div t-if="report_type == 'pdf'">
+                    Page: <span class="page"/> / <span class="topage"/>
+                </div>
+            </div>
+        </div>
+
+
+    </template>
+
+
+<!-- 
+    <template id="web.external_layout_boxed">
+        <div class="header">
+            <div class="o_boxed_header">
+                <div class="row mb8">
+                    <div class="col-6">
+                        <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo"/>
+                    </div>
+                    <div class="col-6 text-right mb4">
+                        <h4 class="mt0" t-field="company.report_header"/>
+                        <div name="company_address" class="mb4">
+                            <h5 style="font-weight:700 !important;" t-field="company.name"/>
+                            <br/>
+                            <span t-field="company.street"/>
+                            <br/>
+                            <span t-field="company.zip"/>
+                            <![CDATA[
+                            &nbsp;
+                            ]]>
+                            <span t-field="company.city"/>
+                            <br/>
+                            <span t-field="company.country_id"/>
+                            <div t-if="company.is_gln">
+                                GLN:<span t-field="company.is_gln"/>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="article o_report_layout_boxed" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id"
+             t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <t t-call="web.address_layout"/>
+            <t t-raw="0"/>
+        </div>
+        <div class="footer o_boxed_footer">
+            <div class="text-center">
+                <div t-field="company.report_footer"/>
+                <div t-if="report_type == 'pdf'">
+                    Page:
+                    <span class="page"/>
+                    /
+                    <span class="topage"/>
+                </div>
+            </div>
+        </div>
+    </template> -->
+</odoo>

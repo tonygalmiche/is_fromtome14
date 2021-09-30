@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_offre_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
+            <t t-set="address">
+                <!-- <div t-field="doc.partner_id"
+                     t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}' />
+                -->
+                <strong style="size=16px;">
+                    <span t-field="doc.partner_id.name"/>
+                </strong>
+                <br/>
+                <t t-if="doc.partner_id.street">
+                    <span t-field="doc.partner_id.street"/>
+                    <br/>
+                </t>
+                <t t-if="doc.partner_id.street2">
+                    <span t-field="doc.partner_id.street2"/>
+                    <br/>
+                </t>
+                <span t-field="doc.partner_id.zip"/>
+
+                &amp;nbsp;
+                <span t-field="doc.partner_id.city"/>
+                <br/>
+                <span t-field="doc.partner_id.country_id"/>
+                <t t-if="doc.partner_id.phone">
+                    <br/>
+                    <strong>Tel:</strong>
+                    <span t-field="doc.partner_id.phone"/>
+                </t>
+
+                <p t-if="doc.partner_id.vat"><t t-esc="doc.company_id.country_id.vat_label or 'Tax ID'"/>:
+                    <span t-field="doc.partner_id.vat"/>
+                </p>
+            </t>
+
+            <div class="page">
+                <div class="oe_structure"/>
+
+                <h5>
+
+                    <span>Offre #</span>
+                    <span t-field="doc.name"/>
+                </h5>
+                <h7>
+                    <strong>Votre Contact:</strong>
+                    <span class="m-0" t-field="doc.user_id"/>
+                    <br/>
+                    <strong t-if="doc.user_id.partner_id.mobile">Tel:</strong>
+                    <span t-if="doc.user_id.partner_id.mobile" class="m-0" t-field="doc.user_id.partner_id.mobile">
+                        &amp;nbsp;
+                    </span>
+                    <strong t-if="doc.user_id.partner_id.email">Email :</strong>
+                    <span class="m-0" t-field="doc.user_id.partner_id.email"/>
+                    <br/>
+                    <br/>
+                    <br/>
+                </h7>
+
+                <div class="row mt32 mb32" id="informations">
+                    <div t-if="doc.date_order and doc.state in ['draft','sent']" class="col-auto mw-100 mb-2">
+                        <strong>Date:</strong>
+                        <p class="m-0" t-field="doc.date_order" t-options="{'widget': 'date'}"/>
+                    </div>
+                    <div t-if="doc.validity_date and doc.state in ['draft','sent']" class="col-auto mw-100 mb-2">
+                        <strong>Date de Validité:</strong>
+                        <p class="m-0" t-field="doc.validity_date" t-options="{'widget': 'date'}"/>
+                    </div>
+                    <div t-if="doc.date_order and doc.state in ['sale','done']" class="col-auto mw-100 mb-2">
+                        <strong>Date:</strong>
+                        <p class="m-0" t-field="doc.confirmation_date" t-options="{'widget': 'date'}"/>
+                    </div>
+                </div>
+
+                <!-- Is there a discount on at least one line? -->
+                <t t-set="display_discount" t-value="any([l.discount for l in doc.order_line])"/>
+
+                <table class="table table-sm o_main_table">
+                    <thead>
+                        <tr>
+                            <!-- TODO: remove in master -->
+                            <t t-set="colspan" t-value="5"/>
+                            <th class="text-left">Désignation</th>
+                            <th class="text-right">Unité</th>
+                            <th class="text-right">PU H.T. en €</th>
+                        </tr>
+                    </thead>
+                    <tbody class="sale_tbody">
+
+                        <t t-set="current_subtotal" t-value="0"/>
+
+                        <t t-foreach="doc.order_line" t-as="line">
+
+                            <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
+                            <t t-set="current_subtotal" t-value="current_subtotal + line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
+
+                            <tr t-att-class="'bg-200 font-weight-bold o_line_section' if line.display_type == 'line_section' else 'font-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                <t t-if="not line.display_type">
+                                    <td>
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <td class="text-right">
+
+                                        <span t-field="line.product_uom"/>
+                                    </td>
+                                    <td class="text-right">
+                                        <span t-field="line.price_unit"/>
+                                    </td>
+
+                                </t>
+                                <t t-if="line.display_type == 'line_section'">
+                                    <td colspan="99">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                    <t t-set="current_section" t-value="line"/>
+                                    <t t-set="current_subtotal" t-value="0"/>
+                                </t>
+                                <t t-if="line.display_type == 'line_note'">
+                                    <td colspan="99">
+                                        <span t-field="line.name"/>
+                                    </td>
+                                </t>
+                            </tr>
+
+
+                        </t>
+                    </tbody>
+                </table>
+
+                <div class="clearfix"/>
+
+                <div class="oe_structure"/>
+            </div>
+        </t>
+    </template>
+
+
+    <template id="report_offre">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="b2c_cheese_base.report_offre_document" t-lang="doc.partner_id.lang"/>
+            </t>
+        </t>
+    </template>
+
+    <report
+            id="action_report_offre"
+            string="Offre"
+            model="sale.order"
+            report_type="qweb-pdf"
+            name="b2c_cheese_base.report_offre"
+            file="b2c_cheese_base.report_offre"
+    />
+
+</odoo>
