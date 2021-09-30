@@ -96,6 +96,7 @@
                 <sheet>
                     <group>
                         <field name="name"/>
+                        <field name="enseigne_id"/>
                         <field name="partner_id"/>
                         <field name="stock_mini"/>
                         <field name="order_id" readonly="1"/>
@@ -110,6 +111,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
+                 <field name="enseigne_id"/>
                 <field name="partner_id"/>
                 <field name="stock_mini"/>
                 <field name="order_id"/>
@@ -122,6 +124,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
+                 <field name="enseigne_id"/>
                 <field name="partner_id"/>
                 <field name="order_id"/>
            </search>

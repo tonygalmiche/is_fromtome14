@@ -33,11 +33,12 @@ class IsCommandeFromtome(models.Model):
     _description = u"Commande fromtome"
     _order='name desc'
 
-    name       = fields.Char(u"N°", readonly=True)
-    partner_id = fields.Many2one('res.partner', u'Fournisseur', required=True)
-    stock_mini = fields.Boolean(u"Stock mini", default=True, help=u"Si cette case est cochée, il faut tenir compte du stock mini")
-    order_id   = fields.Many2one('purchase.order', u'Commande Fromtome')
-    ligne_ids  = fields.One2many('is.commande.fromtome.ligne', 'commande_id', u'Lignes')
+    name        = fields.Char(u"N°", readonly=True)
+    enseigne_id = fields.Many2one('is.enseigne.commerciale', 'Enseigne', required=True, help="Enseigne commerciale")
+    partner_id  = fields.Many2one('res.partner', u'Fournisseur', required=True)
+    stock_mini  = fields.Boolean(u"Stock mini", default=True, help=u"Si cette case est cochée, il faut tenir compte du stock mini")
+    order_id    = fields.Many2one('purchase.order', u'Commande Fromtome')
+    ligne_ids   = fields.One2many('is.commande.fromtome.ligne', 'commande_id', u'Lignes')
 
 
     @api.model
@@ -70,7 +71,7 @@ class IsCommandeFromtome(models.Model):
                 order.onchange_partner_id()
             order.order_line.unlink()
             now = datetime.date.today()
-            products = self.env['product.product'].search([('sale_ok','=',True)],order='name')
+            products = self.env['product.product'].search([('sale_ok','=',True),('is_enseigne_id','=',obj.enseigne_id.id)],order='name')
             print(products)
             sequence=0
             for product in products:
