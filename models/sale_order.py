@@ -119,17 +119,14 @@ class SaleOrder(models.Model):
     is_date_livraison  = fields.Date('Date Livraison')
     is_commande_soldee = fields.Boolean(string=u'Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
 
-    @api.depends('order_line','partner_id')
+    @api.depends('order_line')
     def _compute_is_creer_commande_fournisseur_vsb(self):
         for obj in self:
-            if self.env.user.company_id.partner_id==obj.partner_id:
-                vsb=False
-            else:
-                vsb = False
-                for line in obj.order_line:
-                    if not line.is_purchase_line_id.id:
-                        vsb=True
-                        break
+            vsb = False
+            for line in obj.order_line:
+                if not line.is_purchase_line_id.id:
+                    vsb=True
+                    break
             obj.is_creer_commande_fournisseur_vsb=vsb
 
 
