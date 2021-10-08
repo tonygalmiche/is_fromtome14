@@ -1,246 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <template id="stock.report_delivery_document">
-        <t t-call="web.html_container">
-            <t t-call="web.external_layout">
-                <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
-                <t t-set="partner" t-value="o.partner_id or (o.move_lines and o.move_lines[0].partner_id) or False"/>
-                <div class="page">
-                    <div class="row mt32 mb32">
-                        <div class="col-6">
-                            <u>Adresse de Livraison:</u>
-                            <br/>
-                            <strong style="size=16px;">
-                                <span t-field="o.sale_id.partner_shipping_id.name"/>
-                            </strong>
-                            <br/>
-                            <span t-field="o.sale_id.partner_shipping_id.street"/>
-                            <br/>
-                            <t t-if="o.sale_id.partner_shipping_id.street2">
-                                <span t-field="o.sale_id.partner_shipping_id.street2"/>
-                                <br/>
-                            </t>
-                            <span t-field="o.sale_id.partner_shipping_id.zip"/>
-
-                            &amp;nbsp;
-
-                            <span t-field="o.sale_id.partner_shipping_id.city"/>
-                            <br/>
-                            <div t-if="o.partner_id.is_iln">
-                                <strong>ILN client:</strong>
-                                <span t-field="o.partner_id.is_iln"/>
-                            </div>
-                            <span t-field="o.sale_id.partner_shipping_id.country_id"/>
-                            <br/>
-                            <br/>
-                            <t t-if="o.sale_id.partner_invoice_id.phone">
-                                <strong>N° tel:</strong>
-                                <span t-field="o.sale_id.partner_shipping_id.phone"/>
-                            </t>
-                        </div>
-                        <div class="col-6">
-                            <u>Adresse de facturation:</u>
-                            <br/>
-                            <strong style="size=16px;">
-                                <span t-field="o.sale_id.partner_invoice_id.name"/>
-                            </strong>
-                            <br/>
-                            <span t-field="o.sale_id.partner_invoice_id.street"/>
-                            <br/>
-                            <t t-if="o.sale_id.partner_invoice_id.street2">
-                                <span t-field="o.sale_id.partner_invoice_id.street2"/>
-                                <br/>
-                            </t>
-                            <span t-field="o.sale_id.partner_invoice_id.zip"/>
-
-                            &amp;nbsp;
-
-                            <span t-field="o.sale_id.partner_invoice_id.city"/>
-                            <br/>
-                            <div t-if="o.sale_id.partner_invoice_id.vat">
-                                <strong>N°TVA Intra:</strong>
-                                <span t-field="o.sale_id.partner_invoice_id.vat"/>
-                            </div>
-                            <div t-if="o.partner_id.is_gln">
-                                <strong>GLN client:</strong>
-                                <span t-field="o.partner_id.is_gln"/>
-                            </div>
-                            <span t-field="o.sale_id.partner_invoice_id.country_id"/>
-                            <br/>
-                            <div t-if="o.sale_id.partner_invoice_id.phone">
-                                <strong>N° tel:</strong>
-                                <span t-field="o.sale_id.partner_invoice_id.phone"/>
-                            </div>
-                        </div>
-                    </div>
-                    <h2></h2>
-                    <h5>
-                        <span t-field="o.name"/>
-                    </h5>
-                    <h7 t-if="o.user_id">
-                        <strong>Votre Contact:</strong>
-                        <span class="m-0" t-field="o.user_id"/>
-                        <br/>
-                        <strong t-if="o.user_id.partner_id.mobile">Tel:</strong>
-                        <span class="m-0" t-field="o.user_id.partner_id.mobile"/>
-
-                        &amp;nbsp;
-
-                        <strong t-if="o.user_id.partner_id.email">Email :</strong>
-                        <span class="m-0" t-field="o.user_id.partner_id.email"/>
-                        <br/>
-                        <br/>
-                        <br/>
-                    </h7>
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th t-if="o.sale_id.client_order_ref">
-                                    <strong>N° client</strong>
-                                </th>
-                                <th t-if="o.origin">
-                                    <strong>N° Commande</strong>
-                                </th>
-                                <th name="td_sched_date_h">
-                                    <strong>Date Livraison</strong>
-                                </th>
-                                <th name="td_quantity_done_h" t-if="o.is_colis">
-                                    <strong>Nbre Colis</strong>
-                                </th>
-                                <th name="td_product_weight_h" t-if="o.is_colis">
-                                    <strong>Poids</strong>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td t-if="o.sale_id.client_order_ref">
-                                    <span t-field="o.sale_id.client_order_ref"/>
-                                </td>
-                                <td t-if="o.origin">
-                                    <span t-field="o.origin"/>
-                                </td>
-                                <td name="td_sched_date">
-                                    <span t-field="o.scheduled_date" t-options="{'widget': 'date','format': 'dd/MM/yyyy'}"/>
-                                </td>
-                                <td name="td_quantity_done" t-if="o.is_colis">
-
-                                    <span t-esc="sum(o.move_ids_without_package.mapped('quantity_done'))" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 0}"/>
-                                </td>
-
-                                <td name="td_product_weight" t-if="o.is_colis">
-                                    <t t-set="qty_weight" t-value="0"/>
-                                    <t t-foreach="o.move_ids_without_package" t-as="l">
-                                        <t t-if="l.weight_uom_id.id == 3">
-                                            <t t-set="qty_weight" t-value="qty_weight+l.weight"/>
-                                        </t>
-                                        <t t-if="l.weight_uom_id.id != 3">
-                                            <t t-set="qty_weight" t-value="qty_weight+l.product_weight"/>
-                                        </t>
-                                    </t>
-                                    <span t-esc="qty_weight" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 3}"/>
-                                    KG
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <table class="table table-sm mt48">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <strong>Désignation</strong>
-                                </th>
-                                <th class="text-right" t-if="o.is_colis">
-                                    <strong>Quant.</strong>
-                                </th>
-                                <th class="text-left" t-if="o.is_colis">
-                                    <strong>Unité</strong>
-                                </th>
-                                <th class="text-right">
-                                    <strong t-if="not o.is_colis">Cdé</strong>
-                                    <strong t-if="o.is_colis">Colis Cdé</strong>
-                                </th>
-                                <th class="text-right">
-                                    <strong t-if="not o.is_colis">Livré</strong>
-                                    <strong t-if="o.is_colis">Colis Livré</strong>
-
-                                </th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                            <t t-set="lines" t-value="o.move_lines.filtered(lambda x: x.product_uom_qty)"/>
-                            <tr t-foreach="lines" t-as="move">
-
-                                <t t-set="ddms" t-value="move.get_ddm_lot()"/>
-                                <t t-set="lots" t-value="[]"/>
-                                <t t-foreach="move.move_line_ids" t-as="ml">
-                                    <t t-esc="lots.append(ml.lot_id)"/>
-                                </t>
-                                <td>
-                                    <strong t-field="move.product_id"/>
-                                    <span t-if="o.picking_type_code == 'outgoing'">
-                                        <br/>
-                                        <span t-field="move.product_id.sudo().description_pickingout"/>
-                                    </span>
-                                    <span t-if="o.picking_type_code == 'incoming'">
-                                        <br/>
-                                        <span t-field="move.product_id.sudo().description_pickingin"/>
-                                    </span>
-                                    <div>
-                                        <t t-foreach="ddms" t-as="ddm">
-                                            <t t-if="ddms[ddm]['weight']">
-                                                <strong>Lot:</strong>
-                                                <span t-esc="ddms[ddm]['lot']" style="margin:0 !important;"/>
-                                                <t t-if="ddms[ddm]['life_use_date']">
-                                                    <strong t-esc="ddms[ddm]['type_tracabilite'].upper()"/>:
-                                                    <span t-esc="ddms[ddm]['life_use_date']" style="margin:0 !important;"/>
-                                                </t>
-                                                <strong>Quant:</strong>
-                                                <span t-esc="ddms[ddm]['weight']" style="margin:0 !important;"/>
-                                                <t t-if="o.company_id.name=='FROMTOME'">
-                                                    <strong>Colis:</strong>
-                                                    <span t-esc="ddms[ddm]['qty_done']" style="margin:0 !important;"/>
-                                                </t>
-                                                <br/>
-                                            </t>
-                                        </t>
-                                    </div>
 
 
-                                </td>
-                                <td class="text-right" t-if="move.is_colis">
+    <template id="is_report_delivery_document" inherit_id="stock.report_delivery_document">
+        <div class="page" position="replace">
 
-                                    <strong t-field="move.weight"/>
-                                </td>
-                                <td class="text-left" t-if="move.is_colis">
-                                    <strong t-field="move.weight_uom_id"/>
-                                </td>
-                                <td class="text-right">
-                                    <strong t-if="o.is_colis" t-field="move.sale_line_id.product_qty" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 0}"/>
-                                    <span t-if="not o.is_colis" t-field="move.sale_line_id.product_qty"/>
-                                    <span t-if="not o.is_colis" t-field="move.product_uom"/>
-                                </td>
-                                <td class="text-right">
-                                    <span>
-                                        <strong t-if="o.is_colis" t-field="move.quantity_done" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 0}"/>
-                                        <strong t-if="not o.is_colis" t-field="move.quantity_done"/>
-                                        <strong t-if="not o.is_colis" t-field="move.product_uom"/>
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
 
-                    <p>
-                        <t t-if="o.backorder_ids and o.backorder_ids.filtered(lambda x: x.state not in ('done', 'cancel'))">
-                            All items couldn't be shipped, the remaining ones will be shipped as soon as they become
-                            available.
-                        </t>
-                    </p>
-                </div>
-            </t>
-        </t>
+            <div class="page">
+                <h2>
+                    <span t-field="o.name"/>
+                </h2>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th class="text-center" t-if="o.sale_id.client_order_ref">
+                                <strong>N° client</strong>
+                            </th>
+                            <th class="text-center" t-if="o.origin">
+                                <strong>N° Commande</strong>
+                            </th>
+                            <th class="text-center" name="td_sched_date_h">
+                                <strong>Date Livraison</strong>
+                            </th>
+                            <th class="text-center" name="td_quantity_done_h">
+                                <strong>Nbre Colis</strong>
+                            </th>
+                            <th class="text-center" name="td_product_weight_h">
+                                <strong>Poids</strong>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center" t-if="o.sale_id.client_order_ref">
+                                <span t-field="o.sale_id.client_order_ref"/>
+                            </td>
+                            <td class="text-center" t-if="o.origin">
+                                <span t-field="o.origin"/>
+                            </td>
+                            <td class="text-center" name="td_sched_date">
+                                <span t-field="o.scheduled_date" t-options="{'widget': 'date','format': 'dd/MM/yyyy'}"/>
+                            </td>
+                            <td class="text-center" name="td_quantity_done">
+
+                                <span t-esc="sum(o.move_ids_without_package.mapped('quantity_done'))" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 0}"/>
+                            </td>
+
+                            <td class="text-center" name="td_product_weight">
+                                <span t-field="o.is_poids_net"/> KG
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+               <table class="table table-sm mt48">
+                    <thead>
+                        <tr>
+                            <th class="text-left"><strong>Désignation</strong></th>
+                            <th class="text-right"><strong>Commandé</strong></th>
+                            <th class="text-right"><strong>Livré</strong></th>
+                            <th class="text-left"><strong>Unité</strong></th>
+                            <th class="text-right"><strong>Colis Livré</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="o.move_ids_without_package" t-as="line">
+                            <td class="text-left">
+                                <div><strong><span t-field="line.product_id"/></strong></div>
+                                <span t-if="line.is_lots" t-field="line.is_lots"/>
+                            </td>
+                            <td class="text-right"><span t-field="line.product_uom_qty"/></td>
+                            <td class="text-right"><span t-field="line.quantity_done"/></td>
+                            <td class="text-left"><span t-field="line.product_uom"/></td>
+                            <td class="text-right"><span t-field="line.is_nb_colis"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </template>
 </odoo>

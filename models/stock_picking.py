@@ -216,6 +216,17 @@ class Picking(models.Model):
     # is_scan_vsb = fields.Boolean(string=u'Scan', compute='_compute_is_scan_vsb', readonly=True, store=False)
 
 
+    @api.depends('move_line_ids_without_package')
+    def _compute_is_poids_net(self):
+        for obj in self:
+            poids=0
+            for line in obj.move_line_ids_without_package:
+                poids+=line.is_poids_net_reel
+            obj.is_poids_net=poids
+
+    is_poids_net = fields.Float(string='Poids net', digits=(14,3), help="Poids net réel total (Kg)", compute='_compute_is_poids_net')
+
+
     def scan_picking_action(self):
         for obj in self:
 

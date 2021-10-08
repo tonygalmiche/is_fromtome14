@@ -95,7 +95,38 @@ class StockMove(models.Model):
                 obj.is_alerte=alerte
 
 
-    is_alerte = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
+    @api.onchange('move_line_ids')
+    def _compute_is_lots(self):
+        for obj in self:
+            lots={}
+            for line in obj.move_line_ids:
+                cle="%s-%s-%s"%(obj.product_id.id,line.lot_id.name,line.is_dlc_ddm)
+                if cle not in lots:
+                    dlc = (line.is_dlc_ddm and line.is_dlc_ddm.strftime('%d/%m/%Y')) or ''
+                    lots[cle]=[(line.lot_id.name or ''),(line.is_type_tracabilite or '').upper(),dlc,0,0]
+                lots[cle][3]+=line.qty_done
+                lots[cle][4]+=line.is_nb_colis
+            t=[]
+            for lot in lots:
+                l=lots[lot]
+                x="Lot:%s %s:%s Quant:%.2f Colis:%.1f"%(l[0],l[1],l[2],l[3],l[4])
+                t.append(x)
+            obj.is_lots = "\n".join(t)
+
+
+    @api.onchange('move_line_ids')
+    def _compute_is_nb_colis(self):
+        for obj in self:
+            nb=0
+            for line in obj.move_line_ids:
+                nb+=line.is_nb_colis
+            obj.is_nb_colis=nb
+ 
+
+    is_alerte   = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
+    is_lots     = fields.Text('Lots'  , copy=False, compute=_compute_is_lots)
+    is_nb_colis = fields.Float('Nb Colis', digits=(14,2), compute=_compute_is_nb_colis)
+
 
 
     def get_nb_colis(self):
