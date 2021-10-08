@@ -78,7 +78,7 @@ InfoSaône - Module Odoo 14 pour Fromtome
 #        'wizard/mail_compose_message_view.xml',
 
         # 'report/fiche_prepa_template.xml',
-        # 'report/sale_template.xml',
+        'report/sale_template.xml',
         #'report/purchase_document.xml',
         'report/purchase_order_templates.xml',
         # 'report/sale_invoice_template.xml',

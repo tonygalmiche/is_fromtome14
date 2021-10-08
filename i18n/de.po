@@ -6,14 +6,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 14.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-08 08:00+0000\n"
-"PO-Revision-Date: 2021-10-08 08:00+0000\n"
+"POT-Creation-Date: 2021-10-08 07:17+0000\n"
+"PO-Revision-Date: 2021-10-08 09:27+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: \n"
+"Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: \n"
+"Language: de\n"
+"X-Generator: Poedit 2.0.6\n"
 
 #. module: is_fromtome14
 #: code:addons/is_fromtome14/models/stock.py:0
@@ -29,7 +31,7 @@ msgstr ""
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
 msgid "&amp;nbsp;<span>on</span>&amp;nbsp;"
-msgstr "&amp;nbsp;<span>sur</span>&amp;nbsp;"
+msgstr ""
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.report_product_technical_document
@@ -59,8 +61,6 @@ msgid ""
 "<span groups=\"account.group_show_line_subtotals_tax_excluded\">Amount</span>\n"
 "                            <span groups=\"account.group_show_line_subtotals_tax_included\">Total Price</span>"
 msgstr ""
-"<span groups=\"account.group_show_line_subtotals_tax_excluded\">Montant</span>\n"
-"                            <span groups=\"account.group_show_line_subtotals_tax_included\">Montant Total</span>"
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
@@ -76,12 +76,12 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_purchaseorder_document
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
 msgid "<strong class=\"mr16\">Subtotal</strong>"
-msgstr "<strong class=\"mr16\">Sous-total</strong>"
+msgstr ""
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_purchaseorder_document
 msgid "<strong>Amount</strong>"
-msgstr "<strong>Montant</strong>"
+msgstr ""
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_purchaseorder_document
@@ -90,8 +90,9 @@ msgstr ""
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_purchaseorder_document
+#, fuzzy
 msgid "<strong>Description</strong>"
-msgstr ""
+msgstr "<strong>BESCHREIBUNG</strong>"
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
@@ -107,7 +108,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_purchaseorder_document
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
 msgid "<strong>Order Date:</strong>"
-msgstr "<strong>Date de commande:</strong>"
+msgstr ""
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_purchaseorder_document
@@ -122,12 +123,12 @@ msgstr ""
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
 msgid "<strong>Quotation Date:</strong>"
-msgstr "<strong>Date du devis:</strong>"
+msgstr ""
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
 msgid "<strong>Salesperson:</strong>"
-msgstr "<strong>Vendeur:</strong>"
+msgstr ""
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
@@ -138,7 +139,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_purchaseorder_document
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
 msgid "<strong>Subtotal</strong>"
-msgstr "<strong>Sous-total</strong>"
+msgstr ""
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_purchaseorder_document
@@ -154,7 +155,7 @@ msgstr ""
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_purchaseorder_document
 msgid "<strong>Unit Price</strong>"
-msgstr "<strong>Prix Unitaire</strong>"
+msgstr ""
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_purchaseorder_document
@@ -410,9 +411,7 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model.fields,help:is_fromtome14.field_purchase_order__is_commande_soldee
 #: model:ir.model.fields,help:is_fromtome14.field_sale_order__is_commande_soldee
-msgid ""
-"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue "
-"sur celle-ci"
+msgid "Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci"
 msgstr ""
 
 #. module: is_fromtome14
@@ -480,7 +479,7 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_res_company
 msgid "Companies"
-msgstr "Sociétés"
+msgstr "Unternehmen"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_is_export_compta_ligne__compte_lib
@@ -517,7 +516,7 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_res_partner
 msgid "Contact"
-msgstr ""
+msgstr "Kontakt"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_contrat_date_client__name
@@ -540,9 +539,7 @@ msgstr ""
 #. module: is_fromtome14
 #: code:addons/is_fromtome14/models/intrastat_product_declaration.py:0
 #, python-format
-msgid ""
-"Conversion from Intrastat Supplementary Unit '%s' to Unit of Measure is not "
-"implemented yet."
+msgid "Conversion from Intrastat Supplementary Unit '%s' to Unit of Measure is not implemented yet."
 msgstr ""
 
 #. module: is_fromtome14
@@ -833,7 +830,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:is_fromtome14.field_is_sale_order_line__description
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
 msgid "Description"
-msgstr ""
+msgstr "BESCHREIBUNG"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_is_fnc__description
@@ -894,7 +891,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:is_fromtome14.field_stock_picking__display_name
 #: model:ir.model.fields,field_description:is_fromtome14.field_stock_production_lot__display_name
 msgid "Display Name"
-msgstr "Nom affiché"
+msgstr "Anzeigename"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_product_product__duree_affinage
@@ -966,13 +963,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:is_fromtome14.field_product_supplierdiscount__date_end
 #: model:ir.model.fields,field_description:is_fromtome14.field_product_supplierinfo__date_end
 msgid "End Date"
-msgstr "Date de fin"
+msgstr "Enddatum"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,help:is_fromtome14.field_product_supplierdiscount__date_end
 #: model:ir.model.fields,help:is_fromtome14.field_product_supplierinfo__date_end
 msgid "End date for this vendor price"
-msgstr "Date de fin pour ce prix fournisseur"
+msgstr "Enddatum dieses Lieferantenpreises"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_is_commande_fromtome__enseigne_id
@@ -1026,8 +1023,7 @@ msgstr ""
 
 #. module: is_fromtome14
 #: model:ir.actions.act_window,name:is_fromtome14.is_fnc_action
-#: model:ir.ui.menu,name:is_fromtome14.is_fnc_main_menu
-#: model:ir.ui.menu,name:is_fromtome14.is_fnc_menu
+#: model:ir.ui.menu,name:is_fromtome14.is_fnc_main_menu model:ir.ui.menu,name:is_fromtome14.is_fnc_menu
 msgid "FNC"
 msgstr ""
 
@@ -1219,8 +1215,7 @@ msgstr ""
 
 #. module: is_fromtome14
 #: model:ir.model.fields,help:is_fromtome14.field_stock_production_lot__is_article_actif
-msgid ""
-"If unchecked, it will allow you to hide the product without removing it."
+msgid "If unchecked, it will allow you to hide the product without removing it."
 msgstr ""
 
 #. module: is_fromtome14
@@ -1273,22 +1268,22 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_stock_inventory
 msgid "Inventory"
-msgstr "Inventaire"
+msgstr "Lager"
 
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_stock_inventory_line
 msgid "Inventory Line"
-msgstr "Ligne d'inventaire"
+msgstr "Lagerbestandspos."
 
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_account_move
 msgid "Journal Entry"
-msgstr "Pièce comptable"
+msgstr "Buchungssatz"
 
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_account_move_line
 msgid "Journal Item"
-msgstr "Écriture comptable"
+msgstr "Buchungszeile"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_is_export_compta_ligne__journal_code
@@ -1381,7 +1376,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:is_fromtome14.field_stock_picking____last_update
 #: model:ir.model.fields,field_description:is_fromtome14.field_stock_production_lot____last_update
 msgid "Last Modified on"
-msgstr "Dernière modification le"
+msgstr "Zuletzt geändert am"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_contrat_date_client__write_uid
@@ -1442,9 +1437,8 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model.fields,help:is_fromtome14.field_product_supplierdiscount__delay
 msgid ""
-"Lead time in days between the confirmation of the purchase order and the "
-"receipt of the products in your warehouse. Used by the scheduler for "
-"automatic computation of the purchase order planning."
+"Lead time in days between the confirmation of the purchase order and the receipt of the products in your "
+"warehouse. Used by the scheduler for automatic computation of the purchase order planning."
 msgstr ""
 
 #. module: is_fromtome14
@@ -1562,7 +1556,7 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_stock_production_lot
 msgid "Lot/Serial"
-msgstr "Lot/N° série"
+msgstr "Los/Serie"
 
 #. module: is_fromtome14
 #: model:ir.actions.act_window,name:is_fromtome14.is_stock_production_lot_action
@@ -1579,9 +1573,7 @@ msgstr ""
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.report_product_technical_document
-msgid ""
-"MOBILE: 06 52 34 73 63 – TEL: 03 84 52 01 02 – email: lefromelier@le-"
-"fromelier.fr"
+msgid "MOBILE: 06 52 34 73 63 – TEL: 03 84 52 01 02 – email: lefromelier@le-fromelier.fr"
 msgstr ""
 
 #. module: is_fromtome14
@@ -1611,19 +1603,16 @@ msgstr ""
 #. module: is_fromtome14
 #: code:addons/is_fromtome14/models/intrastat_product_declaration.py:0
 #, python-format
-msgid ""
-"Missing H.S. code on product %s. This product is present in invoice %s."
+msgid "Missing H.S. code on product %s. This product is present in invoice %s."
 msgstr ""
 
 #. module: is_fromtome14
 #: code:addons/is_fromtome14/models/intrastat_product_declaration.py:0
 #, python-format
-msgid ""
-"Missing unit of measure on the line with %d product(s) '%s' on invoice '%s'."
+msgid "Missing unit of measure on the line with %d product(s) '%s' on invoice '%s'."
 msgstr ""
 
 #. module: is_fromtome14
-#: code:addons/is_fromtome14/models/intrastat_product_declaration.py:0
 #: code:addons/is_fromtome14/models/intrastat_product_declaration.py:0
 #, python-format
 msgid "Missing weight on product %s."
@@ -1699,11 +1688,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:is_fromtome14.field_sale_order_line__is_nb_pieces_par_colis
 #: model:ir.model.fields,field_description:is_fromtome14.field_stock_move_line__is_nb_pieces_par_colis
 msgid "Nb Pièces / colis"
-msgstr ""
-
-#. module: is_fromtome14
-#: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
-msgid "Nb colis"
 msgstr ""
 
 #. module: is_fromtome14
@@ -1787,7 +1771,7 @@ msgstr ""
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
 msgid "Order #"
-msgstr "Commande n°"
+msgstr ""
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_is_commande_fromtome_ligne__sequence
@@ -1818,7 +1802,7 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_account_payment
 msgid "Payments"
-msgstr "Paiements"
+msgstr "Zahlungen"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_is_scan_picking__picking_id
@@ -1858,26 +1842,21 @@ msgstr ""
 #: code:addons/is_fromtome14/models/intrastat_product_declaration.py:0
 #, python-format
 msgid ""
-"Please correct the Intrastat Supplementary Unit settings and regenerate the "
-"lines or adjust the lines with Intrastat Code '%s' manually"
+"Please correct the Intrastat Supplementary Unit settings and regenerate the lines or adjust the lines with "
+"Intrastat Code '%s' manually"
 msgstr ""
 
 #. module: is_fromtome14
 #: code:addons/is_fromtome14/models/intrastat_product_declaration.py:0
-#: code:addons/is_fromtome14/models/intrastat_product_declaration.py:0
-#: code:addons/is_fromtome14/models/intrastat_product_declaration.py:0
 #, python-format
-msgid ""
-"Please correct the product record and regenerate the lines or adjust the "
-"impacted lines manually"
+msgid "Please correct the product record and regenerate the lines or adjust the impacted lines manually"
 msgstr ""
 
 #. module: is_fromtome14
 #: code:addons/is_fromtome14/models/intrastat_product_declaration.py:0
 #, python-format
 msgid ""
-"Please correct the unit of measure settings and regenerate the lines or "
-"adjust the impacted lines manually"
+"Please correct the unit of measure settings and regenerate the lines or adjust the impacted lines manually"
 msgstr ""
 
 #. module: is_fromtome14
@@ -1895,7 +1874,6 @@ msgstr ""
 #: model:ir.model.fields,field_description:is_fromtome14.field_account_move_line__is_poids_net
 #: model:ir.model.fields,field_description:is_fromtome14.field_purchase_order_line__is_poids_net
 #: model:ir.model.fields,field_description:is_fromtome14.field_sale_order_line__is_poids_net
-#: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
 msgid "Poids net"
 msgstr ""
 
@@ -1937,17 +1915,17 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_product_supplierinfo__price
 msgid "Price"
-msgstr "Prix"
+msgstr "Preis"
 
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_product_pricelist
 msgid "Pricelist"
-msgstr "Liste de prix"
+msgstr "Preisliste"
 
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_product_pricelist_item
 msgid "Pricelist Rule"
-msgstr "Règle des listes des prix"
+msgstr "Preislistenregel"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_product_supplierinfo__prix_brut
@@ -1962,28 +1940,27 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_product_product
 msgid "Product"
-msgstr "Article"
+msgstr "Produkt"
 
 #. module: is_fromtome14
 #: code:addons/is_fromtome14/models/intrastat_product_declaration.py:0
 #, python-format
 msgid ""
-"Product '%s' has an Intrastat Supplementary Unit in the 'volume' Unit of "
-"Measure (UoM) category. The Supplementary Unit Quantity calculation has "
-"failed since the product has been sold/purchased with a UoM without volume "
-"conversion. There is also no 'volume' specificied on the product record "
-"which also allows to calculate the Intrastat Supplementary Unit."
+"Product '%s' has an Intrastat Supplementary Unit in the 'volume' Unit of Measure (UoM) category. The "
+"Supplementary Unit Quantity calculation has failed since the product has been sold/purchased with a UoM "
+"without volume conversion. There is also no 'volume' specificied on the product record which also allows to "
+"calculate the Intrastat Supplementary Unit."
 msgstr ""
 
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_stock_move_line
 msgid "Product Moves (Stock Move Line)"
-msgstr "Mouvements d'article (Ligne de mouvement de stock)"
+msgstr "Produktbewegungen (Lagerbewegung)"
 
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_product_template
 msgid "Product Template"
-msgstr "Modèle d'article"
+msgstr "Produktvorlage"
 
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_product_label
@@ -2016,17 +1993,17 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_purchase_order
 msgid "Purchase Order"
-msgstr "Commande fournisseur"
+msgstr "Beschaffungsauftrag"
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_purchaseorder_document
 msgid "Purchase Order #"
-msgstr "Commande n°"
+msgstr ""
 
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_purchase_order_line
 msgid "Purchase Order Line"
-msgstr "Ligne de commande fournisseur"
+msgstr "Bestellposition"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_is_commande_fromtome_ligne__purchase_qty
@@ -2061,7 +2038,7 @@ msgstr ""
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
 msgid "Quantity"
-msgstr "Quantité"
+msgstr "MENGE"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_is_stock_production_lot_contrat__product_qty
@@ -2076,7 +2053,7 @@ msgstr ""
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
 msgid "Quotation #"
-msgstr "Devis n°"
+msgstr "Angebot #"
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.product_template_form_inherit
@@ -2141,12 +2118,12 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_sale_order
 msgid "Sales Order"
-msgstr "Bon de commande"
+msgstr "Verkaufsauftrag"
 
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_sale_order_line
 msgid "Sales Order Line"
-msgstr "Ligne de bons de commande"
+msgstr "Auftragsposition"
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.view_picking_form_inherit
@@ -2165,9 +2142,7 @@ msgstr ""
 
 #. module: is_fromtome14
 #: model:ir.model.fields,help:is_fromtome14.field_sale_order_line__is_livraison_directe
-msgid ""
-"Si cette case est cochée, une commande fournisseur spécifique pour ce client"
-" sera créée"
+msgid "Si cette case est cochée, une commande fournisseur spécifique pour ce client sera créée"
 msgstr ""
 
 #. module: is_fromtome14
@@ -2188,13 +2163,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:is_fromtome14.field_product_supplierdiscount__date_start
 #: model:ir.model.fields,field_description:is_fromtome14.field_product_supplierinfo__date_start
 msgid "Start Date"
-msgstr "Date de début"
+msgstr "Startdatum"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,help:is_fromtome14.field_product_supplierdiscount__date_start
 #: model:ir.model.fields,help:is_fromtome14.field_product_supplierinfo__date_start
 msgid "Start date for this vendor price"
-msgstr "Date de début pour le prix de ce vendeur. "
+msgstr "Anfangsdatum dieses Lieferantenpreises"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_is_fnc__status_move
@@ -2211,7 +2186,7 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_stock_move
 msgid "Stock Move"
-msgstr "Mouvement de stock"
+msgstr "Lagerbuchung"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_is_commande_fromtome__stock_mini
@@ -2234,7 +2209,7 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_product_supplierinfo
 msgid "Supplier Pricelist"
-msgstr "Liste de prix du fournisseur"
+msgstr "Lieferantenpreisliste"
 
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_product_supplierdiscount
@@ -2280,7 +2255,7 @@ msgstr ""
 #: model:ir.model.fields,help:is_fromtome14.field_product_supplierinfo__last_price
 #: model:ir.model.fields,help:is_fromtome14.field_product_supplierinfo__price
 msgid "The price to purchase a product"
-msgstr "Le prix pour l'achat d'un article"
+msgstr "Der Preis zum Erwerb eines Produkts"
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_export_compta_ligne_tree
@@ -2311,7 +2286,7 @@ msgstr ""
 #. module: is_fromtome14
 #: model:ir.model,name:is_fromtome14.model_stock_picking
 msgid "Transfer"
-msgstr "Transfert"
+msgstr "Lieferung vornehmen"
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_is_scan_picking__type_tracabilite
@@ -2377,13 +2352,8 @@ msgstr ""
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
-msgid "Unit"
-msgstr "Unité"
-
-#. module: is_fromtome14
-#: model_terms:ir.ui.view,arch_db:is_fromtome14.is_report_saleorder_document
 msgid "Unit Price"
-msgstr "Prix Unitaire"
+msgstr ""
 
 #. module: is_fromtome14
 #: model:ir.model.fields,field_description:is_fromtome14.field_is_commande_fromtome_ligne__uom_id
@@ -2495,7 +2465,5 @@ msgstr ""
 
 #. module: is_fromtome14
 #: model_terms:ir.ui.view,arch_db:is_fromtome14.is_product_pricelist_view
-msgid ""
-"Êtes-vous certain de vouloir appliquer l'augmentation sur toutes les lignes "
-"?"
+msgid "Êtes-vous certain de vouloir appliquer l'augmentation sur toutes les lignes ?"
 msgstr ""

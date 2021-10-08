@@ -55,6 +55,7 @@ class SaleOrderLine(models.Model):
             else:
                 poids = nb_colis*obj.product_id.is_poids_net_colis
             obj.is_poids_net = poids
+            obj.is_nb_pieces_par_colis=obj.product_id.is_nb_pieces_par_colis
 
 
     is_purchase_line_id       = fields.Many2one('purchase.order.line', string=u'Ligne commande fournisseur', index=True, copy=False)
