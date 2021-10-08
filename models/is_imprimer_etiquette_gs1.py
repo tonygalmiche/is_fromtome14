@@ -14,6 +14,7 @@ class IsImprimerEtiquetteGS1(models.Model):
     code_gs1   = fields.Text("Code GS1")
     code_ean   = fields.Char("Code EAN (01)")
     product_id = fields.Many2one('product.product', 'Article', required=True)
+    type_tracabilite = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
     lot        = fields.Char("Lot (10)", required=True)
     dlc        = fields.Date("DLC (17)")
     dluo       = fields.Date("DDM (15)")

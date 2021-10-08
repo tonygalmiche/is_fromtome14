@@ -19,9 +19,10 @@
                         <field name="code_gs1"/>
                         <field name="code_ean"/>
                         <field name="product_id"/>
+                        <field name="type_tracabilite"/>
                         <field name="lot"/>
-                        <field name="dluo"/>
-                        <field name="dlc"/>
+                        <field name="dluo" attrs="{'invisible': [('type_tracabilite', '!=', 'ddm')]}"/>
+                        <field name="dlc"  attrs="{'invisible': [('type_tracabilite', '!=', 'dlc')]}"/>
                         <field name="poids"/>
                         <field name="nb_pieces"/>
                         <field name="qt_imprime"/>
