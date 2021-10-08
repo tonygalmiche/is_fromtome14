@@ -217,14 +217,18 @@ class Picking(models.Model):
 
 
     @api.depends('move_line_ids_without_package')
-    def _compute_is_poids_net(self):
+    def _compute_poids_colis(self):
         for obj in self:
             poids=0
+            colis=0
             for line in obj.move_line_ids_without_package:
                 poids+=line.is_poids_net_reel
+                colis+=line.is_nb_colis
             obj.is_poids_net=poids
+            obj.is_nb_colis=colis
 
-    is_poids_net = fields.Float(string='Poids net', digits=(14,3), help="Poids net réel total (Kg)", compute='_compute_is_poids_net')
+    is_poids_net = fields.Float(string='Poids net', digits=(14,3), compute='_compute_poids_colis')
+    is_nb_colis  = fields.Float(string='Nb colis' , digits=(14,1), compute='_compute_poids_colis')
 
 
     def scan_picking_action(self):

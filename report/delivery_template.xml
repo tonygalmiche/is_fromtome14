@@ -42,10 +42,8 @@
                                 <span t-field="o.scheduled_date" t-options="{'widget': 'date','format': 'dd/MM/yyyy'}"/>
                             </td>
                             <td class="text-center" name="td_quantity_done">
-
-                                <span t-esc="sum(o.move_ids_without_package.mapped('quantity_done'))" t-options="{&quot;widget&quot;: &quot;float&quot;, &quot;precision&quot;: 0}"/>
+                                <span t-field="o.is_nb_colis"/>
                             </td>
-
                             <td class="text-center" name="td_product_weight">
                                 <span t-field="o.is_poids_net"/> KG
                             </td>
@@ -70,7 +68,7 @@
                                 <div><strong><span t-field="line.product_id"/></strong></div>
                                 <span t-if="line.is_lots" t-field="line.is_lots"/>
                             </td>
-                            <td class="text-right"><span t-field="line.product_uom_qty"/></td>
+                            <td class="text-right"><span t-field="line.sale_line_id.product_uom_qty"/></td>
                             <td class="text-right"><span t-field="line.quantity_done"/></td>
                             <td class="text-left"><span t-field="line.product_uom"/></td>
                             <td class="text-right"><span t-field="line.is_nb_colis"/></td>
