@@ -7,7 +7,17 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form" />
         <field name="arch" type="xml">
+
+            <field name="payment_reference" position="before">
+                <field name="is_ref_int_cde"/>
+                <field name="is_ref_client"/>
+                <field name="is_bl"/>
+            </field>
+
+
+
             <xpath expr="//page[1]/field[@name='invoice_line_ids']/tree/field[@name='product_uom_id']" position="after">
+                <field name="is_lots" optional="hide"/>
                 <field name="is_nb_pieces_par_colis" optional="hide"/>
                 <field name="is_nb_colis" sum="Total"/>
                 <field name="is_poids_net"  sum="Total" optional="hide"/>

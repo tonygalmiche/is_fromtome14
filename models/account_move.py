@@ -19,10 +19,25 @@ class AccountMoveLine(models.Model):
             obj.is_poids_net = poids_net
             obj.is_nb_colis = nb_colis
 
+
+    @api.depends('sale_line_ids')
+    def _compute_is_lots(self):
+        for obj in self:
+            lots=[]
+            for line in obj.sale_line_ids:
+                for move in line.move_ids:
+                    lots.append(move.is_lots)
+            print(lots)
+            obj.is_lots= (lots and "\r".join(lots)) or False
+
+
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis'     , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2) , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_poids_net           = fields.Float(string='Poids net', digits=(14,4), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
+    is_lots                = fields.Text('Lots', compute='_compute_is_lots')
 
+
+#sale_line_ids
 
 
 
@@ -41,9 +56,42 @@ class AccountMove(models.Model):
             obj.is_alerte=alerte
 
 
+    @api.depends('invoice_line_ids')
+    def _is_ref_client_int_cde(self):
+        for obj in self:
+            ref_client=[]
+            ref_int=[]
+            for line in obj.invoice_line_ids:
+                for sale_line in line.sale_line_ids:
+                    x = sale_line.order_id.name
+                    if x and x not in ref_int:
+                        ref_int.append(x)
+                    x = sale_line.order_id.client_order_ref
+                    if x and x not in ref_client:
+                        ref_client.append(x)
+            obj.is_ref_int_cde = (ref_int    and "\n".join(ref_int))    or False
+            obj.is_ref_client  = (ref_client and "\n".join(ref_client)) or False
+
+
+
+    @api.depends('invoice_line_ids')
+    def _is_is_bl(self):
+        for obj in self:
+            bl=[]
+            for line in obj.invoice_line_ids:
+                for sale_line in line.sale_line_ids:
+                    for move in sale_line.move_ids:
+                        x = move.picking_id.name
+                        if x and x not in bl:
+                            bl.append(x)
+            obj.is_bl  = (bl and "\n".join(bl)) or False
+
+
     is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
     is_alerte           = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
-
+    is_ref_client       = fields.Text('Ref Client' , compute='_is_ref_client_int_cde')
+    is_ref_int_cde      = fields.Text('Ref Int Cde', compute='_is_ref_client_int_cde')
+    is_bl               = fields.Text('BL'         , compute='_is_is_bl')
 
 
 
