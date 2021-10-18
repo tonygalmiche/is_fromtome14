@@ -164,11 +164,16 @@ class SaleOrder(models.Model):
                         if line.is_livraison_directe:
                             filtre.append(('delivery_adress','=', obj.partner_shipping_id.id))
                         orders=self.env['purchase.order'].search(filtre,limit=1)
+
+                        print(orders)
+
+
                         if orders:
                             order=orders[0]
                         else:
                             vals={
                                 'partner_id'  : partner_id,
+                                #'date_planned': date_planned,
                             }
                             order=self.env['purchase.order'].create(vals)
                             if order:
@@ -180,6 +185,7 @@ class SaleOrder(models.Model):
                         filtre=[
                             ('order_id'  ,'=', order.id),
                             ('product_id','=', line.product_id.id),
+
                         ]
                         order_lines=self.env['purchase.order.line'].search(filtre,limit=1)
                         if not order_lines:
@@ -196,6 +202,8 @@ class SaleOrder(models.Model):
                                 }
                                 order_line=self.env['purchase.order.line'].create(vals)
                                 order_line.onchange_product_id()
+                                order_line.date_planned = date_planned
+                                print(vals,order_line.date_planned)
                         else:
                             order_line = order_lines[0]
 

@@ -86,10 +86,25 @@ class PurchaseOrderLine(models.Model):
             obj.is_nb_colis = nb_colis
             obj.is_poids_net = nb_colis * poids_net
 
+
+    @api.depends('product_id','is_nb_colis','price_unit')
+    def _compute_is_alerte(self):
+        for obj in self:
+            alerte=[]
+            if obj.is_nb_colis!=round(obj.is_nb_colis):
+                alerte.append("Colis incomplet")
+            if obj.is_nb_colis==0:
+                alerte.append("Colis à 0")
+            if obj.price_unit==0:
+                alerte.append("Prix à 0")
+            obj.is_alerte="\n".join(alerte)
+
+
     is_sale_order_line_id  = fields.Many2one('sale.order.line', string=u'Ligne commande client', index=True)
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis'     , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2) , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_poids_net           = fields.Float(string='Poids net', digits=(14,4), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
+    is_alerte              = fields.Text(string='Alerte', compute='_compute_is_alerte')
 
 
 class PurchaseOrder(models.Model):

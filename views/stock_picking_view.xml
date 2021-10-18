@@ -58,7 +58,14 @@
                         </group>
                        <group>
                             <field name="product_id"/>
-                            <field name="lot_id"/>
+                            <field 
+                                name="lot_id" 
+                                context="{
+                                    'default_product_id': product_id, 
+                                    'active_picking_id': picking_id, 
+                                    'default_company_id': 1
+                                }" 
+                            />
                             <field name="type_tracabilite"/>
                             <field name="dlc_ddm"/>
                             <field name="poids"/>
@@ -79,15 +86,22 @@
                             decoration-success="nb_colis_reste==0" 
                         >
                             <field name="product_id"/>
-                            <field name="lot_id"           />
+                            <field 
+                                name="lot_id" 
+                                context="{
+                                    'default_product_id': product_id, 
+                                    'active_picking_id': parent.picking_id, 
+                                    'default_company_id': 1
+                                }" 
+                            />
                             <field name="type_tracabilite" optional="show"/>
                             <field name="dlc_ddm"/>
                             <field name="nb_pieces"          sum="Total"/>
                             <field name="uom_id"           optional="show"/>
                             <field name="nb_pieces_par_colis"            optional="show"/>
                             <field name="nb_colis"          sum="Total"  optional="show"/>
-                            <field name="nb_colis_prevues"  sum="Total"  optional="show"/>
-                            <field name="nb_colis_reste"    sum="Total"  optional="show"/>
+                            <field name="nb_colis_prevues"               optional="show"/>
+                            <field name="nb_colis_reste"                 optional="show"/>
                             <field name="poids"             sum="Total"  optional="show"/>
                             <field name="info"        style="color:gray" optional="show"/>
                         </tree>
@@ -141,7 +155,8 @@
                 <field name="is_lots" optional="hide"/>
             </xpath> 
             <xpath expr="//page[@name='operations']/field/tree/field[@name='quantity_done']" position="after">
-                <field name="is_nb_colis" optional="hide"/>
+                <field name="is_nb_colis"       optional="hide"/>
+                <field name="is_poids_net_reel" optional="hide"/>
             </xpath> 
 
 

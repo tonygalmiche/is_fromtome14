@@ -18,6 +18,13 @@ class IsScanPickingLine(models.Model):
     _description = "Lignes Scan Picking"
     _order='id'
 
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        for obj in self:
+            obj.nb_pieces = obj.product_id.is_nb_pieces_par_colis
+            obj.poids     = obj.product_id.is_poids_net_colis
+            obj.nb_colis  = 1
+
     scan_id             = fields.Many2one('is.scan.picking', 'Picking', required=True, ondelete='cascade')
     product_id          = fields.Many2one('product.product', 'Article', required=True)
     uom_id              = fields.Many2one('uom.uom', 'Unité', related='product_id.uom_id')
@@ -65,12 +72,20 @@ class IsScanPicking(models.Model):
                 alertes.append("Lot non trouvé")
             obj.is_alerte = '\n'.join(alertes) or False
 
-
     @api.onchange('ajouter')
     def _onchange_ajouter(self):
         for obj in self:
             obj.ajouter_ligne()
 
+    @api.onchange('lot_id')
+    def _onchange_lot_id(self):
+        for obj in self:
+            obj.dlc_ddm = obj.lot_id.is_dlc_ddm
+
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        for obj in self:
+            obj.poids = obj.product_id.is_poids_net_colis
 
     picking_id = fields.Many2one('stock.picking', 'Picking', required=True)
     ean        = fields.Char("EAN")

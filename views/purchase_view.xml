@@ -31,6 +31,10 @@
                 <field name="is_commande_soldee"/>
             </field>
 
+            <xpath expr="//field[@name='order_line']//tree" position='attributes'>
+                <attribute name="decoration-danger">is_alerte!=""</attribute>
+            </xpath>
+
 
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_qty']" position='attributes'>
                 <attribute name="sum">Total</attribute>
@@ -44,6 +48,13 @@
                 <field name="is_poids_net"  sum="Total" optional="hide"/>
             </xpath>
 
+             <xpath expr="//field[@name='order_line']//tree//field[@name='price_subtotal']" position='after'>
+                <field name="is_alerte" optional="hide"/>
+            </xpath>
+
+
+
+
 
              <!-- <xpath expr="//field[@name='order_line']/tree" position="inside">
                 <field name="echantillion"/>
@@ -53,14 +64,8 @@
              </xpath> -->
             <xpath expr="//field[@name='order_line']//tree//field[@name='date_planned']" position='attributes'>
                 <attribute name="invisible">1</attribute>
-             </xpath>
-            <!-- <xpath expr="//field[@name='order_line']//tree//field[@name='company_id']" position='attributes'>
-                <attribute name="invisible">1</attribute>
-             </xpath> -->
-            <!-- <xpath expr="//page[1]/group[1]" position='attributes'>
-                 <attribute name="invisible">1</attribute>
-             </xpath>
- -->
+            </xpath>
+
             <div name="date_approve" position="attributes">
                  <attribute name="invisible">1</attribute>
              </div>

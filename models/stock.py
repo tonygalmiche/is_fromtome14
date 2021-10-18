@@ -115,18 +115,21 @@ class StockMove(models.Model):
 
 
     @api.onchange('move_line_ids')
-    def _compute_is_nb_colis(self):
+    def _compute_is_nb_colis_poids(self):
         for obj in self:
             nb=0
+            poids=0
             for line in obj.move_line_ids:
                 nb+=line.is_nb_colis
-            obj.is_nb_colis=nb
+                poids+=line.is_poids_net_reel
+            obj.is_nb_colis       = nb
+            obj.is_poids_net_reel = poids
  
 
-    is_alerte   = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
-    is_lots     = fields.Text('Lots'  , copy=False, compute=_compute_is_lots)
-    is_nb_colis = fields.Float('Nb Colis', digits=(14,2), compute=_compute_is_nb_colis)
-
+    is_alerte         = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
+    is_lots           = fields.Text('Lots'  , copy=False, compute=_compute_is_lots)
+    is_nb_colis       = fields.Float('Nb Colis'      , digits=(14,2), compute=_compute_is_nb_colis_poids)
+    is_poids_net_reel = fields.Float('Poids net réel', digits=(14,4), compute=_compute_is_nb_colis_poids)
 
 
     def get_nb_colis(self):

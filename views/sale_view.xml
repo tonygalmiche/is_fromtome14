@@ -28,8 +28,17 @@
             </field>
 
 
+            <group name="sale_shipping" position="attributes">
+                 <attribute name="invisible">1</attribute>
+            </group>
+
             <field name="payment_mode_id" position="after">
                 <field name="commitment_date"/>
+            </field>
+
+
+            <field name="validity_date" position="attributes">
+                 <attribute name="invisible">1</attribute>
             </field>
 
 

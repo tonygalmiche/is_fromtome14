@@ -253,6 +253,9 @@ records.exporter_article_fromelier_action()
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
+
+
+
             <field name="barcode" position="attributes">
                 <attribute name="string">code barre interne</attribute>
             </field>
@@ -371,6 +374,9 @@ records.exporter_article_fromelier_action()
                     <button string="Recharger les valeurs" name="recharger_valeurs_action" type="object" confirm="Cela va remplacer les données ci-dessus"/>
                 </page>
             </xpath>
+            <field name="description" position="after">
+                <field name="_barcode_scanned" widget="barcode_handler"/>
+            </field>
         </field>
     </record>
 

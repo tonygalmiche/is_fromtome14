@@ -52,26 +52,44 @@
                 </table>
 
 
+    <!-- • Code produit
+    • Désignation
+    • Gencode fiche article (colis)
+    • Colis Livrés
+    • PCB (Pièces par colis) => PCB = Par combien
+    • Pièces livrées
+    • Poids Livré
+    • => Ne pas mettre la notion de quantité commandée
+    • Traçabilité => Enlever quantité en pièces (Quant). Mettre des tirets pour séparer
+    • Mettre les totaux en bas et enlever cette information du haut
+ -->
+
                <table class="table table-sm mt48">
                     <thead>
                         <tr>
-                            <th class="text-left"><strong>Désignation</strong></th>
-                            <th class="text-right"><strong>Commandé</strong></th>
-                            <th class="text-right"><strong>Livré</strong></th>
-                            <th class="text-left"><strong>Unité</strong></th>
-                            <th class="text-right"><strong>Colis Livré</strong></th>
+                            <th class="text-left"> <strong>Code</strong></th>
+                            <th class="text-left"> <strong>Désignation</strong></th>
+                            <th class="text-left"> <strong>Gencode</strong></th>
+                            <th class="text-center"> <strong>Colis</strong></th>
+                            <th class="text-center"> <strong>PCB</strong></th>
+                            <th class="text-right"><strong>Pièces</strong></th>
+                            <th class="text-left"> <strong>Unité</strong></th>
+                            <th class="text-right"> <strong>Poids</strong></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr t-foreach="o.move_ids_without_package" t-as="line">
+                            <td class="text-left"><span t-field="line.product_id.default_code"/></td>
                             <td class="text-left">
-                                <div><strong><span t-field="line.product_id"/></strong></div>
+                                <div><strong><span t-field="line.product_id.name"/></strong></div>
                                 <span t-if="line.is_lots" t-field="line.is_lots"/>
                             </td>
-                            <td class="text-right"><span t-field="line.sale_line_id.product_uom_qty"/></td>
+                            <td class="text-left"><span t-field="line.product_id.barcode"/></td>
+                            <td class="text-center"><span t-field="line.is_nb_colis"/></td>
+                            <td class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
                             <td class="text-right"><span t-field="line.quantity_done"/></td>
                             <td class="text-left"><span t-field="line.product_uom"/></td>
-                            <td class="text-right"><span t-field="line.is_nb_colis"/></td>
+                            <td class="text-right"><span t-field="line.is_poids_net_reel"/></td>
                         </tr>
                     </tbody>
                 </table>

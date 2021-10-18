@@ -121,20 +121,19 @@ class IsValeurNutritionnelleLine(models.Model):
     ordre          = fields.Integer('Ordre')
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 class ProductTemplate(models.Model):
-    _inherit = "product.template"
+    _name = 'product.template'
+    _inherit = ['product.template', 'barcodes.barcode_events_mixin']
+
+
+    def on_barcode_scanned(self, barcode):
+        for obj in self:
+            code   = str(barcode)[2:]
+            prefix = str(barcode)[:2]
+            print(obj,code,prefix)
+            if prefix in ("01","02"):
+                obj.barcode = code
+
 
     @api.onchange('default_code')
     def default_code_uniq(self):
