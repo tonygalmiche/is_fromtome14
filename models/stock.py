@@ -109,7 +109,8 @@ class StockMove(models.Model):
             t=[]
             for lot in lots:
                 l=lots[lot]
-                x="Lot:%s %s:%s Quant:%.2f Colis:%.1f"%(l[0],l[1],l[2],l[3],l[4])
+                #x="Lot:%s %s:%s Quant:%.2f Colis:%.1f"%(l[0],l[1],l[2],l[3],l[4])
+                x="Lot:%s - %s:%s - Colis:%.1f"%(l[0],l[1],l[2],l[4])
                 t.append(x)
             obj.is_lots = "\n".join(t)
 

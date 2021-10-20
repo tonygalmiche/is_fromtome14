@@ -87,13 +87,25 @@ class AccountMove(models.Model):
             obj.is_bl  = (bl and "\n".join(bl)) or False
 
 
+    @api.depends('invoice_line_ids')
+    def _compute_poids_colis(self):
+        for obj in self:
+            poids=0
+            colis=0
+            for line in obj.invoice_line_ids:
+                poids+=line.is_poids_net
+                colis+=line.is_nb_colis
+            obj.is_poids_net = poids
+            obj.is_nb_colis  = colis
+
+
     is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
     is_alerte           = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
     is_ref_client       = fields.Text('Ref Client' , compute='_is_ref_client_int_cde')
     is_ref_int_cde      = fields.Text('Ref Int Cde', compute='_is_ref_client_int_cde')
     is_bl               = fields.Text('BL'         , compute='_is_is_bl')
-
-
+    is_poids_net        = fields.Float(string='Poids net', digits=(14,3), compute='_compute_poids_colis')
+    is_nb_colis         = fields.Float(string='Nb colis' , digits=(14,1), compute='_compute_poids_colis')
 
 
 class AccountPayment(models.Model):

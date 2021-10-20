@@ -69,11 +69,9 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
-            <!-- <field name="property_product_pricelist" position="after">
-                <field name="is_iln"/>
+            <field name="vat" position="after">
                 <field name="is_gln"/>
-
-            </field> -->
+            </field>
             <xpath expr="//group/group/field[@name='type']" position="after">
                 <field name="is_enseigne_id"/>
             </xpath>

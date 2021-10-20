@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="is_report_invoice_document" inherit_id="account.report_invoice_document">
+
+        <t t-set="address" position="replace">
+            <t t-set="address">
+                <address t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}' />
+                <div t-if="o.partner_id.vat" class="mt16">
+                    <t t-if="o.company_id.country_id.vat_label" t-esc="o.company_id.country_id.vat_label" id="inv_tax_id_label"/>
+                    <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/></div>
+                <div t-if="o.partner_id.is_gln">GLN:<span t-field="o.partner_id.is_gln"/></div>
+            </t>
+        </t>
+
+
         <div class="page" position="replace">
+
+
+
+
             <div class="page">
                 <h2>
                     <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">Invoice</span>
@@ -20,8 +36,8 @@
                             <th class="text-center">DATE FACTURE</th>
                             <th class="text-center">ÉCHÉANCE</th>
                             <th class="text-center">CODE CLIENT</th>
-                            <th class="text-center">REF. CLIENT</th>
-                            <th class="text-center">REF INT CDE</th>
+                            <th class="text-center">REF CDE CLIENT</th>
+                            <th class="text-center">REF CDE INT</th>
                             <th class="text-center">BL</th>
                         </tr>
                     </thead>
@@ -42,27 +58,32 @@
                 <table class="table table-sm o_main_table" name="invoice_line_table">
                     <thead>
                         <tr>
-                            <th class="text-left"> <span>Désignation</span></th>
-                            <th class="text-right"><span>Quantité</span></th>
-                            <th class="text-left"> <span>Unité</span></th>
-                            <th class="text-right"> <span>Colis</span></th>
-                            <th class="text-right"> <span>Poids</span></th>
-                            <th class="text-right"> <span>P.U.HT</span></th>
-                            <th class="text-right"> <span>Total&amp;nbsp;HT</span></th>
-                            <th class="text-center"> <span>TVA</span></th>
+                            <th class="text-left"><span>Code produit</span></th>
+                            <th class="text-left"><span>Désignation</span></th>
+                            <th class="text-left"><span>Gencode</span></th>
+                            <th class="text-left"><span>Colis Livrés</span></th>
+                            <th class="text-left"><span>PCB</span></th>
+                            <th class="text-left"><span>Pièces livrées</span></th>
+                            <th class="text-left"><span>Unité</span></th>
+                            <th class="text-left"><span>Poids Livré</span></th>
+                            <th class="text-left"><span>P.U.HT</span></th>
+                            <th class="text-left"><span>Montant net</span></th>
+                            <th class="text-left"><span>TVA</span></th>
                         </tr>
                     </thead>
                     <tbody class="invoice_tbody">
                         <t t-set="lines" t-value="o.invoice_line_ids.sorted(key=lambda l: (-l.sequence, l.date, l.move_name, -l.id), reverse=True)"/>
-
                         <tr t-foreach="lines" t-as="line">
+                            <td class="text-left"><span t-field="line.product_id.default_code"/></td>
                             <td class="text-left">
                                 <b><div t-field="line.name"/></b>
                                 <div t-if="line.is_lots" t-field="line.is_lots"/>
                             </td>
+                            <td class="text-left"><span t-field="line.product_id.barcode"/></td>
+                            <td class="text-right"><span t-field="line.is_nb_colis"/></td>
+                            <td class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
                             <td class="text-right"><span t-field="line.quantity"/></td>
                             <td class="text-left"><span t-field="line.product_uom_id"/></td>
-                            <td class="text-right"><span t-field="line.is_nb_colis"/></td>
                             <td class="text-right"><span t-field="line.is_poids_net"/></td>
                             <td class="text-right"><span t-field="line.price_unit"/></td>
                             <td class="text-right"><span t-field="line.price_subtotal"/></td>
@@ -71,6 +92,17 @@
                             </td>
                         </tr>
                     </tbody>
+                    <thead>
+                        <tr>
+                            <th class="text-left" colspan="3"> <strong>Total : </strong></th>
+                            <th class="text-right"> <strong><span t-field="o.is_nb_colis"/></strong></th>
+                            <th colspan="3"> </th>
+                            <th class="text-right"> <strong><span t-field="o.is_poids_net"/></strong></th>
+                            <th> </th>
+                            <th class="text-right"> <strong><span t-field="o.amount_untaxed"/></strong></th>
+                            <th> </th>
+                        </tr>
+                    </thead>
                 </table>
 
                 <div class="clearfix">

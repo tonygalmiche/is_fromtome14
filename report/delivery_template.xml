@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-
     <template id="is_report_delivery_document" inherit_id="stock.report_delivery_document">
+        <t name="partner_header" position="replace">
+            <t t-if="partner" name="partner_header">
+                <t t-set="address">
+                    <div t-esc="partner"
+                    t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True}'/>
+                    <div t-if="o.partner_id.is_gln">GLN:<span t-field="o.partner_id.is_gln"/></div>
+                </t>
+            </t>
+        </t>
         <div class="page" position="replace">
-
-
+            <style>
+                .page{
+                    font-size:10pt;
+                }
+            </style>
             <div class="page">
                 <h2>
                     <span t-field="o.name"/>
@@ -14,19 +24,13 @@
                     <thead>
                         <tr>
                             <th class="text-center" t-if="o.sale_id.client_order_ref">
-                                <strong>N° client</strong>
+                                <strong>N°Cde Client</strong>
                             </th>
                             <th class="text-center" t-if="o.origin">
-                                <strong>N° Commande</strong>
+                                <strong>N°Cde Fromtome</strong>
                             </th>
                             <th class="text-center" name="td_sched_date_h">
                                 <strong>Date Livraison</strong>
-                            </th>
-                            <th class="text-center" name="td_quantity_done_h">
-                                <strong>Nbre Colis</strong>
-                            </th>
-                            <th class="text-center" name="td_product_weight_h">
-                                <strong>Poids</strong>
                             </th>
                         </tr>
                     </thead>
@@ -41,29 +45,9 @@
                             <td class="text-center" name="td_sched_date">
                                 <span t-field="o.scheduled_date" t-options="{'widget': 'date','format': 'dd/MM/yyyy'}"/>
                             </td>
-                            <td class="text-center" name="td_quantity_done">
-                                <span t-field="o.is_nb_colis"/>
-                            </td>
-                            <td class="text-center" name="td_product_weight">
-                                <span t-field="o.is_poids_net"/> KG
-                            </td>
-                        </tr>
+                         </tr>
                     </tbody>
                 </table>
-
-
-    <!-- • Code produit
-    • Désignation
-    • Gencode fiche article (colis)
-    • Colis Livrés
-    • PCB (Pièces par colis) => PCB = Par combien
-    • Pièces livrées
-    • Poids Livré
-    • => Ne pas mettre la notion de quantité commandée
-    • Traçabilité => Enlever quantité en pièces (Quant). Mettre des tirets pour séparer
-    • Mettre les totaux en bas et enlever cette information du haut
- -->
-
                <table class="table table-sm mt48">
                     <thead>
                         <tr>
@@ -92,6 +76,14 @@
                             <td class="text-right"><span t-field="line.is_poids_net_reel"/></td>
                         </tr>
                     </tbody>
+                    <thead>
+                        <tr>
+                            <th class="text-left" colspan="3"> <strong>Total : </strong></th>
+                            <th class="text-center"> <strong><span t-field="o.is_nb_colis"/></strong></th>
+                            <th colspan="3"> </th>
+                            <th class="text-right"> <strong><span t-field="o.is_poids_net"/></strong></th>
+                        </tr>
+                    </thead>
                 </table>
             </div>
         </div>
