@@ -139,6 +139,18 @@
                 </style>
             </xpath>
 
+
+            <field name="state" position="before">
+                <button 
+                    name="action_picking_send" 
+                    string="Envoyer par mail" type="object" 
+                    attrs="{'invisible': [('picking_type_code', '!=', 'outgoing')]}" 
+                    groups="base.group_user"
+                />
+            </field>
+
+
+
             <field name="origin" position="after">
                 <field name="is_poids_net" sum="Total"/>
             </field>
