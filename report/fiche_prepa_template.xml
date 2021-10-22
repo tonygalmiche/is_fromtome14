@@ -1,6 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+
+        <template id="report_picking_inherit" inherit_id="stock.report_picking">
+
+            <div name="right_box" position="replace"/>
+
+            <xpath expr="//table[1]" position="replace">
+
+
+            <style>
+                .table{
+                    font-size:10pt;
+                }
+            </style>
+
+
+
+               <table class="table table-sm mt48">
+                    <thead>
+                        <tr>
+                            <th class="text-left"> <strong>Désignation</strong></th>
+                            <th class="text-right"> <strong>Colis</strong></th>
+                            <th class="text-center"> <strong>PCB</strong></th>
+                            <th class="text-right"><strong>Pièces</strong></th>
+                            <th class="text-left"> <strong>Unité</strong></th>
+                            <th class="text-right"> <strong>QUANT.PRÉPA</strong></th>
+                            <th class="text-right"> <strong>LOT</strong></th>
+                            <th class="text-right"> <strong>DLC/DDM</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="o.move_ids_without_package" t-as="line">
+                            <td class="text-left">
+                                <div t-field="line.product_id.display_name"/>
+                                <div t-if="line.product_id.description_picking" t-field="line.product_id.description_picking"/>
+                                <div t-if="line.product_id.barcode" t-field="line.product_id.barcode"/>
+                            </td>
+                            <td class="text-right"><span t-field="line.is_nb_colis"/></td>
+                            <td class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
+                            <td class="text-right">
+                                <span t-if="o.state != 'done'" t-field="line.product_uom_qty"/>
+                                <span t-if="o.state == 'done'" t-field="line.quantity_done"/>
+                            </td>
+                            <td class="text-left"><span t-field="line.product_uom"/></td>
+                            <td></td>
+                            <td style="width:25%"></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <tr>
+                            <th class="text-left">  <strong>Total : </strong></th>
+                            <th class="text-center"><strong><span t-field="o.is_nb_colis"/></strong></th>
+                            <th colspan="6"> </th>
+                        </tr>
+                    </thead>
+                </table>
+
+
+                <!-- <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th><strong>ARTICLE</strong></th>
+                            <th><strong>QUANT.CDÉS</strong></th>
+                            <th><strong>QUANT.PRÉPA</strong></th>
+                            <th><strong>LOT</strong></th>
+                            <th><strong>DLC/DDM</strong></th>
+
+
+                            <th class="text-center"> <strong>Colis</strong></th>
+                            <th class="text-center"> <strong>PCB</strong></th>
+                            <th class="text-right"><strong>Pièces</strong></th>
+                            <th class="text-left"> <strong>Unité</strong></th>
+                            <th class="text-right"> <strong>Poids</strong></th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="o.move_ids_without_package" t-as="move">
+                            <t t-foreach="move.move_line_ids.sorted(key=lambda ml: ml.location_id.id)" t-as="ml">
+                                <tr>
+                                    <td>
+                                        <span t-field="ml.product_id.display_name"/><br/>
+                                        <span t-field="ml.product_id.description_picking"/>
+                                    </td>
+                                    <td>
+                                        <span t-if="o.state != 'done'" t-field="ml.product_uom_qty"/>
+                                        <span t-if="o.state == 'done'" t-field="ml.qty_done"/>
+                                        <span t-field="ml.product_uom_id" groups="uom.group_uom"/>
+                                    </td>
+                                 </tr>
+                            </t>
+                        </t>
+                    </tbody>
+                </table> -->
+            </xpath>
+
+
+
+
+
+        </template>
+
+
+
+
+<!-- 
         <template id="report_picking_inherit" inherit_id="stock.report_picking">
              <xpath expr="//table[1]/thead/tr/th[1]" position="before">
 
@@ -23,10 +130,6 @@
             <xpath expr="//table[2]" position="replace">
 
                 <table class="table table-sm" t-if="o.move_line_ids">
-<!--                    <t t-set="has_barcode"-->
-<!--                       t-value="any([move_ids_without_package.product_id and move_ids_without_package.product_id.sudo().barcode or move_ids_without_package.package_id for move_ids_without_package in o.move_line_ids])"/>-->
-
-                    <!--                                <t t-set="has_serial_number" t-value="o.move_line_ids.filtered(lambda move_ids_without_package.move_line_ids[0]: move_ids_without_package.move_line_ids[0].lot_id or move_ids_without_package.move_line_ids[0].lot_name)" groups="stock.group_production_lot"/>-->
                     <thead>
                         <tr>
                             <th>
@@ -38,26 +141,12 @@
                             <th>
                                 <strong>Quant. Prépa</strong>
                             </th>
-                          <!--  <th>
-                                <strong>Quantité</strong>
-                            </th>-->
-                           <!-- <th>
-                                <strong>DLC/DDM</strong>
-                            </th>-->
-                            <!--<th width="20%" t-if="o.picking_type_id.code != 'incoming'" align="left"><strong>From</strong>
-                            </th>-->
-                            <!--<th t-if="o.picking_type_id.code != 'outgoing'"><strong>To</strong></th>-->
                             <th width="30%" class="text-center">
                                 <strong>Lot</strong>
                             </th>
                             <th>
                                 <strong>DLC/DDM</strong>
                             </th>
-                            <!--<th width="15%" class="text-center" t-if="has_barcode">
-                                <strong>
-                                    Product Barcode
-                                </strong>
-                            </th>-->
                         </tr>
                     </thead>
                     <tbody>
@@ -69,21 +158,15 @@
                                     <span t-field="m.product_id.description_picking"/>
                                     <t t-if="m.product_id.type_traçabilite">
                                         -
-                                     <!--   <strong t-field="m.product_id.type_traçabilite"/>-->
                                     </t>
                                 </td>
                                 <td>
                                     <span t-field="m.product_uom_qty"/>
                                 </td>
                                 <td>
-                                <!--    <span t-field="m.quantity_done"/>-->
 
                                 </td>
 
-                              <!--  <td>
-                                    <span t-field="m.weight"/>
-
-                                </td>-->
                                  <t t-set="lots" t-value="[]"/>
                                     <t t-foreach="m.move_line_ids" t-as="ml">
                                         <t t-esc="lots.append(ml.lot_id)"/>
@@ -111,29 +194,11 @@
                                 </td>
 
 
-
-                               <!-- <td width="15%" class="text-center" t-if="has_barcode">
-                                    <t t-if="product_barcode != m.product_id.barcode">
-                                        <span t-if="m.product_id and m.product_id.barcode">
-                                            <img t-if="len(m.product_id.barcode) == 13"
-                                                 t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN13', m.product_id.barcode, 600, 100)"
-                                                 style="width:100%;height:35px" alt="Barcode"/>
-                                            <img t-elif="len(ù.product_id.barcode) == 8"
-                                                 t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('EAN8', m.product_id.barcode, 600, 100)"
-                                                 style="width:100%;height:35px" alt="Barcode"/>
-                                            <img t-else=""
-                                                 t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', m.product_id.barcode, 600, 100)"
-                                                 style="width:100%;height:35px" alt="Barcode"/>
-
-                                        </span>
-                                        <t t-set="product_barcode" t-value="m.product_id.barcode"/>
-                                    </t>
-                                </td>-->
                             </tr>
                         </t>
                     </tbody>
                 </table>
             </xpath>
-        </template>
-    </data>
+        </template> -->
+    </data> 
 </odoo>

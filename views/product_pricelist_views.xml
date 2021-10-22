@@ -5,7 +5,7 @@
             <field name="name">is_product_pricelist_item_tree</field>
             <field name="model">product.pricelist.item</field>
             <field name="arch" type="xml">
-                <tree editable="top" default_order="product_tmpl_id">
+                <tree default_order="product_tmpl_id">
                     <field name="is_archive" invisible="1"/>
                     <button 
                         name="is_archive_action" type="object" class="oe_stat_button" 
@@ -36,6 +36,10 @@
             <field name="domain">[('pricelist_id','=',active_id)]</field>
             <field name="context">{'default_pricelist_id': active_id}</field>
         </record>
+
+
+
+
         <record id="is_product_pricelist_view" model="ir.ui.view">
             <field name="name">is_product_pricelist_view</field>
             <field name="model">product.pricelist</field>
@@ -68,7 +72,7 @@
                         </div>
                     </group>
                 </xpath>
-                <xpath expr="//field[@name='item_ids']/tree/field[@name='product_tmpl_id']" position="before">
+                <xpath expr="//field[@name='item_ids']/tree/field[@name='min_quantity']" position="before">
                     <field name="is_archive" invisible="1"/>
                     <button 
                         name="is_archive_action" type="object" class="oe_stat_button" 

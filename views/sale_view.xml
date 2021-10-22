@@ -80,9 +80,10 @@
             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_id']" position="before">
                 <field name="is_purchase_line_id" invisible="1"/>
                 <button 
-                    string="Cde fournisseur" 
+                    title="Cde fournisseur" 
                     name="acceder_commande_fournisseur" 
                     type="object" icon="fa-search-plus" 
+                    class="oe_stat_button" 
                     attrs="{'invisible': [('is_purchase_line_id', '=', False)]}"
                 />
             </xpath>
