@@ -71,7 +71,8 @@ class IsCommandeFromtome(models.Model):
                 order.onchange_partner_id()
             order.order_line.unlink()
             now = datetime.date.today()
-            products = self.env['product.product'].search([('sale_ok','=',True),('is_enseigne_id','=',obj.enseigne_id.id)],order='name')
+            #products = self.env['product.product'].search([('sale_ok','=',True),('is_enseigne_id','=',obj.enseigne_id.id)],order='name')
+            products = self.env['product.product'].search([('sale_ok','=',True)],order='name')
             print(products)
             sequence=0
             for product in products:
