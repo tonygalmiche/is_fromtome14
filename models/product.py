@@ -168,6 +168,12 @@ class ProductTemplate(models.Model):
             obj.is_ingredient = ', '.join(res)
 
 
+    @api.onchange('is_nb_pieces_par_colis','is_poids_net_colis')
+    def onchange_is_poids_net_colis(self):
+        for obj in self:
+            obj.weight = obj.is_poids_net_colis / (obj.is_nb_pieces_par_colis or 1)
+ 
+
     contrat_date_id = fields.One2many('contrat.date.client','product_id','Contrat Date')
 
     # Présentation / Conseils
