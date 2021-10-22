@@ -16,6 +16,13 @@
         <div class="page" position="replace">
 
 
+            <style>
+                .page{
+                    font-size:10pt;
+                }
+            </style>
+
+
 
 
             <div class="page">
@@ -61,14 +68,13 @@
                             <th class="text-left"><span>Code produit</span></th>
                             <th class="text-left"><span>Désignation</span></th>
                             <th class="text-left"><span>Gencode</span></th>
-                            <th class="text-left"><span>Colis Livrés</span></th>
-                            <th class="text-left"><span>PCB</span></th>
-                            <th class="text-left"><span>Pièces livrées</span></th>
-                            <th class="text-left"><span>Unité</span></th>
-                            <th class="text-left"><span>Poids Livré</span></th>
-                            <th class="text-left"><span>P.U.HT</span></th>
-                            <th class="text-left"><span>Montant net</span></th>
-                            <th class="text-left"><span>TVA</span></th>
+                            <th class="text-right"><span>Colis</span></th>
+                            <th class="text-center"><span>PCB</span></th>
+                            <th class="text-center" colspan="2"><span>Qt</span></th>
+                            <th class="text-right"><span>Poids</span></th>
+                            <th class="text-right"><span>P.U.HT</span></th>
+                            <th class="text-right"><span>Montant net</span></th>
+                            <th class="text-center"><span>TVA</span></th>
                         </tr>
                     </thead>
                     <tbody class="invoice_tbody">
@@ -79,11 +85,11 @@
                                 <b><div t-field="line.name"/></b>
                                 <div t-if="line.is_lots" t-field="line.is_lots"/>
                             </td>
-                            <td class="text-left"><span t-field="line.product_id.barcode"/></td>
+                            <td class="text-left"><span style="font-size:6pt" t-field="line.product_id.barcode"/></td>
                             <td class="text-right"><span t-field="line.is_nb_colis"/></td>
                             <td class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
-                            <td class="text-right"><span t-field="line.quantity"/></td>
-                            <td class="text-left"><span t-field="line.product_uom_id"/></td>
+                            <td class="text-right" style="border-right:none"><span t-field="line.quantity"/></td>
+                            <td class="text-left"  style="border-left:none"><span t-field="line.product_uom_id"/></td>
                             <td class="text-right"><span t-field="line.is_poids_net"/></td>
                             <td class="text-right"><span t-field="line.price_unit"/></td>
                             <td class="text-right"><span t-field="line.price_subtotal"/></td>

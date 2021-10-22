@@ -16,6 +16,10 @@ class AccountMoveLine(models.Model):
                 for line in obj.purchase_line_id.move_ids.move_line_ids:
                     poids_net+=line.is_poids_net_reel
                     nb_colis+=line.is_nb_colis
+            if obj.sale_line_ids.move_ids:
+                for line in obj.sale_line_ids.move_ids.move_line_ids:
+                    poids_net+=line.is_poids_net_reel
+                    nb_colis+=line.is_nb_colis
             obj.is_poids_net = poids_net
             obj.is_nb_colis = nb_colis
 
@@ -31,14 +35,10 @@ class AccountMoveLine(models.Model):
             obj.is_lots= (lots and "\r".join(lots)) or False
 
 
-    is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis'     , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
+    is_nb_pieces_par_colis = fields.Integer(string='PCB', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2) , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_poids_net           = fields.Float(string='Poids net', digits=(14,4), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
     is_lots                = fields.Text('Lots', compute='_compute_is_lots')
-
-
-#sale_line_ids
-
 
 
 class AccountMove(models.Model):
