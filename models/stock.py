@@ -127,9 +127,25 @@ class StockMove(models.Model):
             obj.is_poids_net_reel = poids
  
 
+    @api.onchange('product_uom_qty','product_id')
+    def _compute_is_nb_colis_cde(self):
+        for obj in self:
+            nb        = obj.product_id.is_nb_pieces_par_colis
+            poids_net = obj.product_id.is_poids_net_colis
+            unite     = obj.product_uom.category_id.name
+            nb_colis  = 0
+            if unite=="Poids":
+                if poids_net>0:
+                    nb_colis = obj.product_uom_qty/poids_net
+            else:
+                if nb>0:
+                    nb_colis = obj.product_uom_qty / nb
+            obj.is_nb_colis_cde=nb_colis
+
     is_alerte         = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
     is_lots           = fields.Text('Lots'  , copy=False, compute=_compute_is_lots)
     is_nb_colis       = fields.Float('Nb Colis'      , digits=(14,2), compute=_compute_is_nb_colis_poids)
+    is_nb_colis_cde   = fields.Float('Nb Colis Cde'  , digits=(14,2), compute=_compute_is_nb_colis_cde)
     is_poids_net_reel = fields.Float('Poids net réel', digits=(14,4), compute=_compute_is_nb_colis_poids)
 
 

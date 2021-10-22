@@ -140,7 +140,7 @@
             </xpath>
 
             <field name="origin" position="after">
-                <field name="is_poids_net"/>
+                <field name="is_poids_net" sum="Total"/>
             </field>
 
 
@@ -154,10 +154,20 @@
             <xpath expr="//page[@name='operations']/field/tree/field[@name='product_id']" position="after">
                 <field name="is_lots" optional="hide"/>
             </xpath> 
-            <xpath expr="//page[@name='operations']/field/tree/field[@name='quantity_done']" position="after">
-                <field name="is_nb_colis"       optional="hide"/>
-                <field name="is_poids_net_reel" optional="hide"/>
+            <xpath expr="//page[@name='operations']/field/tree/field[@name='product_uom_qty']" position="after">
+                <field name="is_nb_colis_cde"   optional="hide" sum="Total"/>
             </xpath> 
+            <xpath expr="//page[@name='operations']/field/tree/field[@name='quantity_done']" position="after">
+                <field name="is_nb_colis"       optional="hide" sum="Total"/>
+                <field name="is_poids_net_reel" optional="hide" sum="Total"/>
+            </xpath> 
+
+
+ 
+<!-- 
+                      <page string="Operations" name="operations">
+                            <field name="move_ids_without_package" mode="tree,kanban" attrs="{'readonly': ['&amp;', ('state', '=', 'done'), ('is_locked', '=', True)]}" context="{'default_company_id': company_id, 'default_date': scheduled_date, 'default_date_deadline': date_deadline, 'picking_type_code': picking_type_code, 'default_picking_id': id, 'form_view_ref':'stock.view_move_form', 'address_in_id': partner_id, 'default_picking_type_id': picking_type_id, 'default_location_id': location_id, 'default_location_dest_id': location_dest_id}">
+                                <tree decoration-danger="not parent.immediate_transfer and state != 'done' and quantity_done &gt; reserved_availability and show_reserved_availability" decoration-muted="scrapped == True or state == 'cancel' or (state == 'done' and is_locked == True)" string="Stock Moves" editable="bottom"> -->
 
 
 

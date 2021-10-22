@@ -56,23 +56,22 @@
                             <th class="text-left"> <strong>Gencode</strong></th>
                             <th class="text-center"> <strong>Colis</strong></th>
                             <th class="text-center"> <strong>PCB</strong></th>
-                            <th class="text-right"><strong>Pièces</strong></th>
-                            <th class="text-left"> <strong>Unité</strong></th>
+                            <th class="text-center" colspan="2"><strong>Qt</strong></th>
                             <th class="text-right"> <strong>Poids</strong></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr t-foreach="o.move_ids_without_package" t-as="line">
+                        <tr t-foreach="o.move_ids_without_package" t-as="line" t-if="line.quantity_done">
                             <td class="text-left"><span t-field="line.product_id.default_code"/></td>
                             <td class="text-left">
                                 <div><strong><span t-field="line.product_id.name"/></strong></div>
                                 <span t-if="line.is_lots" t-field="line.is_lots"/>
                             </td>
-                            <td class="text-left"><span t-field="line.product_id.barcode"/></td>
+                            <td class="text-left;"><span style="font-size:6pt" t-field="line.product_id.barcode"/></td>
                             <td class="text-center"><span t-field="line.is_nb_colis"/></td>
                             <td class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
-                            <td class="text-right"><span t-field="line.quantity_done"/></td>
-                            <td class="text-left"><span t-field="line.product_uom"/></td>
+                            <td class="text-right" style="border-right:none"><span t-field="line.quantity_done"/></td>
+                            <td class="text-left"  style="border-left:none"><span t-field="line.product_uom"/></td>
                             <td class="text-right"><span t-field="line.is_poids_net_reel"/></td>
                         </tr>
                     </tbody>
