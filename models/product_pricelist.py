@@ -17,10 +17,17 @@ class Pricelist(models.Model):
             obj.is_augmentation=0
 
 
+    def lignes_action(self):
+        for obj in self:
+            print(obj)
+
 
 class PricelistItem(models.Model):
     _inherit = "product.pricelist.item"
 
+    def is_archive_action(self):
+        for obj in self:
+            print(obj)
 
     def is_archive(self):
         for obj in self:

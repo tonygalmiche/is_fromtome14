@@ -1,19 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-
-
+        <record id="is_product_pricelist_item_tree" model="ir.ui.view">
+            <field name="name">is_product_pricelist_item_tree</field>
+            <field name="model">product.pricelist.item</field>
+            <field name="arch" type="xml">
+                <tree editable="top" default_order="product_tmpl_id">
+                    <field name="is_archive" invisible="1"/>
+                    <button 
+                        name="is_archive_action" type="object" class="oe_stat_button" 
+                        icon="fa-exclamation-triangle"
+                        attrs="{'invisible': [('is_archive', '=', False)]}"
+                        title="Article archivé"
+                    />
+                    <field name="product_tmpl_id" string="Products" required="1"/>
+                    <field name="product_id" string="Variants" groups="product.group_product_variant" domain="[('product_tmpl_id', '=', product_tmpl_id)]" options="{'no_create':1}"/>
+                    <field name="min_quantity"/>
+                    <field name="fixed_price" string="Price"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="pricelist_id" invisible="1"/>
+                    <field name="date_start"/>
+                    <field name="date_end"/>
+                    <field name="base" invisible="1"/>
+                    <field name="applied_on" invisible="1"/>
+                    <field name="company_id" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+        <record  id="is_product_pricelist_item_action" model="ir.actions.act_window">
+            <field name="name">Lignes</field>
+            <field name="res_model">product.pricelist.item</field>
+            <field name="limit">1000</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="is_fromtome14.is_product_pricelist_item_tree"/>
+            <field name="domain">[('pricelist_id','=',active_id)]</field>
+            <field name="context">{'default_pricelist_id': active_id}</field>
+        </record>
         <record id="is_product_pricelist_view" model="ir.ui.view">
             <field name="name">is_product_pricelist_view</field>
             <field name="model">product.pricelist</field>
             <field name="inherit_id" ref="product.product_pricelist_view"/>
             <field name="arch" type="xml">
-
-               <field name="currency_id" position="before">
+                <sheet position="before">
+                    <header>
+                        <button 
+                            name="%(is_product_pricelist_item_action)d"
+                            type="action"
+                            string="Voir les lignes"
+                        />
+                    </header>
+                </sheet>
+                <field name="currency_id" position="before">
                     <field name="partner_id"/>
                 </field>
-
-
                 <xpath expr="//field[@name='item_ids']/.." position="after">
                     <group col="4">
                         <label for="is_augmentation" string="Pourcentage d'augmentation à appliquer"/>
@@ -29,35 +68,16 @@
                         </div>
                     </group>
                 </xpath>
-                <!-- <field name="product_tmpl_id" position="before">
+                <xpath expr="//field[@name='item_ids']/tree/field[@name='product_tmpl_id']" position="before">
                     <field name="is_archive" invisible="1"/>
                     <button 
-                        class="oe_stat_button" name="#" type="object" 
-                        icon="fa-exclamation-triangle" 
-                        title="Article archivé"
+                        name="is_archive_action" type="object" class="oe_stat_button" 
+                        icon="fa-exclamation-triangle"
                         attrs="{'invisible': [('is_archive', '=', False)]}"
+                        title="Article archivé"
                     />
-                </field> -->
+                </xpath>
             </field>
         </record>
-
-
-        <!-- <record id="is_product_pricelist_item_tree_view" model="ir.ui.view">
-            <field name="name">is_product_pricelist_item_tree_view</field>
-            <field name="model">product.pricelist.item</field>
-            <field name="inherit_id" ref="product.product_pricelist_item_tree_view"/>
-            <field name="arch" type="xml">
-                <field name="product_tmpl_id" position="before">
-                    <field name="is_archive" invisible="1"/>
-                    <button 
-                        class="oe_stat_button" name="#" type="object" 
-                        icon="fa-exclamation-triangle" 
-                        title="Article archivé"
-                        attrs="{'invisible': [('is_archive', '=', False)]}"
-                    />
-                </field>
-            </field>
-        </record>
- -->
     </data>
 </odoo>
