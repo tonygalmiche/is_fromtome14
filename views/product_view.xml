@@ -36,10 +36,10 @@ records.exporter_article_fromelier_action()
             </button>
             -->
             <!-- <group name="group_lots_and_weight" string="Logistics" attrs="{'invisible': [('type', 'not in', ['product', 'consu'])]}"> -->
-            <group name="group_lots_and_weight" position="attributes">
+            <!-- <group name="group_lots_and_weight" position="attributes">
                 <attribute name="invisible">1</attribute>
                 <attribute name="attrs">{}</attribute>
-            </group>
+            </group> -->
 
             <field name="type" position="after">
                 <field name="is_stock_mini"/>
