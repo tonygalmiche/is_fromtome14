@@ -28,7 +28,7 @@ class IsScanPickingLine(models.Model):
     scan_id             = fields.Many2one('is.scan.picking', 'Picking', required=True, ondelete='cascade')
     product_id          = fields.Many2one('product.product', 'Article', required=True)
     uom_id              = fields.Many2one('uom.uom', 'Unité', related='product_id.uom_id')
-    nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis', related="product_id.is_nb_pieces_par_colis")
+    nb_pieces_par_colis = fields.Integer(string='PCB', related="product_id.is_nb_pieces_par_colis", help="Nb Pièces / colis")
     lot_id            = fields.Many2one('stock.production.lot', 'Lot', required=True)
     type_tracabilite  = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
     dlc_ddm           = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
@@ -93,8 +93,9 @@ class IsScanPicking(models.Model):
     lot        = fields.Char("Lot scanné")
     lot_id     = fields.Many2one('stock.production.lot', 'Lot')
     type_tracabilite = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
-    dlc_ddm          = fields.Date('DLC / DDM')
+    dlc_ddm     = fields.Date('DLC / DDM')
     poids       = fields.Float("Poids")
+    nb_colis    = fields.Integer('Colis', default=1)
     ajouter     = fields.Boolean("Ajouter", help="Ajouter cette ligne")
     is_alerte   = fields.Text('Alerte', compute=_compute_is_alerte, readonly=True, store=False)
     line_ids    = fields.One2many('is.scan.picking.line', 'scan_id', 'Lignes')
@@ -109,13 +110,14 @@ class IsScanPicking(models.Model):
             obj.lot_id     = False
             obj.dlc_ddm    = False
             obj.poids      = False
+            obj.nb_colis   = 1
 
 
     def ajouter_ligne(self):
         for obj in self:
             if obj.product_id and obj.lot_id and obj.dlc_ddm:
-                nb_pieces=obj.product_id.is_nb_pieces_par_colis
-
+                nb_colis = obj.nb_colis or 1
+                nb_pieces=obj.product_id.is_nb_pieces_par_colis*nb_colis
 
                 #** Recherche de la quantité prévue ***************************
                 prevu=0.0
@@ -126,7 +128,7 @@ class IsScanPicking(models.Model):
 
                 #** Recherche quantité scannée ********************************
                 products={}
-                scanne=1
+                scanne=nb_colis
                 for line in obj.line_ids:
                     if line.product_id==obj.product_id:
                         scanne+=line.nb_colis
@@ -135,12 +137,12 @@ class IsScanPicking(models.Model):
 
                 tz = pytz.timezone('Europe/Paris')
                 now = datetime.now(tz).strftime("%H:%M:%S")
-                poids = obj.poids or obj.product_id.is_poids_net_colis
+                poids = (obj.poids or obj.product_id.is_poids_net_colis)*nb_colis
                 vals={
                     "product_id": obj.product_id.id,
                     "lot_id"    : obj.lot_id.id,
                     "nb_pieces" : nb_pieces,
-                    "nb_colis"  : 1,
+                    "nb_colis"  : nb_colis,
                     "nb_colis_prevues": prevu,
                     "nb_colis_reste"  : reste,
                     "poids"     : poids,

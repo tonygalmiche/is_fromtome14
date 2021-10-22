@@ -69,6 +69,7 @@
                             <field name="type_tracabilite"/>
                             <field name="dlc_ddm"/>
                             <field name="poids"/>
+                            <field name="nb_colis"/>
                         </group>
                     </group>
                     <field 
