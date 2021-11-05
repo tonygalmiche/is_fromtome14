@@ -73,7 +73,6 @@ class IsCommandeFromtome(models.Model):
             now = datetime.date.today()
             #products = self.env['product.product'].search([('sale_ok','=',True),('is_enseigne_id','=',obj.enseigne_id.id)],order='name')
             products = self.env['product.product'].search([('sale_ok','=',True)],order='name')
-            print(products)
             sequence=0
             for product in products:
                 if product.default_code:
@@ -84,26 +83,23 @@ class IsCommandeFromtome(models.Model):
                             pt.default_code,
                             sol.product_id,
                             sum(sol.product_uom_qty-sol.qty_delivered)
-                        FROM sale_order so inner join sale_order_line sol on so.id=sol.order_id
-                                           inner join product_product pp on sol.product_id=pp.id
-                                           inner join product_template pt on pp.product_tmpl_id=pt.id
+                        FROM sale_order so join sale_order_line sol on so.id=sol.order_id
+                                           join product_product pp on sol.product_id=pp.id
+                                           join product_template pt on pp.product_tmpl_id=pt.id
+                                           join res_partner rp on so.partner_id=rp.id
                         WHERE 
                             so.state in ('draft','send','sale') and
                             (so.is_commande_soldee='f' or so.is_commande_soldee is null) and 
                             so.commitment_date>='2020-10-01' and
-                            sol.product_id="""+str(product.id)+"""
-                        GROUP BY pt.default_code,sol.product_id
+                            sol.product_id=%s and rp.is_enseigne_id=%s
+                        GROUP BY pt.default_code,sol.product_id 
                         ORDER BY pt.default_code,sol.product_id
                     """
-                    cr.execute(sql)
+                    cr.execute(sql,[product.id,obj.enseigne_id.id])
                     sale_qty = 0
                     for row in cr.fetchall():
                         sale_qty = row[2]
                     #***********************************************************
-
-
-                    if sale_qty>0:
-                        print (product.default_code,sale_qty)
 
 
                     #** Commande Fromtome ***********************************
@@ -131,10 +127,6 @@ class IsCommandeFromtome(models.Model):
                         if qt<0:
                             qt=0
                         purchase_qty += qt
-                        print(row,purchase_qty)
-
-
-
                     #***********************************************************
                     stock_mini=0
                     if obj.stock_mini==True:
@@ -153,11 +145,6 @@ class IsCommandeFromtome(models.Model):
                     #if factor_inv>0:
                     #    product_qty = factor_inv*ceil(product_qty/factor_inv)
                     order_line_id=False
-
-                    print(product.name,product_qty)
-
-
-
                     if product_qty>0:
                         sequence+=1
                         vals={
@@ -174,7 +161,6 @@ class IsCommandeFromtome(models.Model):
                         order_line.onchange_product_id()
                         order_line.product_qty = product_qty
                         order_line_id=order_line.id
-                        print(vals,order_line)
                     if sale_qty>0 or product_qty>0:
                         vals={
                             'commande_id'   : obj.id,
@@ -192,7 +178,6 @@ class IsCommandeFromtome(models.Model):
                             'order_line_id' : order_line_id,
                         }
                         ligne=self.env['is.commande.fromtome.ligne'].create(vals)
-                        print(vals,ligne)
 
 
 
