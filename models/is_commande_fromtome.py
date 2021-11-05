@@ -16,6 +16,7 @@ class IsCommandeFromtomeLigne(models.Model):
     commande_id      = fields.Many2one('is.commande.fromtome', 'Commande Fromtome', required=True, ondelete='cascade')
     sequence         = fields.Integer("Ordre")
     product_id       = fields.Many2one('product.product', 'Article')
+    nb_pieces_par_colis = fields.Integer(string='PCB', related="product_id.is_nb_pieces_par_colis")
     uom_id           = fields.Many2one('uom.uom', "Unité")
     #uom_po_id        = fields.Many2one('uom.uom', "Unité d'achat")
     #factor_inv       = fields.Float("Multiple de", digits=(14,4))
@@ -139,12 +140,21 @@ class IsCommandeFromtome(models.Model):
                     if product_qty<0:
                         product_qty=0
 
-                    #product_po_qty = product.uom_id._compute_quantity(product_qty, product.uom_po_id, round=True, rounding_method='UP', raise_if_failure=True)
-
-                    #factor_inv = product.uom_po_id.factor_inv
-                    #if factor_inv>0:
-                    #    product_qty = factor_inv*ceil(product_qty/factor_inv)
                     order_line_id=False
+
+                    # ** Arrondi au colis supérieur ***************************
+                    if product_qty>0:
+                        nb        = product.is_nb_pieces_par_colis
+                        poids_net = product.is_poids_net_colis
+                        unite     = product.uom_id.category_id.name
+                        if unite=="Poids":
+                            if poids_net>0:
+                                product_qty = poids_net * ceil(product_qty / poids_net)
+                        else:
+                            if nb>0:
+                                product_qty = nb * (product_qty / nb)
+                    # *********************************************************
+
                     if product_qty>0:
                         sequence+=1
                         vals={

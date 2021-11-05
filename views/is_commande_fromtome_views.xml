@@ -39,9 +39,7 @@
                 <field name="sale_qty"/>
                 <field name="purchase_qty"/>
                 <field name="product_qty"/>
-                <!-- <field name="product_po_qty"/> -->
-                <!-- <field name="uom_po_id"/> -->
-                <!-- <field name="factor_inv"/> -->
+                <field name="nb_pieces_par_colis" optional="show"/>
             </tree>
         </field>
     </record>
