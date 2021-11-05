@@ -117,7 +117,7 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
 
-    is_date_livraison  = fields.Date('Date Livraison')
+    is_date_livraison  = fields.Date('Date Livraison (ancien champ non utilisé')
     is_commande_soldee = fields.Boolean(string=u'Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
 
     @api.depends('order_line')
