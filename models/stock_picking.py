@@ -63,7 +63,6 @@ class IsScanPicking(models.Model):
     @api.depends('ean','lot','product_id','lot_id')
     def _compute_is_alerte(self):
         for obj in self:
-            print(obj)
             alertes=[]
             if obj.ean and not obj.product_id:
                 alertes.append("Article non trouvé pour ce code ean")
@@ -87,19 +86,22 @@ class IsScanPicking(models.Model):
         for obj in self:
             obj.poids = obj.product_id.is_poids_net_colis
 
-    picking_id = fields.Many2one('stock.picking', 'Picking', required=True)
-    ean        = fields.Char("EAN")
-    product_id = fields.Many2one('product.product', 'Article')
-    lot        = fields.Char("Lot scanné")
-    lot_id     = fields.Many2one('stock.production.lot', 'Lot')
+
+    type         = fields.Selection(string='Type', selection=[('picking', 'Picking'), ('inventory', 'Inventaire')], required=True, default='picking')
+    picking_id   = fields.Many2one('stock.picking', 'Picking'     , required=False)
+    inventory_id = fields.Many2one('stock.inventory', 'Inventaire', required=False)
+    ean          = fields.Char("EAN")
+    product_id   = fields.Many2one('product.product', 'Article')
+    lot          = fields.Char("Lot scanné")
+    lot_id       = fields.Many2one('stock.production.lot', 'Lot')
     type_tracabilite = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
-    dlc_ddm     = fields.Date('DLC / DDM')
-    poids       = fields.Float("Poids")
-    nb_colis    = fields.Integer('Colis', default=1)
-    ajouter     = fields.Boolean("Ajouter", help="Ajouter cette ligne")
-    is_alerte   = fields.Text('Alerte', compute=_compute_is_alerte, readonly=True, store=False)
-    line_ids    = fields.One2many('is.scan.picking.line', 'scan_id', 'Lignes')
-    product_ids = fields.One2many('is.scan.picking.product', 'scan_id', 'Articles')
+    dlc_ddm      = fields.Date('DLC / DDM')
+    poids        = fields.Float("Poids")
+    nb_colis     = fields.Integer('Colis', default=1)
+    ajouter      = fields.Boolean("Ajouter", help="Ajouter cette ligne")
+    is_alerte    = fields.Text('Alerte', compute=_compute_is_alerte, readonly=True, store=False)
+    line_ids     = fields.One2many('is.scan.picking.line', 'scan_id', 'Lignes')
+    product_ids  = fields.One2many('is.scan.picking.product', 'scan_id', 'Articles')
 
 
     def reset_scan(self):
@@ -196,7 +198,6 @@ class IsScanPicking(models.Model):
 
     def maj_picking_action(self):
         for obj in self:
-            print(obj)
             obj.picking_id.move_line_ids_without_package.unlink()
             for line in obj.line_ids:
                 unite = line.uom_id.category_id.name
@@ -217,6 +218,31 @@ class IsScanPicking(models.Model):
                     "is_poids_net_reel" : line.poids,
                 }
                 res = self.env['stock.move.line'].create(vals)
+
+
+    def maj_inventory_action(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            obj.inventory_id.line_ids.unlink()
+            SQL="""
+                SELECT product_id, lot_id, sum(nb_pieces)
+                FROM is_scan_picking_line
+                WHERE scan_id=%s
+                GROUP BY product_id, lot_id
+            """
+            cr.execute(SQL,[obj.id])
+            for row in cr.fetchall():
+                vals={
+                    "inventory_id"      : obj.inventory_id.id,
+                    "product_id"        : row[0],
+                    "prod_lot_id"       : row[1],
+                    "company_id"        : 1,
+                    "location_id"       : 8,
+                    "product_qty"       : row[2],
+                }
+                res = self.env['stock.inventory.line'].create(vals)
+
+
 
 
 class Picking(models.Model):
@@ -281,21 +307,13 @@ class Picking(models.Model):
 
     def scan_picking_action(self):
         for obj in self:
-
-
             products={}
             for line in obj.move_ids_without_package:
-                print(line)
-
                 nb_colis=line.get_nb_colis()
-
-                
                 if line.product_id not in products:
                     products[line.product_id]=[0,0]
                 products[line.product_id][0]+=line.product_uom_qty
                 products[line.product_id][1]+=nb_colis
-            print(products)
-
             scans = self.env['is.scan.picking'].search([('picking_id','=',obj.id)],limit=1)
             if scans:
                 scan=scans[0]
@@ -304,8 +322,6 @@ class Picking(models.Model):
                     "picking_id": obj.id,
                 }
                 scan=self.env['is.scan.picking'].create(vals)
-
-
             scan.product_ids.unlink()
             for product in products:
                 vals={
@@ -336,7 +352,6 @@ class Picking(models.Model):
 
     # @api.onchange('move_ids_without_package')
     # def _compute_is_alerte(self):
-    #     print(self)
     #     for obj in self:
     #         obj.is_alerte=str(len(obj.move_ids_without_package))
     #         alerte=[]
@@ -508,7 +523,6 @@ class Picking(models.Model):
     #         float_is_zero(move_line.product_qty, precision_rounding=move_line.product_uom_id.rounding) for move_line in
     #         self.move_line_ids)
     #     if no_reserved_quantities and no_quantities_done:
-    #         print('You cannot validate a transfer if no quantites are reserved nor done. To force the transfer, switch in edit more and encode the done quantities.')
 
     #     if picking_type.use_create_lots or picking_type.use_existing_lots:
     #         lines_to_check = self.move_line_ids
@@ -522,7 +536,6 @@ class Picking(models.Model):
     #             product = line.product_id
     #             if product and product.tracking != 'none':
     #                 if not line.lot_name and not line.lot_id:
-    #                     print('You need to supply a Lot/Serial number for product  in ean picking module')
 
     #     if no_quantities_done:
     #         view = self.env.ref('stock.view_immediate_transfer')
@@ -569,7 +582,6 @@ class Picking(models.Model):
 #     @api.onchange('qty_done','product_uom_qty')
 #     def delete_line_qty_zero(self):
 
-#         print("#### delete_line_qty_zero ####",self,self.product_uom_qty)
 
 #         if self.product_uom_qty == 0:
 #             self.unlink()
@@ -586,7 +598,6 @@ class Picking(models.Model):
 #         for obj in self:
 #             if obj.product_id and obj.lot_id and obj.life_use_date:
 #                 if not obj.lot_id.use_date and not obj.lot_id.life_date:
-#                     print("### StockMoveLine ### obj=",obj)
 #                     if obj.lot_id.type_traçabilite=="ddm":
 #                         obj.lot_id.write({"use_date": obj.life_use_date})
 #                     else:

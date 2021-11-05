@@ -22,7 +22,6 @@ class StockInventory(models.Model):
 #                 'type': 'ir.actions.act_window',
 #                 #'limit':1000,
 #             }
-#             print(res)
 #             return res
 
 
@@ -57,15 +56,42 @@ class StockInventory(models.Model):
         return action
 
 
-
-
-
-
+    def scan_inventory_action(self):
+        for obj in self:
+            scans = self.env['is.scan.picking'].search([('inventory_id','=',obj.id)],limit=1)
+            if scans:
+                scan=scans[0]
+            else:
+                vals={
+                    "type"        : 'inventory',
+                    "inventory_id": obj.id,
+                }
+                scan=self.env['is.scan.picking'].create(vals)
+                # ** Mettre à 0 les stocks ****************************************
+                for line in obj.line_ids:
+                    vals={
+                        "scan_id"   : scan.id,
+                        "product_id": line.product_id.id,
+                        "lot_id"    : line.prod_lot_id.id,
+                        "nb_pieces" : 0,
+                    }
+                    self.env['is.scan.picking.line'].create(vals)
+                # *****************************************************************
+            context = dict(self.env.context)
+            context['form_view_initial_mode'] = 'edit'
+            res= {
+                'name': 'Scan',
+                'view_mode': 'form',
+                'res_model': 'is.scan.picking',
+                'type': 'ir.actions.act_window',
+                'res_id': scan.id,
+                'context': context,
+            }
+            return res
 
 
 class StockInventoryLine(models.Model):
     _inherit = "stock.inventory.line"
-
 
     @api.depends('product_id')
     def compute_is_dernier_prix(self):
@@ -83,13 +109,11 @@ class StockInventoryLine(models.Model):
             prix=0
             uom_id = obj.product_uom_id.id
             for row in cr.fetchall():
-                print(row)
                 prix = row[0]
                 uom_id=row[1]
             obj.is_dernier_prix   = prix
             obj.is_stock_valorise = prix*obj.product_qty
             obj.is_uom_facture_id = uom_id
-
 
     is_default_code    = fields.Char('Référence interne'           , related='product_id.default_code')
     is_product_name    = fields.Char('Désignation article'         , related='product_id.name')

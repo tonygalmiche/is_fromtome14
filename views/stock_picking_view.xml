@@ -52,6 +52,7 @@
                     </style>
                     <group>
                         <group>
+                            <field name="type" readonly="1"/>
                             <field name="ean" readonly="1"/>
                             <field name="lot" readonly="1"/>
                             <field name="ajouter"/>
@@ -115,11 +116,24 @@
                             <field name="nb_colis" sum="Total"/>
                         </tree>
                     </field>
-                    <field name="picking_id" readonly="1"/>
-                    <field name="_barcode_scanned" widget="barcode_handler"/>
+
                     <group>
-                        <button name="maj_picking_action" type="object" string="Mise à jour du Picking" confirm2="Attention, cela va supprimer et remplacer les lignes du picking"/>
+                        <group  attrs="{'invisible': [('type','!=', 'picking'  )],'readonly':True}">
+                            <button name="maj_picking_action" type="object" string="Mise à jour du Picking"   confirm2="Attention, cela va supprimer et remplacer les lignes du picking"/>
+                            <field name="picking_id" readonly="1"/>
+                        </group>
+                        <group  attrs="{'invisible': [('type','!=', 'inventory'  )],'readonly':True}">
+                            <button 
+                                name="maj_inventory_action" 
+                                type="object" string="Mise à jour Inventaire" 
+                                confirm2="Attention, cela va supprimer et remplacer les lignes de l'inventaire"
+                            />
+                            <field name="inventory_id" readonly="1"/>
+                        </group>
                     </group>
+
+                    <field name="_barcode_scanned" widget="barcode_handler"/>
+
                 </sheet>
             </form>
         </field>
