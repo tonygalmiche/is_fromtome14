@@ -105,13 +105,30 @@
         </t>
     </template>
     <data>
-        <report
-                id="action_report_fiche_palette"
-                string="Fiche Palette"
-                model="stock.picking"
-                report_type="qweb-pdf"
-                file="b2c_cheese_base.report_fiche_palette_document"
-                name="b2c_cheese_base.report_fiche_palette_document"
-        />
+
+
+        <record id="fiche_palette_paperformat" model="report.paperformat">
+            <field name="name">Fiche Palette</field>
+            <field name="default" eval="True"/>
+            <field name="format">custom</field>
+            <field name="page_height">297</field>
+            <field name="page_width">210</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">10</field>
+            <field name="margin_bottom">10</field>
+            <field name="margin_left">10</field>
+            <field name="margin_right">10</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">10</field>
+            <field name="dpi">90</field>
+        </record>
+        <record id="action_report_fiche_palette" model="ir.actions.report">
+            <field name="name">Fiche Palette</field>
+            <field name="model">stock.picking</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">is_fromtome14.report_fiche_palette_document</field>
+            <field name="report_file">is_fromtome14.report_fiche_palette_document</field>
+            <field name="paperformat_id" ref="is_fromtome14.fiche_palette_paperformat"/>
+        </record>
     </data>
 </odoo>
