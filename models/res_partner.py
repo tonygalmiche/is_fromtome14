@@ -23,7 +23,8 @@ class ResPartner(models.Model):
     is_gln                      = fields.Char(string='GLN Client')
     is_iln                      = fields.Char(string='ILN Client')
     is_enseigne_id              = fields.Many2one('is.enseigne.commerciale', 'Enseigne', help="Enseigne commerciale")
-
+    is_customer                 = fields.Boolean("Est un Client")
+    is_supplier                 = fields.Boolean("Est un Fournisseur")
 
 
 
