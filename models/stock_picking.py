@@ -165,7 +165,7 @@ class IsScanPicking(models.Model):
                 for product in products:
                     obj.product_id = product.id
             if prefix=="10":
-                obj.lot = code
+                obj.lot = code.strip()
             if prefix in ["15","17"]:
                 date = dateparser.parse(code, date_formats=['%y%m%d'])
                 obj.dlc_ddm = date.strftime('%Y-%m-%d')

@@ -3,6 +3,13 @@
 from odoo import api, fields, models
 
 
+class StockQuant(models.Model):
+    _inherit = 'stock.quant'
+
+    is_dlc_ddm = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
+
+
+
 #TODO : A revoir
 
 # class StockQuant(models.Model):

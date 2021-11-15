@@ -114,6 +114,7 @@
         <field name="arch" type="xml">
             <field name="property_supplier_payment_term_id" position="before">
                 <field name="is_supplier"/>
+                <field name="is_date_reception" readonly="1"/>
             </field>
         </field>
     </record>

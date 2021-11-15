@@ -2,6 +2,35 @@
 <odoo>
 
 
+
+
+
+    <record model="ir.ui.view" id="is_view_stock_quant_tree_editable">
+        <field name="name">is_view_stock_quant_tree_editable</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree_editable"/>
+        <field name="arch" type="xml">
+            <field name="lot_id" position="after">
+                <field name="is_dlc_ddm"/>
+            </field>
+        </field>
+    </record>
+
+
+   <record model="ir.ui.view" id="is_view_stock_quant_tree">
+        <field name="name">is_view_stock_quant_tree</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree"/>
+        <field name="arch" type="xml">
+            <field name="lot_id" position="after">
+                <field name="is_dlc_ddm"/>
+            </field>
+        </field>
+    </record>
+
+
+
+
     <!-- <record model="ir.ui.view" id="view_quant_package_form">
         <field name="name">stock.quant.package.form</field>
         <field name="model">stock.quant.package</field>
