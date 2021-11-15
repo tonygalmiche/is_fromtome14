@@ -38,7 +38,7 @@ class SupplierInfo(models.Model):
                     price= price * (1- r.name/100)
             s.price = price
 
-    prix_brut=fields.Float(string="Prix Brut")
+    prix_brut=fields.Float(string="Prix Brut", digits=(14,4))
     discount_ids=fields.One2many('product.supplierdiscount','supplier_info_id',string='Taux de remises')
     price = fields.Float(
         'Price', default=0.0, digits=dp.get_precision('Product Price'),
