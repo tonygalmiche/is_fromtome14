@@ -197,7 +197,7 @@ class IsExportCompta(models.Model):
     def generer_fichier_action(self):
         cr=self._cr
         for obj in self:
-            name='export-compta.csv'
+            name='export-compta.txt'
             model='is.export.compta'
             attachments = self.env['ir.attachment'].search([('res_model','=',model),('res_id','=',obj.id),('name','=',name)])
             attachments.unlink()
