@@ -142,11 +142,24 @@ class StockMove(models.Model):
                     nb_colis = obj.product_uom_qty / nb
             obj.is_nb_colis_cde=nb_colis
 
-    is_alerte         = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
-    is_lots           = fields.Text('Lots'  , copy=False, compute=_compute_is_lots)
-    is_nb_colis       = fields.Float('Nb Colis'      , digits=(14,2), compute=_compute_is_nb_colis_poids)
-    is_nb_colis_cde   = fields.Float('Nb Colis Cde'  , digits=(14,2), compute=_compute_is_nb_colis_cde)
-    is_poids_net_reel = fields.Float('Poids net réel', digits=(14,4), compute=_compute_is_nb_colis_poids)
+
+    @api.onchange('product_id')
+    def _compute_is_description_cde(self):
+        for obj in self:
+            description = obj.description_picking
+            if obj.sale_line_id:
+                description = obj.sale_line_id.name
+            if obj.purchase_line_id:
+                description = obj.purchase_line_id.name
+            obj.is_description_cde=description
+
+
+    is_alerte          = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
+    is_lots            = fields.Text('Lots'  , copy=False, compute=_compute_is_lots)
+    is_nb_colis        = fields.Float('Nb Colis'      , digits=(14,2), compute=_compute_is_nb_colis_poids)
+    is_nb_colis_cde    = fields.Float('Nb Colis Cde'  , digits=(14,2), compute=_compute_is_nb_colis_cde)
+    is_poids_net_reel  = fields.Float('Poids net réel', digits=(14,4), compute=_compute_is_nb_colis_poids)
+    is_description_cde = fields.Text('Description commande', compute=_compute_is_description_cde)
 
 
     def get_nb_colis(self):
@@ -161,5 +174,15 @@ class StockMove(models.Model):
             if nb>0:
                 nb_colis = self.product_uom_qty / nb
         return round(nb_colis)
+
+
+
+    # @api.onchange('product_id', 'picking_type_id')
+    # def onchange_product(self):
+    #     if self.product_id:
+    #         print("#### TEST ####",self)
+    #         product = self.product_id.with_context(lang=self._get_lang())
+    #         self.description_picking = product._get_description(self.picking_type_id)
+
 
 

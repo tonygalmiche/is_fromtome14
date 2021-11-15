@@ -64,7 +64,7 @@
                         <tr t-foreach="o.move_ids_without_package" t-as="line" t-if="line.quantity_done">
                             <td class="text-left"><span t-field="line.product_id.default_code"/></td>
                             <td class="text-left">
-                                <div><strong><span t-field="line.product_id.name"/></strong></div>
+                                <div><strong><span t-field="line.is_description_cde"/></strong></div>
                                 <span t-if="line.is_lots" t-field="line.is_lots"/>
                             </td>
                             <td class="text-left;"><span style="font-size:6pt" t-field="line.product_id.barcode"/></td>
