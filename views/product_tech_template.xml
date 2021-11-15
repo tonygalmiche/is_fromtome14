@@ -57,12 +57,11 @@
                                             <span t-field="enseigne.zip"/> 
                                             <span t-field="enseigne.city"/>
                                             <br />
-                                            <t t-if="res_company.name=='FROMTOME'">
-                                                TEL: 03 84 52 01 02 – email: info@fromtome.com
+                                            <t t-if="enseigne.mobile">
+                                                MOBILE: <span t-field="enseigne.mobile"/> - 
                                             </t>
-                                            <t t-if="res_company.name!='FROMTOME'">
-                                                MOBILE: 06 52 34 73 63 – TEL: 03 84 52 01 02 – email: lefromelier@le-fromelier.fr
-                                            </t>
+                                            TEL: <span t-field="enseigne.phone"/> - 
+                                            email: <span t-field="enseigne.email"/>
                                         </div>
                                     </td>
                                     <td style="width:45mm;text-align:left;vertical-align:middle;border:1px solid">
