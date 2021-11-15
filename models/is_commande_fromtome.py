@@ -117,11 +117,12 @@ class IsCommandeFromtome(models.Model):
                             po.state not in ('done','cancel','draft') and
                             po.date_planned>='2020-10-01' and
                             pol.product_id=%s and
-                            po.is_commande_soldee='f' and
-                            po.partner_id=%s
+                            po.is_commande_soldee='f'
                     """
+                    # po.partner_id=%s
+
                     #(select sum(product_uom_qty) from stock_move sm where sm.purchase_line_id=pol.id and state='done')
-                    cr.execute(sql,[product.id,obj.partner_id.id])
+                    cr.execute(sql,[product.id])  # ,obj.partner_id.id
                     purchase_qty = 0
                     for row in cr.fetchall():
                         qt = row[2]-(row[3] or 0)
