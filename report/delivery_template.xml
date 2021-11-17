@@ -1,14 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+
+    <!-- <template id="report_delivery_document">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)" />
+                <t t-set="partner" t-value="o.partner_id or (o.move_lines and o.move_lines[0].partner_id) or False"/>
+                <t t-if="partner" name="partner_header">
+                    <t t-set="address">
+                        <div t-esc="partner"
+                        t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True}'/>
+                   </t>
+                </t>
+
+                <div class="page"> -->
+
+
     <template id="is_report_delivery_document" inherit_id="stock.report_delivery_document">
         <t name="partner_header" position="replace">
-            <t t-if="partner" name="partner_header">
+
+            Adresse de Livraison:
+
+            <!-- <t t-if="partner" name="partner_header">
                 <t t-set="address">
                     <div t-esc="partner"
                     t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True}'/>
                     <div t-if="o.partner_id.is_gln">GLN:<span t-field="o.partner_id.is_gln"/></div>
                 </t>
-            </t>
+            </t> -->
         </t>
         <div class="page" position="replace">
             <style>
@@ -17,6 +37,30 @@
                 }
             </style>
             <div class="page">
+                <table style="border:none;width:100%">
+                    <tr>
+                        <th style="border:none;width:95mm">
+                            <div style="text-decoration: underline">Adresse de livraison:</div>
+                            <div><b><span t-field="o.partner_id.name"/></b></div>
+                            <div t-field="o.partner_id.street"/>
+                            <div t-if="o.partner_id.street2"><span t-field="o.partner_id.street2"/></div>
+                            <div><span t-field="o.partner_id.zip"/> <span t-field="o.partner_id.city"/></div>
+                            <div t-if="o.partner_id.country_id"><span t-field="o.partner_id.country_id.name"/></div>
+                            <div t-if="o.partner_id.phone">N°tel:<span t-field="o.partner_id.phone"/></div>
+                        </th>
+                        <th style="border:none" t-if="o.sale_id">
+                            <div style="text-decoration: underline">Adresse de facturation:</div>
+                            <div><b><span t-field="o.sale_id.partner_invoice_id.name"/></b></div>
+                            <div t-field="o.sale_id.partner_invoice_id.street"/>
+                            <div t-if="o.sale_id.partner_invoice_id.street2"><span t-field="o.sale_id.partner_invoice_id.street2"/></div>
+                            <div><span t-field="o.sale_id.partner_invoice_id.zip"/> <span t-field="o.sale_id.partner_invoice_id.city"/></div>
+                            <div t-if="o.sale_id.partner_invoice_id.country_id"><span t-field="o.sale_id.partner_invoice_id.country_id.name"/></div>
+                            <div t-if="o.sale_id.partner_invoice_id.phone">N°tel:<span t-field="o.sale_id.partner_invoice_id.phone"/></div>
+                        </th>
+                    </tr>
+                </table>
+                <br />
+
                 <h2>
                     <span t-field="o.name"/>
                 </h2>
@@ -27,10 +71,13 @@
                                 <strong>N°Cde Client</strong>
                             </th>
                             <th class="text-center" t-if="o.origin">
-                                <strong>N°Cde Fromtome</strong>
+                                <strong>N°Commande</strong>
                             </th>
                             <th class="text-center" name="td_sched_date_h">
                                 <strong>Date Livraison</strong>
+                            </th>
+                            <th class="text-center">
+                                <strong>Votre contact</strong>
                             </th>
                         </tr>
                     </thead>
@@ -45,6 +92,13 @@
                             <td class="text-center" name="td_sched_date">
                                 <span t-field="o.scheduled_date" t-options="{'widget': 'date','format': 'dd/MM/yyyy'}"/>
                             </td>
+
+                            <td class="text-center" t-if="o.origin">
+                                <div t-field="o.partner_id.user_id.name"/>
+                                <div t-field="o.partner_id.user_id.email"/>
+                            </td>
+
+
                          </tr>
                     </tbody>
                 </table>

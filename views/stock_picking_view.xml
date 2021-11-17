@@ -166,7 +166,9 @@
 
 
 
-            <field name="origin" position="after">
+            <field name="origin" position="replace">
+                <field name="sale_id"     readonly="1" attrs="{'invisible': [('sale_id', '=', False)]}" />
+                <field name="purchase_id" readonly="1" attrs="{'invisible': [('purchase_id', '=', False)]}"/>
                 <field name="is_poids_net" sum="Total"/>
             </field>
 
