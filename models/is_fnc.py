@@ -66,7 +66,7 @@ class StockMoveLine(models.Model):
                     'picking_id'  : obj.move_id.picking_id.id,
                     'product_id'  : obj.move_id.product_id.id,
                     'lot_id'      : obj.lot_id.id,
-                    'dlc_ddm'     : obj.life_use_date,
+                    'dlc_ddm'     : obj.is_dlc_ddm,
                     'status_move' : obj.status_move,
                 }
                 fnc=self.env['is.fnc'].create(vals)

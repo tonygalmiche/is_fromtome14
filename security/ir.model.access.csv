@@ -26,4 +26,4 @@ access_is_scan_picking,access_is_scan_picking,model_is_scan_picking,base.group_u
 access_is_scan_picking_line,access_is_scan_picking_line,model_is_scan_picking_line,base.group_user,1,1,1,1
 access_is_scan_picking_product,access_is_scan_picking_product,model_is_scan_picking_product,base.group_user,1,1,1,1
 access_is_enseigne_commerciale,access_is_enseigne_commerciale,model_is_enseigne_commerciale,base.group_user,1,1,1,1
-
+access_is_stock_move_line_valorise,access_is_stock_move_line_valorise,model_is_stock_move_line_valorise,base.group_user,1,0,0,0
