@@ -103,7 +103,7 @@ class PurchaseOrderLine(models.Model):
     is_sale_order_line_id  = fields.Many2one('sale.order.line', string=u'Ligne commande client', index=True)
     is_nb_pieces_par_colis = fields.Integer(string='PCB', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2) , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
-    is_poids_net           = fields.Float(string='Poids net', digits=(14,4), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
+    is_poids_net           = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
     is_alerte              = fields.Text(string='Alerte', compute='_compute_is_alerte')
 
 

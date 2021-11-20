@@ -170,7 +170,7 @@
         <field name="name">is.stock.move.line.valorise.tree</field>
         <field name="model">is.stock.move.line.valorise</field>
         <field name="arch" type="xml">
-            <tree decoration-danger="marge &lt; 0">
+            <tree decoration-danger="alerte!=''">
                 <field name="date_done"              optional="show"/>
                 <field name="picking_id"             optional="show"/>
                 <field name="picking_type_id"        optional="hide"/>
@@ -193,8 +193,9 @@
                 <field name="marge"                  optional="show"  sum="Total"/>
                 <field name="create_date"            optional="hide"/>
                 <field name="write_date"             optional="hide"/>
-                <field name="status_move" optional="show"/>
-                <field name="state" optional="show"/>
+                <field name="status_move"            optional="show"/>
+                <field name="state"                  optional="show"/>
+                <field name="alerte"                 optional="hide"/>
             </tree>
         </field>
     </record>

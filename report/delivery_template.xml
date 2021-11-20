@@ -114,8 +114,8 @@
                             <th class="text-right"> <strong>Poids</strong></th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr t-foreach="o.move_ids_without_package" t-as="line" t-if="line.quantity_done">
+                    <tbody> 
+                        <tr t-foreach="o.move_ids_without_package" t-as="line"> <!-- t-if="line.quantity_done" -->
                             <td class="text-left"><span t-field="line.product_id.default_code"/></td>
                             <td class="text-left">
                                 <div><strong><span t-field="line.is_description_cde"/></strong></div>

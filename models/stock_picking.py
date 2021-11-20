@@ -32,11 +32,11 @@ class IsScanPickingLine(models.Model):
     lot_id            = fields.Many2one('stock.production.lot', 'Lot', required=True)
     type_tracabilite  = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
     dlc_ddm           = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
-    nb_pieces         = fields.Float('Pièces'   , digits=(14,2), help="Nb pièces scannées")
+    nb_pieces         = fields.Float('Pièces'   , digits=(14,4), help="Nb pièces scannées")
     nb_colis          = fields.Float('Colis'    , digits=(14,2), help="Nb Colis scannés")
     nb_colis_prevues  = fields.Float('Prévu'    , digits=(14,2), help="Nb Colis prévus")
     nb_colis_reste    = fields.Float('Reste'    , digits=(14,2), help="Nb Colis reste")
-    poids             = fields.Float("Poids"    , digits=(14,4))
+    poids             = fields.Float("Poids"    , digits='Stock Weight')
     info              = fields.Char("Info")
 
 
@@ -47,7 +47,7 @@ class IsScanPickingLine(models.Model):
 
     scan_id    = fields.Many2one('is.scan.picking', 'Picking', required=True, ondelete='cascade')
     product_id = fields.Many2one('product.product', 'Article', required=True)
-    nb_pieces  = fields.Float('Nb pièces prévues', digits=(14,2))
+    nb_pieces  = fields.Float('Nb pièces prévues', digits=(14,4))
     uom_id     = fields.Many2one('uom.uom', 'Unité', related='product_id.uom_id')
     nb_colis   = fields.Float('Nb colis prévus', digits=(14,2))
 
@@ -96,7 +96,7 @@ class IsScanPicking(models.Model):
     lot_id       = fields.Many2one('stock.production.lot', 'Lot')
     type_tracabilite = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
     dlc_ddm      = fields.Date('DLC / DDM')
-    poids        = fields.Float("Poids")
+    poids        = fields.Float("Poids", digits='Stock Weight')
     nb_colis     = fields.Integer('Colis', default=1)
     ajouter      = fields.Boolean("Ajouter", help="Ajouter cette ligne")
     is_alerte    = fields.Text('Alerte', compute=_compute_is_alerte, readonly=True, store=False)
@@ -301,8 +301,8 @@ class Picking(models.Model):
             obj.is_poids_net=poids
             obj.is_nb_colis=colis
 
-    is_poids_net = fields.Float(string='Poids net', digits=(14,3), compute='_compute_poids_colis')
-    is_nb_colis  = fields.Float(string='Nb colis' , digits=(14,1), compute='_compute_poids_colis')
+    is_poids_net = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_poids_colis')
+    is_nb_colis  = fields.Float(string='Nb colis' , digits=(14,1)        , compute='_compute_poids_colis')
 
 
     def scan_picking_action(self):

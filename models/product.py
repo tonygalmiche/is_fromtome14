@@ -226,7 +226,7 @@ class ProductTemplate(models.Model):
 
 
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis')
-    is_poids_net_colis     = fields.Float(string='Poids net colis (Kg)', digits=(14,4))
+    is_poids_net_colis     = fields.Float(string='Poids net colis (Kg)', digits='Stock Weight')
 
 
 

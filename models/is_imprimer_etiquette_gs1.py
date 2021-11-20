@@ -19,7 +19,7 @@ class IsImprimerEtiquetteGS1(models.Model):
     dlc        = fields.Date("DLC (17)")
     dluo       = fields.Date("DDM (15)")
     nb_pieces  = fields.Integer("Nb pièces (37)", required=True, default=1)
-    poids      = fields.Float("Poids (31xx)"    , required=True, digits=(14,4))
+    poids      = fields.Float("Poids (31xx)"    , required=True, digits='Stock Weight')
     qt_imprime = fields.Integer("Quantité à Imprimer", required=True, default=1)
 
 

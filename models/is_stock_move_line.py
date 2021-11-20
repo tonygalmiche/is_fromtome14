@@ -48,8 +48,8 @@ class is_stock_move_line(models.Model):
     qty_done        = fields.Float('Fait')
     is_nb_pieces_par_colis = fields.Integer(string='PCB', related="product_id.is_nb_pieces_par_colis")
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2))
-    is_poids_net_estime    = fields.Float(string='Poids net estimé', digits=(14,4), compute='_compute_is_poids_net_estime', readonly=True, store=True, help="Poids net total (Kg)")
-    is_poids_net_reel      = fields.Float(string='Poids net réel', digits=(14,4), help="Poids net réel total (Kg)")
+    is_poids_net_estime    = fields.Float(string='Poids net estimé', digits='Stock Weight', compute='_compute_is_poids_net_estime', readonly=True, store=True, help="Poids net total (Kg)")
+    is_poids_net_reel      = fields.Float(string='Poids net réel'  , digits='Stock Weight', help="Poids net réel total (Kg)")
     status_move     = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'),('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')])
     creer_fnc_vsb   = fields.Boolean(string='Créer FNC visibility', compute='_compute_creer_fnc_vsb', readonly=True, store=False)
     create_date     = fields.Datetime('Date de création')
@@ -118,6 +118,20 @@ class is_stock_move_line_valorise(models.Model):
     _order='product_id'
     _auto = False
 
+
+    @api.depends('prix_achat','prix_vente','marge')
+    def _compute_alerte(self):
+        for obj in self:
+            alerte=[]
+            if not obj.prix_achat:
+                alerte.append("Prix d'achat à 0")
+            if not obj.prix_vente:
+                alerte.append("Prix de vente à 0")
+            if obj.marge<0:
+                alerte.append("Marge négative")
+            obj.alerte="\n".join(alerte)
+
+
     company_id      = fields.Many2one('res.company', 'Société')
     picking_id      = fields.Many2one('stock.picking', 'Picking')
     date_done       = fields.Date('Date effective')
@@ -135,8 +149,8 @@ class is_stock_move_line_valorise(models.Model):
     qty_done        = fields.Float('Fait')
     is_nb_pieces_par_colis = fields.Integer(string='PCB', related="product_id.is_nb_pieces_par_colis")
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2))
-    is_poids_net_estime    = fields.Float(string='Poids net estimé', digits=(14,4), compute='_compute_is_poids_net_estime', readonly=True, store=True, help="Poids net total (Kg)")
-    is_poids_net_reel      = fields.Float(string='Poids net réel', digits=(14,4), help="Poids net réel total (Kg)")
+    is_poids_net_estime    = fields.Float(string='Poids net estimé', digits='Stock Weight', compute='_compute_is_poids_net_estime', readonly=True, store=True, help="Poids net total (Kg)")
+    is_poids_net_reel      = fields.Float(string='Poids net réel'  , digits='Stock Weight', help="Poids net réel total (Kg)")
     status_move     = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'),('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')])
     creer_fnc_vsb   = fields.Boolean(string='Créer FNC visibility', compute='_compute_creer_fnc_vsb', readonly=True, store=False)
     create_date     = fields.Datetime('Date de création')
@@ -147,6 +161,7 @@ class is_stock_move_line_valorise(models.Model):
     montant_achat   = fields.Float(string='Montant achat', digits=(14,2))
     montant_vente   = fields.Float(string='Montant vente', digits=(14,2))
     marge           = fields.Float(string='Marge', digits=(14,2))
+    alerte          = fields.Text(string='Alerte', compute='_compute_alerte')
 
 
 

@@ -63,8 +63,8 @@ class StockMoveLine(models.Model):
     #is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis'    , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_nb_pieces_par_colis = fields.Integer(string='PCB', related="product_id.is_nb_pieces_par_colis")
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2))
-    is_poids_net_estime    = fields.Float(string='Poids net estimé', digits=(14,4), compute='_compute_is_poids_net_estime', readonly=True, store=True, help="Poids net total (Kg)")
-    is_poids_net_reel      = fields.Float(string='Poids net réel', digits=(14,4), help="Poids net réel total (Kg)")
+    is_poids_net_estime    = fields.Float(string='Poids net estimé', digits='Stock Weight', compute='_compute_is_poids_net_estime', readonly=True, store=True, help="Poids net total (Kg)")
+    is_poids_net_reel      = fields.Float(string='Poids net réel'  , digits='Stock Weight', help="Poids net réel total (Kg)")
 
 
 #     def split_qty(self):
