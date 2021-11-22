@@ -99,6 +99,7 @@ class AccountMove(models.Model):
             obj.is_nb_colis  = colis
 
 
+    is_enseigne_id      = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
     is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
     is_alerte           = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
     is_ref_client       = fields.Text('Ref Client' , compute='_is_ref_client_int_cde')
