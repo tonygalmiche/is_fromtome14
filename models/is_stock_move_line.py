@@ -137,6 +137,7 @@ class is_stock_move_line_valorise(models.Model):
     date_done       = fields.Date('Date effective')
     picking_type_id = fields.Many2one('stock.picking.type', 'Type')
     partner_id      = fields.Many2one('res.partner', 'Partenaire')
+    is_enseigne_id  = fields.Many2one('is.enseigne.commerciale', 'Enseigne', help="Enseigne commerciale")
     product_id      = fields.Many2one('product.product', "Article")
     product_tmpl_id = fields.Many2one('product.template', "Modèle d'article")
     move_id         = fields.Many2one('stock.move', 'Mouvement de stock')
@@ -192,6 +193,7 @@ class is_stock_move_line_valorise(models.Model):
                     p.date_done,
                     p.picking_type_id,
                     p.partner_id,
+                    rp.is_enseigne_id,
                     m.product_id,
                     pp.product_tmpl_id,
                     l.move_id,
@@ -222,6 +224,7 @@ class is_stock_move_line_valorise(models.Model):
                                        join stock_production_lot spl on l.lot_id=spl.id
                                        join sale_order so on p.sale_id=so.id
                                        join sale_order_line sol on m.sale_line_id=sol.id
+                                       join res_partner rp on p.partner_id=rp.id
                 where p.state='done'
             )
         """)
