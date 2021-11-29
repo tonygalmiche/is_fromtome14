@@ -128,7 +128,7 @@
                                 type="object" string="Mise à jour Inventaire" 
                                 confirm2="Attention, cela va supprimer et remplacer les lignes de l'inventaire"
                             />
-                            <field name="inventory_id" readonly="1"/>
+                            <field name="inventory_id"/>
                         </group>
                     </group>
 
@@ -138,6 +138,42 @@
             </form>
         </field>
     </record>
+    <record id="is_scan_picking_tree" model="ir.ui.view">
+        <field name="name">is_scan_picking_tree</field>
+        <field name="model">is.scan.picking</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="picking_id"/>
+                <field name="inventory_id"/>
+                <field name="id"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_scan_picking_search" model="ir.ui.view">
+        <field name="name">is_scan_picking_search</field>
+        <field name="model">is.scan.picking</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="id"/>
+                <field name="picking_id"/>
+                <field name="inventory_id"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_scan_picking_action" model="ir.actions.act_window">
+        <field name="name">Scan</field>
+        <field name="res_model">is.scan.picking</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem
+        id="is_scan_picking_menu"
+        name="Scan"
+        parent="stock.menu_stock_warehouse_mgmt"
+        sequence="900"
+        action="is_scan_picking_action"
+    />
+
+
 
 
     <!-- stock.picking -->

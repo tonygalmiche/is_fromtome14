@@ -225,20 +225,29 @@ class IsScanPicking(models.Model):
         for obj in self:
             obj.inventory_id.line_ids.unlink()
             SQL="""
-                SELECT product_id, lot_id, sum(nb_pieces)
+                SELECT product_id, lot_id, sum(nb_pieces), sum(poids)
                 FROM is_scan_picking_line
                 WHERE scan_id=%s
                 GROUP BY product_id, lot_id
             """
             cr.execute(SQL,[obj.id])
             for row in cr.fetchall():
+                filtre=[
+                    ('id','=', row[0]),
+                ]
+                product = self.env['product.product'].search(filtre,limit=1)
+                qty=row[2]
+                if product:
+                    unite = product.uom_id.category_id.name
+                    if unite=="Poids":
+                        qty=row[3]
                 vals={
                     "inventory_id"      : obj.inventory_id.id,
                     "product_id"        : row[0],
                     "prod_lot_id"       : row[1],
                     "company_id"        : 1,
                     "location_id"       : 8,
-                    "product_qty"       : row[2],
+                    "product_qty"       : qty,
                 }
                 res = self.env['stock.inventory.line'].create(vals)
 
