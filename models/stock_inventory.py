@@ -5,6 +5,16 @@ from odoo import api, exceptions, fields, models, _
 class StockInventory(models.Model):
     _inherit = "stock.inventory"
 
+    @api.depends('name')
+    def _compute_partner_id(self):
+        for obj in self:
+            self.partner_id = self.env.user.company_id.partner_id
+
+    partner_id = fields.Many2one('res.partner', 'Partenaire', compute=_compute_partner_id)
+
+
+
+
 
     # def valorisation_stock_action(self):
     #     for obj in self:
