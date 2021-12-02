@@ -117,8 +117,9 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
 
-    is_date_livraison  = fields.Date('Date Livraison (ancien champ non utilisé')
-    is_commande_soldee = fields.Boolean(string=u'Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
+    is_date_livraison        = fields.Date('Date Livraison (ancien champ non utilisé')
+    is_commande_soldee       = fields.Boolean(string=u'Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
+    is_frequence_facturation = fields.Selection(string='Fréquence facturation', related="partner_id.is_frequence_facturation", selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')])
 
     @api.depends('order_line')
     def _compute_is_creer_commande_fournisseur_vsb(self):

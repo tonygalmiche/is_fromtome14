@@ -25,6 +25,8 @@ class ResPartner(models.Model):
     is_enseigne_id              = fields.Many2one('is.enseigne.commerciale', 'Enseigne', help="Enseigne commerciale")
     is_customer                 = fields.Boolean("Est un Client")
     is_supplier                 = fields.Boolean("Est un Fournisseur")
+    is_frequence_facturation    = fields.Selection(string='Fréquence facturation', selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')])
+
 
 
 

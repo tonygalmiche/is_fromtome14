@@ -87,6 +87,12 @@
                 <field name="is_purchase_line_id"/>
             </xpath>
             <field name="validity_date" position="before">
+                <field 
+                    name="is_frequence_facturation"
+                    decoration-info="is_frequence_facturation == 'a_la_livraison'" 
+                    decoration-warning="is_frequence_facturation == 'au_mois'" 
+                    widget="badge" 
+                />
                 <field name="is_commande_soldee" readonly="1"/>
             </field>
         </field>
@@ -99,6 +105,24 @@
         <field name="arch" type="xml">
             <field name="invoice_status" position="before">
                 <field name="is_commande_soldee" optional="show"/>
+                <field 
+                    name="is_frequence_facturation"
+                    decoration-info="is_frequence_facturation == 'a_la_livraison'" 
+                    decoration-warning="is_frequence_facturation == 'au_mois'" 
+                    widget="badge" 
+                    optional="show"
+                />
+            </field>
+        </field>
+    </record>
+
+    <record id="is_view_sales_order_filter" model="ir.ui.view">
+        <field name="name">is_view_sales_order_filter</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_frequence_facturation"/>
             </field>
         </field>
     </record>

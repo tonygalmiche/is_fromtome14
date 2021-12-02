@@ -59,6 +59,15 @@
             <field name="display_name" position="after">
                 <field name="is_enseigne_id"/>
             </field>
+            <field name="user_id" position="after">
+                <field 
+                    name="is_frequence_facturation"
+                    decoration-info="is_frequence_facturation == 'a_la_livraison'" 
+                    decoration-warning="is_frequence_facturation == 'au_mois'" 
+                    widget="badge" 
+                    optional="show"
+                />
+            </field>
         </field>
     </record>
     <record id="is_view_partner_form" model="ir.ui.view" >
@@ -71,6 +80,7 @@
             </field>
             <xpath expr="//page[@name='sales_purchases']/group/group/field[@name='user_id']" position="before">
                 <field name="is_customer"/>
+                <field name="is_frequence_facturation"/>
             </xpath>
             <xpath expr="//group/group/field[@name='type']" position="after">
                 <field name="is_enseigne_id"/>
@@ -125,6 +135,9 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_res_partner_filter"/>
         <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="is_frequence_facturation"/>
+            </field>
             <filter name="type_company" position="after">
                 <filter string="Clients"      name="is_customer" domain="[('is_customer', '=', True)]"/>
                 <filter string="Fournisseurs" name="is_supplier" domain="[('is_supplier', '=', True)]"/>
