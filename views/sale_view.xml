@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <!-- Mise à jour champ commmande soldée  -->
+    <record id="commande_soldee_action_server" model="ir.actions.server">
+        <field name="name">Mise à jour champ commmande soldée</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">action = records.commande_soldee_action_server()</field>
+    </record>
+
     <record id="view_sale_order_form_inherit" model="ir.ui.view">
         <field name="name">sale.order.form.inherit</field>
         <field name="model">sale.order</field>
@@ -103,10 +113,28 @@
                 <field name="is_purchase_line_id"/>
             </xpath>
             <field name="validity_date" position="before">
-                <field name="is_commande_soldee"/>
+                <field name="is_commande_soldee" readonly="0"/>
             </field>
         </field>
     </record>
+
+
+
+    <record id="is_view_order_tree" model="ir.ui.view">
+        <field name="name">is_view_order_tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+
+            <field name="invoice_status" position="before">
+                <field name="is_commande_soldee" optional="show"/>
+            </field>
+
+
+        </field>
+    </record>
+
+
 
      <!-- <record id="sale_order_view_search_inherit_quotation_inherit" model="ir.ui.view">
         <field name="name">sale.order.search.inherit</field>

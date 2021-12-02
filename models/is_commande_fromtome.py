@@ -89,7 +89,7 @@ class IsCommandeFromtome(models.Model):
                                            join product_template pt on pp.product_tmpl_id=pt.id
                                            join res_partner rp on so.partner_id=rp.id
                         WHERE 
-                            so.state in ('draft','send','sale') and
+                            so.state='sale' and
                             (so.is_commande_soldee='f' or so.is_commande_soldee is null) and 
                             so.commitment_date>='2020-10-01' and
                             sol.product_id=%s and rp.is_enseigne_id=%s

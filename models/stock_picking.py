@@ -299,7 +299,7 @@ class Picking(models.Model):
         }
 
 
-    @api.depends('move_line_ids_without_package')
+    @api.depends('move_line_ids_without_package','state')
     def _compute_poids_colis(self):
         for obj in self:
             poids=0
@@ -309,6 +309,11 @@ class Picking(models.Model):
                 colis+=line.is_nb_colis
             obj.is_poids_net=poids
             obj.is_nb_colis=colis
+            if obj.sale_id:
+                obj.sale_id.commande_soldee_action_server()
+            if obj.purchase_id:
+                obj.purchase_id.commande_soldee_action_server()
+
 
     is_poids_net = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_poids_colis')
     is_nb_colis  = fields.Float(string='Nb colis' , digits=(14,1)        , compute='_compute_poids_colis')
@@ -354,9 +359,6 @@ class Picking(models.Model):
                 'context': context,
             }
             return res
-
-
-        #<field name="context">{'display_complete': True, 'default_company_id': allowed_company_ids[0]}</field>
 
 
     # @api.onchange('move_ids_without_package')

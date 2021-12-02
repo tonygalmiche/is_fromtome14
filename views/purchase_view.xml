@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+
+    <!-- Mise à jour champ commmande soldée  -->
+    <record id="purchase_order_soldee_action_server" model="ir.actions.server">
+        <field name="name">Mise à jour champ commmande soldée</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+        <field name="state">code</field>
+        <field name="code">action = records.commande_soldee_action_server()</field>
+    </record>
+
     <record id="purchase_order_view_form_inherit" model="ir.ui.view">
         <field name="name">purchase.order.form.inherit</field>
         <field name="model">purchase.order</field>
@@ -112,5 +123,19 @@
 
         </field>
     </record>
+
+
+
+    <record id="is_purchase_order_view_tree" model="ir.ui.view">
+        <field name="name">is_purchase_order_view_tree</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="before">
+                <field name="is_commande_soldee" optional="show"/>
+            </field>
+       </field>
+    </record>
+
 
 </odoo>

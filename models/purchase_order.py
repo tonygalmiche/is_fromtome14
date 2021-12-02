@@ -26,6 +26,23 @@ class PurchaseOrder(models.Model):
     is_fromtome_order_vsb = fields.Boolean(string='Créer commande dans Fromtome vsb', compute='_compute_is_fromtome_order_vsb')
 
 
+    def commande_soldee_action_server(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            solde=False
+            if obj.state not in ["draft","sent","to_approve"]:
+                solde=True
+                filtre=[
+                    ('purchase_id','=',obj.id),
+                    ('state','not in',['done','cancel']),
+                ]
+
+                pickings = self.env['stock.picking'].search(filtre)
+                for picking in pickings:
+                    solde=False
+            obj.is_commande_soldee=solde
+
+
     def creer_commande_fromtome_action(self):
         cr,uid,context,su = self.env.args
         for obj in self:

@@ -134,6 +134,26 @@ class SaleOrder(models.Model):
     is_creer_commande_fournisseur_vsb = fields.Boolean(string=u'Créer commande fournisseur', compute='_compute_is_creer_commande_fournisseur_vsb', readonly=True, store=False)
 
 
+
+    def commande_soldee_action_server(self):
+        cr,uid,context,su = self.env.args
+        for obj in self:
+            solde=False
+            if obj.state not in ["draft","sent"]:
+                solde=True
+                SQL="""
+                    SELECT id, sale_id, state
+                    FROM stock_picking
+                    WHERE state not in ('done','cancel') and sale_id=%s
+                    limit 1
+                """
+                cr.execute(SQL,[obj.id])
+                for row in cr.fetchall():
+                    solde=False
+            obj.is_commande_soldee=solde
+
+
+
     def creer_commande_fournisseur_action(self):
         for obj in self:
             if not len(obj.order_line):
@@ -164,10 +184,6 @@ class SaleOrder(models.Model):
                         if line.is_livraison_directe:
                             filtre.append(('delivery_adress','=', obj.partner_shipping_id.id))
                         orders=self.env['purchase.order'].search(filtre,limit=1)
-
-                        print(orders)
-
-
                         if orders:
                             order=orders[0]
                         else:
@@ -203,7 +219,6 @@ class SaleOrder(models.Model):
                                 order_line=self.env['purchase.order.line'].create(vals)
                                 order_line.onchange_product_id()
                                 order_line.date_planned = date_planned
-                                print(vals,order_line.date_planned)
                         else:
                             order_line = order_lines[0]
 
