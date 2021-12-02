@@ -10,28 +10,31 @@ class IsExportComptaLigne(models.Model):
     _description = u"Export Compta Lignes"
     _order='ligne,id'
 
-    export_compta_id = fields.Many2one('is.export.compta', u'Export Compta', required=True, ondelete='cascade')
-    ligne            = fields.Integer(u"Ligne")
-    journal_code     = fields.Char(u"JournalCode")
-    journal_lib      = fields.Char(u"JournalLib")
-    ecriture_num     = fields.Char(u"EcritureNum")
-    ecriture_date    = fields.Date(u"EcritureDate")
-    compte_num       = fields.Char(u"CompteNum")
-    compte_lib       = fields.Char(u"CompteLib")
-    comp_aux_num     = fields.Char(u"CompAuxNum")
-    comp_aux_lib     = fields.Char(u"CompAuxLib")
-    piece_ref        = fields.Char(u"PieceRef")
-    piece_date       = fields.Date(u"PieceDate")
-    ecriture_lib     = fields.Char(u"EcritureLib")
-    debit            = fields.Float(u"Debit" , digits=(14,2))
-    credit           = fields.Float(u"Credit", digits=(14,2))
-    invoice_id       = fields.Many2one('account.move', u'Facture')
-    payment_id       = fields.Many2one('account.payment', u'Paiement')
+    export_compta_id = fields.Many2one('is.export.compta', 'Export Compta', required=True, ondelete='cascade')
+    ligne            = fields.Integer("Ligne")
+    journal_code     = fields.Char("JournalCode")
+    journal_lib      = fields.Char("JournalLib")
+    partner_id       = fields.Many2one('res.partner', 'Partenaire')
+    enseigne_id      = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
+    ecriture_num     = fields.Char("EcritureNum")
+    ecriture_date    = fields.Date("EcritureDate")
+    compte_num       = fields.Char("CompteNum")
+    compte_lib       = fields.Char("CompteLib")
+    comp_aux_num     = fields.Char("CompAuxNum")
+    comp_aux_lib     = fields.Char("CompAuxLib")
+    piece_ref        = fields.Char("PieceRef")
+    piece_date       = fields.Date("PieceDate")
+    ecriture_lib     = fields.Char("EcritureLib")
+    debit            = fields.Float("Debit" , digits=(14,2))
+    credit           = fields.Float("Credit", digits=(14,2))
+    invoice_id       = fields.Many2one('account.move', 'Facture')
+    payment_id       = fields.Many2one('account.payment', 'Paiement')
+
+
 
 
 class IsExportCompta(models.Model):
     _name = 'is.export.compta'
-#    _inherit = ['portal.mixin', 'mail.thread', 'mail.activity.mixin']
     _description = "Export Compta"
     _order = 'name desc'
 
@@ -72,7 +75,8 @@ class IsExportCompta(models.Model):
                     rp.name,
                     rp.ref,
                     am.id,
-                    aj.code
+                    aj.code,
+                    am.partner_id
                 FROM account_move_line aml inner join account_move am                on aml.move_id=am.id
                                            inner join account_account aa             on aml.account_id=aa.id
                                            left outer join res_partner rp            on aml.partner_id=rp.id
@@ -107,12 +111,13 @@ class IsExportCompta(models.Model):
                     'ecriture_date'          : row[2],
                     'compte_num'             : compte_num,
                     'comp_aux_num'           : comp_aux_num,
-                    'piece_ref'              : row[4],
+                    'piece_ref'              : row[1],
                     'piece_date'             : row[5],
                     'ecriture_lib'           : row[9] or row[6],
                     'debit'                  : row[7],
                     'credit'                 : row[8],
                     'invoice_id'             : invoice_id,
+                    'partner_id'             : row[13],
                 }
                 self.env['is.export.compta.ligne'].create(vals)
 
@@ -123,7 +128,7 @@ class IsExportCompta(models.Model):
                     payment.is_export_compta_id=False
                 sql="""
                     SELECT  
-                        aml.partner_id,
+                        am.partner_id,
                         am.name,
                         am.date,
                         aa.code,
@@ -173,6 +178,7 @@ class IsExportCompta(models.Model):
                             'debit'                  : row[6],
                             'credit'                 : row[7],
                             'payment_id'             : payment_id,
+                            'partner_id'             : row[0],
                         }
                         self.env['is.export.compta.ligne'].create(vals)
                         ct=ct+1
@@ -190,6 +196,7 @@ class IsExportCompta(models.Model):
                             'debit'                  : row[7],
                             'credit'                 : row[6],
                             'payment_id'             : payment_id,
+                            'partner_id'             : row[0],
                         }
                         self.env['is.export.compta.ligne'].create(vals)
 
@@ -203,7 +210,7 @@ class IsExportCompta(models.Model):
             attachments.unlink()
             dest     = '/tmp/'+name
             f = codecs.open(dest,'wb',encoding='utf-8')
-            f.write("ligne\tjournal_code\tecriture_num\tecriture_date\tcompte_num\tcomp_aux_num\tpiece_ref\tpiece_date\tecriture_lib\tdebit\tcredit\r\n")
+            f.write("ligne\tjournal_code\tecriture_num\tecriture_date\tcompte_num\tcomp_aux_num\tpiece_ref\tpiece_date\tecriture_lib\tdebit\tcredit\tenseigne\r\n")
             for row in obj.ligne_ids:
                 f.write(str(row.ligne)+'\t')
                 f.write(row.journal_code+'\t')
@@ -216,6 +223,7 @@ class IsExportCompta(models.Model):
                 f.write(row.ecriture_lib+'\t')
                 f.write(str(row.debit).replace('.','.')+'\t')
                 f.write(str(row.credit).replace('.','.')+'\t')
+                f.write((row.enseigne_id.name.name or '')+'\t')
                 f.write('\r\n')
             f.close()
             r = open(dest,'rb').read()

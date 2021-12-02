@@ -10,6 +10,9 @@
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id"/>
             </field>
+            <div name="journal_div" position="after">
+                <field name="is_export_compta_id" readonly="1"/>
+            </div>
             <field name="payment_reference" position="before">
                 <field name="is_ref_int_cde"/>
                 <field name="is_ref_client"/>
@@ -31,6 +34,9 @@
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id" optional="show"/>
             </field>
+            <field name="state" position="before">
+                <field name="is_export_compta_id" optional="show"/>
+            </field>
         </field>
     </record>
     <record id="is_view_in_invoice_tree" model="ir.ui.view">
@@ -40,6 +46,9 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id" optional="show"/>
+            </field>
+           <field name="state" position="before">
+                <field name="is_export_compta_id" optional="show"/>
             </field>
         </field>
     </record>

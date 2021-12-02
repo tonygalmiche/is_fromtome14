@@ -12,6 +12,8 @@
                     <group>
                         <field name="ligne"/>
                         <field name="journal_code"/>
+                        <field name="partner_id"/>
+                        <field name="enseigne_id"/>
                         <field name="ecriture_num"/>
                         <field name="ecriture_date"/>
                         <field name="compte_num"/>
@@ -35,6 +37,8 @@
             <tree>
                 <field name="ligne"/>
                 <field name="journal_code"/>
+                <field name="partner_id"/>
+                <field name="enseigne_id"/>
                 <field name="ecriture_num"/>
                 <field name="ecriture_date"/>
                 <field name="compte_num"/>
@@ -54,6 +58,8 @@
             <search>
                 <field name="ligne"/>
                 <field name="journal_code"/>
+                <field name="partner_id"/>
+                <field name="enseigne_id"/>
                 <field name="ecriture_num"/>
                 <field name="compte_num"/>
                 <field name="compte_lib"/>
@@ -73,9 +79,6 @@
         <field name="domain">[('export_compta_id','=',active_id)]</field>
         <field name="context">{'default_export_compta_id': active_id}</field>
     </record>
-
-
-
 
 
     <!-- is.export.compta -->
