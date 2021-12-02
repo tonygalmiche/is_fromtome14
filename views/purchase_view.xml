@@ -2,7 +2,7 @@
 <odoo>
 
 
-    <!-- Mise à jour champ commmande soldée  -->
+    <!-- purchase.order  -->
     <record id="purchase_order_soldee_action_server" model="ir.actions.server">
         <field name="name">Mise à jour champ commmande soldée</field>
         <field name="model_id" ref="purchase.model_purchase_order"/>
@@ -10,7 +10,6 @@
         <field name="state">code</field>
         <field name="code">action = records.commande_soldee_action_server()</field>
     </record>
-
     <record id="purchase_order_view_form_inherit" model="ir.ui.view">
         <field name="name">purchase.order.form.inherit</field>
         <field name="model">purchase.order</field>
@@ -28,7 +27,6 @@
                     }
                 </style>
             </xpath>
-
             <button name="button_unlock" position="after">
                 <button
                     name="creer_commande_fromtome_action"
@@ -38,22 +36,9 @@
                     attrs="{'invisible': [('is_fromtome_order_vsb', '=', False)]}"
                 />
             </button>
-
-
-
-
-
-
             <field name="partner_id" position="attributes">
                 <attribute name="domain">[('is_company','=',True),('is_supplier','=',True)]</attribute>
             </field>
-
-
-
-
-
-
-
             <field name="date_order" position="after">
                 <field name="is_commande_soldee" readonly="1"/>
             </field>
@@ -61,14 +46,9 @@
             <xpath expr="//field[@name='order_line']//tree" position='attributes'>
                 <attribute name="decoration-danger">is_alerte!=""</attribute>
             </xpath>
-
-
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_qty']" position='attributes'>
                 <attribute name="sum">Total</attribute>
             </xpath>
-
-
-
              <xpath expr="//field[@name='order_line']//tree//field[@name='price_unit']" position='before'>
                 <field name="is_nb_pieces_par_colis" optional="hide"/>
                 <field name="is_nb_colis"            optional="show" sum="Total"/>
@@ -78,54 +58,29 @@
              <xpath expr="//field[@name='order_line']//tree//field[@name='price_subtotal']" position='after'>
                 <field name="is_alerte" optional="hide"/>
             </xpath>
-
-
-
-
-
-             <!-- <xpath expr="//field[@name='order_line']/tree" position="inside">
-                <field name="echantillion"/>
-             </xpath> -->
-             <!-- <xpath expr="//field[@name='order_line']//tree//field[@name='price_subtotal']" position='attributes'>
-                <attribute name="invisible">1</attribute>
-             </xpath> -->
             <xpath expr="//field[@name='order_line']//tree//field[@name='date_planned']" position='attributes'>
                 <attribute name="invisible">1</attribute>
             </xpath>
-
             <div name="date_approve" position="attributes">
                  <attribute name="invisible">1</attribute>
              </div>
             <label for="date_approve" position="attributes">
                  <attribute name="invisible">1</attribute>
              </label>
-
-
             <field name="origin" position="before">
                <field name="is_date_enlevement"/>
             </field>
-
-
-            <!-- <xpath expr="//field[@name='date_planned']" position="after">
-                <field name="is_date_enlevement"/>
-            </xpath> -->
             <xpath expr="//field[@name='partner_ref']" position="after">
                 <field name="is_adresse_livraison_id"/>
                 <field name="is_fromtome_order_id"/>
                 <field name="is_fromtome_order_vsb" invisible="1"/>
             </xpath>
-
-            
-
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_uom']" position='attributes'>
                 <attribute name="readonly">1</attribute>
             </xpath>
 
         </field>
     </record>
-
-
-
     <record id="is_purchase_order_view_tree" model="ir.ui.view">
         <field name="name">is_purchase_order_view_tree</field>
         <field name="model">purchase.order</field>
@@ -136,6 +91,42 @@
             </field>
        </field>
     </record>
+
+
+
+
+
+    <!-- purchase.order.line  -->
+    <record id="is_edit_purchase_order_line_tree_view" model="ir.ui.view">
+        <field name="name">is_edit_purchase_order_line_tree_view</field>
+        <field name="model">purchase.order.line</field>
+        <field name="arch" type="xml">
+            <tree editable="top">
+                <field name="order_id"        readonly="1"/>
+                <field name="product_id"      readonly="1" optional="hide"/>
+                <field name="name"            readonly="1" optional="show"/>
+                <field name="product_qty"     readonly="1" optional="show" sum="Total"/>
+                <field name="product_uom"     readonly="1" optional="show"/>
+                <field name="price_unit"/>
+                <field name="price_subtotal"  readonly="1" optional="show" sum="Total"/>
+            </tree>
+        </field>
+    </record>
+    <record  id="is_edit_purchase_order_line_action" model="ir.actions.act_window">
+        <field name="name">Modif lignes de commandes</field>
+        <field name="res_model">purchase.order.line</field>
+        <field name="limit">100</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="is_fromtome14.is_edit_purchase_order_line_tree_view"/>
+    </record>
+    <menuitem
+        id="is_edit_purchase_order_line_menu"
+        name="Modif lignes de commandes"
+        parent="purchase.menu_procurement_management"
+        sequence="900"
+        action="is_edit_purchase_order_line_action"
+    />
+
 
 
 </odoo>
