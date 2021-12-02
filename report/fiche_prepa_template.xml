@@ -36,7 +36,7 @@
                                 <div t-if="line.product_id.description_picking" t-field="line.product_id.description_picking"/>
                                 <div t-if="line.product_id.barcode" t-field="line.product_id.barcode"/>
                             </td>
-                            <td class="text-right"><span t-field="line.is_nb_colis"/></td>
+                            <td class="text-right"><span t-field="line.is_nb_colis_cde"/></td>
                             <td class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
                             <td class="text-right" style="border-right:none">
                                 <span t-if="o.state != 'done'" t-field="line.product_uom_qty"/>
