@@ -55,7 +55,7 @@
 
 
             <field name="date_order" position="after">
-                <field name="is_commande_soldee"/>
+                <field name="is_commande_soldee" readonly="1"/>
             </field>
 
             <xpath expr="//field[@name='order_line']//tree" position='attributes'>

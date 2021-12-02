@@ -113,7 +113,7 @@
                 <field name="is_purchase_line_id"/>
             </xpath>
             <field name="validity_date" position="before">
-                <field name="is_commande_soldee" readonly="0"/>
+                <field name="is_commande_soldee" readonly="1"/>
             </field>
         </field>
     </record>
