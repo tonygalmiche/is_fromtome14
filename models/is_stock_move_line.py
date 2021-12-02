@@ -66,7 +66,7 @@ class is_stock_move_line(models.Model):
                     l.id,
                     pt.company_id,
                     m.picking_id,
-                    p.date_done,
+                    p.date_done::TIMESTAMP::DATE,
                     p.picking_type_id,
                     p.partner_id,
                     m.product_id,
@@ -134,7 +134,7 @@ class is_stock_move_line_valorise(models.Model):
 
     company_id      = fields.Many2one('res.company', 'Société')
     picking_id      = fields.Many2one('stock.picking', 'Picking')
-    date_done       = fields.Date('Date effective')
+    date_done       = fields.Date('Date livraison')
     picking_type_id = fields.Many2one('stock.picking.type', 'Type')
     partner_id      = fields.Many2one('res.partner', 'Partenaire')
     is_enseigne_id  = fields.Many2one('is.enseigne.commerciale', 'Enseigne', help="Enseigne commerciale")
@@ -190,7 +190,7 @@ class is_stock_move_line_valorise(models.Model):
                     l.id,
                     pt.company_id,
                     m.picking_id,
-                    p.date_done,
+                    p.date_done::TIMESTAMP::DATE,
                     p.picking_type_id,
                     p.partner_id,
                     rp.is_enseigne_id,

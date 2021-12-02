@@ -81,6 +81,7 @@
         <field name="model">is.stock.move.line</field>
         <field name="arch" type="xml">
             <search>
+                <field name="date_done"/>
                 <field name="picking_id"/>
                 <field name="picking_type_id"/>
                 <field name="partner_id"/>
@@ -206,6 +207,7 @@
         <field name="model">is.stock.move.line.valorise</field>
         <field name="arch" type="xml">
             <search>
+                <field name="date_done"/>
                 <field name="picking_id"/>
                 <field name="picking_type_id"/>
                 <field name="partner_id"/>
