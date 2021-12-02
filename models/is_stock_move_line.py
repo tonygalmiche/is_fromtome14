@@ -115,7 +115,7 @@ class is_stock_move_line(models.Model):
 class is_stock_move_line_valorise(models.Model):
     _name='is.stock.move.line.valorise'
     _description='is.stock.move.line.valorise'
-    _order='product_id'
+    _order='date_done desc, picking_id'
     _auto = False
 
 
