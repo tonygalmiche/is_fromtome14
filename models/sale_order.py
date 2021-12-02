@@ -182,7 +182,7 @@ class SaleOrder(models.Model):
                             ('date_planned','<=', date_reception+' 23:59:59'),
                         ]
                         if line.is_livraison_directe:
-                            filtre.append(('delivery_adress','=', obj.partner_shipping_id.id))
+                            filtre.append(('is_adresse_livraison_id','=', obj.partner_shipping_id.id))
                         orders=self.env['purchase.order'].search(filtre,limit=1)
                         if orders:
                             order=orders[0]
@@ -195,7 +195,7 @@ class SaleOrder(models.Model):
                             if order:
                                 order.onchange_partner_id()
                                 if line.is_livraison_directe:
-                                    order.delivery_adress = obj.partner_shipping_id.id
+                                    order.is_adresse_livraison_id = obj.partner_shipping_id.id
 
                         #** Création des lignes ************************************
                         filtre=[

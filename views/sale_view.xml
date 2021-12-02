@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Mise à jour champ commmande soldée  -->
+    <!-- sale.order  -->
     <record id="commande_soldee_action_server" model="ir.actions.server">
         <field name="name">Mise à jour champ commmande soldée</field>
         <field name="model_id" ref="sale.model_sale_order"/>
@@ -106,7 +106,7 @@
 
 
 
-
+    <!-- sale.order.line  -->
     <record id="is_edit_sale_order_line_tree_view" model="ir.ui.view">
         <field name="name">is_edit_sale_order_line_tree_view</field>
         <field name="model">sale.order.line</field>
@@ -126,7 +126,7 @@
         </field>
     </record>
     <record  id="is_edit_sale_order_line_action" model="ir.actions.act_window">
-        <field name="name">Lignes</field>
+        <field name="name">Modif lignes de commandes</field>
         <field name="res_model">sale.order.line</field>
         <field name="limit">100</field>
         <field name="view_mode">tree,form</field>
@@ -134,7 +134,7 @@
     </record>
     <menuitem
         id="is_edit_sale_order_line_menu"
-        name="Lignes de commandes"
+        name="Modif lignes de commandes"
         parent="sale.sale_order_menu"
         sequence="900"
         action="is_edit_sale_order_line_action"
