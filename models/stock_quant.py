@@ -6,8 +6,11 @@ from odoo import api, fields, models
 class StockQuant(models.Model):
     _inherit = 'stock.quant'
 
-    is_dlc_ddm = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
-
+    is_dlc_ddm         = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
+    inventory_quantity = fields.Float(digits="Product Unit of Measure")
+    available_quantity = fields.Float(digits="Product Unit of Measure")
+    quantity           = fields.Float(digits="Product Unit of Measure")
+    reserved_quantity  = fields.Float(digits="Product Unit of Measure")
 
 
 #TODO : A revoir

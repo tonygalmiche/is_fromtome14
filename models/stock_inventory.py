@@ -127,6 +127,7 @@ class StockInventoryLine(models.Model):
 
     is_default_code    = fields.Char('Référence interne'           , related='product_id.default_code')
     is_product_name    = fields.Char('Désignation article'         , related='product_id.name')
+    is_dlc_ddm         = fields.Date('DLC / DDM'                   , related="prod_lot_id.is_dlc_ddm")
     is_dernier_prix    = fields.Float("Dernier prix facturé"       , compute=compute_is_dernier_prix, store=False)
     is_stock_valorise  = fields.Float("Stock valorisé"             , compute=compute_is_dernier_prix, store=False)
     is_uom_facture_id  = fields.Many2one('uom.uom', 'Unité facture', compute=compute_is_dernier_prix, store=False)

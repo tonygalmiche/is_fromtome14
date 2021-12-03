@@ -143,7 +143,8 @@
                 <field name="qty_delivered"   readonly="1" optional="show" sum="Total"/>
                 <field name="qty_invoiced"    readonly="1" optional="show" sum="Total"/>
                 <field name="product_uom"     readonly="1" optional="show"/>
-                <field name="price_unit"/>
+                <field name="is_correction_prix_achat"     optional="show"/>
+                <field name="price_unit" string="Prix de vente"/>
                 <field name="discount"        readonly="1" optional="show"/>
                 <field name="price_subtotal"  readonly="1" optional="show" sum="Total"/>
             </tree>

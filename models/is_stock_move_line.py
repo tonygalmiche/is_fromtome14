@@ -44,8 +44,8 @@ class is_stock_move_line(models.Model):
     is_type_tracabilite = fields.Selection(string='Traçabilité', selection=[('ddm', 'DDM'), ('dlc', 'DLC')])
     is_dlc_ddm      = fields.Date('DLC / DDM', required=True)
     product_uom_id  = fields.Many2one('uom.uom', 'Unité')
-    product_uom_qty = fields.Float('Réservé')
-    qty_done        = fields.Float('Fait')
+    product_uom_qty = fields.Float('Réservé', digits="Product Unit of Measure")
+    qty_done        = fields.Float('Fait'   , digits="Product Unit of Measure")
     is_nb_pieces_par_colis = fields.Integer(string='PCB', related="product_id.is_nb_pieces_par_colis")
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2))
     is_poids_net_estime    = fields.Float(string='Poids net estimé', digits='Stock Weight', compute='_compute_is_poids_net_estime', readonly=True, store=True, help="Poids net total (Kg)")
@@ -146,8 +146,8 @@ class is_stock_move_line_valorise(models.Model):
     is_type_tracabilite = fields.Selection(string='Traçabilité', selection=[('ddm', 'DDM'), ('dlc', 'DLC')])
     is_dlc_ddm      = fields.Date('DLC / DDM', required=True)
     product_uom_id  = fields.Many2one('uom.uom', 'Unité')
-    product_uom_qty = fields.Float('Réservé')
-    qty_done        = fields.Float('Fait')
+    product_uom_qty = fields.Float('Réservé', digits="Product Unit of Measure")
+    qty_done        = fields.Float('Fait'   , digits="Product Unit of Measure")
     is_nb_pieces_par_colis = fields.Integer(string='PCB', related="product_id.is_nb_pieces_par_colis")
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2))
     is_poids_net_estime    = fields.Float(string='Poids net estimé', digits='Stock Weight', compute='_compute_is_poids_net_estime', readonly=True, store=True, help="Poids net total (Kg)")
@@ -173,13 +173,13 @@ class is_stock_move_line_valorise(models.Model):
 
             CREATE OR REPLACE FUNCTION get_prix_achat(productid integer, lotid integer) RETURNS float AS $$
             BEGIN
-                RETURN coalesce((
+                RETURN (
                     select pol.price_unit
                     from purchase_order_line pol join stock_move sm on sm.purchase_line_id=pol.id
                                                  join stock_move_line sml on sml.move_id=sm.id
                     where pol.product_id=productid and sml.lot_id=lotid
                     order by pol.id desc limit 1
-                ),0);
+                );
             END;
             $$ LANGUAGE plpgsql;
 
@@ -212,11 +212,11 @@ class is_stock_move_line_valorise(models.Model):
                     l.is_poids_net_estime,
                     l.is_poids_net_reel,
                     p.state,
-                    get_prix_achat(m.product_id,l.lot_id) prix_achat,
+                    COALESCE(get_prix_achat(m.product_id,l.lot_id),sol.is_correction_prix_achat) prix_achat,
                     sol.price_unit prix_vente,
-                    get_prix_achat(m.product_id,l.lot_id)*l.qty_done montant_achat,
+                    COALESCE(get_prix_achat(m.product_id,l.lot_id),sol.is_correction_prix_achat)*l.qty_done montant_achat,
                     sol.price_unit*l.qty_done montant_vente,
-                    (sol.price_unit*l.qty_done-get_prix_achat(m.product_id,l.lot_id)*l.qty_done) marge
+                    (sol.price_unit*l.qty_done-COALESCE(get_prix_achat(m.product_id,l.lot_id),sol.is_correction_prix_achat)*l.qty_done) marge
                 from stock_move_line l join stock_move m on l.move_id=m.id
                                        join stock_picking p on m.picking_id=p.id
                                        join product_product pp on m.product_id=pp.id 

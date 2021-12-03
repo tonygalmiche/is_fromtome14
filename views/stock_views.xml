@@ -1,130 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-
-    <!-- <record  id="is_stock_inventory_line_action" model="ir.actions.act_window">
-        <field name="name">Détail des lignes</field>
-        <field name="res_model">stock.inventory.line</field>
-        <field name="limit">1000</field>
-        <field name="view_mode">tree,form</field>
-        <field name="domain">[('inventory_id','=',active_id)]</field>
-        <field name="context">{'default_inventory_id': active_id}</field>
-    </record> -->
-
-
-
-    <record id="is_view_inventory_form" model="ir.ui.view">
-        <field name="name">is_view_inventory_form</field>
-        <field name="model">stock.inventory</field>
-        <field name="inherit_id" ref="stock.view_inventory_form"/>
-        <field name="arch" type="xml">
-            <div name="button_box" position="inside">
-                    <button 
-                        name="valorisation_stock_action"
-                        class="oe_stat_button" icon="fa-building-o" 
-                        type="object" 
-                        states="done"
-                    >
-                        <div class="o_form_field o_stat_info">
-                            <span class="o_stat_text">Stock valorisé</span>
-                        </div>
-                    </button>
-            </div>
-        </field>
-    </record>
-
-    <record id="is_stock_inventory_line_form" model="ir.ui.view">
-        <field name="name">is_stock_inventory_line_form</field>
-        <field name="model">stock.inventory.line</field>
-        <field name="arch" type="xml">
-            <form>
-                <sheet>
-                    <group>
-                        <!-- <field name="product_id"/> -->
-                        <field name="is_default_code"/>
-                        <!-- <field name="prod_lot_id"/> -->
-                        <!-- <field name="life_use_date"/> -->
-                        <field name="product_qty"/>
-                        <field name="product_uom_id"/>
-                        <field name="is_dernier_prix"/>
-                        <field name="is_stock_valorise"/>
-                        <field name="is_uom_facture_id"/>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-
-    <record id="is_stock_inventory_line_tree" model="ir.ui.view">
-        <field name="name">is_stock_inventory_line_tree</field>
-        <field name="model">stock.inventory.line</field>
-        <field name="arch" type="xml">
-            <tree>
-                <!-- <field name="is_default_code"/>
-                <field name="is_product_name"/>
-                <field name="product_qty" sum="Total"/>
-                <field name="product_uom_id"/>
-                <field name="is_dernier_prix"/>
-                <field name="is_stock_valorise" sum="Total"/>
-                <field name="is_uom_facture_id"/> -->
-
-
-                <field name="company_id" invisible="1"/>
-                <field name="product_tracking" invisible="1"/>
-                <field name="is_editable" invisible="1"/>
-                <field name="outdated" invisible="1"/>
-                <field name="product_id" width="1.6" context="{'default_type': 'product'}" readonly="context.get('default_product_id', False)" attrs="{'readonly': ['|',                             ('is_editable', '=', False),                             ('state', '!=', 'confirm')]}"/>
-                <field name="location_id" groups="stock.group_stock_multi_locations" options="{'no_create': True}" invisible="context.get('readonly_location_id', False)" readonly="context.get('readonly_location_id', False)" attrs="{'readonly': ['|',                             ('is_editable', '=', False),                             ('state', '!=', 'confirm')]}"/>
-                <field name="inventory_date" optional="hide" width="0.8"/>
-                <field name="prod_lot_id" groups="stock.group_production_lot" width="0.8" attrs="{'readonly': ['|', '|',                             ('product_tracking', '=', 'none'),                             ('is_editable', '=', False),                             ('state', '!=', 'confirm')]}" context="{'default_product_id': product_id, 'default_company_id': company_id}" optional="show"/>
-                <field name="package_id" groups="stock.group_tracking_lot" width="0.8" attrs="{'readonly': ['|',                             ('is_editable', '=', False),                             ('state', '!=', 'confirm')]}" string="Package" optional="show"/>
-                <field name="partner_id" groups="stock.group_tracking_owner" attrs="{'readonly': ['|',                             ('is_editable', '=', False),                             ('state', '!=', 'confirm')]}"/>
-                <field name="theoretical_qty" string="On Hand" width="0.5" force_save="1" readonly="1" optional="show"/>
-                <button name="action_refresh_quantity" title="Refresh quantity" icon="fa-refresh" type="object" attrs="{'invisible': [('outdated', '=', False)]}"/>
-                <field name="product_qty" width="0.5" string="Counted"/>
-                <field name="difference_qty" optional="show" width="0.5"/>
-                <field name="product_uom_id" string="UoM" groups="uom.group_uom" width="0.3" force_save="1"/>
-                <field name="inventory_id" invisible="1"/>
-                <field name="state" invisible="1"/>
-
-                <field name="is_dernier_prix"/>
-                <field name="is_stock_valorise" sum="Total"/>
-
-
-
-
-
-            </tree>
-        </field>
-    </record>
-
-
-
-            <!-- <tree default_order="location_id,product_id" editable="top" string="Inventory Details" js_class="inventory_validate_button" decoration-danger="product_qty != theoretical_qty" decoration-muted="product_qty == theoretical_qty" decoration-bf="is_editable">
-                <field name="company_id" invisible="1"/>
-                <field name="product_tracking" invisible="1"/>
-                <field name="is_editable" invisible="1"/>
-                <field name="outdated" invisible="1"/>
-                <field name="product_id" width="1.6" context="{'default_type': 'product'}" readonly="context.get('default_product_id', False)" attrs="{'readonly': ['|',                             ('is_editable', '=', False),                             ('state', '!=', 'confirm')]}"/>
-                <field name="location_id" groups="stock.group_stock_multi_locations" options="{'no_create': True}" invisible="context.get('readonly_location_id', False)" readonly="context.get('readonly_location_id', False)" attrs="{'readonly': ['|',                             ('is_editable', '=', False),                             ('state', '!=', 'confirm')]}"/>
-                <field name="inventory_date" optional="hide" width="0.8"/>
-                <field name="prod_lot_id" groups="stock.group_production_lot" width="0.8" attrs="{'readonly': ['|', '|',                             ('product_tracking', '=', 'none'),                             ('is_editable', '=', False),                             ('state', '!=', 'confirm')]}" context="{'default_product_id': product_id, 'default_company_id': company_id}" optional="show"/>
-                <field name="package_id" groups="stock.group_tracking_lot" width="0.8" attrs="{'readonly': ['|',                             ('is_editable', '=', False),                             ('state', '!=', 'confirm')]}" string="Package" optional="show"/>
-                <field name="partner_id" groups="stock.group_tracking_owner" attrs="{'readonly': ['|',                             ('is_editable', '=', False),                             ('state', '!=', 'confirm')]}"/>
-                <field name="theoretical_qty" string="On Hand" width="0.5" force_save="1" readonly="1" optional="show"/>
-                <button name="action_refresh_quantity" title="Refresh quantity" icon="fa-refresh" type="object" attrs="{'invisible': [('outdated', '=', False)]}"/>
-                <field name="product_qty" width="0.5" string="Counted"/>
-                <field name="difference_qty" optional="show" width="0.5"/>
-                <field name="product_uom_id" string="UoM" groups="uom.group_uom" width="0.3" force_save="1"/>
-                <field name="inventory_id" invisible="1"/>
-                <field name="state" invisible="1"/>
-            </tree> -->
-        
-
-
-
-
+ 
     <!-- Archiver les lots à 0  -->
     <record id="archiver_lot_action_server" model="ir.actions.server">
         <field name="name">Archiver les lots à 0</field>
@@ -161,23 +37,13 @@
         <field name="name">is_stock_production_lot_tree_view</field>
         <field name="model">stock.production.lot</field>
         <field name="arch" type="xml">
-            <!-- <tree 
-                string="Lots avec DLC" 
-                decoration-danger="life_date and life_date &lt; current_date" 
-                decoration-warning="use_date and use_date &lt; current_date" 
-                default_order="life_date"
-            > -->
             <tree>
                 <field name="name"/>
                 <field name="is_article_actif" invisible="1"/>
-                <!-- <button class="oe_stat_button" icon="fa-exclamation" type="object" name="#" string="Article archivé" attrs="{'invisible': [('is_article_actif', '=', True)]}"/> -->
                 <field name="product_id"/>
                 <field name="is_type_tracabilite"/>
                 <field name="is_dlc_ddm"/>
-                <!-- <field name="use_date"/> -->
-                <!-- <field name="life_date"/> -->
                 <field name="product_qty" sum="Total"/>
-                <!-- <button class="oe_stat_button" icon="fa-exclamation" type="object" name="#" string="Stock négatif" attrs="{'invisible': [('product_qty', '>=', 0)]}"/> -->
                 <field name="create_date"/>
                 <field name="write_date"/>
             </tree>
@@ -189,14 +55,6 @@
         <field name="limit">200</field>
         <field name="view_mode">tree,form</field>
         <field name="context">{'display_complete': True, 'default_company_id': allowed_company_ids[0]}</field>
-
-
-
-        <!-- <field name="view_id" ref="is_stock_production_lot_tree_view"/>
-        <field name="view_ids"
-            eval="[(5, 0, 0),
-                    (0, 0, {'view_mode': 'tree', 'view_id': ref('is_stock_production_lot_tree_view')}),
-                    (0, 0, {'view_mode': 'form', 'view_id': ref('is_stock_production_lot_form_view')})]"/> -->
     </record>
     <menuitem
         id="is_stock_production_lot_menu"
@@ -205,10 +63,4 @@
         sequence="900"
         action="is_stock_production_lot_action"
     />
-
-
-
-
-
-
 </odoo>
