@@ -21,6 +21,13 @@ class PurchaseOrder(models.Model):
             obj.is_fromtome_order_vsb=vsb
 
 
+
+    @api.depends('order_line.date_planned')
+    def _compute_date_planned(self):
+        for order in self:
+            print(order)
+
+
     is_commande_soldee    = fields.Boolean(string='Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
     is_fromtome_order_id  = fields.Many2one('sale.order', 'Commande Fromtome', copy=False,readonly=True)
     is_fromtome_order_vsb = fields.Boolean(string='Créer commande dans Fromtome vsb', compute='_compute_is_fromtome_order_vsb')
