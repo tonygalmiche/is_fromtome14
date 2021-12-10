@@ -51,8 +51,15 @@ class IsScanPickingLine(models.Model):
             obj.alerte = '\n'.join(alertes) or False
 
 
+    @api.depends('product_id')
+    def _compute_product_name(self):
+        for obj in self:
+            obj.product_name = obj.product_id.name
+
     scan_id             = fields.Many2one('is.scan.picking', 'Picking', required=True, ondelete='cascade')
     product_id          = fields.Many2one('product.product', 'Article', required=True)
+    product_name        = fields.Text('Désignation article', compute=_compute_product_name, readonly=True, store=True)
+    product_code        = fields.Char('Code'                , related='product_id.default_code')
     uom_id              = fields.Many2one('uom.uom', 'Unité', related='product_id.uom_id')
     nb_pieces_par_colis = fields.Integer(string='PCB', related="product_id.is_nb_pieces_par_colis", help="Nb Pièces / colis")
     creation_lot        = fields.Boolean('Créé', help="Lot créé")

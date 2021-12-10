@@ -71,13 +71,15 @@
                         <tree 
                             string="Lots avec DLC" 
                             editable="bottom" 
-                            limit="10"
+                            limit="5"
                             default_order="info desc"
                             decoration-success="nb_colis_reste==0" 
                             decoration-danger="alerte!=False" 
                         >
-                            <field name="product_id"/>
-                            <field name="creation_lot"/>
+                            <field name="product_id"   optional="hide"/>
+                            <field name="product_code" optional="show"/>
+                            <field name="product_name" optional="show"/>
+                            <field name="creation_lot" optional="show"/>
                             <field 
                                 name="lot_id" 
                                 context="{

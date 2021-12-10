@@ -15,10 +15,14 @@ class is_account_invoice_line(models.Model):
     number                  = fields.Char("N°Facture")
     date_invoice            = fields.Date("Date facture")
     partner_id              = fields.Many2one('res.partner', 'Partenaire')
+    enseigne_id             = fields.Many2one('is.enseigne.commerciale', 'Enseigne')
     line_id                 = fields.Many2one('account.invoice.line', 'Ligne')
     product_id              = fields.Many2one('product.product', 'Article')
     description             = fields.Char('Description')
     quantity                = fields.Float('Quantité'              , digits=(14,4))
+    nb_pieces_par_colis     = fields.Integer(string='PCB')
+    nb_colis                = fields.Float(string='Nb Colis', digits=(14,2))
+    poids_net               = fields.Float(string='Poids net', digits=(14,4))
     price_unit              = fields.Float('Prix unitaire'         , digits=(14,4))
     discount                = fields.Float('Remise'                , digits=(14,2))
     price_subtotal          = fields.Float('Montant HT'            , digits=(14,2))
@@ -57,8 +61,12 @@ class is_account_invoice_line(models.Model):
                     ai.move_type         invoice_type,
                     ai.invoice_date date_invoice,
                     ai.partner_id,
+                    rp.is_enseigne_id enseigne_id,
                     ail.product_id,
                     fsens(ai.move_type)*ail.quantity quantity,
+                    ail.is_nb_pieces_par_colis nb_pieces_par_colis,
+                    fsens(ai.move_type)*ail.is_nb_colis            nb_colis,
+                    fsens(ai.move_type)*ail.is_poids_net           poids_net,
                     ail.price_unit,
                     ail.discount,
                     fsens(ai.move_type)*price_subtotal price_subtotal,
@@ -70,5 +78,3 @@ class is_account_invoice_line(models.Model):
                 where ai.state='posted'
             )
         """)
-
-

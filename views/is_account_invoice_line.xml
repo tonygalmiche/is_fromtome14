@@ -11,15 +11,18 @@
                         <field name="number"/>
                         <field name="date_invoice"/>
                         <field name="partner_id"/>
+                        <field name="enseigne_id"/>
                         <field name="line_id"/>
                         <field name="description"/>
                         <field name="product_id"/>
                         <field name="quantity"/>
+                        <field name="nb_pieces_par_colis"/>
+                        <field name="nb_colis"/>
+                        <field name="poids_net"/>
                         <field name="price_unit"/>
                         <field name="discount"/>
                         <field name="price_subtotal"/>
                         <field name="invoice_type"/>
-                        <!-- <field name="state"/> -->
                     </group>
                 </sheet>
             </form>
@@ -29,19 +32,22 @@
         <field name="name">is.account.invoice.line.tree</field>
         <field name="model">is.account.invoice.line</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree decoration-danger="quantity &lt; 0">
                 <field name="invoice_id" optional="hide"/>
                 <field name="number" optional="show"/>
                 <field name="date_invoice" optional="show"/>
                 <field name="partner_id" optional="show"/>
+                <field name="enseigne_id" optional="show"/>
                 <field name="product_id" optional="show"/>
                 <field name="description" optional="hide"/>
                 <field name="quantity"       sum="Total" optional="show"/>
+                <field name="nb_pieces_par_colis"       sum="Total" optional="hide"/>
+                <field name="nb_colis"       sum="Total" optional="show"/>
+                <field name="poids_net"       sum="Total" optional="show"/>
                 <field name="price_unit" optional="show"/>
                 <field name="discount"       sum="Total" optional="show"/>
                 <field name="price_subtotal" sum="Total" optional="show"/>
                 <field name="invoice_type" optional="show"/>
-                <!-- <field name="state" optional="hide"/> -->
             </tree>
         </field>
     </record>
@@ -53,10 +59,10 @@
                 <field name="invoice_id"/>
                 <field name="number"/>
                 <field name="partner_id"/>
+                <field name="enseigne_id"/>
                 <field name="product_id"/>
                 <field name="description"/>
                 <field name="invoice_type"/>
-                <!-- <field name="state"/> -->
            </search>
         </field>
     </record>
