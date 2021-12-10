@@ -22,8 +22,12 @@ class is_account_invoice_line(models.Model):
     price_unit              = fields.Float('Prix unitaire'         , digits=(14,4))
     discount                = fields.Float('Remise'                , digits=(14,2))
     price_subtotal          = fields.Float('Montant HT'            , digits=(14,2))
-    invoice_type            = fields.Char('Type de facture')
-    state                   = fields.Char('Etat de la facture')
+    invoice_type             = fields.Selection([
+        ('in_invoice' , 'Facture fournisseur'),
+        ('in_refound' , 'Avoir fournisseur'),
+        ('out_invoice', 'Facture client'),
+        ('out_refund' , 'Avoir client'),
+    ], 'Type de facture')
 
 
     def init(self):
@@ -63,7 +67,7 @@ class is_account_invoice_line(models.Model):
                                         inner join res_partner              rp on ai.partner_id=rp.id
                                         inner join product_product          pp on ail.product_id=pp.id
                                         inner join product_template         pt on pp.product_tmpl_id=pt.id
-                where ail.id>0
+                where ai.state='posted'
             )
         """)
 

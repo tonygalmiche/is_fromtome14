@@ -153,18 +153,21 @@ class IsScanPicking(models.Model):
 
                 #** Recherche de la quantité prévue ***************************
                 prevu=0.0
-                for line in obj.product_ids:
-                    if line.product_id==obj.product_id:
-                        prevu=line.nb_colis
+                if obj.picking_id:
+                    for line in obj.product_ids:
+                        if line.product_id==obj.product_id:
+                            prevu=line.nb_colis
                 #**************************************************************
 
                 #** Recherche quantité scannée ********************************
                 products={}
                 scanne=nb_colis
-                for line in obj.line_ids:
-                    if line.product_id==obj.product_id:
-                        scanne+=line.nb_colis
-                reste=prevu-scanne
+                reste=0
+                if obj.picking_id:
+                    for line in obj.line_ids:
+                        if line.product_id==obj.product_id:
+                            scanne+=line.nb_colis
+                    reste=prevu-scanne
                 #**************************************************************
 
                 tz = pytz.timezone('Europe/Paris')

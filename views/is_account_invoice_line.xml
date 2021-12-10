@@ -19,7 +19,7 @@
                         <field name="discount"/>
                         <field name="price_subtotal"/>
                         <field name="invoice_type"/>
-                        <field name="state"/>
+                        <!-- <field name="state"/> -->
                     </group>
                 </sheet>
             </form>
@@ -41,7 +41,7 @@
                 <field name="discount"       sum="Total" optional="show"/>
                 <field name="price_subtotal" sum="Total" optional="show"/>
                 <field name="invoice_type" optional="show"/>
-                <field name="state" optional="show"/>
+                <!-- <field name="state" optional="hide"/> -->
             </tree>
         </field>
     </record>
@@ -56,7 +56,7 @@
                 <field name="product_id"/>
                 <field name="description"/>
                 <field name="invoice_type"/>
-                <field name="state"/>
+                <!-- <field name="state"/> -->
            </search>
         </field>
     </record>
