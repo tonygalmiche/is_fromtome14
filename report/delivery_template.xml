@@ -119,7 +119,8 @@
                             <td class="text-left"><span t-field="line.product_id.default_code"/></td>
                             <td class="text-left">
                                 <div><strong><span t-field="line.is_description_cde"/></strong></div>
-                                <span t-if="line.is_lots" t-field="line.is_lots"/>
+                                <div t-if="line.is_lots" t-field="line.is_lots"/>
+                                <div t-if="line.sale_line_id.discount">Remise prévue de <span t-field="line.sale_line_id.discount"/>%</div>
                             </td>
                             <td class="text-left;"><span style="font-size:6pt" t-field="line.product_id.barcode"/></td>
                             <td class="text-center"><span t-field="line.is_nb_colis"/></td>

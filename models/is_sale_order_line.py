@@ -21,6 +21,9 @@ class is_sale_order_line(models.Model):
     product_uom_qty         = fields.Float('Qt cde'            , digits=(14,3))
     qty_delivered           = fields.Float('Qt livrée'         , digits=(14,3))
     qty_invoiced            = fields.Float('Qt facturée'       , digits=(14,3))
+    price_unit              = fields.Float('Prix unitaire'       , digits=(14,4))
+    discount                = fields.Float('Remise'       , digits=(14,2))
+    price_subtotal          = fields.Float('Montant'       , digits=(14,2))
     order_id                = fields.Many2one('sale.order', 'Commande')
     order_line_id           = fields.Many2one('sale.order.line', 'Ligne de commande')
     is_purchase_line_id     = fields.Many2one('purchase.order.line', 'Ligne cde fournisseur')
@@ -52,6 +55,9 @@ class is_sale_order_line(models.Model):
                     sol.product_uom_qty,
                     sol.qty_delivered,
                     sol.qty_invoiced ,
+                    sol.price_unit,
+                    sol.discount,
+                    sol.price_subtotal,
                     sol.id                  as order_line_id,
                     sol.is_purchase_line_id,
                     po.id                   as purchase_order_id,
