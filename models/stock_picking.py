@@ -30,23 +30,24 @@ class IsScanPickingLine(models.Model):
     def _compute_alerte(self):
         for obj in self:
             alertes=[]
-            now = datetime.now().date()
             if obj.nb_colis_reste<0:
                 alertes.append("Reste<0")
-            if obj.lot_id.is_dlc_ddm<now:
-                alertes.append("DLC/DDM dépassée")
-            if obj.product_id:
-                contrats = self.env['contrat.date.client'].search([('product_id', '=',obj.product_id.product_tmpl_id.id)])
-                for contrat in contrats:
-                    if not contrat.partner_id:
-                        date_limite = obj.lot_id.is_dlc_ddm-timedelta(days=contrat.name)
-                        if date_limite<=now:
-                            alertes.append("Contrat date de %s jours dépassé (Date limite=%s)"%(contrat.name,date_limite.strftime('%d/%m/%Y')))
-                    else:
-                        if obj.scan_id.picking_id:
-                            if  obj.scan_id.picking_id.partner_id==contrat.partner_id:
-                                date_limite = obj.lot_id.is_dlc_ddm-timedelta(days=contrat.name)
-                                alertes.append("Contrat date client de %s jours dépassé (Date limite=%s)"%(contrat.name,date_limite.strftime('%d/%m/%Y')))
+            if obj.lot_id and obj.lot_id.is_dlc_ddm:
+                now = datetime.now().date()
+                if obj.lot_id.is_dlc_ddm<now:
+                    alertes.append("DLC/DDM dépassée")
+                if obj.product_id:
+                    contrats = self.env['contrat.date.client'].search([('product_id', '=',obj.product_id.product_tmpl_id.id)])
+                    for contrat in contrats:
+                        if not contrat.partner_id:
+                            date_limite = obj.lot_id.is_dlc_ddm-timedelta(days=contrat.name)
+                            if date_limite<=now:
+                                alertes.append("Contrat date de %s jours dépassé (Date limite=%s)"%(contrat.name,date_limite.strftime('%d/%m/%Y')))
+                        else:
+                            if obj.scan_id.picking_id:
+                                if  obj.scan_id.picking_id.partner_id==contrat.partner_id:
+                                    date_limite = obj.lot_id.is_dlc_ddm-timedelta(days=contrat.name)
+                                    alertes.append("Contrat date client de %s jours dépassé (Date limite=%s)"%(contrat.name,date_limite.strftime('%d/%m/%Y')))
             obj.alerte = '\n'.join(alertes) or False
 
 
