@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="is_report_inventory" inherit_id="stock.report_inventory">
+            <xpath expr="//th[6]" position="after">
+                <th class="text-right"><strong>Différence</strong></th>
+            </xpath>
+            <xpath expr="//span[@t-field='line.product_qty']/.." position="after">
+                <t t-if="line.difference_qty">
+                    <td class="text-right"><span t-field="line.difference_qty"/></td>
+                </t>
+                <t t-if="not line.difference_qty">
+                    <td></td>
+                </t>
+            </xpath>
+        </template>
+   </data>
+</odoo>
