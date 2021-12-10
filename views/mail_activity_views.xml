@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <!-- <record id="is_mail_activity_form" model="ir.ui.view">
+        <field name="name">is_mail_activity_form</field>
+        <field name="model">mail.activity</field>
+        <field name="arch" type="xml">
+            <form>
+               <sheet>
+                    <group>
+                        <group>
+                            <field name="res_model_id"/>
+                            <field name="res_model"/>
+                            <field name="res_id"/>
+                            <field name="res_name"/>
+                            <field name="activity_type_id"/>
+                            <field name="summary"/>
+                            <field name="note"/>
+                            <field name="date_deadline"/>
+                            <field name="automated"/>
+                            <field name="user_id"/>
+                            <field name="request_partner_id"/>
+                            <field name="recommended_activity_type_id"/>
+                            <field name="previous_activity_type_id"/>
+                            <field name="create_date"/>
+                            <field name="create_uid"/>
+                            <field name="write_uid"/>
+                            <field name="write_date"/>
+                     </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record> -->
+    <record id="is_mail_activity_tree" model="ir.ui.view">
+        <field name="name">is_mail_activity_tree</field>
+        <field name="model">mail.activity</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="res_model_id"                 optional="show"/>
+                <field name="res_model"                    optional="hide"/>
+                <field name="res_id"                       optional="hide"/>
+                <field name="res_name"                     optional="show"/>
+                <field name="activity_type_id"             optional="show"/>
+                <field name="summary"                      optional="show"/>
+                <field name="date_deadline"                optional="show"/>
+                <field name="automated"                    optional="hide"/>
+                <field name="user_id"                      optional="show"/>
+                <field name="request_partner_id"           optional="hide"/>
+                <field name="recommended_activity_type_id" optional="hide"/>
+                <field name="previous_activity_type_id"    optional="hide"/>
+                <field name="create_date"                  optional="hide"/>
+                <field name="create_uid"                   optional="hide"/>
+                <field name="write_uid"                    optional="hide"/>
+                <field name="write_date"                   optional="hide"/>
+                <field name="active"                       optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_mail_activity_search" model="ir.ui.view">
+        <field name="name">is_mail_activity_search</field>
+        <field name="model">mail.activity</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="res_model_id"/>
+                <field name="res_model"/>
+                <field name="res_id"/>
+                <field name="res_name"/>
+                <field name="activity_type_id"/>
+                <field name="summary"/>
+                <field name="note"/>
+                <field name="user_id"/>
+                <field name="create_uid"/>
+                <field name="write_uid"/>
+           </search>
+        </field>
+    </record>
+
+    <record id="is_mail_activity_pivot" model="ir.ui.view">
+        <field name="name">is_mail_activity_pivot</field>
+        <field name="model">mail.activity</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="res_model"  type="row"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="is_mail_activity_graph" model="ir.ui.view">
+        <field name="name">is_mail_activity_graph</field>
+        <field name="model">mail.activity</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="False">
+                <field name="res_model"   type="row"/>
+            </graph>
+        </field>
+    </record>
+
+
+
+    <record  id="is_mail_activity_action" model="ir.actions.act_window">
+        <field name="name">Activités</field>
+        <field name="res_model">mail.activity</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">['|',('active','=',True),('active','=',False)]</field>
+    </record>
+    <menuitem
+        id="is_mail_activity_main_menu"
+        name="Activités"
+        parent="contacts.menu_contacts"
+        sequence="4"
+    />
+    <menuitem
+        id="is_mail_activity_menu"
+        name="Activités"
+        parent="is_mail_activity_main_menu"
+        sequence="10"
+        action="is_mail_activity_action"
+    />
+
+
+
+</odoo>

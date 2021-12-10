@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# from . import intrastat_product_declaration  TODO : A revoir
 # from . import is_account_invoice_line        TODO : A revoir car c'est account_move maintenant
 
-
-from . import account_move               
+from . import account_move
+from . import mail_activity
 from . import product
 from . import product_pricelist
 from . import purchase_order
