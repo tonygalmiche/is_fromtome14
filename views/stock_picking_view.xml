@@ -74,7 +74,7 @@
                             limit="10"
                             default_order="info desc"
                             decoration-success="nb_colis_reste==0" 
-                            decoration-danger="alerte!=''" 
+                            decoration-danger="alerte!=False" 
                         >
                             <field name="product_id"/>
                             <field name="creation_lot"/>
