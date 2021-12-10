@@ -182,6 +182,16 @@
             </xpath>
 
 
+
+            <page name="operations" position="attributes">
+                <attribute name="autofocus">autofocus</attribute>
+            </page>
+
+
+                        <!-- <page string="Detailed Operations" name="detailed_operations_shown" attrs="{'invisible': ['|', ('show_operations', '=', False), ('show_reserved', '=', False)]}"> -->
+<!-- <page string="Description" autofocus="autofocus">  -->
+
+
             <field name="state" position="before">
                 <button 
                     name="action_picking_send" 
@@ -200,11 +210,19 @@
             </field>
 
 
-            <field name="move_line_ids_without_package" position="before">
+
+
+
+           <field name="partner_id" position="after">
+                <button name="scan_picking_action" type="object" string="Scan"/>
+            </field>
+
+
+            <!-- <field name="move_line_ids_without_package" position="before">
                 <group>
                     <button name="scan_picking_action" type="object" string="Scan"/>
                 </group>
-            </field>
+            </field> -->
 
 
             <xpath expr="//page[@name='operations']/field/tree/field[@name='description_picking']" position="after">

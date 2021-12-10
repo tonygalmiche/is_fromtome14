@@ -36,10 +36,6 @@
             <field name="domain">[('pricelist_id','=',active_id)]</field>
             <field name="context">{'default_pricelist_id': active_id}</field>
         </record>
-
-
-
-
         <record id="is_product_pricelist_view" model="ir.ui.view">
             <field name="name">is_product_pricelist_view</field>
             <field name="model">product.pricelist</field>
@@ -57,8 +53,8 @@
                 <field name="currency_id" position="before">
                     <field name="partner_id"/>
                 </field>
-                <xpath expr="//field[@name='item_ids']/.." position="after">
-                    <group col="4">
+                <xpath expr="//field[@name='item_ids']" position="after">
+                    <group col="4" style="text-align:right">
                         <label for="is_augmentation" string="Pourcentage d'augmentation à appliquer"/>
                         <div class="o_row">
                             <field name="is_augmentation" nolabel="1"/>
