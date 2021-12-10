@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import api, exceptions, fields, models, _
+from datetime import datetime
+import pytz
 
 
 class StockInventory(models.Model):
@@ -78,12 +80,15 @@ class StockInventory(models.Model):
                 }
                 scan=self.env['is.scan.picking'].create(vals)
                 # ** Mettre à 0 les stocks ****************************************
+                tz = pytz.timezone('Europe/Paris')
+                now = datetime.now(tz).strftime("%H:%M:%S")
                 for line in obj.line_ids:
                     vals={
                         "scan_id"   : scan.id,
                         "product_id": line.product_id.id,
                         "lot_id"    : line.prod_lot_id.id,
                         "nb_pieces" : 0,
+                        "info"      : now,
                     }
                     self.env['is.scan.picking.line'].create(vals)
                 # *****************************************************************

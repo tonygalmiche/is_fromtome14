@@ -11,7 +11,7 @@ class is_account_invoice_line(models.Model):
 
     company_id              = fields.Many2one('res.company', 'Société')
     line_id                 = fields.Many2one('account.invoice.line', 'Ligne de facture')
-    invoice_id              = fields.Many2one('account.invoice', 'Facture')
+    invoice_id              = fields.Many2one('account.move', 'Facture')
     number                  = fields.Char("N°Facture")
     date_invoice            = fields.Date("Date facture")
     partner_id              = fields.Many2one('res.partner', 'Partenaire')
@@ -24,6 +24,7 @@ class is_account_invoice_line(models.Model):
     price_subtotal          = fields.Float('Montant HT'            , digits=(14,2))
     invoice_type            = fields.Char('Type de facture')
     state                   = fields.Char('Etat de la facture')
+
 
     def init(self):
         drop_view_if_exists(self.env.cr, self._table)
@@ -48,17 +49,17 @@ class is_account_invoice_line(models.Model):
                     ail.name        description,
                     ai.company_id,
                     ai.id           invoice_id,
-                    ai.number,
-                    ai.type         invoice_type,
-                    ai.date_invoice date_invoice,
+                    ai.name         number,
+                    ai.move_type         invoice_type,
+                    ai.invoice_date date_invoice,
                     ai.partner_id,
                     ail.product_id,
-                    fsens(ai.type)*ail.quantity quantity,
+                    fsens(ai.move_type)*ail.quantity quantity,
                     ail.price_unit,
                     ail.discount,
-                    fsens(ai.type)*price_subtotal price_subtotal,
+                    fsens(ai.move_type)*price_subtotal price_subtotal,
                     ai.state
-                from account_invoice ai inner join account_invoice_line ail on ai.id=ail.invoice_id
+                from account_move ai inner join account_move_line ail on ai.id=ail.move_id
                                         inner join res_partner              rp on ai.partner_id=rp.id
                                         inner join product_product          pp on ail.product_id=pp.id
                                         inner join product_template         pt on pp.product_tmpl_id=pt.id
