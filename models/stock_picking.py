@@ -29,15 +29,16 @@ class IsScanPickingLine(models.Model):
     product_id          = fields.Many2one('product.product', 'Article', required=True)
     uom_id              = fields.Many2one('uom.uom', 'Unité', related='product_id.uom_id')
     nb_pieces_par_colis = fields.Integer(string='PCB', related="product_id.is_nb_pieces_par_colis", help="Nb Pièces / colis")
-    lot_id            = fields.Many2one('stock.production.lot', 'Lot', required=True)
-    type_tracabilite  = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
-    dlc_ddm           = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
-    nb_pieces         = fields.Float('Pièces'   , digits=(14,4), help="Nb pièces scannées")
-    nb_colis          = fields.Float('Colis'    , digits=(14,2), help="Nb Colis scannés")
-    nb_colis_prevues  = fields.Float('Prévu'    , digits=(14,2), help="Nb Colis prévus")
-    nb_colis_reste    = fields.Float('Reste'    , digits=(14,2), help="Nb Colis reste")
-    poids             = fields.Float("Poids"    , digits='Stock Weight')
-    info              = fields.Char("Info")
+    creation_lot        = fields.Boolean('Créé', help="Lot créé")
+    lot_id              = fields.Many2one('stock.production.lot', 'Lot', required=True)
+    type_tracabilite    = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
+    dlc_ddm             = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
+    nb_pieces           = fields.Float('Pièces'   , digits=(14,4), help="Nb pièces scannées")
+    nb_colis            = fields.Float('Colis'    , digits=(14,2), help="Nb Colis scannés")
+    nb_colis_prevues    = fields.Float('Prévu'    , digits=(14,2), help="Nb Colis prévus")
+    nb_colis_reste      = fields.Float('Reste'    , digits=(14,2), help="Nb Colis reste")
+    poids               = fields.Float("Poids"    , digits='Stock Weight')
+    info                = fields.Char("Info")
 
 
 class IsScanPickingLine(models.Model):
@@ -115,7 +116,7 @@ class IsScanPicking(models.Model):
             obj.nb_colis   = 1
 
 
-    def ajouter_ligne(self):
+    def ajouter_ligne(self, creation_lot=False):
         for obj in self:
             if obj.product_id and obj.lot_id and obj.dlc_ddm:
                 nb_colis = obj.nb_colis or 1
@@ -147,8 +148,9 @@ class IsScanPicking(models.Model):
                     "nb_colis"  : nb_colis,
                     "nb_colis_prevues": prevu,
                     "nb_colis_reste"  : reste,
-                    "poids"     : poids,
-                    "info"      : now,
+                    "poids"           : poids,
+                    "info"            : now,
+                    "creation_lot"    : creation_lot,
                 }
                 obj.write({"line_ids": [(0,0,vals)]})
                 obj.reset_scan()
@@ -156,6 +158,7 @@ class IsScanPicking(models.Model):
 
     def on_barcode_scanned(self, barcode):
         for obj in self:
+            creation_lot=False
             code   = str(barcode)[2:]
             prefix = str(barcode)[:2]
             if prefix in ("01","02"):
@@ -185,15 +188,16 @@ class IsScanPicking(models.Model):
                     lot_id = lot.id
                 else:
                     vals={
-                        "company_id": obj.picking_id.company_id.id,
+                        "company_id": 1,
                         "name"      : obj.lot,
                         "product_id": obj.product_id.id,
                         "is_dlc_ddm": obj.dlc_ddm,
                     }
                     lot = self.env['stock.production.lot'].create(vals)
                     lot_id = lot.id
+                    creation_lot=True
                 obj.lot_id = lot_id
-            obj.ajouter_ligne()
+            obj.ajouter_ligne(creation_lot=creation_lot)
 
 
     def maj_picking_action(self):

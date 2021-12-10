@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- stock.picking.type -->
-    <!-- <record id="view_picking_type_form" model="ir.ui.view">
-        <field name="name">Picking Types</field>
-        <field name="model">stock.picking.type</field>
-        <field name="inherit_id" ref="stock.view_picking_type_form"/>
-        <field name="arch" type="xml">
-            <field name="sequence_id" position="after">
-                <field name="product_barcode_scanner"/>
-            </field>
-        </field>
-    </record> -->
-
-
     <!-- stock.move.line -->
     <record id="is_view_stock_move_line_detailed_operation_tree" model="ir.ui.view">
         <field name="name">is_view_stock_move_line_detailed_operation_tree</field>
@@ -83,11 +70,14 @@
 
                         <tree 
                             string="Lots avec DLC" 
-                            editable="bottom" limit="500"
+                            editable="bottom" 
+                            limit="10"
+                            default_order="info desc"
                             decoration-danger="nb_colis_reste &lt; 0" 
                             decoration-success="nb_colis_reste==0" 
                         >
                             <field name="product_id"/>
+                            <field name="creation_lot"/>
                             <field 
                                 name="lot_id" 
                                 context="{
