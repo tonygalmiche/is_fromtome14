@@ -148,7 +148,8 @@ class IsExportCompta(models.Model):
                         aml.date<='"""+str(obj.date_fin)+"""' and 
                         am.company_id="""+str(self.env.user.company_id.id)+""" and
                         aa.code='665100' and
-                        ap.is_export_compta_id is null
+                        ap.is_export_compta_id is null and 
+                        aa.code is not null
                     ORDER BY aml.date
                 """
                 cr.execute(sql)
@@ -216,7 +217,7 @@ class IsExportCompta(models.Model):
                 f.write(row.journal_code+'\t')
                 f.write(row.ecriture_num+'\t')
                 f.write(row.ecriture_date.strftime('%Y%m%d')+'\t')
-                f.write(row.compte_num+'\t')
+                f.write((row.compte_num or '')+'\t')
                 f.write((row.comp_aux_num or '')+'\t')
                 f.write(row.piece_ref+'\t')
                 f.write(row.piece_date.strftime('%Y%m%d')+'\t')
