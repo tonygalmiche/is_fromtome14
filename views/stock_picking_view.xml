@@ -16,6 +16,12 @@
                 <field name="is_nb_colis"  sum="Total"        optional="show"/>
                 <field name="is_poids_net_estime" sum="Total" optional="show"/>
                 <field name="is_poids_net_reel"   sum="Total" optional="show"/>
+                <button 
+                    title="Correction de la ligne" 
+                    name="stock_move_line_edit_action" 
+                    type="object" icon="fa-edit" 
+                    class="oe_stat_button" 
+                />
                 <field name="status_move" optional="show"/>
             </field>
             <field name="qty_done" position="attributes">
@@ -23,6 +29,50 @@
             </field>
         </field>
     </record>
+    <!-- <record id="is_stock_move_line_edit" model="ir.ui.view">
+        <field name="name">is_stock_move_line_edit</field>
+        <field name="model">stock.move.line</field>
+        <field name="arch" type="xml">
+            <tree editable="top">
+                <field name="product_id"             readonly="1"/>
+                <field name="lot_id"                 readonly="1"/>
+                <field name="is_type_tracabilite"    readonly="1"/>
+                <field name="is_dlc_ddm"             readonly="1"/>
+                <field name="qty_done"               readonly="1"/>
+                <field name="product_uom_id"         readonly="1"/>
+                <field name="is_nb_pieces_par_colis" readonly="1"/>
+                <field name="is_poids_net_estime"    readonly="1"/>
+                <field name="is_poids_net_reel"/>
+                <field name="company_id"             invisible="1"/>
+            </tree>
+        </field>
+    </record> -->
+
+
+    <record id="is_stock_move_line_edit" model="ir.ui.view">
+        <field name="name">is_stock_move_line_edit</field>
+        <field name="model">stock.move.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="product_id"             readonly="1"/>
+                        <field name="lot_id"                 readonly="1"/>
+                        <field name="is_type_tracabilite"    readonly="1"/>
+                        <field name="is_dlc_ddm"             readonly="1"/>
+                        <field name="qty_done"               readonly="1"/>
+                        <field name="product_uom_id"         readonly="1"/>
+                        <field name="is_nb_pieces_par_colis" readonly="1"/>
+                        <field name="is_poids_net_estime"    readonly="1"/>
+                        <field name="is_poids_net_reel"/>
+                        <field name="company_id"             invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
 
 
     <!-- is.scan.picking -->
@@ -167,8 +217,6 @@
     />
 
 
-
-
     <!-- stock.picking -->
     <record id="view_picking_form_inherit" model="ir.ui.view">
         <field name="name">stock.picking.form.inherit</field>
@@ -182,18 +230,9 @@
                     }
                 </style>
             </xpath>
-
-
-
             <page name="operations" position="attributes">
                 <attribute name="autofocus">autofocus</attribute>
             </page>
-
-
-                        <!-- <page string="Detailed Operations" name="detailed_operations_shown" attrs="{'invisible': ['|', ('show_operations', '=', False), ('show_reserved', '=', False)]}"> -->
-<!-- <page string="Description" autofocus="autofocus">  -->
-
-
             <field name="state" position="before">
                 <button 
                     name="action_picking_send" 
@@ -202,31 +241,14 @@
                     groups="base.group_user"
                 />
             </field>
-
-
-
             <field name="origin" position="replace">
                 <field name="sale_id"     readonly="1" attrs="{'invisible': [('sale_id', '=', False)]}" />
                 <field name="purchase_id" readonly="1" attrs="{'invisible': [('purchase_id', '=', False)]}"/>
                 <field name="is_poids_net" sum="Total"/>
             </field>
-
-
-
-
-
            <field name="partner_id" position="after">
                 <button name="scan_picking_action" type="object" string="Scan"/>
             </field>
-
-
-            <!-- <field name="move_line_ids_without_package" position="before">
-                <group>
-                    <button name="scan_picking_action" type="object" string="Scan"/>
-                </group>
-            </field> -->
-
-
             <xpath expr="//page[@name='operations']/field/tree/field[@name='description_picking']" position="after">
                 <field name="is_description_cde" optional="show"/>
             </xpath> 
