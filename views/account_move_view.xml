@@ -25,6 +25,12 @@
                 <field name="is_lots" optional="hide"/>
                 <field name="is_nb_pieces_par_colis" optional="hide"/>
                 <field name="is_nb_colis" sum="Total"/>
+                <button 
+                    title="Lignes des mouvemments" 
+                    name="stock_move_line_action" 
+                    type="object" icon="fa-search-plus" 
+                    class="oe_stat_button" 
+                />
                 <field name="is_poids_net"  sum="Total" optional="hide"/>
             </xpath>
         </field>

@@ -168,7 +168,7 @@ class SaleOrder(models.Model):
                         else:
                             vals={
                                 'partner_id'  : partner_id,
-                                #'date_planned': date_planned,
+                                'date_planned': date_planned,
                             }
                             order=self.env['purchase.order'].create(vals)
                             if order:
@@ -180,7 +180,6 @@ class SaleOrder(models.Model):
                         filtre=[
                             ('order_id'  ,'=', order.id),
                             ('product_id','=', line.product_id.id),
-
                         ]
                         order_lines=self.env['purchase.order.line'].search(filtre,limit=1)
                         if not order_lines:

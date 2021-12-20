@@ -41,6 +41,28 @@ class AccountMoveLine(models.Model):
     is_lots                = fields.Text('Lots', compute='_compute_is_lots')
 
 
+    def stock_move_line_action(self):
+        for obj in self:
+            ids=[]
+            if obj.sale_line_ids.move_ids:
+                for line in obj.sale_line_ids.move_ids.move_line_ids:
+                    ids.append(line.id)
+            if obj.purchase_line_id.move_ids:
+                for line in obj.purchase_line_id.move_ids.move_line_ids:
+                    ids.append(line.id)
+            res= {
+                'name': 'Picking',
+                'view_mode': 'tree,form',
+                'view_type': 'form',
+                'res_model': 'is.stock.move.line',
+                'type': 'ir.actions.act_window',
+                'domain': [
+                    ('move_line_id','in',ids),
+                ],
+            }
+            return res
+
+
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
