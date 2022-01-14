@@ -49,6 +49,40 @@
             </tree>
         </field>
     </record>
+    <record id="is_search_product_lot_filter" model="ir.ui.view">
+        <field name="name">is_search_product_lot_filter</field>
+        <field name="model">stock.production.lot</field>
+        <field name="inherit_id" ref="stock.search_product_lot_filter"/>
+        <field name="arch" type="xml">
+            <field name="product_id" position="after">
+                <filter 
+                    name="filter1"
+                    string="Expire aujourd'hui" 
+                    domain="[('is_dlc_ddm', '=', datetime.datetime.now().strftime('%Y-%m-%d'))]"
+                />
+                <filter 
+                    name="filter2"
+                    string="Expire à partir de demain" 
+                    domain="[('is_dlc_ddm', '&gt;', datetime.datetime.now().strftime('%Y-%m-%d'))]"
+                />
+                <filter 
+                    name="filter3"
+                    string="Expire dans 5 jours" 
+                    domain="[('is_dlc_ddm', '&gt;=', (context_today()+datetime.timedelta(days=5)).strftime('%Y-%m-%d'))]"
+                />
+                <filter 
+                    name="filter4"
+                    string="Expire dans 10 jours" 
+                    domain="[('is_dlc_ddm', '&gt;=', (context_today()+datetime.timedelta(days=10)).strftime('%Y-%m-%d'))]"
+                />
+                <filter 
+                    name="filter5"
+                    string="Expire dans 15 jours" 
+                    domain="[('is_dlc_ddm', '&gt;=', (context_today()+datetime.timedelta(days=15)).strftime('%Y-%m-%d'))]"
+                />
+            </field>
+         </field>
+    </record>
     <record  id="is_stock_production_lot_action" model="ir.actions.act_window">
         <field name="name">Lots avec DLC</field>
         <field name="res_model">stock.production.lot</field>
