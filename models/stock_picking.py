@@ -348,8 +348,9 @@ class Picking(models.Model):
                 obj.purchase_id.commande_soldee_action_server()
 
 
-    is_poids_net = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_poids_colis')
-    is_nb_colis  = fields.Float(string='Nb colis' , digits=(14,1)        , compute='_compute_poids_colis')
+    is_poids_net      = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_poids_colis')
+    is_nb_colis       = fields.Float(string='Nb colis' , digits=(14,1)        , compute='_compute_poids_colis')
+    is_date_livraison = fields.Date('Date livraison client', help="Date d'arrivée chez le client prévue sur la commande", related='sale_id.is_date_livraison')
 
 
     def scan_picking_action(self):

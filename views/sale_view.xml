@@ -43,7 +43,8 @@
             </group>
 
             <field name="payment_mode_id" position="after">
-                <field name="commitment_date"/>
+                <field name="is_date_livraison"/>
+                <!-- <field name="commitment_date"/> -->
             </field>
 
 

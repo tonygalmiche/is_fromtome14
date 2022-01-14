@@ -241,9 +241,26 @@
                     groups="base.group_user"
                 />
             </field>
+
+            <label for="scheduled_date" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </label>
+            <field name="scheduled_date" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="json_popover" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="date_deadline" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
+            <field name="date_done" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
             <field name="origin" position="replace">
-                <field name="sale_id"     readonly="1" attrs="{'invisible': [('sale_id', '=', False)]}" />
-                <field name="purchase_id" readonly="1" attrs="{'invisible': [('purchase_id', '=', False)]}"/>
+                <field name="is_date_livraison" readonly="1" attrs="{'invisible': [('is_date_livraison', '=', False)]}"/>
+                <field name="sale_id"           readonly="1" attrs="{'invisible': [('sale_id', '=', False)]}"/>
+                <field name="purchase_id"       readonly="1" attrs="{'invisible': [('purchase_id', '=', False)]}"/>
                 <field name="is_poids_net" sum="Total"/>
             </field>
            <field name="partner_id" position="after">
@@ -264,7 +281,6 @@
             </xpath> 
         </field>
     </record>
-
     <record id="vpicktree" model="ir.ui.view">
         <field name="name">stock.picking.form.inherit</field>
         <field name="model">stock.picking</field>
@@ -273,9 +289,20 @@
             <field name="partner_id" position="after">
                 <field name="user_id"/>
                 <field name="date_done"/>
+                <field name="is_date_livraison"/>
             </field>
             <field name="scheduled_date" position="attributes">
                 <attribute name="invisible">1</attribute>
+            </field>
+        </field>
+    </record>
+    <record id="is_view_picking_internal_search" model="ir.ui.view">
+        <field name="name">is_view_picking_internal_search</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_internal_search"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_date_livraison"/>
             </field>
         </field>
     </record>
