@@ -1,25 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-
-    <!-- <template id="report_delivery_document">
-        <t t-call="web.html_container">
-            <t t-call="web.external_layout">
-                <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)" />
-                <t t-set="partner" t-value="o.partner_id or (o.move_lines and o.move_lines[0].partner_id) or False"/>
-                <t t-if="partner" name="partner_header">
-                    <t t-set="address">
-                        <div t-esc="partner"
-                        t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True}'/>
-                   </t>
-                </t>
-
-                <div class="page"> -->
-
-
     <template id="is_report_delivery_document" inherit_id="stock.report_delivery_document">
         <t name="partner_header" position="replace">
-
             Adresse de Livraison:
 
             <!-- <t t-if="partner" name="partner_header">
@@ -90,7 +72,7 @@
                                 <span t-field="o.origin"/>
                             </td>
                             <td class="text-center" name="td_sched_date">
-                                <span t-field="o.scheduled_date" t-options="{'widget': 'date','format': 'dd/MM/yyyy'}"/>
+                                <span t-field="o.is_date_livraison" t-options="{'widget': 'date','format': 'dd/MM/yyyy'}"/>
                             </td>
 
                             <td class="text-center" t-if="o.origin">

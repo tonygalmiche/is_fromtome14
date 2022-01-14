@@ -6,6 +6,15 @@
 
             <div name="right_box" position="replace"/>
 
+
+            <div name="div_sched_date" position="replace">
+                <div class="col-auto" name="div_sched_date">
+                    <strong>Date de livraison prévue:</strong>
+                    <p t-field="o.is_date_livraison"/>
+                </div>
+            </div>
+
+
             <xpath expr="//table[1]" position="replace">
 
 
