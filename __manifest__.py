@@ -89,10 +89,8 @@ InfoSaône - Module Odoo 14 pour Fromtome
         'report/fiche_palette.xml',
         'report/listing_prix_client_template.xml',
         'report/report_stockinventory.xml',
+        'report/report_account_payment_order.xml',
         'data/stock_picking_mail.xml',
-
-
-
     ],
 
 

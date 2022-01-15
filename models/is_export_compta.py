@@ -83,13 +83,12 @@ class IsExportCompta(models.Model):
                                            inner join account_journal aj             on aml.journal_id=aj.id
                 WHERE 
                     am.is_export_compta_id is null and
-                    aml.date<=%s 
+                    aml.date<=%s and aj.name in ('VE','AC')
                 ORDER BY aml.date
             """
             cr.execute(sql,[obj.date_fin])
             ct=0
             for row in cr.fetchall():
-                print(row)
                 invoice_id = row[11]
                 invoices = self.env['account.move'].search([('id','=',invoice_id)])
                 compte_num = row[3]

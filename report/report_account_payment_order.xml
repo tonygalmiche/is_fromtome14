@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_account_payment_order_document">
+        <t t-call="web.external_layout">
+            <t t-set="o" t-value="o.with_context(lang=lang)"/>
+            <style>
+                .page{
+                    font-size:10pt;
+                }
+            </style>
+            <div class="page">
+                <h1>Ordre de paiement n°<span t-field="o.name"/></h1>
+                <table style="width:100%">
+                    <tbody>
+                        <tr><td>Mode de paiement                        </td><td><span t-field="o.payment_mode_id"/></td></tr>
+                        <tr><td>Journal de banque                       </td><td><span t-field="o.journal_id"/></td></tr>
+                        <tr><td>Compte bancaire                         </td><td><span t-field="o.company_partner_bank_id"/></td></tr>
+                        <tr><td>Type de paiement                        </td><td><span t-field="o.payment_type"/></td></tr>
+                        <tr><td>Type de la date d'exécution du paiement </td><td><span t-field="o.date_prefered"/></td></tr>
+                        <tr><td>Date de la génération du fichier        </td><td><span t-field="o.date_generated"/></td></tr>
+                        <tr><td>Généré par                              </td><td><span t-field="o.generated_user_id"/></td></tr>
+                        <tr><td>Date de téléchargement du fichier       </td><td><span t-field="o.date_uploaded"/></td></tr>
+                        <tr><td>Description                             </td><td><span t-field="o.description"/></td></tr>
+                    </tbody>
+                </table>
+                <br />
+                <table class="table table-sm o_main_table">
+                    <thead>
+                        <tr>
+                            <th class="text-left"><strong>Partenaire</strong></th>
+                            <th class="text-left"><strong>Communication</strong></th>
+                            <th class="text-left"> <strong>Compte banquaire</strong></th>
+                            <th class="text-center"><strong>Date d'échéance</strong></th>
+                            <th class="text-center"><strong>Date de paiement</strong></th>
+                            <th class="text-right"><strong>Montant</strong></th>
+                            <th class="text-center"><strong>Devise</strong></th>
+                            <th class="text-left"><strong>Référence paiement</strong></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="o.payment_line_ids" t-as="line">
+                            <td class="text-left"><span t-field="line.partner_id"/></td>
+                            <td class="text-left"><span t-field="line.communication"/></td>
+                            <td class="text-left"><span t-field="line.partner_bank_id"/></td>
+                            <td class="text-center"><span t-field="line.ml_maturity_date"/></td>
+                            <td class="text-center"><span t-field="line.date"/></td>
+                            <td class="text-right"><span t-field="line.amount_currency"  t-options='{"widget": "monetary", "display_currency": line.currency_id}'/></td>
+                            <td class="text-center"><span t-field="line.currency_id"/></td>
+                            <td class="text-left"><span t-field="line.name"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+    <template id="report_account_payment_order">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="lang" t-value="o.generated_user_id.partner_id.lang"/>
+                <t t-call="is_fromtome14.report_account_payment_order_document" t-lang="lang"/>
+            </t>
+        </t>
+    </template>
+    <record id="report_account_payment_order_paperformat" model="report.paperformat">
+        <field name="name">Ordre de paiements</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="page_height">297</field>
+        <field name="page_width">210</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">40</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">35</field>
+        <field name="dpi">90</field>
+    </record>
+    <record id="report_account_payment_order_action" model="ir.actions.report">
+        <field name="name">Ordre de paiements</field>
+        <field name="model">account.payment.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">is_fromtome14.report_account_payment_order</field>
+        <field name="report_file">is_fromtome14.report_account_payment_order</field>
+        <field name="paperformat_id" ref="is_fromtome14.report_account_payment_order_paperformat"/>
+        <field name="binding_model_id" ref="account_payment_order.model_account_payment_order"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>
