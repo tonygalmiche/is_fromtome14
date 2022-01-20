@@ -96,7 +96,7 @@
                                 <div>test</div>
                                 <t t-set="ct" t-value="0"/>
                             </t>
-                            <div class="box">
+                            <div class="box" t-if="p.image_1920">
                                 <div t-field="p.name" style="font-size:10pt"/>
                                 <img t-att-src="image_data_uri(p.image_1920)" alt="Logo" style="max-height:25mm;max-width:35mm"/>
                             </div>
