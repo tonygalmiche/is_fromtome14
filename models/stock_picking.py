@@ -7,11 +7,11 @@ import dateparser
 from odoo.exceptions import UserError, ValidationError
 from odoo.osv import expression
 from odoo.tools.float_utils import float_compare, float_is_zero
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, format_datetime
 from datetime import datetime
 from datetime import timedelta
 import pytz
 import logging
-
 
 class IsScanPickingLine(models.Model):
     _name = 'is.scan.picking.line'
@@ -298,7 +298,6 @@ class IsScanPicking(models.Model):
 
 
 class Picking(models.Model):
-    _name = 'stock.picking'
     _inherit = 'stock.picking'
 
     def action_picking_send(self):
@@ -350,7 +349,8 @@ class Picking(models.Model):
 
     is_poids_net      = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_poids_colis')
     is_nb_colis       = fields.Float(string='Nb colis' , digits=(14,1)        , compute='_compute_poids_colis')
-    is_date_livraison = fields.Date('Date livraison client', help="Date d'arrivée chez le client prévue sur la commande", related='sale_id.is_date_livraison')
+    is_date_livraison = fields.Date('Date livraison client', help="Date d'arrivée chez le client prévue sur la commande"    , related='sale_id.is_date_livraison')
+    is_date_reception = fields.Datetime('Date réception'   , help="Date de réception chez Fromtome indiquée sur la commande", related='purchase_id.date_planned')
 
 
     def scan_picking_action(self):
@@ -392,4 +392,82 @@ class Picking(models.Model):
                 'context': context,
             }
             return res
+
+
+
+class PickingType(models.Model):
+    _inherit = 'stock.picking.type'
+
+
+    def _compute_picking_count(self):
+        domains = {
+            'count_picking_draft': [('state', '=', 'draft')],
+            'count_picking_waiting': [('state', 'in', ('confirmed', 'waiting'))],
+            'count_picking_ready': [('state', '=', 'assigned')],
+            'count_picking': [('state', 'in', ('assigned', 'waiting', 'confirmed'))],
+            'count_picking_late': [('scheduled_date', '<', time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)), ('state', 'in', ('assigned', 'waiting', 'confirmed'))],
+            'count_picking_backorders': [('backorder_id', '!=', False), ('state', 'in', ('confirmed', 'assigned', 'waiting'))],
+        }
+        for field in domains:
+            data = self.env['stock.picking'].read_group(domains[field] +
+                [('state', 'not in', ('done', 'cancel')), ('picking_type_id', 'in', self.ids)],
+                ['picking_type_id'], ['picking_type_id'])
+            count = {
+                x['picking_type_id'][0]: x['picking_type_id_count']
+                for x in data if x['picking_type_id']
+            }
+            for record in self:
+                record[field] = count.get(record.id, 0)
+        for record in self:
+            record.rate_picking_backorders = record.count_picking and record.count_picking_backorders * 100 / record.count_picking or 0
+            now = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)[:10]
+            filtre=[]
+            if record.id==1:
+                filtre=[
+                    ('is_date_reception'  ,'<', now),
+                    ('picking_type_id'  ,'=', record.id),
+                    ('state', 'in', ('assigned', 'waiting', 'confirmed')),
+                ]
+            if record.id==2:
+                filtre=[
+                    ('is_date_livraison'  ,'<', now),
+                    ('picking_type_id'  ,'=', record.id),
+                    ('state', 'in', ('assigned', 'waiting', 'confirmed')),
+                ]
+            pickings=self.env['stock.picking'].search(filtre)
+            record.count_picking_late = len(pickings)
+
+
+    def get_action_picking_tree_late(self):
+        now = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)[:10]
+        filtre=[]
+        if self.id==1:
+            filtre=[
+                ('is_date_reception'  ,'<', now),
+                ('picking_type_id'  ,'=', self.id),
+                ('state', 'in', ('assigned', 'waiting', 'confirmed')),
+            ]
+        if self.id==2:
+            filtre=[
+                ('is_date_livraison'  ,'<', now),
+                ('picking_type_id'  ,'=', self.id),
+                ('state', 'in', ('assigned', 'waiting', 'confirmed')),
+            ]
+        pickings=self.env['stock.picking'].search(filtre)
+        ids=[]
+        for picking in pickings:
+            ids.append(picking.id)
+        res= {
+            'name': 'Retard',
+            'view_mode': 'tree,form',
+            'view_type': 'form',
+            'res_model': 'stock.picking',
+            'type': 'ir.actions.act_window',
+            'domain': [
+                ('id','in',ids),
+            ],
+        }
+        return res
+
+
 
