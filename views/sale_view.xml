@@ -186,7 +186,7 @@
     <menuitem id="menu_sale_offer"
                 action="action_sale_offer"
                 parent="sale.sale_order_menu"
-                sequence="0" groups="sales_team.group_sale_salesman"/>
+                sequence="2" groups="sales_team.group_sale_salesman"/>
 
 
 
