@@ -140,8 +140,7 @@ class PurchaseOrder(models.Model):
     #     self.action_set_date_planned()
 
     is_date_enlevement      = fields.Date('Date Enlèvement')                          # était date_enlevelment
-    is_adresse_livraison_id = fields.Many2one('res.partner', 'Adresse Livraison')     # était delivery_adress
-
+    is_adresse_livraison_id = fields.Many2one('res.partner', 'Adresse Livraison', default=lambda self: self.env.user.company_id.partner_id.id)
 
 
 #TODO : Revoir dans un deuxième temps

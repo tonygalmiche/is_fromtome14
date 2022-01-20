@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- is.listing.prix.client -->
+    <record id="is_listing_prix_client_seq" model="ir.sequence">
+        <field name="name">Liste de prix</field>
+        <field name="code">is.listing.prix.client</field>
+        <field name="prefix"></field>
+        <field name="padding">5</field>
+        <field eval="False" name="company_id"/>
+    </record>
+    <record id="is_listing_prix_client_form" model="ir.ui.view">
+        <field name="name">is.listing.prix.client.form</field>
+        <field name="model">is.listing.prix.client</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="product_ids"/>
+                     </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_listing_prix_client_tree" model="ir.ui.view">
+        <field name="name">is.listing.prix.client.tree</field>
+        <field name="model">is.listing.prix.client</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_listing_prix_client_search" model="ir.ui.view">
+        <field name="name">is.listing.prix.client.search</field>
+        <field name="model">is.listing.prix.client</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_listing_prix_client_action" model="ir.actions.act_window">
+        <field name="name">Liste de prix</field>
+        <field name="res_model">is.listing.prix.client</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_listing_prix_client_menu"
+        name="Liste de prix"
+        parent="sale.sale_order_menu"
+        sequence="900"
+        action="is_listing_prix_client_action"
+
+    />
+</odoo>

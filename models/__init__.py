@@ -21,6 +21,7 @@ from . import is_commande_fromtome
 from . import is_export_compta
 from . import is_fnc
 from . import is_imprimer_etiquette_gs1
+from . import is_listing_prix_client
 from . import is_sale_order_line
 from . import is_stock_production_lot_contrat
 from . import is_stock_move_line

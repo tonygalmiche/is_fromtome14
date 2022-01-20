@@ -140,7 +140,7 @@
     <template id="report_offre">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <t t-call="b2c_cheese_base.report_offre_document" t-lang="doc.partner_id.lang"/>
+                <t t-call="is_fromtome14.report_offre_document" t-lang="doc.partner_id.lang"/>
             </t>
         </t>
     </template>
@@ -150,8 +150,8 @@
             string="Offre"
             model="sale.order"
             report_type="qweb-pdf"
-            name="b2c_cheese_base.report_offre"
-            file="b2c_cheese_base.report_offre"
+            name="is_fromtome14.report_offre"
+            file="is_fromtome14.report_offre"
     />
 
 </odoo>

@@ -10,20 +10,22 @@ class IsListingPrixClient(models.Model):
     _description = "Listing prix client"
     _order = 'name desc'
 
-    name       = fields.Char(u"N°Folio", readonly=True)
-#     date_fin   = fields.Date(u"Date de fin"  , required=True)
-#     escompte   = fields.Boolean(u"Exporter les escomptes", default=True)
+    name        = fields.Char("Liste de prix", readonly=True)
+    partner_id  = fields.Many2one('res.partner', 'Partenaire')
+    product_ids = fields.Many2many('product.product', 'is_listing_prix_client_product_rel', 'doc_id', 'product_id', 'Articles')
 
-#     ligne_ids  = fields.One2many('is.export.compta.ligne', 'export_compta_id', u'Lignes')
-#     file_ids   = fields.Many2many('ir.attachment', 'is_export_compta_attachment_rel', 'doc_id', 'file_id', u'Fichiers')
-#     company_id = fields.Many2one('res.company', u'Société',required=True,default=lambda self: self.env.user.company_id.id)
+    @api.model
+    def create(self, vals):
+        vals['name'] = self.env['ir.sequence'].next_by_code('is.listing.prix.client')
+        res = super(IsListingPrixClient, self).create(vals)
+        return res
 
 
-#     @api.model
-#     def create(self, vals):
-#         vals['name'] = self.env['ir.sequence'].next_by_code('is.export.compta')
-#         res = super(IsExportCompta, self).create(vals)
-#         return res
+
+    def get_html(self):
+        for obj in self:
+            html="<h1>Test Tony</h1>"
+            return html
 
 
 #     def generer_lignes_action(self):

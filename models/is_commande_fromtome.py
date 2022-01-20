@@ -77,7 +77,6 @@ class IsCommandeFromtome(models.Model):
             sequence=0
             for product in products:
                 if product.default_code:
-
                     #** Commande client ****************************************
                     sql="""
                         SELECT  
@@ -91,7 +90,7 @@ class IsCommandeFromtome(models.Model):
                         WHERE 
                             so.state='sale' and
                             (so.is_commande_soldee='f' or so.is_commande_soldee is null) and 
-                            so.commitment_date>='2020-10-01' and
+                            so.is_date_livraison>='2020-10-01' and
                             sol.product_id=%s and rp.is_enseigne_id=%s
                         GROUP BY pt.default_code,sol.product_id 
                         ORDER BY pt.default_code,sol.product_id
