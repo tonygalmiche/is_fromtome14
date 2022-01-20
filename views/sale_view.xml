@@ -104,6 +104,9 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
+            <field name="date_order" position="after">
+                <field name="is_date_livraison" optional="show"/>
+            </field>
             <field name="invoice_status" position="before">
                 <field name="is_commande_soldee" optional="show"/>
                 <field 
@@ -116,6 +119,21 @@
             </field>
         </field>
     </record>
+
+
+    <record id="is_view_quotation_tree_with_onboarding" model="ir.ui.view">
+        <field name="name">is_view_order_tree</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+        <field name="arch" type="xml">
+            <field name="create_date" position="after">
+                <field name="is_date_livraison" optional="show"/>
+            </field>
+       </field>
+    </record>
+
+
+
 
     <record id="is_view_sales_order_filter" model="ir.ui.view">
         <field name="name">is_view_sales_order_filter</field>

@@ -6,7 +6,7 @@ import base64
 
 
 class IsListingPrixClient(models.Model):
-    _name = 'is_listing_prix_client'
+    _name = 'is.listing.prix.client'
     _description = "Listing prix client"
     _order = 'name desc'
 
