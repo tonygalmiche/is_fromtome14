@@ -24,7 +24,28 @@ class IsListingPrixClient(models.Model):
 
     def get_html(self):
         for obj in self:
-            html="<h1>Test Tony</h1>"
+            html="<h1>Listing des prix %s</h1>"%(obj.name)
+            html+="<table style='border:1px solid black;width:100%;border-collapse: collapse;'>"
+
+            col=0
+            for p in obj.product_ids:
+                col+=1
+                if col==1:
+                    html+="<tr>"
+                html+='<td style="border:1px solid black;width:25%;height:30mm;padding:3mm">'
+                html+=p.name
+                html+="""<img t-att-src="image_data_uri(p.image_1920)" alt="Logo" style="max-height:25mm;max-width:45mm"/>"""
+                html+='</td>'
+
+
+                if col==4:
+                    col=0
+                    html+="</tr>"
+
+
+
+            html+="<table>"
+
             return html
 
 

@@ -72,32 +72,58 @@
     </template>
 
     <template id="listing_prix_client_report">
-        <t t-call="web.html_container">
+        <t t-call="is_fromtome14.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-call="web.external_layout">
+                <t t-call="is_fromtome14.external_layout">
+                    <style>
+                        .box{
+                            display: inline-block;
+                            width: 42mm;
+                            height: 50mm;
+                            border:1px solid black;
+                        }
+                    </style>
+
                     <div class="page">
                         <div class="oe_structure"/>
 
-
-                        <h1>Listing des prix<span t-field="o.name"/></h1>
-                        <div t-raw="o.get_html()"/>
+                        <t t-set="ct" t-value="0"/>
 
 
+                        <t t-foreach="o.product_ids" t-as="p">
+                            <t t-set="ct" t-value="ct+1"/>
+                            <t t-if="ct==4">
+                                <div>test</div>
+                                <t t-set="ct" t-value="0"/>
+                            </t>
+                            <div class="box">
+                                <div t-field="p.name" style="font-size:10pt"/>
+                                <img t-att-src="image_data_uri(p.image_1920)" alt="Logo" style="max-height:25mm;max-width:35mm"/>
+                            </div>
+                        </t>
 
-                        <!-- <table>
-                            </tr>
-                                <t t-set="colspan" t-value="5"/>
 
-                                <t t-foreach="o.product_ids" t-as="p">
-                                                            <t t-set="colspan" t-value="5"/>
+                        <!-- <table style="border:1px solid black;width:100%;border-collapse: collapse;">
+                        <t t-set="col" t-value="0"/>
+                        <t t-foreach="o.product_ids" t-as="p">
+                            <t t-set="col" t-value="col+1"/>
+                            <t t-if="col==1">
+                                <t t-set="x" t-value="&lt;tr&gt;"/>
+                                <t t-raw="x"/>
+                            </t>
+                            <td style="border:1px solid black;width:25%;height:30mm;padding:3mm">
+                                <div t-field="p.name"/>
+                                <img t-att-src="image_data_uri(p.image_1920)" alt="Logo" style="max-height:25mm;max-width:45mm"/>
+                            </td>
 
-                                    <td style="border: 1px solid black">
-                                        <span t-field="p.name"/><br />
-                                        toto et tutu
-                                    </td>
-                                </t>
-                            </tr>
-                        </div> -->
+                            <t t-if="col==4">
+                                <t t-set="col" t-value="0"/>
+                                <t t-set="x" t-value="&lt;/tr&gt;"/>
+                                <t t-raw="x"/>
+                            </t>
+                        </t>
+                        </table> -->
+                        <!-- <div t-raw="o.get_html()"/> -->
                     </div>
                 </t>
             </t>
