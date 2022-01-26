@@ -41,14 +41,14 @@
         </field>
     </record>
     <record  id="is_listing_prix_client_action" model="ir.actions.act_window">
-        <field name="name">Liste de prix</field>
+        <field name="name">Listing prix client</field>
         <field name="res_model">is.listing.prix.client</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[]</field>
     </record>
     <menuitem
         id="is_listing_prix_client_menu"
-        name="Liste de prix"
+        name="Listing prix client"
         parent="sale.sale_order_menu"
         sequence="900"
         action="is_listing_prix_client_action"

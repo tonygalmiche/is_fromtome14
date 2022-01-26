@@ -8,6 +8,9 @@ from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError, ValidationError
 
 
+_TRAITEMENT_THERMIQUE = [('laitcru', 'Lait Cru'), ('laitthermise', 'Lait Thermise'), ('laitpasteurisé', 'Lait Pasteurise')]
+
+
 class MilkType(models.Model):
     _name="milk.type"
     _description = "Type de lait"
@@ -189,7 +192,7 @@ class ProductTemplate(models.Model):
     is_region_id          = fields.Many2one('is.region.origine', string="Region d'origine")
     milk_type_ids         = fields.Many2many('milk.type','product_milk_type_rel','product_id','milk_type_id', string='Type de Lait')
     milk_type             = fields.Char(string='Types de Lait', compute='_compute_milk_type')
-    traitement_thermique  = fields.Selection(string='Traitement Thermique', selection=[('laitcru', 'Lait Cru'), ('laitthermise', 'Lait Thermise'), ('laitpasteurisé', 'Lait Pasteurise')])
+    traitement_thermique  = fields.Selection(string='Traitement Thermique', selection=_TRAITEMENT_THERMIQUE)
     is_famille_fromage_id = fields.Many2one('is.famille.fromage', string="Famille de fromage")
     duree_affinage        = fields.Char(string="Durée d'affinage")
     is_croute_comestible  = fields.Char(string="Croûte comestible")

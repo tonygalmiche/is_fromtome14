@@ -84,12 +84,10 @@
                         }
                     </style>
 
-                    <div class="page">
+                    <div class="page" style="background-color:#F2F2F5">
                         <div class="oe_structure"/>
 
-                        <t t-set="ct" t-value="0"/>
-
-
+                        <!-- <t t-set="ct" t-value="0"/>
                         <t t-foreach="o.product_ids" t-as="p">
                             <t t-set="ct" t-value="ct+1"/>
                             <t t-if="ct==4">
@@ -100,7 +98,7 @@
                                 <div t-field="p.name" style="font-size:10pt"/>
                                 <img t-att-src="image_data_uri(p.image_1920)" alt="Logo" style="max-height:25mm;max-width:35mm"/>
                             </div>
-                        </t>
+                        </t> -->
 
 
                         <!-- <table style="border:1px solid black;width:100%;border-collapse: collapse;">
@@ -123,7 +121,7 @@
                             </t>
                         </t>
                         </table> -->
-                        <!-- <div t-raw="o.get_html()"/> -->
+                        <div t-raw="o.get_html()"/>
                     </div>
                 </t>
             </t>
@@ -131,7 +129,7 @@
     </template>
 
     <record id="listing_prix_client_paperformat" model="report.paperformat">
-        <field name="name">Liste prix client</field>
+        <field name="name">Listing prix client</field>
         <field name="default" eval="True"/>
         <field name="format">custom</field>
         <field name="page_height">297</field>
@@ -146,7 +144,7 @@
         <field name="dpi">90</field>
     </record>
     <record id="listing_prix_client_action" model="ir.actions.report">
-        <field name="name">Liste prix client</field>
+        <field name="name">Listing prix client</field>
         <field name="model">is.listing.prix.client</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">is_fromtome14.listing_prix_client_report</field>
