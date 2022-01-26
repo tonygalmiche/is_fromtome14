@@ -41,7 +41,9 @@ class IsListingPrixClient(models.Model):
                 html+='<div style=";height:10mm">'
                 for l in p.milk_type_ids:
                     html+='<span style="border-radius:5pt;background-color:#F2F2F5;border:1px solid #D8D8D9;padding:5pt;margin:5pt">'+l.name+'</span>'
-                traitement = dict(self.env['product.product'].fields_get(allfields=['traitement_thermique'])['traitement_thermique']['selection'])[p.traitement_thermique]
+                traitement=''
+                if p.traitement_thermique:
+                    traitement = dict(self.env['product.product'].fields_get(allfields=['traitement_thermique'])['traitement_thermique']['selection'])[p.traitement_thermique]
                 html+='</div>'
                 html+='<div style=";height:10mm">'
                 html+='<span style="border-radius:5pt;background-color:#DCDCDC;border:1px solid #D8D8D9;padding:5pt;margin:5pt">'+traitement+'</span>'
