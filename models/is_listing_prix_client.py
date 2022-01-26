@@ -31,7 +31,9 @@ class IsListingPrixClient(models.Model):
             html+="<table style='width:100%;border-spacing:3mm;border-collapse:separate;'>"
             col=0
             for p in products:
-                img = tools.image_data_uri(p.image_1920)
+                img=''
+                if p.image_1920:
+                    img = tools.image_data_uri(p.image_1920)
                 col+=1
                 if col==1:
                     html+="<tr>"
