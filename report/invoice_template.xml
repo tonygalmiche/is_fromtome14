@@ -169,6 +169,10 @@
                                 <t t-if="not line.display_type" name="account_invoice_line_accountable">
                                     <td name="account_invoice_line_name">
                                         <span t-field="line.name"/>
+                                        <t t-if="line.product_id.is_bio">
+                                            <div><i>Produit issu de l’agriculture biologique</i></div>
+                                        </t>
+
                                     </td>
                                     <td class="d-none">
                                         <span t-field="line.origin"/>

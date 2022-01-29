@@ -309,6 +309,9 @@ records.exporter_article_fromelier_action()
                         </group>
                         <group>
                             <field name="is_mis_a_jour_le"/>
+                            <field name="is_mise_en_avant"/>
+                            <field name="is_bio"/>
+                            <field name="is_preco"/>
                         </group>
                     </group>
                     <group string="Présentation">
