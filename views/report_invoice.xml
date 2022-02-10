@@ -181,7 +181,7 @@
                     Please use the following communication for your payment : <b><span t-field="o.payment_reference"/></b>
                 </p> -->
                 <p t-if="o.invoice_payment_term_id" name="payment_term">
-                    <span t-field="o.invoice_payment_term_id.note"/>
+                    <span t-field="o.invoice_payment_term_id.note"/> - <span t-field="o.payment_mode_id.name"/>
                 </p>
                 <p t-if="o.narration" name="comment">
                     <span t-field="o.narration"/>
