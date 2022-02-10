@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+<!--
     <template id="account.report_invoice_document">
         <t t-call="web.external_layout">
             <t t-set="o" t-value="o.with_context(lang=lang)"/>
@@ -33,12 +35,12 @@
              </t>
             <div class="page">
                 <h5>
-                    <span t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">Invoice</span>
-                    <span t-if="o.type == 'out_invoice' and o.state == 'draft'">Draft Invoice</span>
-                    <span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Cancelled Invoice</span>
-                    <span t-if="o.type == 'out_refund'">Credit Note</span>
-                    <span t-if="o.type == 'in_refund'">Vendor Credit Note</span>
-                    <span t-if="o.type == 'in_invoice'">Vendor Bill</span>
+                    <span t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">Facture</span>
+                    <span t-if="o.type == 'out_invoice' and o.state == 'draft'">Facture brouillon</span>
+                    <span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Facture annulée</span>
+                    <span t-if="o.type == 'out_refund'">Avoir</span>
+                    <span t-if="o.type == 'in_refund'">Avoir Fournisseur</span>
+                    <span t-if="o.type == 'in_invoice'">Facture Fournisseur Bill</span>
                     <span t-field="o.number"/>
                 </h5>
                 <h7>
@@ -59,7 +61,7 @@
                     <thead>
                         <tr>
                             <th t-if="o.date_invoice">
-                                <strong>Date Facture</strong>
+                                <strong>Date Facture 2</strong>
                             </th>
                             <th t-if="o.date_due and o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">
                                 <strong>Echéance</strong>
@@ -270,12 +272,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- <p t-if="o.reference">
-                    Please use the following communication for your payment :
-                    <b>
-                        <span t-field="o.reference"/>
-                    </b>
-                </p> -->
                 <p t-if="o.comment" name="comment">
                     <span t-field="o.comment"/>
                 </p>
@@ -300,5 +296,5 @@
             </div>
         </t>
     </template>
-
+-->
 </odoo>
