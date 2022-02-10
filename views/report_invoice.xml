@@ -85,6 +85,7 @@
                                 <b><div t-field="line.name"/></b>
                                 <div t-if="line.is_lots" t-field="line.is_lots"/>
                                 <div t-if="line.product_id.is_bio"><i>Produit issu de l’agriculture biologique</i></div>
+                                <div t-if="line.discount">Remise effectuée de <span t-field="line.discount"/>%</div>
                             </td>
                             <td class="text-left"><span style="font-size:6pt" t-field="line.product_id.barcode"/></td>
                             <td class="text-right"><span t-field="line.is_nb_colis"/></td>
