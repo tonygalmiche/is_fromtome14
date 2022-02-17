@@ -25,8 +25,25 @@
                         <field name="name"/>
                         <field name="enseigne_id"/>
                         <field name="pricelist_id"/>
-                        <field name="product_ids"/>
+                        <!-- <field name="product_ids"/> -->
                      </group>
+
+
+                    <field name="product_ids" nolabel="1" >
+                        <tree editable="bottom">
+                            <field name="default_code"/>
+                            <field name="name"/>
+                            <field name="uom_id"/>
+                            <field name="milk_type_ids" widget="many2many_tags"/>
+                            <field name="traitement_thermique"/>
+                            <field name="is_bio"/>
+                            <field name="is_preco"/>
+                            <field name="is_bio"/>
+                        </tree>
+                    </field>
+
+
+
                 </sheet>
             </form>
         </field>
