@@ -29,3 +29,4 @@ access_is_enseigne_commerciale,access_is_enseigne_commerciale,model_is_enseigne_
 access_is_stock_move_line_valorise,access_is_stock_move_line_valorise,model_is_stock_move_line_valorise,base.group_user,1,0,0,0
 access_is_account_invoice_line,access_is_account_invoice_line,model_is_account_invoice_line,base.group_user,1,0,0,0
 access_is_listing_prix_client,access_is_listing_prix_client,model_is_listing_prix_client,base.group_user,1,1,1,1
+access_is_bio,access_is_bio,model_is_bio,base.group_user,1,1,1,1

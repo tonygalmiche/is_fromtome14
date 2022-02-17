@@ -154,7 +154,7 @@ class IsListingPrixClient(models.Model):
                             html+='<span class="tag" style="background-color:#DCDCDC">'+traitement+'</span> '
                         if p.is_preco:
                             html+='<span class="tag" style="background-color:red;font-color:white">PRECO.</span> '
-                        if p.is_bio:
+                        if p.is_bio_id:
                             html+='<span class="tag" style="background-color:#169539;font-color:white">BIO</span> '
                         html+='</div>'
                         html+='</td>'

@@ -35,7 +35,7 @@
                             <field name="milk_type_ids" widget="many2many_tags"/>
                             <field name="traitement_thermique"/>
                             <field name="is_mise_en_avant"/>
-                            <field name="is_bio"/>
+                            <field name="is_bio_id"/>
                             <field name="is_preco"/>
                         </tree>
                     </field>

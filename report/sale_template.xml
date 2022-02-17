@@ -80,7 +80,7 @@
                             <t t-if="not line.display_type">
                                 <td name="td_name">
                                     <span t-field="line.name"/>
-                                    <div t-if="line.product_id.is_bio"><i>Produit issu de l’agriculture biologique</i></div>
+                                    <div t-if="line.product_id.is_bio_id"><i><span t-field="line.product_id.is_bio_id.name"/></i></div>
                                 </td>
 
                                 <td name="td_quantity" class="text-right"><span t-field="line.product_uom_qty"/></td>

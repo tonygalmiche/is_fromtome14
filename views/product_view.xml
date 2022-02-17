@@ -309,8 +309,8 @@ records.exporter_article_fromelier_action()
                         </group>
                         <group>
                             <field name="is_mis_a_jour_le"/>
+                            <field name="is_bio_id"/>
                             <field name="is_mise_en_avant"/>
-                            <field name="is_bio"/>
                             <field name="is_preco"/>
                         </group>
                     </group>
@@ -384,6 +384,9 @@ records.exporter_article_fromelier_action()
         </field>
     </record>
 
+
+
+
     <record model="ir.actions.act_window" id="milk_type_act">
         <field name="name">Type de Lait</field>
         <field name="res_model">milk.type</field>
@@ -393,6 +396,10 @@ records.exporter_article_fromelier_action()
     </record>
     <menuitem id="menu_milk_type" name="Type de Lait" parent="stock.menu_product_in_config_stock" sequence="4"
               action="milk_type_act"/>
+
+
+
+
     <record model="ir.actions.act_window" id="product_label_category_act">
         <field name="name">Categories Labels Produit</field>
         <field name="res_model">product.label.category</field>
@@ -572,6 +579,52 @@ records.exporter_article_fromelier_action()
     />
 
 
+
+    <!-- is.bio -->
+    <record id="is_bio_tree_view" model="ir.ui.view">
+        <field name="name">is_bio_tree_view</field>
+        <field name="model">is.bio</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_bio_form_view" model="ir.ui.view">
+        <field name="name">is_bio_form_view</field>
+        <field name="model">is.bio</field>
+        <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <field name="name"/>
+                </group>
+            </sheet>
+        </form>
+        </field>
+    </record>
+    <record id="is_bio_search_view" model="ir.ui.view">
+        <field name="name">is_bio_search_view</field>
+        <field name="model">is.bio</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+    <record id="is_bio_action" model="ir.actions.act_window" >
+        <field name="name">BIO</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">is.bio</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem 
+        id="is_bio_menu" 
+        name="BIO" 
+        parent="sale.prod_config_main" 
+        sequence="930"
+        action="is_bio_action"
+    />
 
 
 
