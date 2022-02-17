@@ -24,18 +24,11 @@ class IsListingPrixClient(models.Model):
 
     def ajouter_articles_action(self):
         for obj in self:
-            print(obj)
             obj.product_ids=[]
-
-
             ids=[]
             for item in obj.pricelist_id.item_ids:
                 ids.append(item.product_tmpl_id.id)
-                #print(item.price)
-            #print(ids)
-
             products = self.env['product.product'].search([('product_tmpl_id','in',ids)],limit=2000)
-            print(products)
             ids=[]
             for p in products:
                 ids.append(p.id)
@@ -45,18 +38,28 @@ class IsListingPrixClient(models.Model):
             obj.write(vals)
 
 
-
-
     def get_html4(self):
         """ Sortie sur 4 colonnes"""
         for obj in self:
-            ids=[]
-            for p in obj.product_ids:
-                ids.append(p.id)
-            products = self.env['product.product'].search([('id','in',ids)], order="name")
-
             html="""
                 <style>
+                    h1{
+                        font-size: 14pt;
+                        margin-bottom: 0;
+                        font-weight: bold;
+                        line-height: 1;
+                        margin-left:2mm;
+                        margin-right:2mm;
+                        padding:2mm;
+                        background-color:black;
+                        color:white;
+                    }
+                    table{
+                        width:100%;
+                        border-spacing:2mm 1mm;
+                        border-collapse:separate;
+                        font-size:9pt;
+                    }
                     .tag{
                         border-radius:5pt;
                         border:1px solid #D8D8D9;
@@ -80,114 +83,90 @@ class IsListingPrixClient(models.Model):
                     }
                 </style>
             """
-            html+="<h1>Listing des prix %s</h1>"%(obj.name)
-            html+="<table style='width:100%;border-spacing:3mm;border-collapse:separate;font-size:9pt'>"
-            col=0
-            ct=0
-            for p in products:
-                ct+=1
-                print(ct,sys.getsizeof(html))
+            exclude=[]
+            milks = self.env['milk.type'].search([])
+            for milk in milks:
 
+                ids=[]
+                for p in obj.product_ids:
+                    if milk in p.milk_type_ids:
+                        if p.id not in exclude:
+                            ids.append(p.id)
+                            exclude.append(p.id)
+                products = self.env['product.product'].search([('id','in',ids)], order="name")
+                if products:
+                    html+='<div style="height:2mm"></div>'
+                    html+="<h1>Type de lait : %s</h1>"%(milk.name)
+                    html+="<table>"
+                    html+='<thead><tr style="height:0">'
+                    html+='<th style="width:25%"></th>'
+                    html+='<th style="width:25%"></th>'
+                    html+='<th style="width:25%"></th>'
+                    html+='<th style="width:25%"></th>'
+                    html+='</tr></thead>'
+                    html+="<tbody>"
+                    col=1
+                    ct=0
+                    for p in products:
+                        ct+=1
+                        items = self.env['product.pricelist.item'].search([('pricelist_id','=',obj.pricelist_id.id),('product_tmpl_id','=',p.product_tmpl_id.id)])
+                        price=False
+                        for item in items:
+                            price=item.price
+                        img=''
+                        if p.image_1920:
+                            img = tools.image_data_uri(p.image_1920)
+                        colspan=1
+                        border_width="1px"
+                        if p.is_mise_en_avant:
+                            border_width="4px"
+                            colspan=2
+                            if col==4:
+                                html+='<td class="vignette"></td>'
+                                html+="</tr>"
+                                col=1
+                        if col==1:
+                            html+='<tr>'
 
+                        if colspan>1:
+                            html+='<td class="vignette" colspan="%s" style="border-width:%s">'%(colspan,border_width)
+                        else:
+                            html+='<td class="vignette">'
+                        html+='<div style="font-weight:bold;text-align:center;height:23mm">['+p.default_code+'] '+p.name+'</div>'
+                        if img:
+                            html+='<div style="text-align:center;height:30mm"><img src="'+img+'" alt="Logo" style="max-height:30mm;max-width:35mm"/></div>'
+                        else:
+                            html+='<div style="text-align:center;height:25mm"/>'
+                        if price:
+                            html+='<div class="prix">'+str(price)+'/'+p.uom_id.name+'</div>'
+                        else:
+                            html+='<div class="prix"/>'
+                        html+='<div style="line-height:2.1">'
+                        #for l in p.milk_type_ids:
+                        #    html+='<span class="tag">'+l.name+'</span> '
+                        traitement=''
+                        if p.traitement_thermique:
+                            traitement = dict(self.env['product.product'].fields_get(allfields=['traitement_thermique'])['traitement_thermique']['selection'])[p.traitement_thermique]
+                            traitement = traitement.replace(" ","&nbsp;")
 
-                #
-                items = self.env['product.pricelist.item'].search([('pricelist_id','=',obj.pricelist_id.id),('product_tmpl_id','=',p.product_tmpl_id.id)])
-                print("###", p,items)
-                price=False
-                for item in items:
-                    price=item.price
+                        if traitement:
+                            html+='<span class="tag" style="background-color:#DCDCDC">'+traitement+'</span> '
+                        if p.is_preco:
+                            html+='<span class="tag" style="background-color:red;font-color:white">PRECO.</span> '
+                        if p.is_bio:
+                            html+='<span class="tag" style="background-color:#169539;font-color:white">BIO</span> '
+                        html+='</div>'
+                        html+='</td>'
+                        col+=colspan
+                        if col==5:
+                            col=1
+                            html+="</tr>"
+                    if col>1:
+                        for x in range(0, 5-col):
+                            html+='<td class="vignette"></td>'
+                        html+='</tr>'
 
-                img=''
-                if p.image_1920:
-                    img = tools.image_data_uri(p.image_1920)
-                col+=1
-                if col==1:
-                    html+="<tr>"
-
-                html+='<td class="vignette">'
-                html+='<div style="font-weight:bold;text-align:center;height:23mm">['+p.default_code+'] '+p.name+'</div>'
-                
-                if img:
-                    html+='<div style="text-align:center;height:30mm"><img src="'+img+'" alt="Logo" style="max-height:30mm;max-width:35mm"/></div>'
-                else:
-                    html+='<div style="text-align:center;height:25mm"/>'
-
-
-                if price:
-                    html+='<div class="prix">'+str(price)+'/'+p.uom_id.name+'</div>'
-                else:
-                    html+='<div class="prix"/>'
-
-
-                html+='<div style="line-height:2.1">'
-                for l in p.milk_type_ids:
-                    html+='<span class="tag">'+l.name+'</span> '
-                traitement=''
-                if p.traitement_thermique:
-                    traitement = dict(self.env['product.product'].fields_get(allfields=['traitement_thermique'])['traitement_thermique']['selection'])[p.traitement_thermique]
-                    traitement = traitement.replace(" ","&nbsp;")
-
-                if traitement:
-                    html+='<span class="tag" style="background-color:#DCDCDC">'+traitement+'</span> '
-                if p.is_preco:
-                    html+='<span class="tag" style="background-color:red;font-color:white">PRECO.</span> '
-                if p.is_bio:
-                    html+='<span class="tag" style="background-color:green;font-color:white">BIO</span> '
-
-                html+='</div>'
-
-
-
-                html+='</td>'
-                if col==4:
-                    col=0
-                    html+="</tr>"
-            html+="<table>"
+                    html+="</tbody>"
+                    html+="</table>"
+                    html+='<div style="page-break-after: always;"></div>'
             return html
-
-
-
-
-    # def get_html3(self):
-    #     """ Sortie sur 3 colonnes"""
-    #     for obj in self:
-    #         ids=[]
-    #         for p in obj.product_ids:
-    #             ids.append(p.id)
-    #         products = self.env['product.product'].search([('id','in',ids)], order="name")
-    #         html="<h1>Listing des prix %s</h1>"%(obj.name)
-    #         html+="<table style='width:100%;border-spacing:3mm;border-collapse:separate;'>"
-    #         col=0
-    #         for p in products:
-    #             img=''
-    #             if p.image_1920:
-    #                 img = tools.image_data_uri(p.image_1920)
-    #             col+=1
-    #             if col==1:
-    #                 html+="<tr>"
-    #             html+='<td style="border:1px solid #D8D8D9;width:33%;padding:2mm;margin:2mm;background-color:white;vertical-align:top;">'
-    #             html+='<div style="font-weight:bold;text-align:center;height:20mm">['+p.default_code+'] '+p.name+'</div>'
-    #             html+='<div style="text-align:center;height:30mm"><img src="'+img+'" alt="Logo" style="max-height:25mm;max-width:45mm"/></div>'
-    #             html+='<div style="line-height:2.2">'
-    #             for l in p.milk_type_ids:
-    #                 html+='<span style="border-radius:5pt;background-color:#F2F2F5;border:1px solid #D8D8D9;padding:4pt;margin:4pt">'+l.name+'</span> '
-    #             html+='</div>'
-    #             traitement=''
-    #             if p.traitement_thermique:
-    #                 traitement = dict(self.env['product.product'].fields_get(allfields=['traitement_thermique'])['traitement_thermique']['selection'])[p.traitement_thermique]
-    #                 traitement = traitement.replace(" ","&nbsp;")
-    #             html+='<p style="line-height:2.2">'
-    #             html+='<span style="border-radius:5pt;background-color:#DCDCDC;border:1px solid #D8D8D9;padding:4pt;margin:4pt">'+traitement+'</span> '
-    #             if p.is_preco:
-    #                 html+='<span style="border-radius:5pt;background-color:red;font-color:white;border:1px solid #FB573D;padding:4pt;margin:4pt">PRECO.</span> '
-    #             if p.is_bio:
-    #                 html+='<span style="border-radius:5pt;background-color:green;font-color:white;border:1px solid #FB573D;padding:4pt;margin:4pt">BIO</span> '
-    #             html+='</p>'
-    #             html+='<div style="height:10mm;text-align:center">U vente: Kg - Prix : 99,99</div>'
-    #             html+='</td>'
-    #             if col==3:
-    #                 col=0
-    #                 html+="</tr>"
-    #         html+="<table>"
-    #         return html
-
