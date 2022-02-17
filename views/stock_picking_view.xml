@@ -314,6 +314,57 @@
             <field name="partner_id" position="after">
                 <field name="is_date_livraison"/>
             </field>
+
+
+            <filter name="my_transfers" position="before">
+
+                <filter 
+                    name="filter1"
+                    string="A livrer en retard" 
+                    domain="[('is_date_livraison', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d')),('state','not in',['cancel','done'])]"
+                />
+                <filter 
+                    name="filter2"
+                    string="A livrer ce jour" 
+                    domain="[('is_date_livraison', '=', datetime.datetime.now().strftime('%Y-%m-%d')),('state','not in',['cancel','done'])]"
+                />
+                <filter 
+                    name="filter2"
+                    string="A livrer demain" 
+                    domain="[('is_date_livraison', '=',(context_today()+datetime.timedelta(days=1)).strftime('%Y-%m-%d')),('state','not in',['cancel','done'])]"
+                />
+                <separator/>
+
+
+                <filter 
+                    name="filter_reception1"
+                    string="A réceptionner en retard" 
+                    domain="[('is_date_reception', '&lt;', datetime.datetime.now().strftime('%Y-%m-%d')),('state','not in',['cancel','done'])]"
+                />
+                <filter 
+                    name="filter_reception2"
+                    string="A réceptionner ce jour" 
+                    domain="[
+                        ('is_date_reception', '&gt;', (context_today()+datetime.timedelta(days=-1)).strftime('%Y-%m-%d')),
+                        ('is_date_reception', '&lt;', (context_today()+datetime.timedelta(days=1)).strftime('%Y-%m-%d')),
+                        ('state','not in',['cancel','done'])]"
+                />
+                <filter 
+                    name="filter_reception3"
+                    string="A réceptionner demain" 
+                    domain="[
+                        ('is_date_reception', '&gt;', (context_today()+datetime.timedelta(days=0)).strftime('%Y-%m-%d')),
+                        ('is_date_reception', '&lt;', (context_today()+datetime.timedelta(days=2)).strftime('%Y-%m-%d')),
+                        ('state','not in',['cancel','done'])]"
+                />
+                <separator/>
+
+
+
+            </filter>
+
+
+
         </field>
     </record>
 </odoo>
