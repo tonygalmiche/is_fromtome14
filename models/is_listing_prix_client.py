@@ -11,7 +11,8 @@ class IsListingPrixClient(models.Model):
     _order = 'name desc'
 
     name         = fields.Char("Listing", readonly=True)
-    pricelist_id = fields.Many2one('product.pricelist', 'Liste de prix')
+    enseigne_id  = fields.Many2one('is.enseigne.commerciale', 'Enseigne', required=True, help="Enseigne commerciale")
+    pricelist_id = fields.Many2one('product.pricelist', 'Liste de prix' , required=True)
     partner_id   = fields.Many2one('res.partner', 'Partenaire')
     product_ids  = fields.Many2many('product.product', 'is_listing_prix_client_product_rel', 'doc_id', 'product_id', 'Articles')
 

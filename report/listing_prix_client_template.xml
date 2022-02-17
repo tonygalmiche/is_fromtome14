@@ -1,9 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-
     <template id="external_layout_standard">
         <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+           <div class="o_boxed_header">
+                <div class="row mb8">
+                    <div class="col-6">
+                        <img t-if="o.enseigne_id.name.image_1920" t-att-src="image_data_uri(o.enseigne_id.name.image_1920)" alt="Logo"/>
+                        
+                    </div>
+                    <div class="col-6 text-right mb4">
+                        <h4 class="mt0" t-field="res_company.report_header"/>
+                        <div name="res_company" class="mb4">
+                            <h5 style="font-weight:700 !important;" t-field="o.enseigne_id.name.name"/>
+                            <span t-field="res_company.street"/>
+                            <br/>
+                            <span t-field="res_company.zip"/>
+                            <![CDATA[
+                            &nbsp;
+                            ]]>
+                            <span t-field="res_company.city"/>
+                            <br/>
+                            <span t-field="res_company.country_id"/>
+                            <div t-if="res_company.is_gln">
+                                GLN:<span t-field="res_company.is_gln"/>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout"  t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
@@ -135,12 +160,12 @@
         <field name="page_height">297</field>
         <field name="page_width">210</field>
         <field name="orientation">Portrait</field>
-        <field name="margin_top">10</field>
+        <field name="margin_top">32</field>
         <field name="margin_bottom">10</field>
         <field name="margin_left">10</field>
         <field name="margin_right">10</field>
         <field name="header_line" eval="False"/>
-        <field name="header_spacing">10</field>
+        <field name="header_spacing">30</field>
         <field name="dpi">90</field>
     </record>
     <record id="listing_prix_client_action" model="ir.actions.report">

@@ -23,6 +23,7 @@
                 <sheet>
                     <group>
                         <field name="name"/>
+                        <field name="enseigne_id"/>
                         <field name="pricelist_id"/>
                         <field name="product_ids"/>
                      </group>
