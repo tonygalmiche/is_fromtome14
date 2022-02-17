@@ -121,7 +121,7 @@
                             </t>
                         </t>
                         </table> -->
-                        <div t-raw="o.get_html()"/>
+                        <div t-raw="o.get_html4()"/>
                     </div>
                 </t>
             </t>

@@ -13,9 +13,17 @@
         <field name="model">is.listing.prix.client</field>
         <field name="arch" type="xml">
             <form>
+                <header>
+                    <button
+                        name="ajouter_articles_action"
+                        type="object"
+                        string="Ajouter les articles de la liste de prix"
+                    />
+                </header>
                 <sheet>
                     <group>
                         <field name="name"/>
+                        <field name="pricelist_id"/>
                         <field name="product_ids"/>
                      </group>
                 </sheet>
