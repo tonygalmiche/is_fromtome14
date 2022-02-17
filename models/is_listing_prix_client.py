@@ -133,7 +133,7 @@ class IsListingPrixClient(models.Model):
                             html+='<td class="vignette" colspan="%s" style="border-width:%s">'%(colspan,border_width)
                         else:
                             html+='<td class="vignette">'
-                        html+='<div style="font-weight:bold;text-align:center;height:23mm">['+p.default_code+'] '+p.name+'</div>'
+                        html+='<div style="font-weight:bold;text-align:center;height:16mm">['+p.default_code+'] '+p.name+'</div>'
                         if img:
                             html+='<div style="text-align:center;height:30mm"><img src="'+img+'" alt="Logo" style="max-height:30mm;max-width:35mm"/></div>'
                         else:
