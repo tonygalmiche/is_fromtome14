@@ -98,7 +98,7 @@
                     </thead>
                     <tbody> 
                         <t t-foreach="o.move_ids_without_package" t-as="line"> 
-                            <t t-if="line.state not in ['cancel']">
+                            <!-- <t t-if="line.state not in ['cancel']"> -->
                                 <tr>
                                     <td class="text-left"><span t-field="line.product_id.default_code"/></td>
                                     <td class="text-left">
@@ -114,7 +114,7 @@
                                     <td class="text-left"  style="border-left:none"><span t-field="line.product_uom"/></td>
                                     <td class="text-right"><span t-field="line.is_poids_net_reel"/></td>
                                 </tr>
-                            </t>
+                            <!-- </t> -->
                         </t>
                     </tbody>
                     <thead>
