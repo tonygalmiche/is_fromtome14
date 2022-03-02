@@ -16,6 +16,11 @@
             <div name="journal_div" position="after">
                 <field name="is_export_compta_id" readonly="1"/>
             </div>
+            <label for="invoice_payment_term_id" position="replace"/>
+            <xpath expr="//field[@name='invoice_date_due']/.." position="replace">
+                <field name="invoice_payment_term_id"/>
+                <field name="invoice_date_due"/>
+            </xpath>
             <field name="payment_reference" position="before">
                 <field name="is_ref_int_cde"/>
                 <field name="is_ref_client"/>
@@ -46,6 +51,10 @@
             <field name="state" position="before">
                 <field name="is_export_compta_id" optional="show"/>
             </field>
+            <field name="invoice_date_due" position="before">
+                <field name="invoice_payment_term_id" optional="show"/>
+                <field name="invoice_date_due"        optional="show"/>
+            </field>
         </field>
     </record>
     <record id="is_view_in_invoice_tree" model="ir.ui.view">
@@ -58,6 +67,10 @@
             </field>
            <field name="state" position="before">
                 <field name="is_export_compta_id" optional="show"/>
+            </field>
+            <field name="invoice_date_due" position="before">
+                <field name="invoice_payment_term_id" optional="show"/>
+                <field name="invoice_date_due"        optional="show"/>
             </field>
         </field>
     </record>
