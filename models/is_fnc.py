@@ -3,7 +3,7 @@ from odoo import api, fields, models, _
 
 class IsFNC(models.Model):
     _name = 'is.fnc'
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'mail.activity.mixin', 'portal.mixin']
     _description = "Fiche de non-conformité Client / Fournisseur"
     _order = 'name desc'
 
