@@ -33,6 +33,19 @@ class PurchaseOrder(models.Model):
     is_fromtome_order_vsb = fields.Boolean(string='Créer commande dans Fromtome vsb', compute='_compute_is_fromtome_order_vsb')
 
 
+
+    def commande_fournisseur_entierement_facturee_action_server(self):
+        for obj in self:
+            obj.invoice_status = "invoiced"
+
+
+    def initialisation_etat_facturee_fournisseur_action_server(self):
+        for obj in self:
+            obj._get_invoiced()
+ 
+
+
+
     def commande_soldee_action_server(self):
         cr,uid,context,su = self.env.args
         for obj in self:
