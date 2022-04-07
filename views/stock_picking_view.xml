@@ -317,10 +317,7 @@
                 <field name="is_enseigne_id"/>
                 <field name="is_date_livraison"/>
             </field>
-
-
             <filter name="my_transfers" position="before">
-
                 <filter 
                     name="filter1"
                     string="A livrer en retard" 
@@ -332,24 +329,22 @@
                     domain="[('is_date_livraison', '=', datetime.datetime.now().strftime('%Y-%m-%d')),('state','not in',['cancel','done'])]"
                 />
                 <filter 
-                    name="filter2"
+                    name="filter3"
                     string="A livrer demain" 
                     domain="[('is_date_livraison', '=',(context_today()+datetime.timedelta(days=1)).strftime('%Y-%m-%d')),('state','not in',['cancel','done'])]"
                 />
-
-
                 <filter 
-                    name="filter3"
+                    name="filter4"
                     string="A livrer sous 7 jours" 
                     domain="[('is_date_livraison', '&lt;',(context_today()+datetime.timedelta(days=8)).strftime('%Y-%m-%d')),('state','not in',['cancel','done'])]"
                 />
-
-
                 <separator/>
-
-
-
-
+                <filter 
+                    name="filter5"
+                    string="Validé ce jour" 
+                    domain="[('date_done', '&gt;', (context_today()+datetime.timedelta(days=-1)).strftime('%Y-%m-%d')),('state','in',['done'])]"
+                />
+                <separator/>
                 <filter 
                     name="filter_reception1"
                     string="A réceptionner en retard" 
@@ -377,6 +372,10 @@
 
             </filter>
 
+
+            <filter name="expected_date" position="replace">
+                <filter string="Date du transfert" name="date_transfert" domain="[]" context="{'group_by': 'date_done'}"/>
+            </filter>
 
 
         </field>
