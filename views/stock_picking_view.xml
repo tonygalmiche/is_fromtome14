@@ -333,7 +333,18 @@
                     string="A livrer demain" 
                     domain="[('is_date_livraison', '=',(context_today()+datetime.timedelta(days=1)).strftime('%Y-%m-%d')),('state','not in',['cancel','done'])]"
                 />
+
+
+                <filter 
+                    name="filter3"
+                    string="A livrer sous 7 jours" 
+                    domain="[('is_date_livraison', '=',(context_today()+datetime.timedelta(days=7)).strftime('%Y-%m-%d')),('state','not in',['cancel','done'])]"
+                />
+
+
                 <separator/>
+
+
 
 
                 <filter 
