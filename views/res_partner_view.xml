@@ -57,7 +57,7 @@
         <field name="inherit_id" ref="base.view_partner_tree"/>
         <field name="arch" type="xml">
             <field name="display_name" position="after">
-                <field name="is_enseigne_id"/>
+                <field name="is_enseigne_id" optional="show"/>
             </field>
             <field name="user_id" position="after">
                 <field 
@@ -67,6 +67,10 @@
                     widget="badge" 
                     optional="show"
                 />
+            </field>
+           <field name="parent_id" position="after">
+                <field name="property_payment_term_id"          optional="hide"/>
+                <field name="property_supplier_payment_term_id" optional="hide"/>
             </field>
         </field>
     </record>

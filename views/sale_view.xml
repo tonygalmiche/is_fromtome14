@@ -29,6 +29,7 @@
             </xpath>
 
             <field name="partner_id" position="after">
+                <field name="is_enseigne_id"/>
                 <field name="is_type_doc"/>
             </field>
 
@@ -110,6 +111,9 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_enseigne_id" optional="show"/>
+            </field>
             <field name="date_order" position="after">
                 <field name="is_date_livraison" optional="show"/>
             </field>
@@ -137,26 +141,30 @@
             </field>
        </field>
     </record>
-
-
-
-
     <record id="is_view_sales_order_filter" model="ir.ui.view">
         <field name="name">is_view_sales_order_filter</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_sales_order_filter"/>
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
+                <field name="is_enseigne_id"/>
                 <field name="is_frequence_facturation"/>
             </field>
+            <filter name="order_month" position="after">
+                <filter string="Date livraison client"    name="group_by_is_date_livraison" domain="[]" context="{'group_by': 'is_date_livraison'}"/>
+            </filter>
         </field>
     </record>
-
-
-
-
-
-
+    <record id="is_sale_order_view_search_inherit_sale" model="ir.ui.view">
+        <field name="name">is_sale_order_view_search_inherit_sale</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_sale"/>
+        <field name="arch" type="xml">
+            <filter name="order_date" position="after">
+                <filter string="Date livraison client"    name="is_date_livraison"        date="is_date_livraison"/>
+            </filter>
+        </field>
+    </record>
     <record id="sale_order_view_search_inherit" model="ir.ui.view">
         <field name="name">sale.order.form.inherit</field>
         <field name="model">sale.order</field>
