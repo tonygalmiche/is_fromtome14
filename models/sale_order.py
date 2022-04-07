@@ -192,6 +192,16 @@ class SaleOrder(models.Model):
             obj.is_commande_soldee=solde
 
 
+    def commande_entierement_facturee_action_server(self):
+        for obj in self:
+            obj.invoice_status = "invoiced"
+
+
+    def initialisation_etat_facturee_action_server(self):
+        for obj in self:
+            for line in obj.order_line:
+                line._compute_invoice_status()
+ 
 
     def creer_commande_fournisseur_action(self):
         for obj in self:
