@@ -351,6 +351,7 @@ class Picking(models.Model):
     is_nb_colis       = fields.Float(string='Nb colis' , digits=(14,1)        , compute='_compute_poids_colis')
     is_date_livraison = fields.Date('Date livraison client', help="Date d'arrivée chez le client prévue sur la commande"    , related='sale_id.is_date_livraison')
     is_date_reception = fields.Datetime('Date réception'   , help="Date de réception chez Fromtome indiquée sur la commande", related='purchase_id.date_planned')
+    is_enseigne_id    = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
 
 
     def scan_picking_action(self):
