@@ -46,9 +46,9 @@
                         <strong>Date d'enlèvement:</strong>
                         <p t-field="o.is_date_enlevement" class="m-0" t-options='{"format": "d MMMM y"}'/>
                     </div>
-                   <div t-if="o.date_planned" class="col-3 bm-2">
+                   <div t-if="o.date_planned" class="col-3 bm-2" style="background-color:Silver;font-weight: bold;">
                         <strong>Date de livraison:</strong>
-                        <p t-field="o.date_planned" class="m-0"       t-options='{"format": "d MMMM y"}'/>
+                        <p t-field="o.date_planned" class="m-0" t-options='{"format": "d MMMM y"}' style="font-size:14pt"/>
                     </div>
                 </div>
                 <br />
@@ -58,11 +58,11 @@
                     <thead>
                         <tr>
                             <th name="th_description"><strong>Description</strong></th>
+                            <th class="text-right" style="background-color:Silver;font-weight: bold;">   <strong>Nb Colis</strong></th>
                             <th class="text-right">   <strong>Quantité</strong></th>
                             <th class="text-left">    <strong>Unité</strong></th>
-                            <th class="text-right">   <strong>Nb Colis</strong></th>
-                            <th class="text-right">   <strong>Poids</strong></th>
-                            <th class="text-right">   <strong>PU</strong></th>
+                            <!-- <th class="text-right">   <strong>Poids</strong></th> -->
+                            <th class="text-right">   <strong>PU HT</strong></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,18 +71,18 @@
                             <td class="text-left">
                                 <span t-field="line.name"/>
                             </td>
+                            <td class="text-right"  style="background-color:Silver;font-weight: bold;">
+                                <span t-field="line.is_nb_colis"/>
+                            </td>
                             <td class="text-right">
                                 <span t-field="line.product_qty"/>
                             </td>
                             <td class="text-left">
                                 <span t-field="line.product_uom.name"/>
                             </td>
-                            <td class="text-right">
-                                <span t-field="line.is_nb_colis"/>
-                            </td>
-                            <td class="text-right">
+                            <!-- <td class="text-right">
                                 <span t-field="line.is_poids_net"/>
-                            </td>
+                            </td> -->
                             <td class="text-right">
                                 <span 
                                     t-field="line.price_unit"
