@@ -156,7 +156,7 @@ class SaleOrder(models.Model):
     is_enseigne_id           = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
     is_date_livraison        = fields.Date('Date livraison client', help="Date d'arrivée chez le client")
     is_commande_soldee       = fields.Boolean(string='Commande soldée', default=False, copy=False, help="Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
-    is_frequence_facturation = fields.Selection(string='Fréquence facturation', related="partner_id.is_frequence_facturation", selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')])
+    is_frequence_facturation = fields.Selection(string='Fréquence facturation', related="partner_id.is_frequence_facturation") #, selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')])
     is_type_doc              = fields.Selection([('cc', 'CC'), ('offre', 'Offre')], string='Type document', default="cc")
 
 

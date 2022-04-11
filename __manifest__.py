@@ -25,12 +25,8 @@ InfoSaône - Module Odoo 14 pour Fromtome
         'account_payment_purchase',
         'account_payment_sale',
         'account_banking_fr_lcr',
-#        'account_banking_mandate',
-#        'account_banking_pain_base',
         'account_banking_sepa_credit_transfer',
         'account_banking_sepa_direct_debit',
-#        'account_bank_statement_import',
-#        'account_cancel',
         'l10n_fr_department',
         'l10n_fr_fec',
         'l10n_fr_intrastat_product',
@@ -39,16 +35,9 @@ InfoSaône - Module Odoo 14 pour Fromtome
         'list_export_excel_app',
     ],
     'data' : [
-#        'security/res.groups.xml',
         'security/ir.model.access.csv',
-#        'security/ir.model.access.xml',
         'views/assets.xml',
-
-
-#        'views/intrastat_product.xml',
-#        'views/invoice_view.xml',
         'views/account_move_view.xml',
-
         'views/mail_activity_views.xml',
         'views/mail_views.xml',
         'views/product_view.xml',
@@ -62,7 +51,6 @@ InfoSaône - Module Odoo 14 pour Fromtome
         'views/stock_inventory_view.xml',
         'views/stock_move_view.xml',
         'views/stock_picking_view.xml',
-        'views/stock_production_lot_view.xml',
         'views/stock_quant_view.xml',
         'views/product_supplierinfo_view.xml',
         'views/is_account_invoice_line.xml',
@@ -75,16 +63,10 @@ InfoSaône - Module Odoo 14 pour Fromtome
         'views/is_stock_move_line_view.xml',
         'views/is_stock_production_lot_contrat_view.xml',
         'views/report_invoice.xml',
-
-#        'report/invoice_template.xml',
         'report/delivery_template.xml',
-#        'wizard/mail_compose_message_view.xml',
-
         'report/fiche_prepa_template.xml',
         'report/sale_template.xml',
-        #'report/purchase_document.xml',
         'report/purchase_order_templates.xml',
-        # 'report/sale_invoice_template.xml',
         'report/external_layout_boxed.xml',
         'report/offre_report_template.xml',
         'report/fiche_palette.xml',
@@ -93,8 +75,6 @@ InfoSaône - Module Odoo 14 pour Fromtome
         'report/report_account_payment_order.xml',
         'data/stock_picking_mail.xml',
     ],
-
-
     'installable': True,
     'application': True,
 }

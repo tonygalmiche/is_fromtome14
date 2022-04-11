@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
  
-    <!-- Archiver les lots à 0  -->
+    <!-- stock.production.lot  -->
     <record id="archiver_lot_action_server" model="ir.actions.server">
         <field name="name">Archiver les lots à 0</field>
         <field name="model_id" ref="stock.model_stock_production_lot"/>
@@ -9,9 +9,6 @@
         <field name="state">code</field>
         <field name="code">action = records.archiver_lot_action_server()</field>
     </record>
-
-
-    <!-- stock.production.lot -->
     <record id="is_stock_production_lot_form_view" model="ir.ui.view">
         <field name="name">is_stock_production_lot_form_view</field>
         <field name="model">stock.production.lot</field>
@@ -31,8 +28,6 @@
             </notebook>
         </field>
     </record>
-
-
     <record id="is_stock_production_lot_tree_view" model="ir.ui.view">
         <field name="name">is_stock_production_lot_tree_view</field>
         <field name="model">stock.production.lot</field>
@@ -97,4 +92,21 @@
         sequence="900"
         action="is_stock_production_lot_action"
     />
+
+
+    <!-- stock.scrap  -->
+    <record id="is_stock_scrap_tree_view" model="ir.ui.view">
+        <field name="name">is_stock_scrap_tree_view</field>
+        <field name="model">stock.scrap</field>
+        <field name="inherit_id" ref="stock.stock_scrap_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="state" position="before">
+                <field name="is_dernier_prix_achat" optional="show"/>
+                <field name="is_montant_rebut"      optional="show" sum="Total"/>
+                <field name="lot_id"                optional="show"/>
+                <field name="origin"                optional="show"/>
+            </field>
+        </field>
+    </record>
+
 </odoo>

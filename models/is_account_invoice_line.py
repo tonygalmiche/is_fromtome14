@@ -10,13 +10,12 @@ class is_account_invoice_line(models.Model):
     _auto = False
 
     company_id              = fields.Many2one('res.company', 'Société')
-    line_id                 = fields.Many2one('account.invoice.line', 'Ligne de facture')
+    line_id                 = fields.Many2one('account.move.line', 'Ligne de facture')
     invoice_id              = fields.Many2one('account.move', 'Facture')
     number                  = fields.Char("N°Facture")
     date_invoice            = fields.Date("Date facture")
     partner_id              = fields.Many2one('res.partner', 'Partenaire')
     enseigne_id             = fields.Many2one('is.enseigne.commerciale', 'Enseigne')
-    line_id                 = fields.Many2one('account.invoice.line', 'Ligne')
     product_id              = fields.Many2one('product.product', 'Article')
     description             = fields.Char('Description')
     quantity                = fields.Float('Quantité'              , digits=(14,4))
