@@ -17,6 +17,7 @@ from . import stock_production_lot
 from . import stock_quant
 from . import supplier_discount
 from . import is_account_invoice_line
+from . import is_analyse_facturation
 from . import is_commande_fromtome
 from . import is_export_compta
 from . import is_fnc

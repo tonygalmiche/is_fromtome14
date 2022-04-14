@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <record id="is_analyse_facturation_update_form" model="ir.ui.view">
+        <field name="name">is_analyse_facturation_update_form</field>
+        <field name="model">is.analyse.facturation.update</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="date_debut"/>
+                        <field name="date_fin"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="OK" name="action_ok" type="object" class="oe_highlight"/>
+                    <button string="Annuler" class="btn btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record  id="is_analyse_facturation_update_action" model="ir.actions.act_window">
+        <field name="name">Mise à jour analyse facturation</field>
+        <field name="res_model">is.analyse.facturation.update</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_analyse_facturation_update_menu"
+        name="Mise à jour analyse facturation"
+        parent="account.menu_finance_reports"
+        sequence="910"
+        action="is_analyse_facturation_update_action"
+    />
+
+
+    <!-- is.analyse.facturation -->
+    <record id="is_analyse_facturation_form" model="ir.ui.view">
+        <field name="name">is.analyse.facturation.form</field>
+        <field name="model">is.analyse.facturation</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="invoice_date"/>
+                            <field name="move_type"/>
+                            <field name="partner_id"/>
+                            <field name="user_id"/>
+                            <field name="enseigne_id"/>
+                            <field name="product_id"/>
+                            <field name="quantity"/>
+                            <field name="nb_colis"/>
+                            <field name="poids_net"/>
+                            <field name="price_unit"/>
+                            <field name="price_subtotal"/>
+                        </group>
+                        <group>
+                            <field name="invoice_id"/>
+                            <field name="scrap_id"/>
+                         </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_analyse_facturation_tree" model="ir.ui.view">
+        <field name="name">is.analyse.facturation.tree</field>
+        <field name="model">is.analyse.facturation</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="price_subtotal &lt; 0">
+                <field name="invoice_date"/>
+                <field name="move_type"/>
+                <field name="partner_id"/>
+                <field name="enseigne_id"/>
+                <field name="user_id"        optional="show"/>
+                <field name="product_id"     optional="hide"/>
+                <field name="libelle"        optional="show"/>
+                <field name="quantity"       optional="show" sum="Total"/>
+                <field name="product_uom_id" optional="show"/>
+                <field name="nb_colis"       optional="show" sum="Total"/>
+                <field name="poids_net"      optional="show" sum="Total"/>
+                <field name="price_unit"     optional="show"/>
+                <field name="price_subtotal" sum="Total"/>
+                <field name="invoice_id" optional="hide"/>
+                <field name="scrap_id"   optional="hide"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_analyse_facturation_search" model="ir.ui.view">
+        <field name="name">is.analyse.facturation.search</field>
+        <field name="model">is.analyse.facturation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="move_type"/>
+                <field name="partner_id"/>
+                <field name="enseigne_id"/>
+                <field name="product_id"/>
+                <field name="user_id"/>
+                <field name="invoice_id"/>
+                <field name="scrap_id"/>
+           </search>
+        </field>
+    </record>
+
+    <record id="is_analyse_facturation_pivot" model="ir.ui.view">
+        <field name="name">is_analyse_facturation_pivot</field>
+        <field name="model">is.analyse.facturation</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="invoice_date"   type="row" interval="week"/>
+                <field name="move_type"      type="col"/>
+                <field name="price_subtotal" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="is_analyse_facturation_graph" model="ir.ui.view">
+        <field name="name">is_analyse_facturation_graph</field>
+        <field name="model">is.analyse.facturation</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="False">
+                <field name="invoice_date"   type="row" interval="week"/>
+                <field name="price_subtotal" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record  id="is_analyse_facturation_action" model="ir.actions.act_window">
+        <field name="name">Analyse facturation</field>
+        <field name="res_model">is.analyse.facturation</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_analyse_facturation_menu"
+        name="Analyse facturation"
+        parent="account.menu_finance_reports"
+        sequence="900"
+        action="is_analyse_facturation_action"
+    />
+
+</odoo>
