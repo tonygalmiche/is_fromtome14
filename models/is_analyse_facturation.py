@@ -3,6 +3,15 @@ from odoo import api, fields, models, _
 from datetime import datetime, timedelta, date
 
 
+_MOVE_TYPE={
+    'out_invoice': 'Facture client',
+    'out_refund' : 'Avoir client',
+    'in_invoice' : 'Facture fournisseur',
+    'in_refund'  : 'Avoir fournisseur',
+    'rebut'      : 'Rebut',
+}
+
+
 class IsAnalyseFacturationUpdate(models.TransientModel):
     _name = 'is.analyse.facturation.update'
     _description = "Mise à jour analyse de facturation"
@@ -42,7 +51,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                         "poids_net"     : line.is_poids_net,
                         "price_unit"    : line.price_unit,
                         "price_subtotal": line.price_subtotal*sens,
-                        "move_type"     : invoice.move_type,
+                        "move_type"     : _MOVE_TYPE[invoice.move_type],
                     }
                     self.env['is.analyse.facturation'].create(vals)
 
@@ -75,7 +84,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                 "quantity"      : scrap.scrap_qty,
                 "price_unit"    : price_unit,
                 "price_subtotal": price_subtotal,
-                "move_type"     : "rebut",
+                "move_type"     : "Rebut",
             }
             self.env['is.analyse.facturation'].create(vals)
 
@@ -109,10 +118,10 @@ class IsAnalyseFacturation(models.Model):
     price_unit        = fields.Float("Prix"    , digits='Product Price')
     price_subtotal    = fields.Float("Montant HT")
     move_type         = fields.Selection([
-            ('out_invoice', 'Facture client'),
-            ('out_refund' , 'Avoir client'),
-            ('in_invoice' , 'Facture fournisseur'),
-            ('in_refund'  , 'Avoir fournisseur'),
-            ('rebut'      , 'Rebut'),
+            ('Facture client'     , 'Facture client'),
+            ('Avoir client'       , 'Avoir client'),
+            ('Facture fournisseur', 'Facture fournisseur'),
+            ('Avoir fournisseur'  , 'Avoir fournisseur'),
+            ('Rebut'              , 'Rebut'),
         ], 'Type')
 
