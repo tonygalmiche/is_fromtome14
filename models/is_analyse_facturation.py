@@ -42,7 +42,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                         "invoice_date"  : invoice.invoice_date,
                         "partner_id"    : invoice.partner_id.id,
                         "user_id"       : invoice.partner_id.user_id.id,
-                        "enseigne_id"   : invoice.partner_id.is_enseigne_id.id,
+                        "enseigne"      : invoice.partner_id.is_enseigne_id.name.name,
                         "product_id"    : line.product_id.id,
                         "product_uom_id": line.product_uom_id.id,
                         "libelle"       : line.name,
@@ -66,7 +66,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
             partner_id=enseigne_id=user_id=False
             for purchase in scrap.lot_id.purchase_order_ids:
                 partner_id  = purchase.partner_id.id
-                enseigne_id = purchase.partner_id.is_enseigne_id.id
+                enseigne    = purchase.partner_id.is_enseigne_id.name.name
                 user_id     = purchase.partner_id.user_id.id
                 for line in purchase.order_line:
                     if line.product_id == scrap.product_id:
@@ -77,7 +77,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                 "invoice_date"  : scrap.date_done,
                 "partner_id"    : partner_id,
                 "user_id"       : user_id,
-                "enseigne_id"   : enseigne_id,
+                "enseigne"      : enseigne,
                 "product_id"    : scrap.product_id.id,
                 "product_uom_id": scrap.product_id.uom_id.id,
                 "libelle"       : scrap.name+" / "+(scrap.origin or ''),
@@ -108,7 +108,8 @@ class IsAnalyseFacturation(models.Model):
     scrap_id          = fields.Many2one('stock.scrap', 'Rebut')
     partner_id        = fields.Many2one('res.partner', 'Partenaire')
     user_id           = fields.Many2one('res.users', 'Vendeur')
-    enseigne_id       = fields.Many2one('is.enseigne.commerciale', 'Enseigne')
+    #enseigne_id       = fields.Many2one('is.enseigne.commerciale', 'Enseigne')
+    enseigne          = fields.Char('Enseigne')
     product_id        = fields.Many2one('product.product', 'Article')
     product_uom_id    = fields.Many2one('uom.uom', 'Unité')
     libelle           = fields.Text('Libellé')

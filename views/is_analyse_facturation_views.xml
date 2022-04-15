@@ -50,7 +50,7 @@
                             <field name="move_type"/>
                             <field name="partner_id"/>
                             <field name="user_id"/>
-                            <field name="enseigne_id"/>
+                            <field name="enseigne"/>
                             <field name="product_id"/>
                             <field name="quantity"/>
                             <field name="nb_colis"/>
@@ -75,7 +75,7 @@
                 <field name="invoice_date"/>
                 <field name="move_type"/>
                 <field name="partner_id"/>
-                <field name="enseigne_id"/>
+                <field name="enseigne"/>
                 <field name="user_id"        optional="show"/>
                 <field name="product_id"     optional="hide"/>
                 <field name="libelle"        optional="show"/>
@@ -97,7 +97,7 @@
             <search>
                 <field name="move_type"/>
                 <field name="partner_id"/>
-                <field name="enseigne_id"/>
+                <field name="enseigne"/>
                 <field name="product_id"/>
                 <field name="user_id"/>
                 <field name="invoice_id"/>
