@@ -166,8 +166,17 @@
                         <field name="product_uom_qty"/>
                         <field name="qty_done"/>
                         <field name="status_move"/>
+
+                        <field name="prix_achat"/>
+                        <field name="prix_vente"/>
+                        <field name="montant_achat"/>
+                        <field name="montant_vente"/>
+                        <field name="marge"/>
+                        <field name="status_move"/>
                         <field name="state"/>
                         <field name="alerte"/>
+
+
                     </group>
                 </sheet>
             </form>
