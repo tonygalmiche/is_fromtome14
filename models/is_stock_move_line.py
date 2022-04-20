@@ -255,7 +255,7 @@ class is_stock_move_line_valorise(models.Model):
 
 
     @api.depends('prix_achat','prix_vente','marge')
-    def _compute_alerte(self):
+    def _compute(self):
         for obj in self:
             alerte=[]
             if not obj.prix_achat:
@@ -269,6 +269,7 @@ class is_stock_move_line_valorise(models.Model):
             else:
                 alerte="\n".join(alerte)
             obj.alerte=alerte
+            obj.enseigne=obj.partner_id.is_enseigne_id.name.name
 
 
     company_id      = fields.Many2one('res.company', 'Société')
@@ -276,7 +277,8 @@ class is_stock_move_line_valorise(models.Model):
     date_done       = fields.Date('Date livraison')
     picking_type_id = fields.Many2one('stock.picking.type', 'Type')
     partner_id      = fields.Many2one('res.partner', 'Partenaire')
-    is_enseigne_id  = fields.Many2one('is.enseigne.commerciale', 'Enseigne', help="Enseigne commerciale")
+    #is_enseigne_id  = fields.Many2one('is.enseigne.commerciale', 'Enseigne', help="Enseigne commerciale")
+    enseigne        = fields.Char('Enseigne', compute='_compute', readonly=True, store=True, help="Enseigne commerciale")
     product_id      = fields.Many2one('product.product', "Article")
     product_tmpl_id = fields.Many2one('product.template', "Modèle d'article")
     move_id         = fields.Many2one('stock.move', 'Mouvement de stock')
@@ -300,7 +302,7 @@ class is_stock_move_line_valorise(models.Model):
     montant_achat   = fields.Float(string='Montant achat', digits=(14,2))
     montant_vente   = fields.Float(string='Montant vente', digits=(14,2))
     marge           = fields.Float(string='Marge', digits=(14,2))
-    alerte          = fields.Text(string='Alerte', compute='_compute_alerte', readonly=True, store=True)
+    alerte          = fields.Text(string='Alerte', compute='_compute', readonly=True, store=True)
 
 
 
