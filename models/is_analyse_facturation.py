@@ -33,7 +33,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
         invoices = self.env['account.move'].search(filtre)
         for invoice in invoices:
             for line in invoice.invoice_line_ids:
-                 if line.price_subtotal>0.0:
+                if line.price_subtotal>0.0:
                     sens=1
                     if invoice.move_type in ["out_refund","in_invoice"]:
                         sens=-1
@@ -47,8 +47,8 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                         "product_uom_id": line.product_uom_id.id,
                         "libelle"       : line.name,
                         "quantity"      : line.quantity,
-                        "nb_colis"      : line.is_nb_colis,
-                        "poids_net"     : line.is_poids_net,
+                        "nb_colis"      : line.is_nb_colis or 0,
+                        "poids_net"     : line.is_poids_net or 0,
                         "price_unit"    : line.price_unit,
                         "price_subtotal": line.price_subtotal*sens,
                         "move_type"     : _MOVE_TYPE[invoice.move_type],
@@ -72,6 +72,13 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                     if line.product_id == scrap.product_id:
                         price_unit=line.price_unit
             price_subtotal = -price_unit * scrap.scrap_qty
+
+            nb_colis = 0
+            poids_net = 0
+            if scrap.product_id.is_nb_pieces_par_colis>0:
+                nb_colis = scrap.scrap_qty / scrap.product_id.is_nb_pieces_par_colis
+                poids_net = nb_colis * scrap.product_id.is_poids_net_colis
+
             vals={
                 "scrap_id"      : scrap.id,
                 "invoice_date"  : scrap.date_done,
@@ -82,6 +89,8 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                 "product_uom_id": scrap.product_id.uom_id.id,
                 "libelle"       : scrap.name+" / "+(scrap.origin or ''),
                 "quantity"      : scrap.scrap_qty,
+                "nb_colis"      : nb_colis,
+                "poids_net"     : poids_net,
                 "price_unit"    : price_unit,
                 "price_subtotal": price_subtotal,
                 "move_type"     : "Rebut",
