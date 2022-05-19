@@ -69,6 +69,8 @@
                 />
             </field>
            <field name="parent_id" position="after">
+                <field name="is_gln"                            optional="hide"/>
+                <field name="is_code_fromtome"                  optional="hide"/>
                 <field name="property_payment_term_id"          optional="hide"/>
                 <field name="property_supplier_payment_term_id" optional="hide"/>
             </field>
@@ -81,6 +83,7 @@
         <field name="arch" type="xml">
             <field name="vat" position="after">
                 <field name="is_gln"/>
+                <field name="is_code_fromtome"/>
             </field>
             <xpath expr="//page[@name='sales_purchases']/group/group/field[@name='user_id']" position="before">
                 <field name="is_customer"/>

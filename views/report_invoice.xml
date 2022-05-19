@@ -3,14 +3,18 @@
     <template id="is_report_invoice_document" inherit_id="account.report_invoice_document">
 
         <t t-set="address" position="replace">
-            <t t-set="address">
+            <!-- <t t-set="address">
                 <address t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}' />
                 <div t-if="o.partner_id.vat" class="mt16">
                     <t t-if="o.company_id.country_id.vat_label" t-esc="o.company_id.country_id.vat_label" id="inv_tax_id_label"/>
                     <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/></div>
                 <div t-if="o.partner_id.is_gln">GLN:<span t-field="o.partner_id.is_gln"/></div>
-            </t>
+            </t> -->
         </t>
+
+
+
+
 
 
         <div class="page" position="replace">
@@ -26,6 +30,52 @@
 
 
             <div class="page">
+
+
+
+
+                <table style="border:none;width:100%">
+                    <tr>
+                        <th style="border:none;width:95mm">
+                            <div style="text-decoration: underline">Adresse de livraison:</div>
+                            <div><b><span t-field="o.partner_shipping_id.name"/></b></div>
+                            <div t-field="o.partner_shipping_id.street"/>
+                            <div t-if="o.partner_shipping_id.street2"><span t-field="o.partner_shipping_id.street2"/></div>
+                            <div><span t-field="o.partner_shipping_id.zip"/> <span t-field="o.partner_shipping_id.city"/></div>
+                            <div t-if="o.partner_shipping_id.country_id"><span t-field="o.partner_shipping_id.country_id.name"/></div>
+                            <div t-if="o.partner_shipping_id.phone">N°tel:<span t-field="o.partner_shipping_id.phone"/></div>
+
+
+                        </th>
+                        <th style="border:none">
+                            <div style="text-decoration: underline">Adresse de facturation:</div>
+                            <div><b><span t-field="o.partner_id.name"/></b></div>
+                            <div t-field="o.partner_id.street"/>
+                            <div t-if="o.partner_id.street2"><span t-field="o.partner_id.street2"/></div>
+                            <div><span t-field="o.partner_id.zip"/> <span t-field="o.partner_id.city"/></div>
+                            <div t-if="o.partner_id.country_id"><span t-field="o.partner_id.country_id.name"/></div>
+                            <div t-if="o.partner_id.phone">N°tel:<span t-field="o.partner_id.phone"/></div>
+
+                            <div t-if="o.partner_id.vat">
+                                <t t-if="o.company_id.country_id.vat_label" t-esc="o.company_id.country_id.vat_label" id="inv_tax_id_label"/>
+                                <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/></div>
+                            <div t-if="o.partner_id.is_gln">GLN:<span t-field="o.partner_id.is_gln"/></div>
+                            <div t-if="o.partner_id.is_code_fromtome">Code Fournisseur:<span t-field="o.partner_id.is_code_fromtome"/></div>
+                         </th>
+                    </tr>
+                </table>
+                <br />
+
+
+
+
+
+
+
+
+
+
+
                 <h2>
                     <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">Facture</span>
                     <span t-if="o.move_type == 'out_invoice' and o.state == 'draft'">Facture brouillon</span>
