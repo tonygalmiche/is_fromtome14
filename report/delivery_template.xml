@@ -28,7 +28,7 @@
                             <div t-if="o.partner_id.street2"><span t-field="o.partner_id.street2"/></div>
                             <div><span t-field="o.partner_id.zip"/> <span t-field="o.partner_id.city"/></div>
                             <div t-if="o.partner_id.country_id"><span t-field="o.partner_id.country_id.name"/></div>
-                            <div t-if="o.partner_id.phone">N°tel:<span t-field="o.partner_id.phone"/></div>
+                            <!-- <div t-if="o.partner_id.phone">N°tel:<span t-field="o.partner_id.phone"/></div> -->
                         </th>
                         <th style="border:none" t-if="o.sale_id">
                             <div style="text-decoration: underline">Adresse de facturation:</div>
@@ -37,7 +37,7 @@
                             <div t-if="o.sale_id.partner_invoice_id.street2"><span t-field="o.sale_id.partner_invoice_id.street2"/></div>
                             <div><span t-field="o.sale_id.partner_invoice_id.zip"/> <span t-field="o.sale_id.partner_invoice_id.city"/></div>
                             <div t-if="o.sale_id.partner_invoice_id.country_id"><span t-field="o.sale_id.partner_invoice_id.country_id.name"/></div>
-                            <div t-if="o.sale_id.partner_invoice_id.phone">N°tel:<span t-field="o.sale_id.partner_invoice_id.phone"/></div>
+                            <!-- <div t-if="o.sale_id.partner_invoice_id.phone">N°tel:<span t-field="o.sale_id.partner_invoice_id.phone"/></div> -->
                         </th>
                     </tr>
                 </table>
