@@ -25,15 +25,7 @@
                     font-size:10pt;
                 }
             </style>
-
-
-
-
             <div class="page">
-
-
-
-
                 <table style="border:none;width:100%">
                     <tr>
                         <th style="border:none;width:95mm">
@@ -44,8 +36,7 @@
                             <div><span t-field="o.partner_shipping_id.zip"/> <span t-field="o.partner_shipping_id.city"/></div>
                             <div t-if="o.partner_shipping_id.country_id"><span t-field="o.partner_shipping_id.country_id.name"/></div>
                             <div t-if="o.partner_shipping_id.phone">N°tel:<span t-field="o.partner_shipping_id.phone"/></div>
-
-
+                            <div t-if="o.partner_shipping_id.is_gln">GLN:<span t-field="o.partner_shipping_id.is_gln"/></div>
                         </th>
                         <th style="border:none">
                             <div style="text-decoration: underline">Adresse de facturation:</div>
@@ -55,7 +46,6 @@
                             <div><span t-field="o.partner_id.zip"/> <span t-field="o.partner_id.city"/></div>
                             <div t-if="o.partner_id.country_id"><span t-field="o.partner_id.country_id.name"/></div>
                             <div t-if="o.partner_id.phone">N°tel:<span t-field="o.partner_id.phone"/></div>
-
                             <div t-if="o.partner_id.vat">
                                 <t t-if="o.company_id.country_id.vat_label" t-esc="o.company_id.country_id.vat_label" id="inv_tax_id_label"/>
                                 <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/></div>
@@ -65,17 +55,6 @@
                     </tr>
                 </table>
                 <br />
-
-
-
-
-
-
-
-
-
-
-
                 <h2>
                     <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">Facture</span>
                     <span t-if="o.move_type == 'out_invoice' and o.state == 'draft'">Facture brouillon</span>
