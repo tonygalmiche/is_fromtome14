@@ -23,6 +23,8 @@ class ResPartner(models.Model):
     is_gln                      = fields.Char('GLN Client')
     is_iln                      = fields.Char('ILN Client')
     is_code_fromtome            = fields.Char('Code Fournisseur', help="Code Fromtome chez le client")
+    is_code_interne             = fields.Char('Code Interne'    , help="Code interne utilisé en particulier pour Le Cellier")
+    is_code_tarif               = fields.Char('Code Tarif'      , help="Code utilisé par Le Cellier pour la gestion des tarifs")
     is_enseigne_id              = fields.Many2one('is.enseigne.commerciale', 'Enseigne', help="Enseigne commerciale")
     is_customer                 = fields.Boolean("Est un Client")
     is_supplier                 = fields.Boolean("Est un Fournisseur")

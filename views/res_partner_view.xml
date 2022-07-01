@@ -71,6 +71,8 @@
            <field name="parent_id" position="after">
                 <field name="is_gln"                            optional="hide"/>
                 <field name="is_code_fromtome"                  optional="hide"/>
+                <field name="is_code_interne"                   optional="hide"/>
+                <field name="is_code_tarif"                     optional="hide"/>
                 <field name="property_payment_term_id"          optional="hide"/>
                 <field name="property_supplier_payment_term_id" optional="hide"/>
             </field>
@@ -81,9 +83,20 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//sheet[1]" position="inside">
+                <style>
+                    .o_form_view .o_form_sheet_bg > .o_form_sheet{
+                        max-width: 1800px;
+                    }
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
+            </xpath>
             <field name="vat" position="after">
                 <field name="is_gln"/>
                 <field name="is_code_fromtome"/>
+                <field name="is_code_interne"/>
             </field>
             <xpath expr="//page[@name='sales_purchases']/group/group/field[@name='user_id']" position="before">
                 <field name="is_customer"/>
@@ -101,13 +114,21 @@
                             <field name="date_start"/>
                             <field name="date_end"/>
                             <field name="prix_brut"/>
-                            <!-- <field name="x_r1"/>
-                            <field name="x_r2"/> -->
                             <field name="price"/>
                         </tree>
                     </field>
                 </group>
             </xpath>
+        </field>
+    </record>
+    <record id="is_product_view_partner_property_form" model="ir.ui.view" >
+        <field name="name">is_product_view_partner_property_form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="product.view_partner_property_form"/>
+        <field name="arch" type="xml">
+            <field name="property_product_pricelist" position="before">
+                <field name="is_code_tarif"/>
+            </field>
         </field>
     </record>
     <record model="ir.ui.view" id="l10n_fr_siret.res_partner_form_l10n_fr">
@@ -119,9 +140,7 @@
                 <field name="siren" attrs="{'invisible': [('is_company', '=', False)]}" />
                 <field name="nic" attrs="{'invisible': [('is_company', '=', False)]}" />
                 <field name="company_registry" attrs="{'invisible': [('is_company', '=', False)]}"/>
-                <!-- <field name="mode_facturation"/> -->
             </field>
-
         </field>
     </record>
     <record id="is_view_partner_property_form" model="ir.ui.view" >
