@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- is.import.le.cellier -->
+    <record id="is_import_le_cellier_form" model="ir.ui.view">
+        <field name="name">is.import.le.cellier.form</field>
+        <field name="model">is.import.le.cellier</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="importation_excel_action"
+                        type="object"
+                        string="Importer le fichier Excel"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="file_ids" widget="many2many_binary"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_import_le_cellier_tree" model="ir.ui.view">
+        <field name="name">is.import.le.cellier.tree</field>
+        <field name="model">is.import.le.cellier</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_import_le_cellier_search" model="ir.ui.view">
+        <field name="name">is.import.le.cellier.search</field>
+        <field name="model">is.import.le.cellier</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_import_le_cellier_action" model="ir.actions.act_window">
+        <field name="name">Import Le Cellier</field>
+        <field name="res_model">is.import.le.cellier</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_import_le_cellier_menu"
+        name="Import Le Cellier"
+        parent="base.menu_custom"
+        sequence="999"
+        action="is_import_le_cellier_action"
+
+    />
+
+
+</odoo>
