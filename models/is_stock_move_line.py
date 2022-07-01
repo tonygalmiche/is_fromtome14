@@ -46,7 +46,7 @@ class is_stock_move_line(models.Model):
     product_uom_id  = fields.Many2one('uom.uom', 'Unité')
     product_uom_qty = fields.Float('Réservé', digits="Product Unit of Measure")
     qty_done        = fields.Float('Fait'   , digits="Product Unit of Measure")
-    is_nb_pieces_par_colis = fields.Integer(string='PCB', related="product_id.is_nb_pieces_par_colis")
+    is_nb_pieces_par_colis = fields.Integer(string='PCB') #, related="product_id.is_nb_pieces_par_colis")
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2))
     is_poids_net_estime    = fields.Float(string='Poids net estimé', digits='Stock Weight', compute='_compute_is_poids_net_estime', readonly=True, store=True, help="Poids net total (Kg)")
     is_poids_net_reel      = fields.Float(string='Poids net réel'  , digits='Stock Weight', help="Poids net réel total (Kg)")
@@ -55,6 +55,13 @@ class is_stock_move_line(models.Model):
     create_date     = fields.Datetime('Date de création')
     write_date      = fields.Datetime('Date de modification')
     state           = fields.Selection(string='Etat picking', selection=_STATE_PICKING)
+
+
+# psycopg2.errors.UndefinedColumn: ERREUR:  la colonne l.is_nb_pieces_par_colis n'existe pas
+# LIGNE 38 :                     l.is_nb_pieces_par_colis,
+#                                ^
+# ASTUCE : Peut-être que vous souhaitiez référencer la colonne « pt.is_nb_pieces_par_colis ».
+
 
 
     def init(self):
@@ -97,7 +104,7 @@ class is_stock_move_line(models.Model):
                     l.status_move,
                     l.create_date,
                     l.write_date,
-                    l.is_nb_pieces_par_colis,
+                    pt.is_nb_pieces_par_colis,
                     l.is_nb_colis,
                     l.is_poids_net_estime,
                     l.is_poids_net_reel,
