@@ -20,6 +20,18 @@ class AccountMoveLine(models.Model):
                 for line in obj.sale_line_ids.move_ids.move_line_ids:
                     poids_net+=line.is_poids_net_reel
                     nb_colis+=line.is_nb_colis
+
+            # Ajout du 06/07/22 pour Le Cellier
+            if nb_colis==0:
+                if obj.purchase_line_id.move_ids:
+                    for line in obj.purchase_line_id.move_ids:
+                        nb_colis+=line.is_nb_colis
+                if obj.sale_line_ids.move_ids:
+                    for line in obj.sale_line_ids.move_ids:
+                        nb_colis+=line.is_nb_colis
+                poids_net = nb_colis* obj.product_id.is_poids_net_colis
+
+
             obj.is_poids_net = poids_net
             obj.is_nb_colis = nb_colis
 
@@ -31,7 +43,6 @@ class AccountMoveLine(models.Model):
             for line in obj.sale_line_ids:
                 for move in line.move_ids:
                     lots.append(move.is_lots)
-            print(lots)
             obj.is_lots= (lots and "\r".join(lots)) or False
 
 

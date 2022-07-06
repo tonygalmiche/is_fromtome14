@@ -67,12 +67,13 @@ class StockMove(models.Model):
         for obj in self:
             lots={}
             for line in obj.move_line_ids:
-                cle="%s-%s-%s"%(obj.product_id.id,line.lot_id.name,line.is_dlc_ddm)
-                if cle not in lots:
-                    dlc = (line.is_dlc_ddm and line.is_dlc_ddm.strftime('%d/%m/%Y')) or ''
-                    lots[cle]=[(line.lot_id.name or ''),(line.is_type_tracabilite or '').upper(),dlc,0,0]
-                lots[cle][3]+=line.qty_done
-                lots[cle][4]+=line.is_nb_colis
+                if line.lot_id:
+                    cle="%s-%s-%s"%(obj.product_id.id,line.lot_id.name,line.is_dlc_ddm)
+                    if cle not in lots:
+                        dlc = (line.is_dlc_ddm and line.is_dlc_ddm.strftime('%d/%m/%Y')) or ''
+                        lots[cle]=[(line.lot_id.name or ''),(line.is_type_tracabilite or '').upper(),dlc,0,0]
+                    lots[cle][3]+=line.qty_done
+                    lots[cle][4]+=line.is_nb_colis
             t=[]
             for lot in lots:
                 l=lots[lot]
@@ -81,7 +82,7 @@ class StockMove(models.Model):
             obj.is_lots = "\n".join(t)
 
 
-    @api.onchange('move_line_ids')
+    @api.onchange('move_line_ids','quantity_done')
     def _compute_is_nb_colis_poids(self):
         for obj in self:
             nb=0
@@ -89,6 +90,22 @@ class StockMove(models.Model):
             for line in obj.move_line_ids:
                 nb+=line.is_nb_colis
                 poids+=line.is_poids_net_reel
+
+            # Ajout du 06/07/22 pour Le Cellier
+            if nb==0:
+                nb        = obj.product_id.is_nb_pieces_par_colis
+                poids_net = obj.product_id.is_poids_net_colis
+                unite     = obj.product_uom.category_id.name
+                nb_colis  = 0
+                if unite=="Poids":
+                    if poids_net>0:
+                        nb_colis = obj.quantity_done/poids_net
+                else:
+                    if nb>0:
+                        nb_colis = obj.quantity_done / nb
+                nb=nb_colis
+                poids = nb_colis * poids_net
+
             obj.is_nb_colis       = nb
             obj.is_poids_net_reel = poids
  
