@@ -94,14 +94,23 @@ class IsImportLeCellier(models.Model):
                 kg_piece    = cells[lig][16].value
 
                 #** Recherche du fournisseur ******************************
-                partner_id = 1 # Fournisseur = My Company
+                partner_id = False # Fournisseur = My Company
                 if fournisseur:
                     partners = self.env['res.partner'].search([("name","ilike",fournisseur)])
                     for partner in partners:
                         partner_id = partner.id
+                    if partner_id==False:
+                        vals={
+                            "name"           : fournisseur,
+                            "is_code_interne": "CREATION",
+                        }
+                        partner=self.env['res.partner'].create(vals)
+                        print("CREATION ",partner)
+                        partner_id = partner.id
                 #**********************************************************
 
-                if code and designation and prix:
+
+                if code and designation and prix and partner_id:
                     filtre=[("default_code","=",code)]
                     products = self.env['product.template'].search(filtre)
                     vals={
@@ -112,6 +121,7 @@ class IsImportLeCellier(models.Model):
                         "is_poids_net_colis"    : poids,
                         "taxes_id"              : [(6, 0, [taxe_vente_id])],
                         "supplier_taxes_id"     : [(6, 0, [taxe_achat_id])],
+                        "type"                  : "product",
                     }
                     if kg_piece=="K":
                         vals["uom_id"]    = uom_id
