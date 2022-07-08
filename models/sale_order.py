@@ -149,8 +149,6 @@ class SaleOrder(models.Model):
 
     def creer_commande_fournisseur_action(self):
         company = self.env.user.company_id
-        print(company, company.is_regroupe_cde)
-
         for obj in self:
             if not len(obj.order_line):
                 raise Warning(u"Il n'y a aucune ligne de commandes à traiter !")

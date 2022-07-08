@@ -42,6 +42,7 @@
                 </style>
             </xpath>
             <button name="button_unlock" position="after">
+                <field name="is_fromtome_order_vsb" invisible="1"/>
                 <button
                     name="creer_commande_fromtome_action"
                     type="object"
@@ -49,7 +50,16 @@
                     class="oe_highlight"
                     attrs="{'invisible': [('is_fromtome_order_vsb', '=', False)]}"
                 />
+ 
+                <field name="is_maj_commande_client_vsb" invisible="1"/>
+                <button
+                    name="maj_commande_client_action"
+                    type="object"
+                    string="MAJ commandes clients"
+                    attrs="{'invisible': [('is_maj_commande_client_vsb', '=', False)]}"
+                />
             </button>
+
             <field name="partner_id" position="attributes">
                 <attribute name="domain">[('is_company','=',True),('is_supplier','=',True)]</attribute>
             </field>
@@ -107,7 +117,6 @@
             <xpath expr="//field[@name='partner_ref']" position="after">
                 <field name="is_adresse_livraison_id"/>
                 <field name="is_fromtome_order_id"/>
-                <field name="is_fromtome_order_vsb" invisible="1"/>
             </xpath>
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_uom']" position='attributes'>
                 <attribute name="readonly">1</attribute>
