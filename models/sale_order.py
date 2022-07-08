@@ -93,62 +93,6 @@ class SaleOrderLine(models.Model):
             return res
 
 
-
-    # def _get_display_price(self, product):
-
-    #     print("### TEST 1 ####")
-
-    #     # TO DO: move me in master/saas-16 on sale.order
-    #     # awa: don't know if it's still the case since we need the "product_no_variant_attribute_value_ids" field now
-    #     # to be able to compute the full price
-
-    #     # it is possible that a no_variant attribute is still in a variant if
-    #     # the type of the attribute has been changed after creation.
-    #     no_variant_attributes_price_extra = [
-    #         ptav.price_extra for ptav in self.product_no_variant_attribute_value_ids.filtered(
-    #             lambda ptav:
-    #                 ptav.price_extra and
-    #                 ptav not in product.product_template_attribute_value_ids
-    #         )
-    #     ]
-    #     if no_variant_attributes_price_extra:
-    #         product = product.with_context(
-    #             no_variant_attributes_price_extra=tuple(no_variant_attributes_price_extra)
-    #         )
-
-
-    #     cr,uid,context,su = self.env.args
-
-
-    #     print("### TEST 2 ####",context)
-
-
-    #     if self.order_id.pricelist_id.discount_policy == 'with_discount':
-
-    #         print("### TEST 3 ####",product.with_context(pricelist=self.order_id.pricelist_id.id).price)
-
-
-    #         return product.with_context(pricelist=self.order_id.pricelist_id.id).price
-    #     #product_context = dict(self.env.context, partner_id=self.order_id.partner_id.id, date=self.order_id.date_order, uom=self.product_uom.id)
-    #     product_context = dict(self.env.context, partner_id=self.order_id.partner_id.id, date=self.order_id.is_date_livraison, uom=self.product_uom.id)
-
-    #     final_price, rule_id = self.order_id.pricelist_id.with_context(product_context).get_product_price_rule(product or self.product_id, self.product_uom_qty or 1.0, self.order_id.partner_id)
-    #     base_price, currency = self.with_context(product_context)._get_real_price_currency(product, rule_id, self.product_uom_qty, self.product_uom, self.order_id.pricelist_id.id)
-    #     if currency != self.order_id.pricelist_id.currency_id:
-    #         base_price = currency._convert(
-    #             base_price, self.order_id.pricelist_id.currency_id,
-    #             #self.order_id.company_id or self.env.company, self.order_id.date_order or fields.Date.today())
-    #             self.order_id.company_id or self.env.company, self.order_id.is_date_livraison or fields.Date.today())
-    #     # negative discounts (= surcharge) are included in the display price
-
-    #     print(base_price, final_price)
-
-    #     return max(base_price, final_price)
-
-
-
-
-
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
@@ -204,6 +148,9 @@ class SaleOrder(models.Model):
  
 
     def creer_commande_fournisseur_action(self):
+        company = self.env.user.company_id
+        print(company, company.is_regroupe_cde)
+
         for obj in self:
             if not len(obj.order_line):
                 raise Warning(u"Il n'y a aucune ligne de commandes à traiter !")
@@ -247,10 +194,20 @@ class SaleOrder(models.Model):
                                     order.is_adresse_livraison_id = obj.partner_shipping_id.id
 
                         #** Création des lignes ************************************
-                        filtre=[
-                            ('order_id'  ,'=', order.id),
-                            ('product_id','=', line.product_id.id),
-                        ]
+
+
+                        if company.is_regroupe_cde=="Oui":
+                            filtre=[
+                                ('order_id'  ,'=', order.id),
+                                ('product_id','=', line.product_id.id),
+                            ]
+                        else:
+                            filtre=[
+                                ('order_id'             ,'=' , order.id),
+                                ('product_id'           ,'=' , line.product_id.id),
+                                ('is_sale_order_line_id','=' , line.id),
+                                ('is_sale_order_line_id','!=', False),
+                            ]
                         order_lines=self.env['purchase.order.line'].search(filtre,limit=1)
                         if not order_lines:
                             if order:
@@ -262,24 +219,31 @@ class SaleOrder(models.Model):
                                     'product_uom' : line.product_uom.id,
                                     'date_planned': date_planned,
                                     'price_unit'  : line.price_unit,
-                                    #'is_sale_order_line_id': line.id,
                                 }
+
+                                if company.is_regroupe_cde=="Non":
+                                    vals["is_sale_order_line_id"]=line.id
+
                                 order_line=self.env['purchase.order.line'].create(vals)
                                 order_line.onchange_product_id()
                                 order_line.date_planned = date_planned
                         else:
                             order_line = order_lines[0]
 
+
                         if order_line:
                             line.is_purchase_line_id=order_line.id
-                            filtre=[
-                                ('is_purchase_line_id'  ,'=', order_line.id),
-                            ]
-                            order_lines=self.env['sale.order.line'].search(filtre)
-                            qty=0
-                            for l in order_lines:
-                                qty+=l.product_uom_qty
-                            order_line.product_qty = qty
+                            if company.is_regroupe_cde=="Non":
+                                order_line.product_qty = line.product_uom_qty
+                            else:
+                                filtre=[
+                                    ('is_purchase_line_id'  ,'=', order_line.id),
+                                ]
+                                order_lines=self.env['sale.order.line'].search(filtre)
+                                qty=0
+                                for l in order_lines:
+                                    qty+=l.product_uom_qty
+                                order_line.product_qty = qty
                         # ***********************************************************
 
 

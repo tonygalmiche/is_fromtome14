@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-
     <template id="purchase_stock.report_purchaseorder_document" inherit_id="purchase.report_purchaseorder_document">
         <xpath expr="//t[@t-if='o.dest_address_id']" position="after">
             <t t-else="">
@@ -30,17 +28,15 @@
         </xpath>
     </template>
 
-
-   <template id="is_report_purchaseorder_document" inherit_id="purchase.report_purchaseorder_document">
+    <template id="is_report_purchaseorder_document" inherit_id="purchase.report_purchaseorder_document">
         <div class="page" position="replace">
             <div class="page">
                 <div class="oe_structure"/>
-                <h2 t-if="o.state == 'draft'">Request for Quotation #<span t-field="o.name"/></h2>
+                <!-- <h2 t-if="o.state == 'draft'">Request for Quotation #<span t-field="o.name"/></h2>
                 <h2 t-if="o.state in ['sent', 'to approve']">Purchase Order #<span t-field="o.name"/></h2>
-                <h2 t-if="o.state in ['purchase', 'done']">Confirmation du Bon de commande N°<span t-field="o.name"/></h2>
+                <h2 t-if="o.state in ['purchase', 'done']">Confirmation du Bon de commande N°<span t-field="o.name"/></h2> -->
+                <h2 t-if="o.state != ['cancel']">Confirmation du Bon de commande N°<span t-field="o.name"/></h2>
                 <h2 t-if="o.state == 'cancel'">Cancelled Purchase Order #<span t-field="o.name"/></h2>
-
-
                 <div id="informations" class="row mt32 mb32">
                     <div t-if="o.is_date_enlevement" class="col-3 bm-2">
                         <strong>Date d'enlèvement:</strong>
@@ -52,22 +48,22 @@
                     </div>
                 </div>
                 <br />
-
-
                 <table class="table table-sm o_main_table">
                     <thead>
                         <tr>
+                            <th class="text-left" t-if="res_company.is_regroupe_cde=='Non'">    <strong>Client</strong></th>
                             <th name="th_description"><strong>Description</strong></th>
                             <th class="text-right" style="background-color:Silver;font-weight: bold;">   <strong>Nb Colis</strong></th>
                             <th class="text-right">   <strong>Quantité</strong></th>
                             <th class="text-left">    <strong>Unité</strong></th>
-                            <!-- <th class="text-right">   <strong>Poids</strong></th> -->
                             <th class="text-right">   <strong>PU HT</strong></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr t-foreach="o.order_line" t-as="line">
-
+                            <td class="text-left" t-if="res_company.is_regroupe_cde=='Non'">
+                                <span t-field="line.is_client_id.is_code_interne"/>
+                            </td>
                             <td class="text-left">
                                 <span t-field="line.name"/>
                             </td>
@@ -80,9 +76,6 @@
                             <td class="text-left">
                                 <span t-field="line.product_uom.name"/>
                             </td>
-                            <!-- <td class="text-right">
-                                <span t-field="line.is_poids_net"/>
-                            </td> -->
                             <td class="text-right">
                                 <span 
                                     t-field="line.price_unit"
@@ -93,42 +86,9 @@
 
                     </tbody>
                 </table>
-
-                <!-- <div id="total" class="row justify-content-end">
-                    <div class="col-4">
-                        <table class="table table-sm">
-                            <tr class="border-black">
-                                <td name="td_subtotal_label"><strong>Subtotal</strong></td>
-                                <td class="text-right">
-                                    <span t-field="o.amount_untaxed"
-                                        t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td name="td_taxes_label">Taxes</td>
-                                <td class="text-right">
-                                    <span t-field="o.amount_tax"
-                                        t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                </td>
-                            </tr>
-                            <tr class="border-black o_total">
-                                <td name="td_amount_total_label"><strong>Total</strong></td>
-                                <td class="text-right">
-                                    <span t-field="o.amount_total"
-                                        t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div> -->
-
                 <p t-field="o.notes"/>
                 <div class="oe_structure"/>
             </div>
         </div>
     </template>
-
-
-
-
 </odoo>

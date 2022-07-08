@@ -44,6 +44,9 @@
                     .o_form_view .o_form_sheet_bg > .o_form_sheet{
                         max-width: 1800px;
                     }
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
                 </style>
             </xpath>
 
@@ -51,29 +54,15 @@
                 <field name="is_enseigne_id"/>
                 <field name="is_type_doc"/>
             </field>
-
-
             <field name="partner_id" position="attributes">
                 <attribute name="domain">[('is_company','=',True),('is_customer','=',True)]</attribute>
             </field>
-            <!-- <field name="partner_invoice_id" position="attributes">
-                <attribute name="domain">['|',('id','=',partner_id),('parent_id','=',partner_id)]</attribute>
-            </field>
-            <field name="partner_shipping_id" position="attributes">
-                <attribute name="domain">['|',('id','=',partner_id),('parent_id','=',partner_id)]</attribute>
-            </field> -->
-
-
             <group name="sale_shipping" position="attributes">
                  <attribute name="invisible">1</attribute>
             </group>
-
             <field name="payment_mode_id" position="after">
                 <field name="is_date_livraison"/>
-                <!-- <field name="commitment_date"/> -->
             </field>
-
-
             <field name="validity_date" position="attributes">
                  <attribute name="invisible">1</attribute>
             </field>

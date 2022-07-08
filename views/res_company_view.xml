@@ -5,8 +5,16 @@
         <field name="model">res.company</field>
         <field name="inherit_id" ref="base.view_company_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//sheet[1]" position="inside">
+                <style>
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
+            </xpath>
             <field name="website" position="before">
                 <field name="is_gln"/>
+                <field name="is_regroupe_cde"/>
             </field>
         </field>
     </record>

@@ -142,6 +142,27 @@ class PurchaseOrderLine(models.Model):
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2) , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_poids_net           = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
     is_alerte              = fields.Text(string='Alerte', compute='_compute_is_alerte')
+    is_client_id           = fields.Many2one('res.partner', 'Client', related='is_sale_order_line_id.order_id.partner_id')
+
+
+    def acceder_commande_client(self):
+        for obj in self:
+            res= {
+                'name': 'Ligne commande client',
+                'view_mode': 'tree,form',
+                'view_type': 'form',
+                'res_model': 'sale.order.line',
+                'type': 'ir.actions.act_window',
+                'domain': [
+                    ('id','=',obj.is_sale_order_line_id.id),
+                ],
+            }
+            return res
+
+
+
+
+
 
 
 class PurchaseOrder(models.Model):

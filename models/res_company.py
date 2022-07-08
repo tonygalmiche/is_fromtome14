@@ -1,14 +1,10 @@
+from email.policy import default
 from odoo import api, fields, models
 
 class Company(models.Model):
     _inherit = 'res.company'
 
-    #inv_is_colis = fields.Boolean(string="Gestion Stock des colis", help="Cochez si l'unité de stockage est colis")
-    is_gln = fields.Char(string='GLN')
+    is_gln          = fields.Char(string='GLN')
+    is_regroupe_cde = fields.Selection(string='Regrouper les commandes', selection=[('Oui', 'Oui'), ('Non', 'Non')], default="Oui", help="Regrouper les commandes des clients sur les commandes fournisseur")
 
 
-# class ResDiscountSettings(models.TransientModel):
-#     _inherit = 'res.config.settings'
-
-#     inv_is_colis = fields.Boolean(related="company_id.inv_is_colis" ,string="Gestion Stock des colis",
-#                                   help="Cochez si l'unité de stockage est colis", readonly=False, stored=True)
