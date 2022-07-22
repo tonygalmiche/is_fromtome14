@@ -131,7 +131,7 @@ class IsImportLeCellier(models.Model):
                         product=self.env['product.template'].create(vals)
                     else:
                         product = products[0]
-                        product.write(vals)
+                        #product.write(vals)
 
                     print(ct,product,code,kg_piece,prix,designation)
 
