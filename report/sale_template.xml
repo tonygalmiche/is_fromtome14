@@ -33,6 +33,10 @@
                     <strong>Quotation Date:</strong>
                     <p class="m-0" t-field="doc.date_order" t-options='{"widget": "date"}'/>
                 </div>
+                <div t-if="doc.is_date_livraison" class="col-auto mw-100 mb-2">
+                    <strong>Date livraison</strong>
+                    <p class="m-0" t-field="doc.is_date_livraison" t-options='{"widget": "date"}'/>
+                </div>
                 <div t-if="doc.validity_date and doc.state in ['draft', 'sent']" class="col-auto mw-100 mb-2" name="expiration_date">
                     <strong>Expiration:</strong>
                     <p class="m-0" t-field="doc.validity_date"/>
@@ -42,6 +46,10 @@
                     <p class="m-0" t-field="doc.user_id"/>
                 </div>
             </div>
+
+
+
+
 
             <!-- Is there a discount on at least one line? -->
             <t t-set="display_discount" t-value="any(l.discount for l in doc.order_line)"/>
