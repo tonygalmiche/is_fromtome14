@@ -110,7 +110,9 @@ class IsListingPrixClient(models.Model):
                     ct=0
                     for p in products:
                         ct+=1
-                        items = self.env['product.pricelist.item'].search([('pricelist_id','=',obj.pricelist_id.id),('product_tmpl_id','=',p.product_tmpl_id.id)])
+                        items = self.env['product.pricelist.item'].search([
+                                ('pricelist_id','=',obj.pricelist_id.id),('product_tmpl_id','=',p.product_tmpl_id.id)
+                            ], order="date_start desc", limit=1)
                         price=False
                         for item in items:
                             price=item.price
