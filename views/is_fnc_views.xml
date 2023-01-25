@@ -16,6 +16,11 @@
         <field name="model">is.fnc</field>
         <field name="arch" type="xml">
             <form>
+                <style>
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
                 <header>
                     <field name="state" widget="statusbar" clickable="true"/>
                 </header>
@@ -44,6 +49,7 @@
                         <field name="decision"/>
                         <field name="analyse"/>
                         <field name="action_corrective"/>
+                        <field name="efficacite_action_corrective"/>
                         <field name="date_cloture"/>
                     </group>
                 </sheet>

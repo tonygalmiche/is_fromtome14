@@ -24,6 +24,7 @@ class IsFNC(models.Model):
     decision          = fields.Text('Décision')
     analyse           = fields.Text('Analyse des causes')
     action_corrective = fields.Text('Action corrective proposée')
+    efficacite_action_corrective = fields.Text("Efficacité de l'action corrective")
     date_cloture      = fields.Date("Date cloture")
     state             = fields.Selection([
             ('en_cours', 'En cours'),
