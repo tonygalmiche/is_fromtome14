@@ -65,10 +65,10 @@ class IsExportCompta(models.Model):
                 SELECT  
                     aj.name,
                     am.name,
-                    am.date,
+                    am.invoice_date,
                     aa.code,
                     aa.name,
-                    am.date,
+                    am.invoice_date,
                     aml.name,
                     aml.debit,
                     aml.credit,
@@ -83,8 +83,8 @@ class IsExportCompta(models.Model):
                                            inner join account_journal aj             on aml.journal_id=aj.id
                 WHERE 
                     am.is_export_compta_id is null and
-                    aml.date<=%s and aj.name in ('VE','AC')
-                ORDER BY aml.date
+                    am.invoice_date<=%s and aj.name in ('VE','AC')
+                ORDER BY am.invoice_date
             """
             cr.execute(sql,[obj.date_fin])
             ct=0
@@ -129,7 +129,7 @@ class IsExportCompta(models.Model):
                     SELECT  
                         am.partner_id,
                         am.name,
-                        am.date,
+                        am.invoice_date,
                         aa.code,
                         aa.name,
                         aml.name,
@@ -144,12 +144,12 @@ class IsExportCompta(models.Model):
                                             inner join account_journal aj             on aml.journal_id=aj.id
                                             inner join account_payment ap             on aml.payment_id=ap.id
                     WHERE 
-                        aml.date<='"""+str(obj.date_fin)+"""' and 
+                        am.invoice_date<='"""+str(obj.date_fin)+"""' and 
                         am.company_id="""+str(self.env.user.company_id.id)+""" and
                         aa.code='665100' and
                         ap.is_export_compta_id is null and 
                         aa.code is not null
-                    ORDER BY aml.date
+                    ORDER BY am.invoice_date
                 """
                 cr.execute(sql)
                 for row in cr.fetchall():
