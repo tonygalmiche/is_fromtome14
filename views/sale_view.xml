@@ -1,6 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+
+    <!-- is.modele.commande -->
+    <record id="is_modele_commande_form" model="ir.ui.view">
+        <field name="name">is.modele.commande.form</field>
+        <field name="model">is.modele.commande</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="initialiser_action"
+                        type="object"
+                        string="Initialiser avec les articles livrés"
+                        confirm="Cela va écraser les lignes ?"
+                    />
+                    <button
+                        name="trier_action"
+                        type="object"
+                        string="Trier par poids décroissant"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                    <field name="ligne_ids">
+                        <tree decoration-danger="weight==0" editable="bottom">
+                            <field name="sequence"  widget="handle"/>
+                            <field name="product_id" widget="many2one_clickable"/>
+                            <field name="qt_livree"/>
+                            <field name="weight"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_modele_commande_tree" model="ir.ui.view">
+        <field name="name">is.modele.commande.tree</field>
+        <field name="model">is.modele.commande</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_modele_commande_search" model="ir.ui.view">
+        <field name="name">is.modele.commande.search</field>
+        <field name="model">is.modele.commande</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+    <record  id="is_modele_commande_action" model="ir.actions.act_window">
+        <field name="name">Modèle de commande</field>
+        <field name="res_model">is.modele.commande</field>
+        <field name="limit">100</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem
+        id="is_modele_commande_menu"
+        name="Modèle de commande"
+        parent="sale.sale_order_menu"
+        sequence="910"
+        action="is_modele_commande_action"
+    />
+
+
     <!-- sale.order  -->
     <record id="commande_soldee_action_server" model="ir.actions.server">
         <field name="name">Mise à jour champ commmande soldée</field>
@@ -51,6 +120,24 @@
             </xpath>
 
             <field name="partner_id" position="after">
+                <field 
+                    name="is_modele_commande_id" 
+                    attrs="{'invisible': ['|','|',
+                        ('is_modele_commande_id', '=', False),
+                        ('state', 'not in', ['draft','sent']),
+                        ('order_line', '!=', []),
+                    ]}"
+                />
+                <button
+                    name="initialiser_depuis_modele_commande"
+                    type="object"
+                    string="Initialiser la commande à partir de ce modèle"
+                    attrs="{'invisible': ['|','|',
+                        ('is_modele_commande_id', '=', False),
+                        ('state', 'not in', ['draft','sent']),
+                        ('order_line', '!=', []),
+                    ]}"
+                />
                 <field name="is_enseigne_id"/>
                 <field name="is_type_doc"/>
             </field>

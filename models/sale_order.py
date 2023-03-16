@@ -7,6 +7,69 @@ from odoo.osv import expression
 import datetime
 
 
+class IsModeleCommandeLigne(models.Model):
+    _name = 'is.modele.commande.ligne'
+    _description = "Lignes des modèles de commandes"
+    _order='modele_id,sequence'
+
+    modele_id  = fields.Many2one('is.modele.commande', 'Modèle de commandes', required=True, ondelete='cascade')
+    sequence   = fields.Integer('Séquence')
+    product_id = fields.Many2one('product.product', 'Article', required=True)
+    weight     = fields.Float(string='Poids unitaire', digits='Stock Weight', related='product_id.weight')
+    qt_livree  = fields.Float(string='Qt livrée', help="quantité livrée au moment de l'initialisation", readonly=True)
+
+
+class IsModeleCommande(models.Model):
+    _name        = 'is.modele.commande'
+    _description = "Modèle de commandes"
+    _order       ='name'
+
+    name       = fields.Char('Nom du modèle', required=True)
+    ligne_ids  = fields.One2many('is.modele.commande.ligne', 'modele_id', 'Lignes')
+
+
+    def initialiser_action(self):
+        cr = self._cr
+        for obj in self:
+            filtre=[
+                ('is_modele_commande_id','=',obj.id),
+            ]
+            partners = self.env['res.partner'].search(filtre)
+            if len(partners)>0:
+                obj.ligne_ids.unlink()
+                ids=[]
+                for partner in partners:
+                    ids.append("'%s'"%(partner.id))
+                ids=','.join(ids)
+                sql="""
+                    SELECT  
+                        sol.product_id,
+                        sum(sol.qty_delivered) qt_livree
+                    FROM sale_order so join sale_order_line sol on so.id=sol.order_id
+                                    join product_product pp on sol.product_id=pp.id
+                    WHERE 
+                        so.state='sale' and so.partner_id in ("""+ids+""") and sol.qty_delivered>0
+                    GROUP BY sol.product_id 
+                """
+                cr.execute(sql)
+                for row in cr.dictfetchall():
+                    vals={
+                        'modele_id' : obj.id,
+                        'product_id': row["product_id"],
+                        'qt_livree' : row["qt_livree"],
+                    }
+                    self.env['is.modele.commande.ligne'].create(vals)
+                obj.trier_action()
+
+
+
+
+    def trier_action(self):
+        for obj in self:
+            for line in obj.ligne_ids:
+                line.sequence = - line.weight*10000
+
+
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
@@ -102,6 +165,7 @@ class SaleOrder(models.Model):
     is_commande_soldee       = fields.Boolean(string='Commande soldée', default=False, copy=False, help="Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
     is_frequence_facturation = fields.Selection(string='Fréquence facturation', related="partner_id.is_frequence_facturation") #, selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')])
     is_type_doc              = fields.Selection([('cc', 'CC'), ('offre', 'Offre')], string='Type document', default="cc")
+    is_modele_commande_id    = fields.Many2one('is.modele.commande', 'Modèle de commande', related='partner_id.is_modele_commande_id')
 
 
     @api.depends('order_line')
@@ -116,6 +180,21 @@ class SaleOrder(models.Model):
 
 
     is_creer_commande_fournisseur_vsb = fields.Boolean(string=u'Créer commande fournisseur', compute='_compute_is_creer_commande_fournisseur_vsb', readonly=True, store=False)
+
+
+    def initialiser_depuis_modele_commande(self):
+        for obj in self:
+            sequence=10
+            for line in obj.is_modele_commande_id.ligne_ids:
+                vals={
+                    'order_id'    : obj.id,
+                    'sequence'    : sequence,
+                    'product_id'  : line.product_id.id,
+                    'name'        : line.product_id.name_get()[0][1],
+                    'product_uom_qty': 0,
+                }
+                self.env['sale.order.line'].create(vals)
+                sequence+=10
 
 
     def commande_soldee_action_server(self):

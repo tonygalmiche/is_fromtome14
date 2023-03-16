@@ -37,3 +37,6 @@ access_is_analyse_facturation_update,access_is_analyse_facturation_update,model_
 access_is_stock_move_line_valorise_update,access_is_stock_move_line_valorise_update,model_is_stock_move_line_valorise_update,base.group_user,1,1,1,1
 
 access_is_import_le_cellier,access_is_import_le_cellier,model_is_import_le_cellier,base.group_user,1,1,1,1
+
+access_is_modele_commande,access_is_modele_commande,model_is_modele_commande,base.group_user,1,1,1,1
+access_is_modele_commande_ligne,access_is_modele_commande_ligne,model_is_modele_commande_ligne,base.group_user,1,1,1,1

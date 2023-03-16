@@ -129,6 +129,15 @@
             <field name="property_product_pricelist" position="before">
                 <field name="is_code_tarif"/>
             </field>
+            <field name="property_product_pricelist" position="after">
+                <field name="is_modele_commande_id"/>
+                <button
+                    name="creer_modele_commande"
+                    type="object"
+                    string="Créer un modèle de commande"
+                    attrs="{'invisible': [('is_modele_commande_id', '!=', False)]}"
+                />
+            </field>
         </field>
     </record>
     <record model="ir.ui.view" id="l10n_fr_siret.res_partner_form_l10n_fr">

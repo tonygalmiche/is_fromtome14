@@ -29,4 +29,13 @@ class ResPartner(models.Model):
     is_customer                 = fields.Boolean("Est un Client")
     is_supplier                 = fields.Boolean("Est un Fournisseur")
     is_frequence_facturation    = fields.Selection(string='Fréquence facturation', selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')])
+    is_modele_commande_id       = fields.Many2one('is.modele.commande', 'Modèle de commande')
 
+
+    def creer_modele_commande(self):
+        for obj in self:
+            vals={
+                'name'  : obj.name,
+            }
+            modele=self.env['is.modele.commande'].create(vals)
+            obj.is_modele_commande_id = modele.id
