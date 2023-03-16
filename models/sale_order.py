@@ -12,10 +12,20 @@ class IsModeleCommandeLigne(models.Model):
     _description = "Lignes des modèles de commandes"
     _order='modele_id,sequence'
 
+
+    @api.depends('product_id')
+    def _compute_weight(self):
+        for obj in self:
+            weight = 0
+            if obj.product_id:
+                weight = obj.product_id.is_poids_net_colis / (obj.product_id.is_nb_pieces_par_colis or 1)
+            obj.weight = weight
+
+
     modele_id  = fields.Many2one('is.modele.commande', 'Modèle de commandes', required=True, ondelete='cascade')
     sequence   = fields.Integer('Séquence')
     product_id = fields.Many2one('product.product', 'Article', required=True)
-    weight     = fields.Float(string='Poids unitaire', digits='Stock Weight', related='product_id.weight')
+    weight     = fields.Float(string='Poids unitaire', digits='Stock Weight', compute='_compute_weight', readonly=True, store=True)
     qt_livree  = fields.Float(string='Qt livrée', help="quantité livrée au moment de l'initialisation", readonly=True)
 
 
