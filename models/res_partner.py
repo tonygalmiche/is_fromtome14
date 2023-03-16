@@ -39,3 +39,4 @@ class ResPartner(models.Model):
             }
             modele=self.env['is.modele.commande'].create(vals)
             obj.is_modele_commande_id = modele.id
+            modele.initialiser_action()
