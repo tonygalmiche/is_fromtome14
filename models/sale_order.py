@@ -135,13 +135,17 @@ class SaleOrderLine(models.Model):
 
     @api.onchange('is_colis_cde')
     def onchange_is_colis_cde(self):
-        self.product_uom_qty = self.is_colis_cde * self.is_nb_pieces_par_colis
+        unite = self.product_uom.category_id.name
+        if unite=="Poids":
+            self.product_uom_qty =  self.is_colis_cde * self.product_id.is_poids_net_colis
+        else:
+            self.product_uom_qty =  self.is_colis_cde * self.is_nb_pieces_par_colis
 
 
     @api.onchange('product_uom_qty')
     def onchange_product_uom_qty_colis(self):
         if self.is_nb_pieces_par_colis>0:
-            self.is_colis_cde = self.product_uom_qty / self.is_nb_pieces_par_colis
+            self.is_colis_cde = self.get_nb_colis()
 
 
     @api.onchange('product_id','is_livraison_directe')
