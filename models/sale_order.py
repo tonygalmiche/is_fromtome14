@@ -115,8 +115,9 @@ class SaleOrderLine(models.Model):
     is_purchase_line_id       = fields.Many2one('purchase.order.line', string=u'Ligne commande fournisseur', index=True, copy=False)
     is_date_reception         = fields.Date(string=u'Date réception')
     is_livraison_directe      = fields.Boolean(string=u'Livraison directe', help=u"Si cette case est cochée, une commande fournisseur spécifique pour ce client sera créée",default=False)
-    is_nb_pieces_par_colis    = fields.Integer(string='Nb Pièces / colis', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
+    is_nb_pieces_par_colis    = fields.Integer(string="PCB", help='Nb Pièces / colis', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_nb_colis               = fields.Float(string='Nb Colis', digits=(14,2), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
+    is_colis_cde              = fields.Float(string='Colis Cde', digits=(14,2))
     is_poids_net              = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
     is_correction_prix_achat  = fields.Float(string="Correction Prix d'achat", digits='Product Price', help="Utilsé dans 'Lignes des mouvements valorisés'")
 
@@ -130,6 +131,17 @@ class SaleOrderLine(models.Model):
                 partner=s.name
                 break
         return partner
+
+
+    @api.onchange('is_colis_cde')
+    def onchange_is_colis_cde(self):
+        self.product_uom_qty = self.is_colis_cde * self.is_nb_pieces_par_colis
+
+
+    @api.onchange('product_uom_qty')
+    def onchange_product_uom_qty_colis(self):
+        if self.is_nb_pieces_par_colis>0:
+            self.is_colis_cde = self.product_uom_qty / self.is_nb_pieces_par_colis
 
 
     @api.onchange('product_id','is_livraison_directe')

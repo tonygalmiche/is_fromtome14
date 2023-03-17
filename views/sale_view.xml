@@ -181,6 +181,12 @@
             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom_qty']" position="attributes">
                 <attribute name="sum">Total</attribute>
             </xpath>
+            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_packaging']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom_qty']" position="before">
+                <field name="is_colis_cde" optional="show"/>
+            </xpath>
              <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='price_unit']" position="before">
                 <field name="is_nb_pieces_par_colis" optional="hide"/>
                 <field name="is_nb_colis" sum="Total"/>
