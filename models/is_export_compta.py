@@ -129,7 +129,7 @@ class IsExportCompta(models.Model):
                     SELECT  
                         am.partner_id,
                         am.name,
-                        am.invoice_date,
+                        am.date,
                         aa.code,
                         aa.name,
                         aml.name,
@@ -144,12 +144,12 @@ class IsExportCompta(models.Model):
                                             inner join account_journal aj             on aml.journal_id=aj.id
                                             inner join account_payment ap             on aml.payment_id=ap.id
                     WHERE 
-                        am.invoice_date<='"""+str(obj.date_fin)+"""' and 
+                        am.date<='"""+str(obj.date_fin)+"""' and 
                         am.company_id="""+str(self.env.user.company_id.id)+""" and
                         aa.code='665100' and
                         ap.is_export_compta_id is null and 
                         aa.code is not null
-                    ORDER BY am.invoice_date
+                    ORDER BY am.date
                 """
                 cr.execute(sql)
                 for row in cr.fetchall():

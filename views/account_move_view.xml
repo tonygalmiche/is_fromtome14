@@ -84,4 +84,33 @@
             </field>
         </field>
     </record>
+
+    <!-- account.payment -->
+    <record id="is_view_account_payment_tree" model="ir.ui.view">
+        <field name="name">is_view_account_payment_tree</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_tree" />
+        <field name="arch" type="xml">
+            <field name="date" position="after">
+                <field name="invoice_date" optional="hide"/>
+            </field>
+            <field name="state" position="before">
+                <field name="is_export_compta_id" optional="show"/>
+            </field>
+        </field>
+    </record>
+    <record id="is_view_account_payment_form" model="ir.ui.view">
+        <field name="name">is_view_account_payment_form</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form" />
+        <field name="arch" type="xml">
+            <field name="move_id" position="after">
+                <field name="is_export_compta_id"/>
+            </field>
+        </field>
+    </record>
+
+
+    
+
 </odoo>
