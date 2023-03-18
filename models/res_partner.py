@@ -30,6 +30,7 @@ class ResPartner(models.Model):
     is_supplier                 = fields.Boolean("Est un Fournisseur")
     is_frequence_facturation    = fields.Selection(string='Fréquence facturation', selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')])
     is_modele_commande_id       = fields.Many2one('is.modele.commande', 'Modèle de commande')
+    is_presentation_bl          = fields.Selection(string='Présentation BL', selection=[('standard', 'Standard'),('detaillee', 'Détaillée')], default="standard")
 
 
     def creer_modele_commande(self):

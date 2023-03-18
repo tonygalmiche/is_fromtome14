@@ -106,27 +106,58 @@
                             <th class="text-right"> <strong>Poids</strong></th>
                         </tr>
                     </thead>
-                    <tbody> 
-                        <t t-foreach="o.move_ids_without_package" t-as="line"> 
-                            <t t-if="line.state not in ['cancel']">
+
+                    <t t-if="o.partner_id.is_presentation_bl=='standard'">
+                        <tbody> 
+                            <t t-foreach="o.move_ids_without_package" t-as="line"> 
+                                <t t-if="line.state not in ['cancel']">
+                                    <tr>
+                                        <td class="text-left"><span t-field="line.product_id.default_code"/></td>
+                                        <td class="text-left">
+                                            <div><strong><span t-field="line.is_description_cde"/></strong></div>
+                                            <div t-if="line.is_lots" t-field="line.is_lots"/>
+                                            <div t-if="line.sale_line_id.discount">Remise prévue de <span t-field="line.sale_line_id.discount"/>%</div>
+                                            <div t-if="line.product_id.is_bio_id"><i><span t-field="line.product_id.is_bio_id.name"/></i></div>
+                                        </td>
+                                        <td class="text-left;"><span style="font-size:6pt" t-field="line.product_id.barcode"/></td>
+                                        <td class="text-center"><span t-field="line.is_nb_colis"/></td>
+                                        <td class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
+                                        <td class="text-right" style="border-right:none"><span t-field="line.quantity_done"/></td>
+                                        <td class="text-left"  style="border-left:none"><span t-field="line.product_uom"/></td>
+                                        <td class="text-right"><span t-field="line.is_poids_net_reel"/></td>
+                                    </tr>
+                                </t>
+                            </t>
+                        </tbody>
+                    </t>
+
+
+                    <t t-if="o.partner_id.is_presentation_bl=='detaillee'">
+                        <tbody> 
+                            <t t-foreach="o.move_line_ids_without_package" t-as="line"> 
                                 <tr>
                                     <td class="text-left"><span t-field="line.product_id.default_code"/></td>
                                     <td class="text-left">
-                                        <div><strong><span t-field="line.is_description_cde"/></strong></div>
-                                        <div t-if="line.is_lots" t-field="line.is_lots"/>
-                                        <div t-if="line.sale_line_id.discount">Remise prévue de <span t-field="line.sale_line_id.discount"/>%</div>
+                                        <div><strong><span t-field="line.move_id.is_description_cde"/></strong></div>
+                                        <div t-if="line.lot_id">
+                                            Lot:<span t-field="line.lot_id"/>-<span t-field="line.is_type_tracabilite"/>:<span t-field="line.is_dlc_ddm"/>
+                                        </div> 
+                                        <div t-if="line.move_id.sale_line_id.discount">Remise prévue de <span t-field="line.move_id.sale_line_id.discount"/>%</div>
                                         <div t-if="line.product_id.is_bio_id"><i><span t-field="line.product_id.is_bio_id.name"/></i></div>
                                     </td>
                                     <td class="text-left;"><span style="font-size:6pt" t-field="line.product_id.barcode"/></td>
                                     <td class="text-center"><span t-field="line.is_nb_colis"/></td>
                                     <td class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
-                                    <td class="text-right" style="border-right:none"><span t-field="line.quantity_done"/></td>
-                                    <td class="text-left"  style="border-left:none"><span t-field="line.product_uom"/></td>
+                                    <td class="text-right" style="border-right:none"><span t-field="line.qty_done"/></td>
+                                    <td class="text-left"  style="border-left:none"><span t-field="line.product_uom_id"/></td>
                                     <td class="text-right"><span t-field="line.is_poids_net_reel"/></td>
                                 </tr>
                             </t>
-                        </t>
-                    </tbody>
+                        </tbody>
+                    </t>
+
+
+
                     <thead>
                         <tr>
                             <th class="text-left" colspan="3"> <strong>Total : </strong></th>

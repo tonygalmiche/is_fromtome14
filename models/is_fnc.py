@@ -7,7 +7,14 @@ class IsFNC(models.Model):
     _description = "Fiche de non-conformité Client / Fournisseur"
     _order = 'name desc'
 
-    name              = fields.Char(u"N°FNC", readonly=True)
+    name    = fields.Char("N°FNC", readonly=True)
+    origine = fields.Selection([
+            ('client'      , 'Client'),
+            ('fournisseur' , 'Fournisseur'),
+            ('transporteur', 'Transporteur'),
+            ('interne'     , 'Interne'),
+        ], 'Origine FNC', required=True, default="fournisseur")
+    
     company_id        = fields.Many2one('res.company', 'Société'    , required=True, default=lambda self: self.env.user.company_id.id, readonly=True)
     emetteur_id       = fields.Many2one('res.users'   , 'Émetteur'  , required=True, default=lambda self: self.env.user.id, readonly=True)
     date_creation     = fields.Date("Date de création"              , required=True, default=lambda *a: fields.Date.today())
@@ -20,16 +27,42 @@ class IsFNC(models.Model):
     status_move       = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'),('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')], required=True)
     description       = fields.Text('Description de la non-conformité')
     cause             = fields.Text('Causes')
-    action_immediate  = fields.Text('Action immédiate')
-    decision          = fields.Text('Décision')
-    analyse           = fields.Text('Analyse des causes')
-    action_corrective = fields.Text('Action corrective proposée')
-    efficacite_action_corrective = fields.Text("Efficacité de l'action corrective")
-    date_cloture      = fields.Date("Date cloture")
+
+    action_immediate     = fields.Text('Action curative')
+    action_curative_date = fields.Date("Date action curative", copy=False)
+    action_curative_responsable_id = fields.Many2one('res.users', 'Responsable action curative', copy=False)
+    action_curative_statut = fields.Selection([
+            ('en_cours' , 'En cours'),
+            ('en_retard', 'En retard'),
+            ('fait'     , 'Fait'),
+        ], 'Statut action curative', default="en_cours", copy=False)
+    decision          = fields.Text('Décision', copy=False)
+    analyse           = fields.Text('Analyse des causes', copy=False)
+
+    action_corrective = fields.Text('Action corrective proposée', copy=False)
+    action_corrective_responsable_id = fields.Many2one('res.users', 'Responsable action corrective')
+    action_corrective_date_prevue    = fields.Date("Date prévue action corrective", copy=False)
+    action_corrective_date_effective = fields.Date("Date éffective action corrective", copy=False)
+    action_corrective_statut = fields.Selection([
+            ('en_cours' , 'En cours'),
+            ('en_retard', 'En retard'),
+            ('fait'     , 'Fait'),
+        ], 'Statut action corrective', default="en_cours", copy=False)
+
+    efficacite_action_corrective     = fields.Text("Efficacité de l'action corrective", copy=False)
+    efficacite_action_date           = fields.Date("Date de vérification", copy=False)
+    efficacite_action_responsable_id = fields.Many2one('res.users', 'Responsable vérification')
+    efficacite_action_date_validee   = fields.Date("Date efficacité validée", copy=False)
+
+    date_cloture      = fields.Date("Date cloture", copy=False)
     state             = fields.Selection([
             ('en_cours', 'En cours'),
             ('solde'   , 'Soldé'),
-        ], 'État', default="en_cours")
+        ], 'État', default="en_cours", copy=False)
+
+
+    fnc_origine_id    = fields.Many2one('is.fnc', "FNC client d'origine", copy=False)
+    fnc_associees_ids = fields.One2many('is.fnc', 'fnc_origine_id', 'FNC associées', copy=False)
 
 
     @api.model
@@ -37,6 +70,40 @@ class IsFNC(models.Model):
         vals['name'] = self.env['ir.sequence'].next_by_code('is.fnc')
         res = super(IsFNC, self).create(vals)
         return res
+
+
+    def creer_fnc_fournisseur_action(self):
+        for obj in self:
+            copy = obj.copy()
+            copy.origine = 'fournisseur'
+            copy.fnc_origine_id = obj.id
+            filtre=[
+                ('date','<=',obj.move_line_id.date),
+                ('lot_id','=',obj.lot_id.id),
+            ]
+            lines = self.env['stock.move.line'].search(filtre, order="date desc")
+            for line in lines:
+                if line.move_id.picking_type_id.id==1:
+                    copy.move_line_id = line.id
+                    copy.picking_id = line.move_id.picking_id.id
+                    copy.partner_id = line.move_id.picking_id.partner_id.id
+                    break
+            return copy.voir_fnc_action()
+
+
+    def voir_fnc_action(self):
+        for obj in self:
+            return {
+                "name": obj.name,
+                "view_mode": "form,tree",
+                "res_model": "is.fnc",
+                "res_id"   : obj.id,
+                "type": "ir.actions.act_window",
+            }
+
+
+
+
 
 
 class StockMoveLine(models.Model):

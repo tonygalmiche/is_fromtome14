@@ -22,12 +22,23 @@
                     }
                 </style>
                 <header>
+                    <button
+                        name="creer_fnc_fournisseur_action"
+                        type="object"
+                        string="Créer FNC fournisseur associée"
+                        attrs="{'invisible': ['|','|',
+                            ('origine', '!=', 'client'),
+                            ('state'  , '!=', 'en_cours'),
+                            ('fnc_associees_ids', '!=', []),
+                        ]}"
+                    />
                     <field name="state" widget="statusbar" clickable="true"/>
                 </header>
                 <sheet>
                     <group>
                         <group>
                             <field name="name"/>
+                            <field name="origine"/>
                             <field name="move_line_id"/>
                             <field name="partner_id"/>
                             <field name="picking_id"/>
@@ -41,17 +52,54 @@
                             <field name="date_creation"/>
                         </group>
                     </group>
-                    <group>
+                    <group string="Description / Cause">
                         <field name="status_move"/>
                         <field name="description"/>
                         <field name="cause"/>
+                    </group>
+                    <group string="Action curative">
                         <field name="action_immediate"/>
+                        <field name="action_curative_date"/>
+                        <field name="action_curative_responsable_id"/>
+                        <field name="action_curative_statut"/>
+                    </group>
+                    <group string="Décision / Analyse">
                         <field name="decision"/>
                         <field name="analyse"/>
+                    </group>
+                    <group string="Action corrective proposée">
                         <field name="action_corrective"/>
+                        <field name="action_corrective_responsable_id"/>
+                        <field name="action_corrective_date_prevue"/>
+                        <field name="action_corrective_date_effective"/>
+                        <field name="action_corrective_statut"/>
+                    </group>
+                    <group string="Efficacité action corrective">
                         <field name="efficacite_action_corrective"/>
+                        <field name="efficacite_action_date"/>
+                        <field name="efficacite_action_responsable_id"/>
+                        <field name="efficacite_action_date_validee"/>
+                    </group>
+                    <group string="Cloture">
                         <field name="date_cloture"/>
                     </group>
+                    <group string="FNC associées">
+                        <field 
+                            name="fnc_origine_id"
+                            attrs="{'invisible': [('origine', '==', 'client')]}"
+                        />
+                    </group>
+                    <field 
+                        name="fnc_associees_ids"
+                        nolabel="1"
+                        attrs="{'readonly': 1, 'invisible': [('fnc_associees_ids', '==', [])]}">
+                        <tree>
+                            <button name="voir_fnc_action" type="object" icon="fa-search-plus"/>
+                            <field name="name"/>
+                            <field name="origine"/>
+                            <field name="partner_id"/>    
+                        </tree>
+                    </field>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids"/>
@@ -67,18 +115,37 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
-                <field name="partner_id"/>
-                <field name="picking_id"/>
-                <field name="product_id"/>
-                <field name="lot_id"/>
-                <field name="dlc_ddm"/>
-                <field name="emetteur_id"/>
-                <field name="date_creation"/>
-                <field name="status_move"/>
-                <field name="description"/>
-                <field name="cause"/>
-                <field name="date_cloture"/>
-                <field name="state"/>
+                <field name="origine"/>
+                <field name="fnc_origine_id" optional="hide"/>
+                <field name="partner_id" optional="show"/>
+                <field name="picking_id" optional="show"/>
+                <field name="product_id" optional="show"/>
+                <field name="lot_id" optional="show"/>
+                <field name="dlc_ddm" optional="show"/>
+                <field name="emetteur_id" optional="show"/>
+                <field name="date_creation" optional="show"/>
+                <field name="status_move" optional="show"/>
+                <field name="description" optional="show"/>
+                <field name="cause" optional="show"/>
+
+                <field name="action_immediate" optional="hide"/>
+                <field name="action_curative_date" optional="hide"/>
+                <field name="action_curative_responsable_id" optional="hide"/>
+                <field name="action_curative_statut" optional="hide"/>
+
+                <field name="action_corrective" optional="hide"/>
+                <field name="action_corrective_responsable_id" optional="hide"/>
+                <field name="action_corrective_date_prevue" optional="hide"/>
+                <field name="action_corrective_date_effective" optional="hide"/>
+                <field name="action_corrective_statut" optional="hide"/>
+
+                <field name="efficacite_action_corrective" optional="hide"/>
+                <field name="efficacite_action_date" optional="hide"/>
+                <field name="efficacite_action_responsable_id" optional="hide"/>
+                <field name="efficacite_action_date_validee" optional="hide"/>
+
+                <field name="date_cloture" optional="show"/>
+                <field name="state" optional="show"/>
             </tree>
         </field>
     </record>
@@ -88,6 +155,8 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
+                <field name="origine"/>
+                <field name="fnc_origine_id"/>
                 <field name="partner_id"/>
                 <field name="picking_id"/>
                 <field name="product_id"/>

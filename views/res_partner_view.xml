@@ -75,6 +75,8 @@
                 <field name="is_code_tarif"                     optional="hide"/>
                 <field name="property_payment_term_id"          optional="hide"/>
                 <field name="property_supplier_payment_term_id" optional="hide"/>
+                <field name="is_modele_commande_id"             optional="hide"/>
+                <field name="is_presentation_bl"                optional="hide"/>
             </field>
         </field>
     </record>
@@ -130,6 +132,7 @@
                 <field name="is_code_tarif"/>
             </field>
             <field name="property_product_pricelist" position="after">
+                <field name="is_presentation_bl"/>
                 <field name="is_modele_commande_id"/>
                 <button
                     name="creer_modele_commande"
