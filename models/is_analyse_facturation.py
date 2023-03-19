@@ -67,12 +67,14 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                         #** Recherche du dernier prix d'achat pour cet article ****
                         prix_achat=montant_achat=marge_brute=0
                         ligne_facture_fournisseur_id = date_facture_fournisseur = False
+                        fournisseur_id = False
                         if invoice.move_type=='out_invoice':
                             sql="""
                                 SELECT  
                                     aml.price_unit,
                                     am.invoice_date,
-                                    aml.id
+                                    aml.id,
+                                    am.partner_id
                                 FROM account_move_line aml inner join account_move am on aml.move_id=am.id
                                 WHERE 
                                     am.invoice_date<=%s and
@@ -86,6 +88,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                                 prix_achat                   = row[0]
                                 date_facture_fournisseur     = row[1]
                                 ligne_facture_fournisseur_id = row[2]
+                                fournisseur_id               = row[3]
                                 montant_achat = prix_achat*line.quantity*sens
                                 marge_brute = line.price_subtotal*sens-montant_achat
 
@@ -114,6 +117,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                             "marge_brute"   : marge_brute,
                             "ligne_facture_fournisseur_id": ligne_facture_fournisseur_id,
                             "date_facture_fournisseur"    : date_facture_fournisseur,
+                            "fournisseur_id"              : fournisseur_id,
                         }
                         self.env['is.analyse.facturation'].create(vals)
 
@@ -163,6 +167,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                     "price_subtotal": price_subtotal,
                     "marge_brute"   : price_subtotal,
                     "move_type"     : "Rebut",
+                    "fournisseur_id": partner_id,
                 }
                 self.env['is.analyse.facturation'].create(vals)
 
@@ -202,6 +207,7 @@ class IsAnalyseFacturation(models.Model):
     marge_brute       = fields.Float("Marge brute")
     ligne_facture_fournisseur_id = fields.Many2one('account.move.line', 'Ligne facture fournisseur')
     date_facture_fournisseur     = fields.Date("Date facture fournisseur")
+    fournisseur_id               = fields.Many2one('res.partner', 'Fournisseur')
     move_type         = fields.Selection([
             ('Facture client'     , 'Facture client'),
             ('Avoir client'       , 'Avoir client'),
@@ -218,3 +224,9 @@ class IsAnalyseFacturation(models.Model):
         date_debut = date_fin - timedelta(30)
         self.env['is.analyse.facturation.update'].update(date_debut,date_fin)
         return True
+    
+
+    def update_fournisseur_action(self):
+        for obj in self:
+            obj.fournisseur_id = obj.ligne_facture_fournisseur_id.move_id.partner_id.id
+

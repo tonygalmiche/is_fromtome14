@@ -38,6 +38,13 @@
 
 
     <!-- is.analyse.facturation -->
+    <record id="is_analyse_facturation_fournisseur_action_server" model="ir.actions.server">
+        <field name="name">Mise à jour du fournisseur</field>
+        <field name="model_id" ref="is_fromtome14.model_is_analyse_facturation"/>
+        <field name="binding_model_id" ref="is_fromtome14.model_is_analyse_facturation"/>
+        <field name="state">code</field>
+        <field name="code">action = records.update_fournisseur_action()</field>
+    </record>
     <record id="is_analyse_facturation_ir_cron" model="ir.cron">
         <field name="name">Mise à jour analyse facturation sur 30 jours</field>
         <field name="model_id" ref="is_fromtome14.model_is_analyse_facturation"/>
@@ -86,6 +93,7 @@
                             <field name="montant_achat"/>
                             <field name="marge_brute"/>
                             <field name="date_facture_fournisseur"/>
+                            <field name="fournisseur_id"/>
                             <field name="ligne_facture_fournisseur_id"/>
                         </group>
                         <group>
@@ -119,7 +127,9 @@
                 <field name="prix_achat"    optional="show"/>
                 <field name="montant_achat" optional="show" sum="Total"/>
                 <field name="marge_brute"   optional="show" sum="Total"/>
-                <field name="bloquer"       optional="hide"/>
+                <field name="date_facture_fournisseur" optional="hide"/>
+                <field name="fournisseur_id"           optional="hide"/>
+                <field name="bloquer"                  optional="hide"/>
             </tree>
         </field>
     </record>
@@ -135,6 +145,7 @@
                 <field name="user_id"/>
                 <field name="invoice_id"/>
                 <field name="scrap_id"/>
+                <field name="fournisseur_id"/>
                 <filter name="group_by_move_type"    string="Type"       context="{'group_by': 'move_type'}"/>
                 <filter name="group_by_partner_id"   string="Partenaire" context="{'group_by': 'partner_id'}"/>
                 <filter name="group_by_enseigne"     string="Enseigne"   context="{'group_by': 'enseigne'}"/>
