@@ -40,3 +40,5 @@ access_is_import_le_cellier,access_is_import_le_cellier,model_is_import_le_celli
 
 access_is_modele_commande,access_is_modele_commande,model_is_modele_commande,base.group_user,1,1,1,1
 access_is_modele_commande_ligne,access_is_modele_commande_ligne,model_is_modele_commande_ligne,base.group_user,1,1,1,1
+
+access_is_transporteur,access_is_transporteur,model_is_transporteur,base.group_user,1,1,1,1

@@ -149,6 +149,7 @@
             </group>
             <field name="payment_mode_id" position="after">
                 <field name="is_date_livraison"/>
+                <field name="is_transporteur_id"/>
             </field>
             <field name="validity_date" position="attributes">
                  <attribute name="invisible">1</attribute>
@@ -216,7 +217,8 @@
                 <field name="is_enseigne_id" optional="show"/>
             </field>
             <field name="date_order" position="after">
-                <field name="is_date_livraison" optional="show"/>
+                <field name="is_date_livraison"  optional="show"/>
+                <field name="is_transporteur_id" optional="hide"/>
             </field>
             <field name="invoice_status" position="before">
                 <field name="is_commande_soldee" optional="show"/>
@@ -238,7 +240,8 @@
         <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
         <field name="arch" type="xml">
             <field name="create_date" position="after">
-                <field name="is_date_livraison" optional="show"/>
+                <field name="is_date_livraison"  optional="show"/>
+                <field name="is_transporteur_id" optional="hide"/>
             </field>
        </field>
     </record>
@@ -249,6 +252,7 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id"/>
+                <field name="is_transporteur_id"/>
                 <field name="is_frequence_facturation"/>
             </field>
             <filter name="order_month" position="after">

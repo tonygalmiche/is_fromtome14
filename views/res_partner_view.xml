@@ -43,11 +43,57 @@
     <menuitem 
         id="is_enseigne_commerciale_menu" 
         name="Enseigne commerciale" 
-        parent="sale.prod_config_main" 
-        sequence="990"
+        parent="sale.menu_sale_config" 
+        sequence="900"
         action="is_enseigne_commerciale_action"
     />
 
+
+    <!-- is.transporteur -->
+    <record id="is_transporteur_tree_view" model="ir.ui.view">
+        <field name="name">is_transporteur_tree_view</field>
+        <field name="model">is.transporteur</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_transporteur_form_view" model="ir.ui.view">
+        <field name="name">is_transporteur_form_view</field>
+        <field name="model">is.transporteur</field>
+        <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <field name="name"/>
+                </group>
+            </sheet>
+        </form>
+        </field>
+    </record>
+    <record id="is_transporteur_search_view" model="ir.ui.view">
+        <field name="name">is_transporteur_search_view</field>
+        <field name="model">is.transporteur</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+    <record id="is_transporteur_action" model="ir.actions.act_window" >
+        <field name="name">Transporteur</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">is.transporteur</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem 
+        id="is_transporteur_menu" 
+        name="Transporteur" 
+        parent="sale.menu_sale_config" 
+        sequence="910"
+        action="is_transporteur_action"
+    />
 
 
     <!-- res.partner -->
@@ -68,6 +114,24 @@
                     optional="show"
                 />
             </field>
+            <field name="email" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
+            <field name="user_id" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
+            <field name="city" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
+            <field name="country_id" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
+            <field name="activity_ids" position="attributes">
+                <attribute name="optional">hide</attribute>
+            </field>
+
+
+
            <field name="parent_id" position="after">
                 <field name="is_gln"                            optional="hide"/>
                 <field name="is_code_fromtome"                  optional="hide"/>
@@ -77,6 +141,7 @@
                 <field name="property_supplier_payment_term_id" optional="hide"/>
                 <field name="is_modele_commande_id"             optional="hide"/>
                 <field name="is_presentation_bl"                optional="hide"/>
+                <field name="is_transporteur_id"                optional="hide"/>
             </field>
         </field>
     </record>
@@ -99,6 +164,7 @@
                 <field name="is_gln"/>
                 <field name="is_code_fromtome"/>
                 <field name="is_code_interne"/>
+                <field name="is_transporteur_id" widget="selection"/>
             </field>
             <xpath expr="//page[@name='sales_purchases']/group/group/field[@name='user_id']" position="before">
                 <field name="is_customer"/>
@@ -175,6 +241,7 @@
         <field name="arch" type="xml">
             <field name="name" position="after">
                 <field name="is_frequence_facturation"/>
+                <field name="is_transporteur_id"/>
             </field>
             <filter name="type_company" position="after">
                 <filter string="Clients"      name="is_customer" domain="[('is_customer', '=', True)]"/>

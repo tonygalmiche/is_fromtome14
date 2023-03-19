@@ -15,6 +15,13 @@ class IsEnseigneCommerciale(models.Model):
     name = fields.Many2one('res.partner', 'Enseigne commerciale', required=True)
 
 
+class IsTransporteur(models.Model):
+    _name = 'is.transporteur'
+    _description = "Transporteur"
+
+    name = fields.Char('Transporteur', required=True)
+
+
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
@@ -31,6 +38,7 @@ class ResPartner(models.Model):
     is_frequence_facturation    = fields.Selection(string='Fréquence facturation', selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')])
     is_modele_commande_id       = fields.Many2one('is.modele.commande', 'Modèle de commande')
     is_presentation_bl          = fields.Selection(string='Présentation BL', selection=[('standard', 'Standard'),('detaillee', 'Détaillée')], default="standard")
+    is_transporteur_id          = fields.Many2one('is.transporteur', 'Transporteur', help="Enseigne commerciale")
 
 
     def creer_modele_commande(self):

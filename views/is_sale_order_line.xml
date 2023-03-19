@@ -18,6 +18,7 @@
                         <field name="product_uom_qty"/>
                         <field name="qty_delivered"/>
                         <field name="qty_invoiced"/>
+                        <field name="is_poids_net"/>
                         <field name="price_unit"/>
                         <field name="discount"/>
                         <field name="price_subtotal"/>
@@ -41,22 +42,22 @@
                 <field name="order_id" optional="show"/>
                 <field name="date_order" optional="show"/>
                 <field name="partner_id" optional="show"/>
+                <field name="is_enseigne_id" optional="show"/>
+                <field name="user_id" optional="show"/>
                 <field name="description" optional="show"/>
-                <field name="barcode" optional="show"/>
-                <field name="is_date_livraison" optional="show"/>
+                <field name="barcode" optional="hide"/>
+                <field name="is_date_livraison" optional="hide"/>
                 <field name="product_uom_qty" sum="Total" optional="show"/>
-                <field name="qty_delivered"   sum="Total" optional="show"/>
-                <field name="qty_invoiced"    sum="Total" optional="show"/>
-                <field name="price_unit"/>
-                <field name="discount" optional="show"/>
+                <field name="qty_delivered"   sum="Total" optional="hide"/>
+                <field name="qty_invoiced"    sum="Total" optional="hide"/>
+                <field name="is_poids_net" sum="Total" optional="show"/>
+                <field name="price_unit" optional="hide"/>
+                <field name="discount" optional="hide"/>
                 <field name="price_subtotal"  sum="Total" optional="show"/>
-
-
-
-                <field name="product_uom"/>
-                <field name="is_commande_soldee"/>
-                <field name="purchase_order_id"/>
-                <field name="state"/>
+                <field name="product_uom" optional="hide"/>
+                <field name="is_commande_soldee" optional="hide"/>
+                <field name="purchase_order_id" optional="hide"/>
+                <field name="state" optional="hide"/>
             </tree>
         </field>
     </record>
@@ -67,6 +68,8 @@
             <search>
                 <field name="order_id"/>
                 <field name="partner_id"/>
+                <field name="is_enseigne_id"/>
+                <field name="user_id"/>
                 <field name="product_id"/>
                 <field name="barcode"/>
                 <field name="is_commande_soldee"/>

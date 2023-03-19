@@ -192,6 +192,7 @@ class SaleOrder(models.Model):
     is_frequence_facturation = fields.Selection(string='Fréquence facturation', related="partner_id.is_frequence_facturation") #, selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')])
     is_type_doc              = fields.Selection([('cc', 'CC'), ('offre', 'Offre')], string='Type document', default="cc")
     is_modele_commande_id    = fields.Many2one('is.modele.commande', 'Modèle de commande', related='partner_id.is_modele_commande_id')
+    is_transporteur_id       = fields.Many2one(related='partner_id.is_transporteur_id')
 
 
     @api.depends('order_line')

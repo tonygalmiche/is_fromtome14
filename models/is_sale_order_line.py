@@ -35,6 +35,10 @@ class is_sale_order_line(models.Model):
             ('done', 'Bloqué'),
             ('cancel', 'Annulé'),
         ], 'Etat de la commande')
+    
+    user_id        = fields.Many2one('res.users', 'Vendeur')
+    is_enseigne_id = fields.Many2one('is.enseigne.commerciale', 'Enseigne', help="Enseigne commerciale")
+    is_poids_net   = fields.Float(string='Poids net', digits='Stock Weight', help="Poids net total (Kg)")
 
     def init(self):
         drop_view_if_exists(self.env.cr, self._table)
@@ -61,7 +65,10 @@ class is_sale_order_line(models.Model):
                     sol.id                  as order_line_id,
                     sol.is_purchase_line_id,
                     po.id                   as purchase_order_id,
-                    so.state
+                    so.state,
+                    so.user_id,
+                    rp.is_enseigne_id,
+                    sol.is_poids_net
                 from sale_order so    inner join sale_order_line     sol on so.id=sol.order_id
                                       inner join product_product     pp on sol.product_id=pp.id
                                       inner join product_template    pt on pp.product_tmpl_id=pt.id

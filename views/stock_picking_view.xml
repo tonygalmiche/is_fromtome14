@@ -265,8 +265,9 @@
                 <field name="is_poids_net" sum="Total"/>
             </field>
            <field name="backorder_id" position="after">
-                <field name="is_enseigne_id"/>
-            </field>
+            <field name="is_enseigne_id"/>
+            <field name="is_transporteur_id"/>
+        </field>
            <field name="partner_id" position="after">
                 <button name="scan_picking_action" type="object" string="Scan"/>
             </field>
@@ -292,7 +293,8 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id" optional="show"/>
-                <field name="user_id"        optional="hide"/>
+                <field name="is_transporteur_id" optional="hide"/>
+                <field name="user_id"            optional="hide"/>
                 <field name="date_done"/>
                 <field name="is_date_reception" widget="remaining_days" optional="show"/>
                 <field name="is_date_livraison" widget="remaining_days" optional="show"/>
@@ -315,6 +317,7 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id"/>
+                <field name="is_transporteur_id"/>
                 <field name="is_date_livraison"/>
             </field>
             <filter name="my_transfers" position="before">
