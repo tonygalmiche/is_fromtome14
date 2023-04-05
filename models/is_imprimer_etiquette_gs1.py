@@ -156,5 +156,5 @@ class IsImprimerEtiquetteGS1(models.Model):
                     output = check_output(cmd, shell=True, stderr=STDOUT)
                 except CalledProcessError as exc:
                     raise UserError("%s \n%s"%(cmd,exc.output.decode("utf-8")))
-                else:
-                    assert 0
+                #else:
+                #    assert 0
