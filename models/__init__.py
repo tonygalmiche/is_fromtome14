@@ -8,6 +8,7 @@ from . import product_pricelist
 from . import purchase_order
 from . import res_company
 from . import res_partner
+from . import res_users
 from . import sale_order
 from . import stock
 from . import stock_inventory

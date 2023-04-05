@@ -42,3 +42,6 @@ access_is_modele_commande,access_is_modele_commande,model_is_modele_commande,bas
 access_is_modele_commande_ligne,access_is_modele_commande_ligne,model_is_modele_commande_ligne,base.group_user,1,1,1,1
 
 access_is_transporteur,access_is_transporteur,model_is_transporteur,base.group_user,1,1,1,1
+
+access_is_imprimante_etiquette,access_is_imprimante_etiquette,model_is_imprimante_etiquette,base.group_user,1,0,0,0
+access_is_imprimante_etiquette_manager,access_is_imprimante_etiquette_manager,model_is_imprimante_etiquette,base.group_system,1,1,1,1

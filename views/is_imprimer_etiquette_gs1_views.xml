@@ -26,6 +26,7 @@
                         <field name="poids"/>
                         <field name="nb_pieces"/>
                         <field name="qt_imprime"/>
+                        <field name="imprimante_id" required="1"/>
                     </group>
                 </sheet>
             </form>
@@ -46,6 +47,7 @@
                 <field name="qt_imprime" sum="Total"/>
                 <field name="create_date" string="Créée le"/>
                 <field name="write_date"  string="Modifiée le"/>
+                <field name="imprimante_id"/>
             </tree>
         </field>
     </record>
@@ -58,6 +60,7 @@
                 <field name="code_ean"/>
                 <field name="lot"/>
                 <field name="nb_pieces"/>
+                <field name="imprimante_id"/>
            </search>
         </field>
     </record>
@@ -97,8 +100,57 @@
 
     />
 
-<!--
 
--->
 
+    <!-- is.imprimante.etiquette -->
+    <record id="is_imprimante_etiquette_form" model="ir.ui.view">
+        <field name="name">is.imprimante.etiquette.form</field>
+        <field name="model">is.imprimante.etiquette</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="name_cups"/>
+                        <field name="default"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_imprimante_etiquette_tree" model="ir.ui.view">
+        <field name="name">is.imprimante.etiquette.tree</field>
+        <field name="model">is.imprimante.etiquette</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="name_cups"/>
+                <field name="default"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_imprimante_etiquette_search" model="ir.ui.view">
+        <field name="name">is.imprimante.etiquette.search</field>
+        <field name="model">is.imprimante.etiquette</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="name_cups"/>
+           </search>
+        </field>
+    </record>
+
+    <record  id="is_imprimante_etiquette_action" model="ir.actions.act_window">
+        <field name="name">Imprimantes étiquettes</field>
+        <field name="res_model">is.imprimante.etiquette</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_imprimante_etiquette_menu"
+        name="Imprimantes étiquettes"
+        parent="stock.menu_stock_config_settings"
+        sequence="900"
+        action="is_imprimante_etiquette_action"
+    />
 </odoo>

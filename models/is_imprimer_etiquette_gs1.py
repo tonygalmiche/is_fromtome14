@@ -1,14 +1,26 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
+from odoo.exceptions import UserError
 import codecs
 import unicodedata
 import base64
 from datetime import datetime
-import subprocess
+#import subprocess
+from subprocess import check_output, STDOUT, CalledProcessError
+
+class IsImprimanteEtiquette(models.Model):
+    _name = 'is.imprimante.etiquette'
+    _description = "Imprimante étiquettes"
+    _order='name'
+
+    name      = fields.Char("Nom de l'imprimante", required=True)
+    name_cups = fields.Char("Nom CUPS", required=True)
+    default   = fields.Boolean("Imprimante par défaut", default=False)
+
 
 class IsImprimerEtiquetteGS1(models.Model):
     _name = 'is.imprimer.etiquette.gs1'
-    _description = u"Imprimer des éiquettes GS1"
+    _description = u"Imprimer des étiquettes GS1"
     _order='id desc'
 
     code_gs1   = fields.Text("Code GS1")
@@ -21,7 +33,17 @@ class IsImprimerEtiquetteGS1(models.Model):
     nb_pieces  = fields.Integer("Nb pièces (37)", required=True, default=1)
     poids      = fields.Float("Poids (31xx)"    , required=True, digits='Stock Weight')
     qt_imprime = fields.Integer("Quantité à Imprimer", required=True, default=1)
+    imprimante_id = fields.Many2one('is.imprimante.etiquette', 'Imprimante étiquettes',default=lambda self: self.get_imprimante())
 
+
+    def get_imprimante(self):
+        imprimante_id=self.env.user.is_imprimante_id.id
+        if not imprimante_id:
+            imprimantes = self.env['is.imprimante.etiquette'].search([('default', '=', True)],limit=1)
+            for imprimante in imprimantes:
+                imprimante_id = imprimante.id
+        return imprimante_id
+    
 
     def str2date(self,txt):
         try:
@@ -125,6 +147,14 @@ class IsImprimerEtiquetteGS1(models.Model):
             f.write(ZPL)
             f.close()
 
-            cmd = "lpr -P GX430T " + dest
+            imprimante = obj.imprimante_id.name_cups or 'GX430T'
+
+            cmd = "lpr -P %s %s "%(imprimante,dest)
             for x in range(0, obj.qt_imprime):
-                subprocess.check_call(cmd, shell=True)
+                #subprocess.check_call(cmd, shell=True)
+                try:
+                    output = check_output(cmd, shell=True, stderr=STDOUT)
+                except CalledProcessError as exc:
+                    raise UserError("%s \n%s"%(cmd,exc.output.decode("utf-8")))
+                else:
+                    assert 0
