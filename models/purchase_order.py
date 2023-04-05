@@ -144,6 +144,8 @@ class PurchaseOrderLine(models.Model):
     is_poids_net           = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
     is_alerte              = fields.Text(string='Alerte', compute='_compute_is_alerte')
     is_client_id           = fields.Many2one('res.partner', 'Client', related='is_sale_order_line_id.order_id.partner_id')
+    is_date_planned        = fields.Datetime(string="Date de réception", related='order_id.date_planned')
+    is_date_enlevement     = fields.Date(related='order_id.is_date_enlevement')
 
 
     def acceder_commande_client(self):
