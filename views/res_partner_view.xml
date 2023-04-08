@@ -136,6 +136,7 @@
                 <field name="is_gln"                            optional="hide"/>
                 <field name="is_code_fromtome"                  optional="hide"/>
                 <field name="is_code_interne"                   optional="hide"/>
+                <field name="property_account_payable_id"       optional="hide"/>
                 <field name="is_code_tarif"                     optional="hide"/>
                 <field name="property_payment_term_id"          optional="hide"/>
                 <field name="property_supplier_payment_term_id" optional="hide"/>
