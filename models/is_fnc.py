@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
+from datetime import date
+
 
 class IsFNC(models.Model):
     _name = 'is.fnc'
@@ -102,8 +104,34 @@ class IsFNC(models.Model):
             }
 
 
+    @api.model
+    def fnc_update_ir_cron(self):
+        fncs=self.env['is.fnc'].search([])
+        for fnc in fncs:
+            fnc.fnc_update_action()
+        return True
+    
+
+    @api.onchange('action_corrective_date_effective', 'action_corrective_date_prevue')
+    def fnc_update_action(self):
+        for obj in self:
+            statut = obj.get_statut()
+            if statut:
+                if obj.action_corrective_statut != statut:
+                    obj.action_corrective_statut = statut
 
 
+    def get_statut(self):
+        statut = False
+        for obj in self:
+            if obj.action_corrective_date_effective:
+                statut =  'fait'
+            if obj.action_corrective_date_prevue and not obj.action_corrective_date_effective:
+                if obj.action_corrective_date_prevue < date.today():
+                    statut = 'en_retard'
+                else:
+                    statut = 'en_cours'
+        return statut
 
 
 class StockMoveLine(models.Model):
