@@ -252,6 +252,9 @@ class ProductTemplate(models.Model):
     is_poids_net_colis     = fields.Float(string='Poids net colis (Kg)', digits='Stock Weight')
 
 
+    is_note_importation = fields.Text(string='Note importation Fusion Fromtome / Le Cellier')
+
+
 
 #TODO : Toute la partie ci-dessous sera a revoir dans un deuxième temps
 

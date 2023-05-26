@@ -46,6 +46,9 @@ records.exporter_article_fromelier_action()
             </field>
             <xpath expr="//page/group/field[@name='description']/.." position="before">
                 <group>
+                    <field name="is_note_importation" nolabel="1" readonly="1"/>
+                </group>
+                <group>
                     <field name="is_pricelist_item_ids" nolabel="1">
                         <tree>
                             <field name="pricelist_id" string="Liste de prix"/>
@@ -86,6 +89,7 @@ records.exporter_article_fromelier_action()
             </field>
             <field name="responsible_id" position="replace">
                 <field name="responsible_id" optional="hide"/>
+                <field name="is_note_importation" optional="hide"/>
             </field>
         </field>
     </record>
