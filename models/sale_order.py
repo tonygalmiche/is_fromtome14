@@ -195,6 +195,12 @@ class SaleOrder(models.Model):
     is_transporteur_id       = fields.Many2one(related='partner_id.is_transporteur_id')
 
 
+    @api.onchange('partner_id')
+    def onchange_partner_id_warehouse(self):
+        if self.partner_id and self.partner_id.is_enseigne_id and self.partner_id.is_enseigne_id.warehouse_id:
+            self.warehouse_id = self.partner_id.is_enseigne_id.warehouse_id.id
+ 
+
     @api.depends('order_line')
     def _compute_is_creer_commande_fournisseur_vsb(self):
         for obj in self:
