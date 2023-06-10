@@ -47,30 +47,30 @@ class IsImportLeCellier(models.Model):
                 #**************************************************************
 
 
-            #** Création des listes de prix ***********************************
-            name = "Liste Prix CDF QUAI"
-            pricelist_quai = False
-            pricelists = self.env['product.pricelist'].search([("name","=",name)])
-            if len(pricelists):
-                pricelist_quai = pricelists[0]
-                pricelist_quai.item_ids.unlink()
-            else:
-                vals={
-                    "name": name,
-                }
-                pricelist_quai=self.env['product.pricelist'].create(vals)
-            name = "Liste Prix CDF FRANCO"
-            pricelist_franco = False
-            pricelists = self.env['product.pricelist'].search([("name","=",name)])
-            if len(pricelists):
-                pricelist_franco = pricelists[0]
-                pricelist_franco.item_ids.unlink()
-            else:
-                vals={
-                    "name": name,
-                }
-                pricelist_franco=self.env['product.pricelist'].create(vals)
-            #******************************************************************
+            # #** Création des listes de prix ***********************************
+            # name = "Liste Prix CDF QUAI"
+            # pricelist_quai = False
+            # pricelists = self.env['product.pricelist'].search([("name","=",name)])
+            # if len(pricelists):
+            #     pricelist_quai = pricelists[0]
+            #     pricelist_quai.item_ids.unlink()
+            # else:
+            #     vals={
+            #         "name": name,
+            #     }
+            #     pricelist_quai=self.env['product.pricelist'].create(vals)
+            # name = "Liste Prix CDF FRANCO"
+            # pricelist_franco = False
+            # pricelists = self.env['product.pricelist'].search([("name","=",name)])
+            # if len(pricelists):
+            #     pricelist_franco = pricelists[0]
+            #     pricelist_franco.item_ids.unlink()
+            # else:
+            #     vals={
+            #         "name": name,
+            #     }
+            #     pricelist_franco=self.env['product.pricelist'].create(vals)
+            # #******************************************************************
 
 
             ws = wb['Sheet1']
@@ -117,17 +117,17 @@ class IsImportLeCellier(models.Model):
                             partners = self.env['res.partner'].search([("name","=",fournisseur)])
                             if len(partners)>0:
                                 partner = partners[0]
-                    if not partner and fournisseur:
-                        vals={
-                            "name": fournisseur,
-                        }
-                        partner = self.env['res.partner'].create(vals)
-                        print("Création", fournisseur, code_comptable_fournisseur)
-                if partner and code_fournisseur and not partner.is_code_interne:
-                        vals={
-                            "is_code_interne" : code_fournisseur,
-                        }
-                        partner.write(vals)
+                    # if not partner and fournisseur:
+                    #     vals={
+                    #         "name": fournisseur,
+                    #     }
+                    #     partner = self.env['res.partner'].create(vals)
+                    #     print("Création", fournisseur, code_comptable_fournisseur)
+                # if partner and code_fournisseur and not partner.is_code_interne:
+                #         vals={
+                #             "is_code_interne" : code_fournisseur,
+                #         }
+                #         partner.write(vals)
                 #**************************************************************
 
                 #** Recherche article *****************************************
@@ -141,14 +141,13 @@ class IsImportLeCellier(models.Model):
                             products = self.env['product.template'].search([("barcode","=",code_ean)])
                     if len(products):
                         product = products[0]
-                    else:
-                        vals={
-                            "name"        : designation_interne,
-                            "default_code": nouvelle_reference,
-                            #"barcode"     : code_ean,
-                        }
-                        product = self.env['product.template'].create(vals)
-                        print("Création", designation_interne)
+                    # else:
+                    #     vals={
+                    #         "name"        : designation_interne,
+                    #         "default_code": nouvelle_reference,
+                    #     }
+                    #     product = self.env['product.template'].create(vals)
+                    #     print("Création", designation_interne)
                 #**************************************************************
 
 
@@ -160,114 +159,109 @@ class IsImportLeCellier(models.Model):
                 #**************************************************************
 
 
-
-
                 #** Création / Modification article ***************************
                 if product:
-                    print(lig,ct,products,code_ean, ref_fromtome, nouvelle_reference)
+                    print(lig,ct,products,nouvelle_reference,designation_interne)
                     tz = pytz.timezone('Europe/Paris')
                     now = datetime.now(tz).strftime("%d/%m/%Y à %H:%M:%S")
                     note = "Importé le %s"%(now)
                     vals={
                         "is_note_importation": note,
                         "default_code"       : nouvelle_reference,
-                        "taxes_id"           : [(6, 0, [taxe_vente_id])],
-                        "supplier_taxes_id"  : [(6, 0, [taxe_achat_id])],
-                        "type"               : "product",
+                        "name"               : designation_interne,
+
+
+                        #"taxes_id"           : [(6, 0, [taxe_vente_id])],
+                        #"supplier_taxes_id"  : [(6, 0, [taxe_achat_id])],
+                        #"type"               : "product",
                     }
-                    if unite=="Kg":
-                        vals["uom_id"]    = uom_id
-                        vals["uom_po_id"] = uom_id
-                    if colisage>0:
-                        vals["is_nb_pieces_par_colis"] = colisage
-                    if poids_colis>0:
-                        vals["is_poids_net_colis"] = poids_colis
-                    if milk_type_ids:
-                        vals["milk_type_ids"] = [(6, 0, milk_type_ids)]
-                    traitements={
-                        "Cru":"laitcru",
-                        "Pasteurisé":"laitpasteurisé",
-                        "Thermisé":"laitthermise",
-                    }
-                    if traitement_thermique in traitements:
-                        vals["traitement_thermique"] = traitements[traitement_thermique]
+                    # if unite=="Kg":
+                    #     vals["uom_id"]    = uom_id
+                    #     vals["uom_po_id"] = uom_id
+                    # if colisage>0:
+                    #     vals["is_nb_pieces_par_colis"] = colisage
+                    # if poids_colis>0:
+                    #     vals["is_poids_net_colis"] = poids_colis
+                    # if milk_type_ids:
+                    #     vals["milk_type_ids"] = [(6, 0, milk_type_ids)]
+                    # traitements={
+                    #     "Cru":"laitcru",
+                    #     "Pasteurisé":"laitpasteurisé",
+                    #     "Thermisé":"laitthermise",
+                    # }
+                    # if traitement_thermique in traitements:
+                    #     vals["traitement_thermique"] = traitements[traitement_thermique]
+
+
+
                     product.write(vals)
                     ct+=1
                 #**************************************************************
 
-                #** Tarif fournisseur *****************************************
-                if partner and product and prix_brut>0:
-                    product.seller_ids.unlink()
-                    vals={
-                        "product_tmpl_id": product.id,
-                        "name"           : partner.id,
-                        "product_code"   : ref_fournisseur,
-                        "prix_brut"      : prix_brut,
-                        "min_qty"        : 0,
-                        "date_start"     : "2023-01-01",
-                        "date_end"       : "2033-01-01",
-                    }
-                    supplierinfo = self.env['product.supplierinfo'].create(vals)
-                    if remise1>0:
-                        vals={
-                            "supplier_info_id": supplierinfo.id,
-                            "name"            : remise1*100,
-                        }
-                        self.env['product.supplierdiscount'].create(vals)
-                    if remise2>0:
-                        vals={
-                            "supplier_info_id": supplierinfo.id,
-                            "name"            : remise2*100,
-                        }
-                        self.env['product.supplierdiscount'].create(vals)
-                    if remise3>0:
-                        vals={
-                            "supplier_info_id": supplierinfo.id,
-                            "name"            : remise3*100,
-                        }
-                        self.env['product.supplierdiscount'].create(vals)
-                    if remise4>0:
-                        vals={
-                            "supplier_info_id": supplierinfo.id,
-                            "name"            : remise4*100,
-                        }
-                        self.env['product.supplierdiscount'].create(vals)
-                    if remise5>0:
-                        vals={
-                            "supplier_info_id": supplierinfo.id,
-                            "name"            : remise5*100,
-                        }
-                        self.env['product.supplierdiscount'].create(vals)
-                #**************************************************************
+                # #** Tarif fournisseur *****************************************
+                # if partner and product and prix_brut>0:
+                #     product.seller_ids.unlink()
+                #     vals={
+                #         "product_tmpl_id": product.id,
+                #         "name"           : partner.id,
+                #         "product_code"   : ref_fournisseur,
+                #         "prix_brut"      : prix_brut,
+                #         "min_qty"        : 0,
+                #         "date_start"     : "2023-01-01",
+                #         "date_end"       : "2033-01-01",
+                #     }
+                #     supplierinfo = self.env['product.supplierinfo'].create(vals)
+                #     if remise1>0:
+                #         vals={
+                #             "supplier_info_id": supplierinfo.id,
+                #             "name"            : remise1*100,
+                #         }
+                #         self.env['product.supplierdiscount'].create(vals)
+                #     if remise2>0:
+                #         vals={
+                #             "supplier_info_id": supplierinfo.id,
+                #             "name"            : remise2*100,
+                #         }
+                #         self.env['product.supplierdiscount'].create(vals)
+                #     if remise3>0:
+                #         vals={
+                #             "supplier_info_id": supplierinfo.id,
+                #             "name"            : remise3*100,
+                #         }
+                #         self.env['product.supplierdiscount'].create(vals)
+                #     if remise4>0:
+                #         vals={
+                #             "supplier_info_id": supplierinfo.id,
+                #             "name"            : remise4*100,
+                #         }
+                #         self.env['product.supplierdiscount'].create(vals)
+                #     if remise5>0:
+                #         vals={
+                #             "supplier_info_id": supplierinfo.id,
+                #             "name"            : remise5*100,
+                #         }
+                #         self.env['product.supplierdiscount'].create(vals)
+                # #**************************************************************
 
 
-                #** Liste de prix client **************************************
-                if pricelist_quai and product and prix_quai>0:
-                    vals={
-                        "pricelist_id"   : pricelist_quai.id,
-                        "applied_on"     : "1_product",
-                        "product_tmpl_id": product.id,
-                        "fixed_price"    : prix_quai,
-                    }
-                    self.env['product.pricelist.item'].create(vals)
-                if pricelist_franco and product and prix_franco>0:
-                    vals={
-                        "pricelist_id"   : pricelist_franco.id,
-                        "applied_on"     : "1_product",
-                        "product_tmpl_id": product.id,
-                        "fixed_price"    : prix_franco,
-                    }
-                    self.env['product.pricelist.item'].create(vals)
-                #**************************************************************
+                # #** Liste de prix client **************************************
+                # if pricelist_quai and product and prix_quai>0:
+                #     vals={
+                #         "pricelist_id"   : pricelist_quai.id,
+                #         "applied_on"     : "1_product",
+                #         "product_tmpl_id": product.id,
+                #         "fixed_price"    : prix_quai,
+                #     }
+                #     self.env['product.pricelist.item'].create(vals)
+                # if pricelist_franco and product and prix_franco>0:
+                #     vals={
+                #         "pricelist_id"   : pricelist_franco.id,
+                #         "applied_on"     : "1_product",
+                #         "product_tmpl_id": product.id,
+                #         "fixed_price"    : prix_franco,
+                #     }
+                #     self.env['product.pricelist.item'].create(vals)
+                # #**************************************************************
 
 
                 lig+=1
-
-                #if ct>30:
-                #  break
-
-
-
-
-
-
