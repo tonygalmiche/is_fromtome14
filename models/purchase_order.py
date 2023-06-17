@@ -45,7 +45,26 @@ class PurchaseOrder(models.Model):
     is_fromtome_order_id       = fields.Many2one('sale.order', 'Commande Fromtome', copy=False,readonly=True)
     is_fromtome_order_vsb      = fields.Boolean(string='Créer commande dans Fromtome vsb', compute='_compute_is_fromtome_order_vsb')
     is_maj_commande_client_vsb = fields.Boolean(string='MAJ commandes clients', compute='_compute_is_maj_commande_client_vsb', readonly=True, store=False)
+    is_enseigne_id             = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
 
+
+
+    @api.onchange('partner_id')
+    def onchange_partner_id_warehouse(self):
+
+        print("onchange_partner_id_warehouse",self)
+
+        if self.partner_id and self.partner_id.is_warehouse_id:
+            print(self,self.partner_id.is_warehouse_id.in_type_id)
+            self.picking_type_id = self.partner_id.is_warehouse_id.in_type_id.id
+        else:
+            if self.partner_id and self.partner_id.is_enseigne_id and self.partner_id.is_enseigne_id.warehouse_id:
+
+                print(self,self.partner_id.is_enseigne_id.warehouse_id.in_type_id.id)
+
+
+                self.picking_type_id = self.partner_id.is_enseigne_id.warehouse_id.in_type_id.id
+ 
 
     def maj_commande_client_action(self):
         for obj in self:

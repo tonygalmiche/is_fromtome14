@@ -40,6 +40,7 @@ class ResPartner(models.Model):
     is_modele_commande_id       = fields.Many2one('is.modele.commande', 'Modèle de commande')
     is_presentation_bl          = fields.Selection(string='Présentation BL', selection=[('standard', 'Standard'),('detaillee', 'Détaillée')], default="standard")
     is_transporteur_id          = fields.Many2one('is.transporteur', 'Transporteur', help="Enseigne commerciale")
+    is_warehouse_id             = fields.Many2one('stock.warehouse', 'Entrepôt', help="Entrepôt à utiliser dans les réceptions ou les livraisons")
 
 
     def creer_modele_commande(self):

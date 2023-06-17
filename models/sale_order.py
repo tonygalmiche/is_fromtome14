@@ -197,8 +197,11 @@ class SaleOrder(models.Model):
 
     @api.onchange('partner_id')
     def onchange_partner_id_warehouse(self):
-        if self.partner_id and self.partner_id.is_enseigne_id and self.partner_id.is_enseigne_id.warehouse_id:
-            self.warehouse_id = self.partner_id.is_enseigne_id.warehouse_id.id
+        if self.partner_id and self.partner_id.is_warehouse_id:
+            self.warehouse_id = self.partner_id.is_warehouse_id.id
+        else:
+            if self.partner_id and self.partner_id.is_enseigne_id and self.partner_id.is_enseigne_id.warehouse_id:
+                self.warehouse_id = self.partner_id.is_enseigne_id.warehouse_id.id
  
 
     @api.depends('order_line')

@@ -39,6 +39,9 @@
                     .o_form_view .o_form_sheet_bg > .o_form_sheet{
                         max-width: 1800px;
                     }
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
                 </style>
             </xpath>
             <button name="button_unlock" position="after">
@@ -59,19 +62,18 @@
                     attrs="{'invisible': [('is_maj_commande_client_vsb', '=', False)]}"
                 />
             </button>
-
+            <field name="partner_id" position="after">
+                <field name="is_enseigne_id"/>
+            </field>
             <field name="partner_id" position="attributes">
                 <attribute name="domain">[('is_company','=',True),('is_supplier','=',True)]</attribute>
             </field>
             <field name="date_order" position="after">
                 <field name="is_commande_soldee" readonly="1"/>
             </field>
-
             <xpath expr="//field[@name='order_line']//tree" position='attributes'>
                 <attribute name="decoration-danger">is_alerte!=""</attribute>
             </xpath>
-
-
              <xpath expr="//field[@name='order_line']//tree//field[@name='product_id']" position='before'>
                 <field name="is_sale_order_line_id" invisible="1"/>
                 <button 
@@ -114,8 +116,12 @@
             <field name="origin" position="before">
                <field name="is_date_enlevement"/>
             </field>
+            <field name="picking_type_id" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </field>
             <xpath expr="//field[@name='partner_ref']" position="after">
                 <field name="is_adresse_livraison_id"/>
+                <field name="picking_type_id"/>
                 <field name="is_fromtome_order_id"/>
             </xpath>
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_uom']" position='attributes'>
