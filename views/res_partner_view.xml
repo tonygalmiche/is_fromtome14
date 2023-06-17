@@ -147,6 +147,7 @@
                 <field name="is_presentation_bl"                optional="hide"/>
                 <field name="is_transporteur_id"                optional="hide"/>
                 <field name="is_warehouse_id"                   optional="hide"/>
+                <field name="is_frais_port_id"                  optional="hide"/>
             </field>
         </field>
     </record>
@@ -171,6 +172,7 @@
                 <field name="is_code_interne"/>
                 <field name="is_transporteur_id" widget="selection"/>
                 <field name="is_warehouse_id"    widget="selection"/>
+                <field name="is_frais_port_id"/>
             </field>
             <xpath expr="//page[@name='sales_purchases']/group/group/field[@name='user_id']" position="before">
                 <field name="is_customer"/>
@@ -249,6 +251,7 @@
                 <field name="is_frequence_facturation"/>
                 <field name="is_transporteur_id"/>
                 <field name="is_warehouse_id"/>
+                <field name="is_frais_port_id"/>
             </field>
             <filter name="type_company" position="after">
                 <filter string="Clients"      name="is_customer" domain="[('is_customer', '=', True)]"/>

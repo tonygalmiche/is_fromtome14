@@ -195,6 +195,29 @@ class SaleOrder(models.Model):
     is_transporteur_id       = fields.Many2one(related='partner_id.is_transporteur_id')
 
 
+    @api.model
+    def create(self, vals):
+        order = super(SaleOrder, self).create(vals)
+        ##** Ajout des frais de port ******************************************
+        if order.partner_id.is_frais_port_id:
+            test = True
+            for line in order.order_line:
+                if line.product_id==order.partner_id.is_frais_port_id:
+                    test=False
+                    break
+            if test:
+                vals={
+                    "order_id": order.id,
+                    "sequence": 999,
+                    "product_id": order.partner_id.is_frais_port_id.id,
+                    "price_unit": order.partner_id.is_frais_port_id.lst_price,
+                    "product_uom_qty": 1,
+                }
+                order_line = self.env['sale.order.line'].create(vals)
+        #**********************************************************************
+        return order
+
+
     @api.onchange('partner_id')
     def onchange_partner_id_warehouse(self):
         if self.partner_id and self.partner_id.is_warehouse_id:
