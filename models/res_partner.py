@@ -13,7 +13,7 @@ class IsEnseigneCommerciale(models.Model):
     _description = "Enseigne commerciale"
 
     name         = fields.Many2one('res.partner', 'Enseigne commerciale', required=True)
-    warehouse_id = fields.Many2one('stock.warehouse', 'Entrepôts')
+    warehouse_id = fields.Many2one('stock.warehouse', 'Entrepôt')
 
 
 class IsTransporteur(models.Model):

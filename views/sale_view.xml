@@ -241,6 +241,13 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
         <field name="arch" type="xml">
+
+            <field name="partner_id" position="after">
+                <field name="is_enseigne_id" optional="show"/>
+                <field name="warehouse_id" optional="show"/>
+            </field>
+
+
             <field name="create_date" position="after">
                 <field name="is_date_livraison"  optional="show"/>
                 <field name="is_transporteur_id" optional="hide"/>

@@ -34,12 +34,13 @@ class IsCommandeFromtome(models.Model):
     _description = u"Commande fromtome"
     _order='name desc'
 
-    name        = fields.Char(u"N°", readonly=True)
-    enseigne_id = fields.Many2one('is.enseigne.commerciale', 'Enseigne', required=True, help="Enseigne commerciale")
-    partner_id  = fields.Many2one('res.partner', u'Fournisseur', required=True)
-    stock_mini  = fields.Boolean(u"Stock mini", default=True, help=u"Si cette case est cochée, il faut tenir compte du stock mini")
-    order_id    = fields.Many2one('purchase.order', u'Commande Fromtome')
-    ligne_ids   = fields.One2many('is.commande.fromtome.ligne', 'commande_id', u'Lignes')
+    name         = fields.Char(u"N°", readonly=True)
+    enseigne_id  = fields.Many2one('is.enseigne.commerciale', 'Enseigne', required=True, help="Enseigne commerciale")
+    warehouse_id = fields.Many2one(related='enseigne_id.warehouse_id')
+    partner_id   = fields.Many2one('res.partner', u'Fournisseur', required=True)
+    stock_mini   = fields.Boolean(u"Stock mini", default=True, help=u"Si cette case est cochée, il faut tenir compte du stock mini")
+    order_id     = fields.Many2one('purchase.order', u'Commande Fromtome')
+    ligne_ids    = fields.One2many('is.commande.fromtome.ligne', 'commande_id', u'Lignes')
 
 
     @api.model
@@ -53,6 +54,8 @@ class IsCommandeFromtome(models.Model):
         #cr,uid,context = self.env.args
         cr,uid,context,su = self.env.args
         for obj in self:
+            #Emplacement de stock de l'enseigne
+            location_id =  obj.enseigne_id.warehouse_id.lot_stock_id.id
 
             if obj.order_id and obj.order_id.state!='draft':
                 raise Warning(u"La commande Fromtome associée est déjà validée. Le calcul n'est pas autorisé !")
@@ -132,7 +135,16 @@ class IsCommandeFromtome(models.Model):
                     stock_mini=0
                     if obj.stock_mini==True:
                         stock_mini = product.is_stock_mini
-                    stock = product.qty_available
+
+                    #** Recherche du stock dans l'Entrepôt ********************
+                    #stock = product.qty_available
+                    stock = 0
+                    quants = self.env['stock.quant'].search([('product_id','=',product.id),('location_id','=',location_id)])
+                    for quant in quants:
+                        #print(product.name, quant, quant.location_id.name )
+                        stock+=quant.quantity
+                    #***********************************************************
+
                     #Convertir la quantité en UA en US
                     purchase_qty = product.uom_po_id._compute_quantity(purchase_qty, product.uom_id, round=True, rounding_method='UP', raise_if_failure=True)
                     product_qty = sale_qty - stock + stock_mini - purchase_qty
@@ -183,7 +195,7 @@ class IsCommandeFromtome(models.Model):
                             'purchase_qty'  : purchase_qty,
                             'product_qty'   : product_qty,
                             #'product_po_qty': product_po_qty,
-                            'stock'         : product.qty_available,
+                            'stock'         : stock,
                             'stock_mini'    : stock_mini,
                             'order_line_id' : order_line_id,
                         }
