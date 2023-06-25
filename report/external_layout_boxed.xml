@@ -58,7 +58,18 @@
                         <div name="res_company" class="mb4">
                             <!-- <h5 style="font-weight:700 !important;" t-field="res_company.name"/> -->
                             <h5 t-if="o and o.partner_id" style="font-weight:700 !important;" t-field="o.partner_id.is_enseigne_id.name.name"/>
+                            <span t-field="o.partner_id.is_enseigne_id.name.street"/>
+                            <t t-if="o.partner_id.is_enseigne_id.name.street2">
+                                - <span t-field="o.partner_id.is_enseigne_id.name.street2"/>
+                            </t>
                             <br/>
+                            <span t-field="o.partner_id.is_enseigne_id.name.zip"/> <span t-field="o.partner_id.is_enseigne_id.name.city"/> - 
+                            <span t-field="res_company.country_id"/>
+                            <div t-if="res_company.is_gln">
+                                GLN:<span t-field="res_company.is_gln"/>
+                            </div>
+
+                            <!-- <br/>
                             <span t-field="res_company.street"/>
                             <br/>
                             <span t-field="res_company.zip"/>
@@ -70,8 +81,7 @@
                             <span t-field="res_company.country_id"/>
                             <div t-if="res_company.is_gln">
                                 GLN:<span t-field="res_company.is_gln"/>
-                            </div>
-
+                            </div> -->
                         </div>
                     </div>
                 </div>
