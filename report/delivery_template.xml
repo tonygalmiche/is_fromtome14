@@ -67,6 +67,9 @@
                             <th class="text-center" t-if="o.partner_id.is_code_fromtome">
                                 <strong>Code Fournisseur</strong>
                             </th>
+                            <th class="text-center" t-if="o.is_transporteur_id">
+                                <strong>Transporteur</strong>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -90,6 +93,9 @@
                             </td>
                             <td class="text-center" t-if="o.partner_id.is_code_fromtome">
                                 <span t-field="o.partner_id.is_code_fromtome"/>
+                            </td>
+                            <td class="text-center" t-if="o.is_transporteur_id">
+                                <span t-field="o.is_transporteur_id.name"/>
                             </td>
                          </tr>
                     </tbody>
