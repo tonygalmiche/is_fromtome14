@@ -246,6 +246,7 @@ class SaleOrder(models.Model):
 
 
     def initialiser_depuis_modele_commande(self):
+        date_reception = datetime.date.today()+datetime.timedelta(days=2)
         for obj in self:
             sequence=10
             for line in obj.is_modele_commande_id.ligne_ids:
@@ -255,6 +256,7 @@ class SaleOrder(models.Model):
                     'product_id'  : line.product_id.id,
                     'name'        : line.product_id.name_get()[0][1],
                     'product_uom_qty': 0,
+                    'is_date_reception': date_reception,
                 }
                 self.env['sale.order.line'].create(vals)
                 sequence+=10
@@ -326,6 +328,8 @@ class SaleOrder(models.Model):
                             vals={
                                 'partner_id'  : partner_id,
                                 'date_planned': date_planned,
+                                'picking_type_id': supplierinfo.name.is_warehouse_id.in_type_id.id,
+                                'is_adresse_livraison_id': supplierinfo.name.is_enseigne_id.name.id,
                             }
                             order=self.env['purchase.order'].create(vals)
                             if order:
