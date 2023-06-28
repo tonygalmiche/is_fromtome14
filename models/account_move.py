@@ -78,6 +78,7 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
 
+    @api.depends('invoice_line_ids')
     def _compute_is_alerte(self):
         for obj in self:
             alerte=''

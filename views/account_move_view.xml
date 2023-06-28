@@ -38,6 +38,15 @@
                 />
                 <field name="is_poids_net"  sum="Total" optional="hide"/>
             </xpath>
+            <notebook position="before">
+                <div style="background:orange;font-weight: bold;" attrs="{'invisible':[('is_alerte','=',False)]}">
+                    <field 
+                        name="is_alerte"
+                        readonly="1" nolabel="1" 
+                        attrs="{'invisible': [('is_alerte', '=', False)]}"
+                    />
+                </div>
+            </notebook>
         </field>
     </record>
     <record id="is_view_out_invoice_tree" model="ir.ui.view">
