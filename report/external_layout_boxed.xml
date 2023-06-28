@@ -47,16 +47,13 @@
    <template id="is_external_layout_boxed" inherit_id="web.external_layout_boxed">
         <div class="o_boxed_header" position="replace">
             <div class="o_boxed_header">
-                <div class="row mb8">
+                <div class="row mb8" t-if="o and 'partner_id' in o._fields">
                     <div class="col-6">
-                        <!-- <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)" alt="Logo"/> -->
                         <img t-if="o and o.partner_id.is_enseigne_id.name.image_1920" t-att-src="image_data_uri(o.partner_id.is_enseigne_id.name.image_1920)" alt="Logo"/>
-                        
                     </div>
                     <div class="col-6 text-right mb4">
                         <h4 class="mt0" t-field="res_company.report_header"/>
                         <div name="res_company" class="mb4">
-                            <!-- <h5 style="font-weight:700 !important;" t-field="res_company.name"/> -->
                             <h5 t-if="o and o.partner_id" style="font-weight:700 !important;" t-field="o.partner_id.is_enseigne_id.name.name"/>
                             <span t-field="o.partner_id.is_enseigne_id.name.street"/>
                             <t t-if="o.partner_id.is_enseigne_id.name.street2">
@@ -65,21 +62,7 @@
                             <br/>
                             <span t-field="o.partner_id.is_enseigne_id.name.zip"/> <span t-field="o.partner_id.is_enseigne_id.name.city"/> - 
                             <span t-field="res_company.country_id"/>
-                            <div t-if="res_company.is_gln">
-                                GLN:<span t-field="res_company.is_gln"/>
-                            </div>
-
-                            <!-- <br/>
-                            <span t-field="res_company.street"/>
-                            <br/>
-                            <span t-field="res_company.zip"/>
-                            <![CDATA[
-                            &nbsp;
-                            ]]>
-                            <span t-field="res_company.city"/>
-                            <br/>
-                            <span t-field="res_company.country_id"/>
-                            <div t-if="res_company.is_gln">
+                            <!-- <div t-if="res_company.is_gln">
                                 GLN:<span t-field="res_company.is_gln"/>
                             </div> -->
                         </div>
