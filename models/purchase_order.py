@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
@@ -52,14 +52,9 @@ class PurchaseOrder(models.Model):
     @api.onchange('partner_id')
     def onchange_partner_id_warehouse(self):
         if self.partner_id and self.partner_id.is_warehouse_id:
-            print(self,self.partner_id.is_warehouse_id.in_type_id)
             self.picking_type_id = self.partner_id.is_warehouse_id.in_type_id.id
         else:
             if self.partner_id and self.partner_id.is_enseigne_id and self.partner_id.is_enseigne_id.warehouse_id:
-
-                print(self,self.partner_id.is_enseigne_id.warehouse_id.in_type_id.id)
-
-
                 self.picking_type_id = self.partner_id.is_enseigne_id.warehouse_id.in_type_id.id
  
 
@@ -99,6 +94,7 @@ class PurchaseOrder(models.Model):
 
     def creer_commande_fromtome_action(self):
         cr,uid,context,su = self.env.args
+        date_reception = date.today()+timedelta(days=2)
         for obj in self:
             vals={
                 #'company_id': 1,
@@ -114,6 +110,7 @@ class PurchaseOrder(models.Model):
                         'product_id': line.product_id.id,
                         'name'      : line.product_id.name,
                         'product_uom_qty': line.product_qty,
+                        'is_date_reception': date_reception,
                         'order_id'       : order.id,
                     }
                     res=self.env['sale.order.line'].create(vals)
