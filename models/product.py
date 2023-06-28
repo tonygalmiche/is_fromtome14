@@ -136,6 +136,15 @@ class ProductTemplate(models.Model):
     _inherit = ['product.template', 'barcodes.barcode_events_mixin']
 
 
+
+    # def name_get(self):
+    #     self.browse(self.ids).read(['name', 'default_code'])
+    #     return [(template.id, '%s%s' % (template.default_code and '[%s] ' % template.default_code or '', template.name))
+    #             for template in self]
+
+
+
+
     def on_barcode_scanned(self, barcode):
         for obj in self:
             code   = str(barcode)[2:]
@@ -376,6 +385,10 @@ class ProductProduct(models.Model):
 
  
 
+    def name_get(self):
+        self.browse(self.ids).read(['name', 'default_code'])
+        return [(template.id, '%s [%s]' % (template.name, template.default_code))
+                for template in self]
 
 
 
