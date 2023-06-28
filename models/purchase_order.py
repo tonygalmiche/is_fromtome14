@@ -12,15 +12,7 @@ class PurchaseOrder(models.Model):
     @api.depends('partner_id','is_fromtome_order_id')
     def _compute_is_fromtome_order_vsb(self):
         cr,uid,context,su = self.env.args
-
-
-
         for obj in self:
-
-            print(self.env.user.company_id.partner_id,obj.partner_id)
-
-
-
             vsb=True
             if self.env.user.company_id.partner_id!=obj.partner_id:
                 vsb=False
@@ -54,14 +46,11 @@ class PurchaseOrder(models.Model):
     is_fromtome_order_vsb      = fields.Boolean(string='Créer commande dans Fromtome vsb', compute='_compute_is_fromtome_order_vsb')
     is_maj_commande_client_vsb = fields.Boolean(string='MAJ commandes clients', compute='_compute_is_maj_commande_client_vsb', readonly=True, store=False)
     is_enseigne_id             = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
-
+    is_heure_envoi             = fields.Char(related='partner_id.is_heure_envoi')
 
 
     @api.onchange('partner_id')
     def onchange_partner_id_warehouse(self):
-
-        print("onchange_partner_id_warehouse",self)
-
         if self.partner_id and self.partner_id.is_warehouse_id:
             print(self,self.partner_id.is_warehouse_id.in_type_id)
             self.picking_type_id = self.partner_id.is_warehouse_id.in_type_id.id

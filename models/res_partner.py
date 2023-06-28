@@ -42,6 +42,8 @@ class ResPartner(models.Model):
     is_transporteur_id          = fields.Many2one('is.transporteur', 'Transporteur', help="Enseigne commerciale")
     is_warehouse_id             = fields.Many2one('stock.warehouse', 'Entrepôt', help="Entrepôt à utiliser dans les réceptions ou les livraisons")
     is_frais_port_id            = fields.Many2one('product.product', 'Frais de port', domain=[('categ_id.name','=','TRANSPORT')], help="Utilisé pour ajouter automatiquement une ligne de frais de port sur les commandes")
+    is_heure_envoi              = fields.Char('Heure', help="Heure maxi d'envoi de la commande au fournisseur")
+
 
     def creer_modele_commande(self):
         for obj in self:

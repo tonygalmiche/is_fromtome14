@@ -150,6 +150,7 @@
                 <field name="is_transporteur_id"                optional="hide"/>
                 <field name="is_warehouse_id"                   optional="hide"/>
                 <field name="is_frais_port_id"                  optional="hide"/>
+                <field name="is_heure_envoi"                    optional="hide"/>
             </field>
         </field>
     </record>
@@ -175,6 +176,7 @@
                 <field name="is_transporteur_id" widget="selection"/>
                 <field name="is_warehouse_id"    widget="selection"/>
                 <field name="is_frais_port_id"/>
+                <field name="is_heure_envoi" attrs="{'invisible': ['|',('is_supplier', '=', False),('is_company', '=', False)]}"/>
             </field>
             <xpath expr="//page[@name='sales_purchases']/group/group/field[@name='user_id']" position="before">
                 <field name="is_customer"/>
