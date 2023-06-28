@@ -12,7 +12,15 @@ class PurchaseOrder(models.Model):
     @api.depends('partner_id','is_fromtome_order_id')
     def _compute_is_fromtome_order_vsb(self):
         cr,uid,context,su = self.env.args
+
+
+
         for obj in self:
+
+            print(self.env.user.company_id.partner_id,obj.partner_id)
+
+
+
             vsb=True
             if self.env.user.company_id.partner_id!=obj.partner_id:
                 vsb=False
