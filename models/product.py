@@ -385,10 +385,10 @@ class ProductProduct(models.Model):
 
  
 
-    def name_get(self):
-        self.browse(self.ids).read(['name', 'default_code'])
-        return [(template.id, '%s [%s]' % (template.name, template.default_code))
-                for template in self]
+    # def name_get(self):
+    #     self.browse(self.ids).read(['name', 'default_code'])
+    #     return [(template.id, '%s [%s]' % (template.name, template.default_code))
+    #             for template in self]
 
 
 

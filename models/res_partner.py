@@ -26,6 +26,18 @@ class IsTransporteur(models.Model):
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
+
+    def _compute_is_encours_client(self):
+        for obj in self:
+            val = 0
+            if obj.is_customer and obj.is_company:
+                filtre=[('partner_id', '=', obj.id),('state', '=', 'posted'),('move_type', 'in', ['out_refund','out_invoice'])]
+                invoices=self.env['account.move'].search(filtre)
+                for invoice in invoices:
+                    val+=invoice.amount_residual_signed
+            obj.is_encours_client = val
+
+  
     is_date_reception           = fields.Date(string='Dernière date de réception saisie')
     is_product_supplierinfo_ids = fields.One2many('product.supplierinfo', 'name', 'Liste de prix')
     is_gln                      = fields.Char('GLN Client')
@@ -43,6 +55,9 @@ class ResPartner(models.Model):
     is_warehouse_id             = fields.Many2one('stock.warehouse', 'Entrepôt', help="Entrepôt à utiliser dans les réceptions ou les livraisons")
     is_frais_port_id            = fields.Many2one('product.product', 'Frais de port', domain=[('categ_id.name','=','TRANSPORT')], help="Utilisé pour ajouter automatiquement une ligne de frais de port sur les commandes")
     is_heure_envoi              = fields.Char('Heure', help="Heure maxi d'envoi de la commande au fournisseur")
+    is_encours_client           = fields.Float(string='En-cours client', digits=(14,2), compute='_compute_is_encours_client')
+
+
 
 
     def creer_modele_commande(self):

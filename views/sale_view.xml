@@ -120,6 +120,7 @@
             </xpath>
 
             <field name="partner_id" position="after">
+                <field name="is_encours_client"/>
                 <field 
                     name="is_modele_commande_id" 
                     attrs="{'invisible': ['|','|',

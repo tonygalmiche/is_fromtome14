@@ -193,6 +193,7 @@ class SaleOrder(models.Model):
     is_type_doc              = fields.Selection([('cc', 'CC'), ('offre', 'Offre')], string='Type document', default="cc")
     is_modele_commande_id    = fields.Many2one('is.modele.commande', 'Modèle de commande', related='partner_id.is_modele_commande_id')
     is_transporteur_id       = fields.Many2one(related='partner_id.is_transporteur_id')
+    is_encours_client        = fields.Float(related='partner_id.is_encours_client')
 
 
     @api.model
@@ -220,11 +221,7 @@ class SaleOrder(models.Model):
 
     @api.onchange('partner_id','company_id','user_id','is_enseigne_id')
     def onchange_partner_id_warehouse(self):
-
-        print(self.partner_id, self.partner_id.is_warehouse_id, self.partner_id.is_enseigne_id.warehouse_id)
-
         warehouse_id=self.partner_id.is_warehouse_id.id or self.partner_id.is_enseigne_id.warehouse_id
-        print(warehouse_id)
         self.warehouse_id = warehouse_id
 
         # if self.partner_id and self.partner_id.is_warehouse_id:
