@@ -262,6 +262,27 @@ class IsScanPicking(models.Model):
                 }
                 res = self.env['stock.move.line'].create(vals)
 
+            #** Ajout de la ligne "Frais de port" *****************************
+            if obj.picking_id.sale_id.partner_id.is_frais_port_id:
+                #** Vérification que le port est bien sur les lignes de la commande
+                test = False
+                for line in obj.picking_id.sale_id.order_line:
+                    if line.product_id==obj.picking_id.sale_id.partner_id.is_frais_port_id:
+                        test=True
+                        break
+                if test:
+                    vals={
+                        "picking_id"        : obj.picking_id.id,
+                        "product_id"        : obj.picking_id.sale_id.partner_id.is_frais_port_id.id,
+                        "company_id"        : obj.picking_id.company_id.id,
+                        "product_uom_id"    : obj.picking_id.sale_id.partner_id.is_frais_port_id.uom_id.id,
+                        "location_id"       : obj.picking_id.location_id.id,
+                        "location_dest_id"  : obj.picking_id.location_dest_id.id,
+                        "qty_done"          : 1,
+                    }
+                    res = self.env['stock.move.line'].create(vals)
+            #******************************************************************
+
 
     def maj_inventory_action(self):
         cr,uid,context,su = self.env.args
