@@ -24,13 +24,22 @@
                     <field name="base" invisible="1"/>
                     <field name="applied_on" invisible="1"/>
                     <field name="company_id" invisible="1"/>
+                    <field name="is_prix_achat" optional="show"/>
+                    <field name="is_taux_marge" optional="show"/>
+                    <field name="is_alerte_marge" invisible="1"/>
+                    <button 
+                        name="is_product_action" type="object" class="oe_stat_button" 
+                        icon="fa-exclamation-triangle"
+                        attrs="{'invisible': [('is_alerte_marge', '=', False)]}"
+                        title="Article avec marge inférieure à 5%"
+                    />
                 </tree>
             </field>
         </record>
         <record  id="is_product_pricelist_item_action" model="ir.actions.act_window">
             <field name="name">Lignes</field>
             <field name="res_model">product.pricelist.item</field>
-            <field name="limit">1000</field>
+            <field name="limit">100</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="is_fromtome14.is_product_pricelist_item_tree"/>
             <field name="domain">[('pricelist_id','=',active_id)]</field>
