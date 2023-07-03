@@ -5,6 +5,8 @@ from odoo.tools.float_utils import float_compare, float_is_zero, float_round
 import time
 from odoo.osv import expression
 import datetime
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class IsModeleCommandeLigne(models.Model):
@@ -301,6 +303,7 @@ class SaleOrder(models.Model):
                     raise Warning(u"La date de réception n'est pas renseignée sur toutes les lignes")
             now = datetime.date.today()
             for line in obj.order_line:
+                _logger.info("creer_commande_fournisseur_action : article=%s (%s)"%(line.product_id.display_name,line.product_id.id))
                 if not line.is_purchase_line_id:
                     suppliers=self.env['product.supplierinfo'].search([('product_tmpl_id', '=', line.product_id.product_tmpl_id.id)])
                     partner_id=False
@@ -309,7 +312,11 @@ class SaleOrder(models.Model):
                         if now>=s.date_start and now<= s.date_end:
                             supplierinfo=s
                             break
+                    if not supplierinfo:
+                        raise Warning("Fournisseur non trouvé pour article '%s'"%(line.product_id.display_name))
                     if supplierinfo:
+                        if not supplierinfo.name.active:
+                            raise Warning("Fournisseur '%s' désactivé pour l'article '%s'"%(supplierinfo.name.name,line.product_id.display_name))
                         partner_id = supplierinfo.name.id
                         date_reception = str(line.is_date_reception)
                         date_planned  = date_reception+' 08:00:00'
