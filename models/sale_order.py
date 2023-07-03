@@ -330,6 +330,8 @@ class SaleOrder(models.Model):
                     if supplierinfo:
                         if not supplierinfo.name.active:
                             raise Warning("Fournisseur '%s' désactivé pour l'article '%s'"%(supplierinfo.name.name,line.product_id.display_name))
+                        if not supplierinfo.name.is_warehouse_id:
+                            raise Warning("Entrepôt non renseigné pour le fournisseur '%s' de l'article '%s'"%(supplierinfo.name.name,line.product_id.display_name))
                         partner_id = supplierinfo.name.id
                         date_reception = str(line.is_date_reception)
                         date_planned  = date_reception+' 08:00:00'
