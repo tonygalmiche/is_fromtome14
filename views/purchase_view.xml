@@ -103,6 +103,10 @@
 
              <xpath expr="//field[@name='order_line']//tree//field[@name='price_subtotal']" position='after'>
                 <field name="is_alerte" optional="hide"/>
+                <!-- <field name="is_sale_order_line_id" optional="hide"/> -->
+            </xpath>
+             <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position='after'>
+                <field name="is_ref_fournisseur" optional="show"/>
             </xpath>
             <xpath expr="//field[@name='order_line']//tree//field[@name='date_planned']" position='attributes'>
                 <attribute name="invisible">1</attribute>

@@ -53,6 +53,7 @@
                         <tr>
                             <th class="text-left" t-if="res_company.is_regroupe_cde=='Non'">    <strong>Client</strong></th>
                             <th name="th_description"><strong>Description</strong></th>
+                            <th class="text-left"><strong>Réf</strong></th>
                             <th class="text-right" style="background-color:Silver;font-weight: bold;">   <strong>Nb Colis</strong></th>
                             <th class="text-right">   <strong>Quantité</strong></th>
                             <th class="text-left">    <strong>Unité</strong></th>
@@ -66,6 +67,9 @@
                             </td>
                             <td class="text-left">
                                 <span t-field="line.name"/>
+                            </td>
+                           <td class="text-left">
+                                <span t-field="line.is_ref_fournisseur"/>
                             </td>
                             <td class="text-right"  style="background-color:Silver;font-weight: bold;">
                                 <span t-field="line.is_nb_colis"/>

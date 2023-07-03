@@ -94,10 +94,6 @@
         <field name="code">action = records.initialisation_etat_facturee_action_server()</field>
     </record>
 
-
-
-
-
     <record id="view_sale_order_form_inherit" model="ir.ui.view">
         <field name="name">sale.order.form.inherit</field>
         <field name="model">sale.order</field>
@@ -166,7 +162,9 @@
                     attrs="{'invisible': [('is_creer_commande_fournisseur_vsb', '=', False)]}"
                 />
             </xpath>
-            
+            <xpath expr="//notebook/page/field/tree" position="attributes">
+                 <attribute name="limit">1000</attribute>
+            </xpath>
             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_id']" position="before">
                 <field name="is_purchase_line_id" invisible="1"/>
                 <button 

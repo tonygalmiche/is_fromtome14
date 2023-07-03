@@ -151,6 +151,21 @@ class PurchaseOrderLine(models.Model):
             obj.is_alerte="\n".join(alerte)
 
 
+    @api.depends('product_id','name')
+    def _compute_is_ref_fournisseur(self):
+        for obj in self:
+            print(obj.product_id.name)
+            filtre=[
+                ('product_tmpl_id', '=', obj.product_id.product_tmpl_id.id),
+                ('name'           , '=', obj.order_id.partner_id.id),
+            ]
+            ref=False
+            suppliers=self.env['product.supplierinfo'].search(filtre,limit=1)
+            for s in suppliers:
+                ref=s.product_code
+            obj.is_ref_fournisseur = ref
+
+
     is_sale_order_line_id  = fields.Many2one('sale.order.line', string=u'Ligne commande client', index=True)
     is_nb_pieces_par_colis = fields.Integer(string='PCB', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2) , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
@@ -159,6 +174,8 @@ class PurchaseOrderLine(models.Model):
     is_client_id           = fields.Many2one('res.partner', 'Client', related='is_sale_order_line_id.order_id.partner_id')
     is_date_planned        = fields.Datetime(string="Date de réception", related='order_id.date_planned')
     is_date_enlevement     = fields.Date(related='order_id.is_date_enlevement')
+    is_ref_fournisseur     = fields.Char(string='Réf fournisseur', compute='_compute_is_ref_fournisseur', readonly=True, store=True)
+
 
 
     def acceder_commande_client(self):

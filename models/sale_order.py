@@ -221,6 +221,19 @@ class SaleOrder(models.Model):
         return order
 
 
+    def action_confirm(self):
+        print("#####",self)
+
+        for obj in self:
+            for line in obj.order_line:
+                print(line)
+                if line.product_uom_qty==0:
+                    line.unlink()
+
+        return super(SaleOrder, self).action_confirm()
+
+
+
     @api.onchange('partner_id','company_id','user_id','is_enseigne_id')
     def onchange_partner_id_warehouse(self):
         warehouse_id=self.partner_id.is_warehouse_id.id or self.partner_id.is_enseigne_id.warehouse_id
