@@ -12,6 +12,10 @@
                     <strong>Date de livraison prévue:</strong>
                     <p t-field="o.is_date_livraison"/>
                 </div>
+                <div class="col-auto">
+                    <strong>Transporteur:</strong>
+                    <p t-field="o.is_transporteur_id"/>
+                </div>
             </div>
 
 
@@ -30,6 +34,7 @@
                     <thead>
                         <tr>
                             <th class="text-left"> <strong>Désignation</strong></th>
+                            <th class="text-left"> <strong>Réf</strong></th>
                             <th class="text-right"> <strong>Colis Cde</strong></th>
                             <th class="text-center"> <strong>PCB</strong></th>
                             <th class="text-center" colspan="2"><strong>Qt</strong></th>
@@ -45,6 +50,7 @@
                                 <div t-if="line.product_id.description_picking" t-field="line.product_id.description_picking"/>
                                 <div t-if="line.product_id.barcode" t-field="line.product_id.barcode"/>
                             </td>
+                            <td class="text-left"><span t-field="line.is_ref_fournisseur"/></td>
                             <td class="text-right"><span t-field="line.is_nb_colis_cde"/></td>
                             <td class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
                             <td class="text-right" style="border-right:none">
@@ -61,7 +67,7 @@
                         <tr>
                             <th class="text-left">  <strong>Total : </strong></th>
                             <th class="text-center"><strong><span t-field="o.is_nb_colis"/></strong></th>
-                            <th colspan="6"> </th>
+                            <th colspan="7"> </th>
                         </tr>
                     </thead>
                 </table>

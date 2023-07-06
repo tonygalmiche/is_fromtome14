@@ -143,6 +143,7 @@ class StockMove(models.Model):
     is_nb_colis_cde    = fields.Float('Nb Colis Cde'  , digits=(14,2), compute=_compute_is_nb_colis_cde)
     is_poids_net_reel  = fields.Float('Poids net réel', digits=(14,4), compute=_compute_is_nb_colis_poids)
     is_description_cde = fields.Text('Description commande', compute=_compute_is_description_cde)
+    is_ref_fournisseur = fields.Char(related="purchase_line_id.is_ref_fournisseur")
 
 
     def get_nb_colis(self):
