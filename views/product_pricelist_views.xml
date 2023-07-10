@@ -6,13 +6,6 @@
             <field name="model">product.pricelist.item</field>
             <field name="arch" type="xml">
                 <tree default_order="product_tmpl_id">
-                    <field name="is_archive" invisible="1"/>
-                    <button 
-                        name="is_archive_action" type="object" class="oe_stat_button" 
-                        icon="fa-exclamation-triangle"
-                        attrs="{'invisible': [('is_archive', '=', False)]}"
-                        title="Article archivé"
-                    />
                     <field name="product_tmpl_id" string="Products" required="1"/>
                     <field name="product_id" string="Variants" groups="product.group_product_variant" domain="[('product_tmpl_id', '=', product_tmpl_id)]" options="{'no_create':1}"/>
                     <field name="min_quantity"/>
@@ -26,14 +19,31 @@
                     <field name="company_id" invisible="1"/>
                     <field name="is_prix_achat" optional="show"/>
                     <field name="is_taux_marge" optional="show"/>
-                    <field name="is_alerte_marge" invisible="1"/>
                     <button 
+                        name="is_alerte_action" type="object" class="oe_stat_button" 
+                        icon="fa-exclamation-triangle"
+                        attrs="{'invisible': [('is_alerte', '=', False)]}"
+                        title="Alertes"
+                    />
+                    <field name="is_alerte"     optional="show"/>
+                    <!-- <field name="is_alerte_marge" invisible="1"/> -->
+                    <!-- <button 
                         name="is_product_action" type="object" class="oe_stat_button" 
                         icon="fa-exclamation-triangle"
                         attrs="{'invisible': [('is_alerte_marge', '=', False)]}"
                         title="Article avec marge inférieure à 5%"
-                    />
+                    /> -->
                 </tree>
+            </field>
+        </record>
+        <record id="is_product_pricelist_item_view_search" model="ir.ui.view">
+            <field name="name">is_product_pricelist_item_view_search</field>
+            <field name="model">product.pricelist.item</field>
+            <field name="inherit_id" ref="product.product_pricelist_item_view_search"/>
+            <field name="arch" type="xml">
+                <field name="pricelist_id" position="after">
+                    <field name="product_tmpl_id"/>
+                </field>
             </field>
         </record>
         <record  id="is_product_pricelist_item_action" model="ir.actions.act_window">
@@ -45,6 +55,9 @@
             <field name="domain">[('pricelist_id','=',active_id)]</field>
             <field name="context">{'default_pricelist_id': active_id}</field>
         </record>
+
+
+        <!-- product.pricelist -->
         <record id="is_product_pricelist_view" model="ir.ui.view">
             <field name="name">is_product_pricelist_view</field>
             <field name="model">product.pricelist</field>
@@ -77,16 +90,19 @@
                         </div>
                     </group>
                 </xpath>
-                <xpath expr="//field[@name='item_ids']/tree/field[@name='min_quantity']" position="before">
-                    <field name="is_archive" invisible="1"/>
+                <xpath expr="//field[@name='item_ids']/tree/field[@name='date_end']" position="after">
+                    <field name="is_prix_achat" optional="show"/>
+                    <field name="is_taux_marge" optional="show"/>
                     <button 
-                        name="is_archive_action" type="object" class="oe_stat_button" 
+                        name="is_alerte_action" type="object" class="oe_stat_button" 
                         icon="fa-exclamation-triangle"
-                        attrs="{'invisible': [('is_archive', '=', False)]}"
-                        title="Article archivé"
+                        attrs="{'invisible': [('is_alerte', '=', False)]}"
+                        title="Alertes"
                     />
+                    <field name="is_alerte"     optional="show"/>
                 </xpath>
             </field>
         </record>
+
     </data>
 </odoo>
