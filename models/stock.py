@@ -137,13 +137,29 @@ class StockMove(models.Model):
             obj.is_description_cde=description
 
 
+
+    @api.depends('product_id','name')
+    def _compute_is_ref_fournisseur(self):
+        for obj in self:
+            filtre=[
+                ('product_tmpl_id', '=', obj.product_id.product_tmpl_id.id),
+                #('name'           , '=', obj.order_id.partner_id.id),
+            ]
+            ref=False
+            suppliers=self.env['product.supplierinfo'].search(filtre,limit=1)
+            for s in suppliers:
+                ref=s.product_code
+            obj.is_ref_fournisseur = ref
+
+
     is_alerte          = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
     is_lots            = fields.Text('Lots'  , copy=False, compute=_compute_is_lots)
     is_nb_colis        = fields.Float('Nb Colis'      , digits=(14,2), compute=_compute_is_nb_colis_poids)
     is_nb_colis_cde    = fields.Float('Nb Colis Cde'  , digits=(14,2), compute=_compute_is_nb_colis_cde)
     is_poids_net_reel  = fields.Float('Poids net réel', digits=(14,4), compute=_compute_is_nb_colis_poids)
     is_description_cde = fields.Text('Description commande', compute=_compute_is_description_cde)
-    is_ref_fournisseur = fields.Char(related="purchase_line_id.is_ref_fournisseur")
+    #is_ref_fournisseur = fields.Char(related="purchase_line_id.is_ref_fournisseur")
+    is_ref_fournisseur = fields.Char(string='Réf fournisseur', compute='_compute_is_ref_fournisseur', readonly=True, store=True)
 
 
     def get_nb_colis(self):
