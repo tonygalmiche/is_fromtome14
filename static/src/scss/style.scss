@@ -1,0 +1,53 @@
+/*
+td {
+    color:black;
+}
+
+td [name="name"]{
+    color:black;
+}
+*/
+
+.test_scss{
+    // max-width: 250px !important;
+    // min-width: 350px !important;
+    width: 350px !important;
+
+    //min-width: fit-content !important;
+
+
+    //white-space: normal !important;
+    white-space: pre-wrap !important;
+    display: inline-block !important;
+    // width: 100% !important;
+}
+
+.test_scss2{
+    overflow: visible !important;
+    width: 0;
+    min-width: fit-content;
+}
+
+/*
+table {
+    white-space: normal;
+    width: 100%;
+  }
+  
+  td {
+    border: 1px solid black;
+  }
+  
+  td {
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  td.fit {
+    width: 0;
+    min-width: fit-content;
+  }
+*/
+
+

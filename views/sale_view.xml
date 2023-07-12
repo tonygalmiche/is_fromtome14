@@ -34,15 +34,20 @@
                 <sheet>
                     <group>
                         <field name="name"/>
+                        <field name="partner_id"/>
                         <field name="enseigne_id"/>
                         <field name="modele_commande_ids" widget="many2many_binary"/>
                     </group>
                     <field name="ligne_ids">
                         <tree decoration-danger="weight==0" editable="bottom">
-                            <field name="sequence"  widget="handle"/>
-                            <field name="product_id" widget="many2one_clickable"/>
-                            <field name="qt_livree"/>
-                            <field name="weight"/>
+                            <field name="sequence"     widget="handle"/>
+                            <field name="product_id"   widget="many2one_clickable"/>
+                            <field name="product_name" optional="hide"/>
+                            <field name="default_code"    optional="show"/>
+                            <field name="ref_fournisseur" optional="show"/>
+                            <field name="price_unit"      optional="show"/>
+                            <field name="qt_livree"       optional="show"/>
+                            <field name="weight"          optional="show"/>
                         </tree>
                     </field>
                 </sheet>
@@ -55,6 +60,9 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
+                <field name="partner_id"/>
+                <field name="enseigne_id"/>
+                <field name="modele_commande_ids" widget="many2many_binary" optional="hide"/>
             </tree>
         </field>
     </record>
@@ -64,6 +72,8 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
+                <field name="partner_id"/>
+                <field name="enseigne_id"/>
             </search>
         </field>
     </record>
@@ -187,7 +197,15 @@
                     attrs="{'invisible': [('is_purchase_line_id', '=', False)]}"
                 />
             </xpath>
+
+            <!-- <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_id']" position="attributes">
+                <attribute name="class">test_scss</attribute>
+            </xpath> -->
+
+
             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='name']" position="after">
+                <field name="is_default_code"      optional="show"/>
+                <field name="is_ref_fournisseur"   optional="show"/>
                 <field name="is_livraison_directe" optional="show"/>
                 <field name="is_date_reception"    optional="show"/>
             </xpath>

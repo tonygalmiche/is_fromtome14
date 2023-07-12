@@ -20,19 +20,42 @@ class IsModeleCommandeLigne(models.Model):
 
 
     @api.depends('product_id')
-    def _compute_weight(self):
+    def _compute(self):
         for obj in self:
             weight = 0
             if obj.product_id:
                 weight = obj.product_id.is_poids_net_colis / (obj.product_id.is_nb_pieces_par_colis or 1)
-            obj.weight = weight
+            obj.weight          = weight
+            obj.product_name    = obj.product_id.name
+            obj.default_code    = obj.product_id.default_code
+            obj.ref_fournisseur = obj.product_id.is_ref_fournisseur
 
 
-    modele_id  = fields.Many2one('is.modele.commande', 'Modèle de commandes', required=True, ondelete='cascade')
-    sequence   = fields.Integer('Séquence')
-    product_id = fields.Many2one('product.product', 'Article', required=True)
-    weight     = fields.Float(string='Poids unitaire', digits='Stock Weight', compute='_compute_weight', readonly=True, store=True)
-    qt_livree  = fields.Float(string='Qt livrée', help="quantité livrée au moment de l'initialisation", readonly=True)
+    @api.depends('product_id')
+    def _compute_price_unit(self):
+        for obj in self:
+            prix = False
+            pricelist = obj.modele_id.partner_id.property_product_pricelist
+            if pricelist:
+                filtre=[
+                    ('pricelist_id'   ,'=',pricelist.id),
+                    ('product_tmpl_id','=',obj.product_id.product_tmpl_id.id),
+                ]
+                lines = self.env['product.pricelist.item'].search(filtre, limit=1)
+                for line in lines:
+                    prix=line.fixed_price
+            obj.price_unit = prix
+
+
+    modele_id       = fields.Many2one('is.modele.commande', 'Modèle de commandes', required=True, ondelete='cascade')
+    sequence        = fields.Integer('Séquence')
+    product_id      = fields.Many2one('product.product', 'Article', required=True)
+    product_name    = fields.Char('Désignation article'  , compute='_compute', readonly=True, store=True)
+    default_code    = fields.Char('Référence Fromtome'   , compute='_compute', readonly=True, store=True)
+    ref_fournisseur = fields.Char('Référence Fournisseur', compute='_compute', readonly=True, store=True)
+    weight          = fields.Float(string='Poids unitaire', digits='Stock Weight', compute='_compute', readonly=True, store=True)
+    qt_livree       = fields.Float(string='Qt livrée', help="quantité livrée au moment de l'initialisation", readonly=True)
+    price_unit      = fields.Float("Prix", digits='Product Price', compute='_compute_price_unit', readonly=True, store=False)
 
 
 class IsModeleCommande(models.Model):
@@ -41,14 +64,16 @@ class IsModeleCommande(models.Model):
     _order       ='name'
 
     name                = fields.Char('Nom du modèle', required=True)
-    enseigne_id         = fields.Many2one('is.enseigne.commerciale', 'Enseigne')
+    partner_id          = fields.Many2one('res.partner', 'Client')
+    #enseigne_id        = fields.Many2one('is.enseigne.commerciale', 'Enseigne')
+    enseigne_id         = fields.Many2one(related='partner_id.is_enseigne_id')
     modele_commande_ids = fields.Many2many('ir.attachment', 'is_modele_commande_modele_commande_rel', 'enseigne_id', 'file_id', 'Modèle de commande client')
     ligne_ids           = fields.One2many('is.modele.commande.ligne', 'modele_id', 'Lignes')
 
 
+
     def actualiser_modele_excel_action(self):
         for obj in self:
-            print(obj)
             if not obj.enseigne_id:
                 raise Warning("Enseigne obligatoire pour générer la commande Excel !")
 
@@ -71,12 +96,19 @@ class IsModeleCommande(models.Model):
                 sheet = wb.active
                 row=7 #Première ligne pour enregistrer les données
                 lig=1
-                for line in obj.ligne_ids:
-                    sheet.cell(row=row, column=1).value = lig
-                    sheet.cell(row=row, column=2).value = line.product_id.name
-                    sheet.cell(row=row, column=3).value = line.product_id.default_code
-                    row+=1
-                    lig+=1
+                filtre=[
+                    ('modele_id','=',obj.id),
+                ]
+                lines = self.env['is.modele.commande.ligne'].search(filtre, order="product_name")
+                for line in lines:
+                    if line.product_id.default_code:
+                        sheet.cell(row=row, column=1).value = lig
+                        sheet.cell(row=row, column=2).value = line.product_id.name
+                        sheet.cell(row=row, column=3).value = line.product_id.default_code
+                        sheet.cell(row=row, column=4).value = line.product_id.is_ref_fournisseur
+                        sheet.cell(row=row, column=5).value = line.price_unit
+                        row+=1
+                        lig+=1
                 wb.save(path)
                 #**************************************************************
 
@@ -177,6 +209,13 @@ class SaleOrderLine(models.Model):
             obj.is_nb_pieces_par_colis=obj.product_id.is_nb_pieces_par_colis
 
 
+    @api.depends('product_id','name','product_uom_qty')
+    def _compute_ref(self):
+        for obj in self:
+            obj.is_default_code    = obj.product_id.default_code
+            obj.is_ref_fournisseur = obj.product_id.is_ref_fournisseur
+
+
     is_purchase_line_id       = fields.Many2one('purchase.order.line', string=u'Ligne commande fournisseur', index=True, copy=False)
     is_date_reception         = fields.Date(string=u'Date réception')
     is_livraison_directe      = fields.Boolean(string=u'Livraison directe', help=u"Si cette case est cochée, une commande fournisseur spécifique pour ce client sera créée",default=False)
@@ -185,6 +224,8 @@ class SaleOrderLine(models.Model):
     is_colis_cde              = fields.Float(string='Colis Cde', digits=(14,2))
     is_poids_net              = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
     is_correction_prix_achat  = fields.Float(string="Correction Prix d'achat", digits='Product Price', help="Utilsé dans 'Lignes des mouvements valorisés'")
+    is_default_code           = fields.Char(string='Réf Fromtome'   , compute='_compute_ref', readonly=True, store=True)
+    is_ref_fournisseur        = fields.Char(string='Réf Fournisseur', compute='_compute_ref', readonly=True, store=True)
 
 
     def get_fournisseur_par_defaut(self):
@@ -285,11 +326,8 @@ class SaleOrder(models.Model):
 
 
     def action_confirm(self):
-        print("#####",self)
-
         for obj in self:
             for line in obj.order_line:
-                print(line)
                 if line.product_uom_qty==0:
                     line.unlink()
 

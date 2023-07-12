@@ -1,6 +1,5 @@
 
 # -*- coding: utf-8 -*-
-
 from odoo import api, fields, tools, models,_
 from odoo.tools import float_is_zero, pycompat
 from odoo.tools.float_utils import float_round
@@ -149,7 +148,6 @@ class ProductTemplate(models.Model):
         for obj in self:
             code   = str(barcode)[2:]
             prefix = str(barcode)[:2]
-            print(obj,code,prefix)
             if prefix in ("01","02"):
                 obj.barcode = code
 
@@ -193,6 +191,21 @@ class ProductTemplate(models.Model):
             obj.weight = obj.is_poids_net_colis / (obj.is_nb_pieces_par_colis or 1)
  
 
+    @api.depends('seller_ids')
+    def _compute_is_ref_fournisseur(self):
+        for obj in self:
+            filtre=[
+                ('product_tmpl_id', '=', obj.id),
+            ]
+            ref=False
+            suppliers=self.env['product.supplierinfo'].search(filtre,limit=1)
+            for s in suppliers:
+                ref=s.product_code
+            obj.is_ref_fournisseur = ref
+
+
+    is_ref_fournisseur = fields.Char(string='Réf fournisseur', compute='_compute_is_ref_fournisseur', readonly=True, store=True)
+
     contrat_date_id = fields.One2many('contrat.date.client','product_id','Contrat Date')
 
     # Présentation / Conseils
@@ -200,19 +213,9 @@ class ProductTemplate(models.Model):
     is_creation_le   = fields.Date(string='Création le', default=lambda *a: fields.Date.today())
     is_mis_a_jour_le = fields.Date(string='Mise à jour le')
     is_mise_en_avant = fields.Boolean(string='Mise en avant', help="Mise en avant de cet article dans le listing client", default=False)
-
-
     is_bio_id   = fields.Many2one('is.bio', 'BIO')
-
     #is_bio           = fields.Boolean(string='BIO', help="Article issue de l'agriculture biologique", default=False)
-
-
-
     is_preco         = fields.Boolean(string='Préco.', default=False)
-
-
-
-
     is_presentation = fields.Text(string='Présentation')
     is_conseils     = fields.Text(string='Conseils')
 
@@ -262,6 +265,9 @@ class ProductTemplate(models.Model):
 
 
     is_note_importation = fields.Text(string='Note importation Fusion Fromtome / Le Cellier')
+
+
+
 
 
 
@@ -385,10 +391,10 @@ class ProductProduct(models.Model):
 
  
 
-    # def name_get(self):
-    #     self.browse(self.ids).read(['name', 'default_code'])
-    #     return [(template.id, '%s [%s]' % (template.name, template.default_code))
-    #             for template in self]
+    def name_get(self):
+        self.browse(self.ids).read(['name', 'default_code'])
+        return [(template.id, '%s [%s]' % (template.name, template.default_code))
+            for template in self]
 
 
 

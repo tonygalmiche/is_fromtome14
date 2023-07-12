@@ -41,6 +41,12 @@ records.exporter_article_fromelier_action()
                 <attribute name="attrs">{}</attribute>
             </group> -->
 
+            <field name="categ_id" position="after">
+                <field name="is_ref_fournisseur"/>
+            </field>
+
+
+
             <field name="type" position="after">
                 <field name="is_stock_mini"/>
             </field>
@@ -81,6 +87,11 @@ records.exporter_article_fromelier_action()
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_tree_view"/>
         <field name="arch" type="xml">
+
+            <field name="default_code" position="after">
+                <field name="is_ref_fournisseur" optional="show"/>
+            </field>
+
              <field name="uom_id" position="after">
                 <field name="is_stock_mini" optional="hide"/>
                 <field name="is_nb_pieces_par_colis" optional="hide"/>
@@ -102,6 +113,7 @@ records.exporter_article_fromelier_action()
         <field name="inherit_id" ref="product.product_template_search_view"/>
         <field name="arch" type="xml">
              <field name="name" position="after">
+                <field name="is_ref_fournisseur"/>
                 <field name="barcode"/>
             </field>
         </field>

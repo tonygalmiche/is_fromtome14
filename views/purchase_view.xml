@@ -106,6 +106,7 @@
                 <!-- <field name="is_sale_order_line_id" optional="hide"/> -->
             </xpath>
              <xpath expr="//field[@name='order_line']//tree//field[@name='name']" position='after'>
+                <field name="is_default_code"    optional="show"/>
                 <field name="is_ref_fournisseur" optional="show"/>
             </xpath>
             <xpath expr="//field[@name='order_line']//tree//field[@name='date_planned']" position='attributes'>
@@ -140,6 +141,9 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
         <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_enseigne_id" optional="show"/>
+            </field>
             <field name="state" position="before">
                 <field name="is_commande_soldee" optional="show"/>
                 <field name="is_heure_envoi"     optional="hide"/>
@@ -152,6 +156,9 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
         <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_enseigne_id" optional="show"/>
+            </field>
             <field name="state" position="before">
                 <field name="is_heure_envoi"     optional="hide"/>
             </field>
@@ -163,8 +170,21 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
         <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_enseigne_id"/>
+            </field>
             <field name="product_id" position="after">
                 <field name="is_heure_envoi"/>
+            </field>
+       </field>
+    </record>
+    <record id="is_purchase_order_view_search" model="ir.ui.view">
+        <field name="name">is_purchase_order_view_search</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_search"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_enseigne_id"/>
             </field>
        </field>
     </record>

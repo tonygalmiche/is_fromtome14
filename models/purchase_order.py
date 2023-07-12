@@ -152,9 +152,8 @@ class PurchaseOrderLine(models.Model):
 
 
     @api.depends('product_id','name')
-    def _compute_is_ref_fournisseur(self):
+    def _compute_ref(self):
         for obj in self:
-            print(obj.product_id.name)
             filtre=[
                 ('product_tmpl_id', '=', obj.product_id.product_tmpl_id.id),
                 ('name'           , '=', obj.order_id.partner_id.id),
@@ -164,6 +163,7 @@ class PurchaseOrderLine(models.Model):
             for s in suppliers:
                 ref=s.product_code
             obj.is_ref_fournisseur = ref
+            obj.is_default_code = obj.product_id.default_code
 
 
     is_sale_order_line_id  = fields.Many2one('sale.order.line', string=u'Ligne commande client', index=True)
@@ -174,7 +174,8 @@ class PurchaseOrderLine(models.Model):
     is_client_id           = fields.Many2one('res.partner', 'Client', related='is_sale_order_line_id.order_id.partner_id')
     is_date_planned        = fields.Datetime(string="Date de réception", related='order_id.date_planned')
     is_date_enlevement     = fields.Date(related='order_id.is_date_enlevement')
-    is_ref_fournisseur     = fields.Char(string='Réf fournisseur', compute='_compute_is_ref_fournisseur', readonly=True, store=True)
+    is_default_code        = fields.Char(string='Réf Fromtome'   , compute='_compute_ref', readonly=True, store=True)
+    is_ref_fournisseur     = fields.Char(string='Réf Fournisseur', compute='_compute_ref', readonly=True, store=True)
 
 
 
