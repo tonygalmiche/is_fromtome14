@@ -10,6 +10,7 @@
             <tree>
                 <field name="name"/>
                 <field name="warehouse_id"/>
+                <field name="modele_commande_ids" widget="many2many_binary"/>
             </tree>
         </field>
     </record>
@@ -18,10 +19,16 @@
         <field name="model">is.enseigne.commerciale</field>
         <field name="arch" type="xml">
         <form>
+            <style>
+                 .o_form_label{
+                    white-space: nowrap;
+                }
+            </style>
             <sheet>
                 <group>
                     <field name="name"/>
                     <field name="warehouse_id"/>
+                    <field name="modele_commande_ids" widget="many2many_binary"/>
                 </group>
             </sheet>
         </form>

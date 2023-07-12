@@ -8,6 +8,11 @@
         <field name="model">is.modele.commande</field>
         <field name="arch" type="xml">
             <form>
+                <style>
+                    .o_form_label{
+                       white-space: nowrap;
+                   }
+               </style>
                 <header>
                     <button
                         name="initialiser_action"
@@ -20,10 +25,17 @@
                         type="object"
                         string="Trier par poids décroissant"
                     />
+                    <button
+                        name="actualiser_modele_excel_action"
+                        type="object"
+                        string="Actualiser le modèle Excel"
+                    />
                 </header>
                 <sheet>
                     <group>
                         <field name="name"/>
+                        <field name="enseigne_id"/>
+                        <field name="modele_commande_ids" widget="many2many_binary"/>
                     </group>
                     <field name="ligne_ids">
                         <tree decoration-danger="weight==0" editable="bottom">

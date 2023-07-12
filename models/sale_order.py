@@ -4,6 +4,10 @@ from odoo.exceptions import UserError, ValidationError, Warning
 from odoo.tools.float_utils import float_compare, float_is_zero, float_round
 import time
 from odoo.osv import expression
+
+from openpyxl import Workbook, load_workbook
+
+import base64
 import datetime
 import logging
 _logger = logging.getLogger(__name__)
@@ -36,8 +40,67 @@ class IsModeleCommande(models.Model):
     _description = "Modèle de commandes"
     _order       ='name'
 
-    name       = fields.Char('Nom du modèle', required=True)
-    ligne_ids  = fields.One2many('is.modele.commande.ligne', 'modele_id', 'Lignes')
+    name                = fields.Char('Nom du modèle', required=True)
+    enseigne_id         = fields.Many2one('is.enseigne.commerciale', 'Enseigne')
+    modele_commande_ids = fields.Many2many('ir.attachment', 'is_modele_commande_modele_commande_rel', 'enseigne_id', 'file_id', 'Modèle de commande client')
+    ligne_ids           = fields.One2many('is.modele.commande.ligne', 'modele_id', 'Lignes')
+
+
+    def actualiser_modele_excel_action(self):
+        for obj in self:
+            print(obj)
+            if not obj.enseigne_id:
+                raise Warning("Enseigne obligatoire pour générer la commande Excel !")
+
+
+
+            for modele in obj.enseigne_id.modele_commande_ids:
+                name = obj.name
+
+                #** Enregistrement du modèle en local *************************
+                res = modele.datas
+                res = base64.b64decode(res)
+                path="/tmp/modele-commande-%s.xlsx"%obj.id
+                f = open(path,'wb')
+                f.write(res)
+                f.close()
+                #**************************************************************
+
+                #** Ecritures des lignes **************************************
+                wb = load_workbook(path)
+                sheet = wb.active
+                row=7 #Première ligne pour enregistrer les données
+                lig=1
+                for line in obj.ligne_ids:
+                    sheet.cell(row=row, column=1).value = lig
+                    sheet.cell(row=row, column=2).value = line.product_id.name
+                    sheet.cell(row=row, column=3).value = line.product_id.default_code
+                    row+=1
+                    lig+=1
+                wb.save(path)
+                #**************************************************************
+
+                # ** Creation ou modification de la pièce jointe **************
+                attachments = obj.modele_commande_ids
+                name="%s.xlsx"%(obj.name)
+                model=self._name
+                file = open(path,'rb').read()
+                datas = base64.b64encode(file)
+                vals = {
+                    'name':        name,
+                    'type':        'binary',
+                    'res_model':   model,
+                    'res_id':      obj.id,
+                    'datas':       datas,
+                }
+                if len(attachments):
+                    attachment=attachments[0]
+                    attachment.write(vals)
+                else:
+                    attachment = self.env['ir.attachment'].create(vals)
+                obj.modele_commande_ids=[attachment.id]
+                #**************************************************************
+
 
 
     def initialiser_action(self):
