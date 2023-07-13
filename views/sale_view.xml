@@ -249,6 +249,11 @@
                             string="Importer le fichier xlsx" type="object" 
                         />
                     </group>
+                    <group string="Alertes importation" attrs="{'invisible':[('is_import_alerte','=',False)]}" >
+                        <div style="background:orange;font-weight:bold;padding-left:5pt">
+                            <field name="is_import_alerte" nolabel="1"/>
+                        </div>
+                    </group>
                 </page>
             </xpath>
 

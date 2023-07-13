@@ -302,28 +302,35 @@ class SaleOrder(models.Model):
     is_transporteur_id       = fields.Many2one(related='partner_id.is_transporteur_id')
     is_encours_client        = fields.Float(related='partner_id.is_encours_client')
     is_import_excel_ids      = fields.Many2many('ir.attachment' , 'sale_order_is_import_excel_ids_rel', 'order_id'     , 'attachment_id'    , 'Commande .xlsx à importer')
+    is_import_alerte         = fields.Text('Alertes importation')
+
+
+
+
+    def ajout_frais_de_port(self):
+        "Ajout des frais de port"
+        for order in self:
+            if order.partner_id.is_frais_port_id:
+                test = True
+                for line in order.order_line:
+                    if line.product_id==order.partner_id.is_frais_port_id:
+                        test=False
+                        break
+                if test:
+                    vals={
+                        "order_id": order.id,
+                        "sequence": 999,
+                        "product_id": order.partner_id.is_frais_port_id.id,
+                        "price_unit": order.partner_id.is_frais_port_id.lst_price,
+                        "product_uom_qty": 1,
+                    }
+                    order_line = self.env['sale.order.line'].create(vals)
 
 
     @api.model
     def create(self, vals):
         order = super(SaleOrder, self).create(vals)
-        ##** Ajout des frais de port ******************************************
-        if order.partner_id.is_frais_port_id:
-            test = True
-            for line in order.order_line:
-                if line.product_id==order.partner_id.is_frais_port_id:
-                    test=False
-                    break
-            if test:
-                vals={
-                    "order_id": order.id,
-                    "sequence": 999,
-                    "product_id": order.partner_id.is_frais_port_id.id,
-                    "price_unit": order.partner_id.is_frais_port_id.lst_price,
-                    "product_uom_qty": 1,
-                }
-                order_line = self.env['sale.order.line'].create(vals)
-        #**********************************************************************
+        order.ajout_frais_de_port()
         return order
 
 
@@ -516,17 +523,9 @@ class SaleOrder(models.Model):
                         # ***********************************************************
 
 
-
-
-
-
-
-
-
     def import_fichier_xlsx(self):
         for obj in self:
             obj.order_line.unlink()
-            sequence=0
             alertes=[]
             for attachment in obj.is_import_excel_ids:
                 xlsxfile=base64.b64decode(attachment.datas)
@@ -539,7 +538,6 @@ class SaleOrder(models.Model):
 
                 #** Test si fichier est bien du xlsx *******************************
                 try:
-                    #wb = openpyxl.load_workbook(filename = path)
                     wb    = load_workbook(filename = path, data_only=True)
                     ws    = wb.active
                     cells = list(ws)
@@ -548,96 +546,51 @@ class SaleOrder(models.Model):
                 #*******************************************************************
 
                 lig=0
-                option=False
                 for row in ws.rows:
-
                     if lig>5:
                         num         = cells[lig][0].value
                         designation = cells[lig][1].value
                         code        = cells[lig][2].value
                         colis       = cells[lig][6].value
-                        filtre=[
-                            ("default_code","=", code),
-                        ]
-                        products = self.env['product.product'].search(filtre, limit=1)
-                        if len(products)>0:
-
-
-
-
-                            print(num,code, colis, products[0].default_code, designation)
-
-
-                        else:
-                            alertes.append("Article %s non trouvé"%code)
-
-
-
-
+                        try:
+                            colis = float(colis or 0)
+                        except ValueError:
+                            colis = 0
+                        if colis and colis>0:
+                            if code==None or code==False:
+                                alertes.append("Ligne %s : Code article non indiqué sur la ligne"%(lig+1))
+                            else:
+                                filtre=[
+                                    ("default_code","=", code),
+                                ]
+                                products = self.env['product.product'].search(filtre, limit=1)
+                                if len(products)>0:
+                                    product=products[0]
+                                    try:
+                                        qty = colis
+                                    except ValueError:
+                                        qty = 0
+                                    vals={
+                                        "order_id"         : obj.id,
+                                        "product_id"       : product.id,
+                                        "sequence"         : lig,
+                                        "is_colis_cde"     : qty,
+                                        "product_uom"      : product.uom_id.id,
+                                        "is_date_reception": datetime.date.today()+datetime.timedelta(days=2),
+                                    }
+                                    res = self.env['sale.order.line'].create(vals)
+                                    res.onchange_is_colis_cde()
+                                    #print(num,code, colis, products[0].default_code, res, designation)
+                                else:
+                                    alertes.append("Ligne %s : Article %s non trouvé"%((lig+1),code))
                     lig+=1
-            print(alertes)
+            obj.ajout_frais_de_port()
+            if alertes:
+                alertes = "\n".join(alertes)
+            else:
+                alertes=False
+            obj.is_import_alerte = alertes
 
 
 
 
-            #         if name and ref and not vals:
-            #             filtre=[
-            #                 ("default_code"  ,"=", ref),
-            #             ]
-            #             products = self.env['product.product'].search(filtre)
-            #             if not products:
-            #                 alertes.append("Code '%s' non trouvé"%(ref))
-            #             else:
-            #                 product=products[0]
-            #                 try:
-            #                     qty = float(cells[lig][2].value or 0)
-            #                 except ValueError:
-            #                     qty = 0
-            #                 try:
-            #                     price = float(cells[lig][4].value or 0)
-            #                 except ValueError:
-            #                     price = 0
-            #                 try:
-            #                     discount = float(cells[lig][8].value or 0)
-            #                 except ValueError:
-            #                     discount = 0
-            #                 try:
-            #                     is_prix_achat = float(cells[lig][9].value or 0)
-            #                 except ValueError:
-            #                     is_prix_achat = 0
-            #                 vals={
-            #                     "order_id"       : not option and obj.id,
-            #                     "product_id"     : product.id,
-            #                     "sequence"       : sequence,
-            #                     "name"           : name,
-            #                     "product_uom_qty": qty,
-            #                     "price_unit"     : price,
-            #                     "discount"       : discount,
-            #                     "is_prix_achat"  : is_prix_achat,
-            #                     "product_uom"    : product.uom_id.id,
-            #                     "is_section_id"  : section_id,
-            #                 }
-            #                 if purchase_order:
-            #                     v={
-            #                         "order_id"    : purchase_order.id,
-            #                         "product_id"  : product.id,
-            #                         "sequence"    : sequence,
-            #                         "name"        : name,
-            #                         "product_qty" : qty,
-            #                         "display_type": False,
-            #                     }
-            #                     if product.is_sous_article_ids:
-            #                         for line in product.is_sous_article_ids:
-            #                             v["product_id"]=line.product_id.id
-            #                             res = self.env['purchase.order.line'].create(v)
-            #                     else:
-            #                         res = self.env['purchase.order.line'].create(v)
-            #         if vals:
-            #             res = self.env['sale.order.line'].create(vals)
-            #         lig+=1
-            #         sequence+=1
-            # if alertes:
-            #     alertes = "\n".join(alertes)
-            # else:
-            #     alertes=False
-            # obj.is_import_alerte = alertes
