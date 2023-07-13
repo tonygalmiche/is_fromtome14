@@ -235,6 +235,25 @@
                 />
                 <field name="is_commande_soldee" readonly="1"/>
             </field>
+
+
+
+            <xpath expr="//page[@name='order_lines']" position="after">
+                <page string="Import commande xlsx">
+                    <group string="Fichier à importer">
+                        <field name="is_import_excel_ids" widget="many2many_binary" nolabel="1"/>
+                    </group>
+                    <group>
+                        <button 
+                            name="import_fichier_xlsx" 
+                            string="Importer le fichier xlsx" type="object" 
+                        />
+                    </group>
+                </page>
+            </xpath>
+
+
+
         </field>
     </record>
 
