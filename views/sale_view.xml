@@ -14,12 +14,12 @@
                    }
                </style>
                 <header>
-                    <button
+                    <!-- <button
                         name="initialiser_action"
                         type="object"
                         string="Initialiser avec les articles livrés"
                         confirm="Cela va écraser les lignes ?"
-                    />
+                    /> -->
                     <button
                         name="trier_action"
                         type="object"

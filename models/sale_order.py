@@ -107,6 +107,7 @@ class IsModeleCommande(models.Model):
                         sheet.cell(row=row, column=3).value = line.product_id.default_code
                         sheet.cell(row=row, column=4).value = line.product_id.is_ref_fournisseur
                         sheet.cell(row=row, column=5).value = line.price_unit
+                        sheet.cell(row=row, column=6).value = line.product_id.uom_id.name
                         row+=1
                         lig+=1
                 wb.save(path)
