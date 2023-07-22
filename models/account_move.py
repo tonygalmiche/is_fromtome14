@@ -143,6 +143,23 @@ class AccountMove(models.Model):
     is_nb_colis         = fields.Float(string='Nb colis' , digits=(14,1), compute='_compute_poids_colis')
 
 
+    def write(self, vals):
+        res = super(AccountMove, self).write(vals)
+        #** Mettre la ligne des frais de port à la fin ************************
+        for obj in self:
+            if obj.partner_id.is_frais_port_id:
+                max=0
+                for line in obj.line_ids:
+                    if line.product_id!=obj.partner_id.is_frais_port_id:
+                        if line.sequence>max:
+                            max=line.sequence
+                for line in obj.line_ids:
+                    if line.product_id==obj.partner_id.is_frais_port_id:
+                        line.sequence=max+10
+        #**********************************************************************
+        return res
+
+
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 

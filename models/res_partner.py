@@ -15,6 +15,7 @@ class IsEnseigneCommerciale(models.Model):
     name                = fields.Many2one('res.partner', 'Enseigne commerciale', required=True)
     warehouse_id        = fields.Many2one('stock.warehouse', 'Entrepôt')
     modele_commande_ids = fields.Many2many('ir.attachment', 'is_enseigne_commerciale_modele_commande_rel', 'enseigne_id', 'file_id', 'Modèle de commande client')
+    prix_sur_livraison  = fields.Boolean("Afficher le prix de vente sur le bon de livraison", default=False)
 
 
 class IsTransporteur(models.Model):
