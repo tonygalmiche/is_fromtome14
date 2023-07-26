@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+
+    <!-- res.bank -->
+    <record  id="is_res_bank_action" model="ir.actions.act_window">
+        <field name="name">Banques</field>
+        <field name="res_model">res.bank</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem
+        id="is_res_bank_menu"
+        name="Banques"
+        parent="account.account_banks_menu"
+        sequence="10"
+        action="is_res_bank_action"
+    />
+
+    <!-- res.partner.bank -->
+    <record  id="is_res_partner_bank_action" model="ir.actions.act_window">
+        <field name="name">Comptes banquaires</field>
+        <field name="res_model">res.partner.bank</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem
+        id="is_res_partner_bank_menu"
+        name="Comptes banquaires"
+        parent="account.account_banks_menu"
+        sequence="20"
+        action="is_res_partner_bank_action"
+    />
+
+
+
+
     <!-- Déplacement des menus inutiles -->
     <menuitem id="mail.menu_root_discuss"     parent="base.menu_custom" sequence="900"/>
     <menuitem id="utm.menu_link_tracker_root" parent="base.menu_custom" sequence="901"/>
