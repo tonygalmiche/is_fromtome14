@@ -112,6 +112,15 @@ class IsFNC(models.Model):
         return True
     
 
+    @api.onchange('action_curative_date')
+    def onchange_action_curative_date(self):
+        for obj in self:
+            if obj.action_curative_date:
+                obj.action_curative_statut="fait"
+            else:
+                obj.action_curative_statut="en_cours"
+
+
     @api.onchange('action_corrective_date_effective', 'action_corrective_date_prevue')
     def fnc_update_action(self):
         for obj in self:
@@ -119,6 +128,8 @@ class IsFNC(models.Model):
             if statut:
                 if obj.action_corrective_statut != statut:
                     obj.action_corrective_statut = statut
+
+
 
 
     def get_statut(self):
@@ -155,10 +166,15 @@ class StockMoveLine(models.Model):
             fnc_id=False
             for fnc in fncs:
                 fnc_id=fnc.id
-
             if not fnc_id:
+                origine="fournisseur"
+                if obj.move_id.picking_id.picking_type_id.code=="outgoing":
+                    origine="client"
+                if obj.move_id.picking_id.picking_type_id.code=="internal":
+                    origine="interne"
                 vals={
                     'move_line_id': obj.id,
+                    'origine'     : origine,
                     'partner_id'  : obj.move_id.picking_id.partner_id.id,
                     'picking_id'  : obj.move_id.picking_id.id,
                     'product_id'  : obj.move_id.product_id.id,
