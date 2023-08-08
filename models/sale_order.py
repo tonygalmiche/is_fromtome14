@@ -257,21 +257,24 @@ class SaleOrderLine(models.Model):
 
     @api.onchange('product_id','is_livraison_directe')
     def onchange_product_id_for_date_reception(self):
-        if self.is_livraison_directe:
-            if self.order_id.is_date_livraison:
-                self.is_date_reception = self.order_id.is_date_livraison
-        else:
-            partner = self.get_fournisseur_par_defaut()
-            if partner and partner.is_date_reception:
-                self.is_date_reception = partner.is_date_reception
+        self.is_date_reception = datetime.date.today()+datetime.timedelta(days=2)
+
+        #TODO : Désactivé le 08/08/2023 car cela pose problème pour Le Cellier
+        # if self.is_livraison_directe:
+        #     if self.order_id.is_date_livraison:
+        #         self.is_date_reception = self.order_id.is_date_livraison
+        # else:
+        #     partner = self.get_fournisseur_par_defaut()
+        #     if partner and partner.is_date_reception:
+        #         self.is_date_reception = partner.is_date_reception
 
 
-    @api.onchange('is_date_reception')
-    def onchange_is_date_reception(self):
-        if self.is_date_reception:
-            partner = self.get_fournisseur_par_defaut()
-            if partner:
-                partner.write({'is_date_reception': self.is_date_reception})
+    # @api.onchange('is_date_reception')
+    # def onchange_is_date_reception(self):
+    #     if self.is_date_reception:
+    #         partner = self.get_fournisseur_par_defaut()
+    #         if partner:
+    #             partner.write({'is_date_reception': self.is_date_reception})
 
 
     def acceder_commande_fournisseur(self):
