@@ -170,6 +170,7 @@
             <field name="payment_mode_id" position="after">
                 <field name="is_date_livraison"/>
                 <field name="is_transporteur_id"/>
+                <field name="is_nb_lignes"/>
             </field>
             <field name="validity_date" position="attributes">
                  <attribute name="invisible">1</attribute>
@@ -274,6 +275,7 @@
             <field name="date_order" position="after">
                 <field name="is_date_livraison"  optional="show"/>
                 <field name="is_transporteur_id" optional="hide"/>
+                <field name="is_nb_lignes"       optional="hide"/>
             </field>
             <field name="invoice_status" position="before">
                 <field name="is_commande_soldee" optional="show"/>

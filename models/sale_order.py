@@ -293,6 +293,15 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
 
+    def _compute_is_nb_lignes(self):
+        for obj in self:
+            nb=0
+            for line in obj.order_line:
+                if line.product_id!=obj.partner_id.is_frais_port_id:
+                    nb+=1
+            obj.is_nb_lignes = nb
+
+
     is_enseigne_id           = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
     is_date_livraison        = fields.Date('Date livraison client', help="Date d'arrivée chez le client")
     is_commande_soldee       = fields.Boolean(string='Commande soldée', default=False, copy=False, help="Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
@@ -303,6 +312,7 @@ class SaleOrder(models.Model):
     is_encours_client        = fields.Float(related='partner_id.is_encours_client')
     is_import_excel_ids      = fields.Many2many('ir.attachment' , 'sale_order_is_import_excel_ids_rel', 'order_id'     , 'attachment_id'    , 'Commande .xlsx à importer')
     is_import_alerte         = fields.Text('Alertes importation')
+    is_nb_lignes             = fields.Integer('Nb lignes (hors transport)', compute='_compute_is_nb_lignes')
 
 
 
