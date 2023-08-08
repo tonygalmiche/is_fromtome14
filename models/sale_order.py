@@ -315,6 +315,9 @@ class SaleOrder(models.Model):
     is_nb_lignes             = fields.Integer('Nb lignes (hors transport)', compute='_compute_is_nb_lignes')
 
 
+    def _message_auto_subscribe_notify(self, partner_ids, template):
+        "Désactiver les notifications d'envoi des mails"
+        return True
 
 
     def ajout_frais_de_port(self):
