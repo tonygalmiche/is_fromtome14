@@ -35,13 +35,13 @@
                         <field name="qt_imprime"/>
                         <field name="imprimante_id" required="1"/>
                     </group>
-                    <footer>
+                    <!-- <footer>
                         <button
                             name="imprimer_etiquette_action"
                             type="object"
                             string="Imprimer les étiquettes"
                         />
-                    </footer>
+                    </footer> -->
                 </sheet>
             </form>
         </field>
