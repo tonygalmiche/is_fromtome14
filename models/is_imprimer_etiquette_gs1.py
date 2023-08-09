@@ -38,11 +38,11 @@ class IsImprimerEtiquetteGS1(models.Model):
     alerte = fields.Text("Message")
 
 
-    @api.constrains('poids')
-    def constrains_poids(self):
-        for obj in self:
-            if obj.poids <= 0:
-                raise ValidationError("Le poids n'est pas renseigné")
+    # @api.constrains('poids')
+    # def constrains_poids(self):
+    #     for obj in self:
+    #         if obj.poids <= 0:
+    #             raise ValidationError("Le poids n'est pas renseigné")
 
 
     @api.model
