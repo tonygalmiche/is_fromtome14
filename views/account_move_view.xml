@@ -1,12 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
+    <!-- Relance facture -->
+    <!-- <record id="is_relance_facture_action_server" model="ir.actions.server">
+        <field name="name">Relance facture</field>
+        <field name="model_id" ref="model_account_move"/>
+        <field name="binding_model_id" ref="model_account_move"/>
+        <field name="state">code</field>
+        <field name="code">action = records.relance_facture_action()</field>
+    </record> -->
+
     <!-- account.move -->
     <record id="is_view_move_form" model="ir.ui.view">
         <field name="name">is_view_move_form</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form" />
         <field name="arch" type="xml">
+            <xpath expr="//sheet[1]" position="inside">
+                <style>
+                    .o_form_view .o_form_sheet_bg > .o_form_sheet{
+                        max-width: 1800px;
+                    }
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
+            </xpath>
             <xpath expr="//sheet/group/group/field[@name='date']" position="attributes">
                  <attribute name="invisible">1</attribute>
             </xpath>
@@ -15,6 +34,7 @@
             </field>
             <div name="journal_div" position="after">
                 <field name="is_export_compta_id" readonly="1"/>
+                <field name="is_date_relance"/>
             </div>
             <label for="invoice_payment_term_id" position="replace"/>
             <xpath expr="//field[@name='invoice_date_due']/.." position="replace">
@@ -64,8 +84,38 @@
                 <field name="invoice_payment_term_id" optional="show"/>
                 <field name="invoice_date_due"        optional="show"/>
             </field>
+            <field name="date" position="replace">
+                <field name="is_date_relance" optional="show"/>
+                <field name="date"            optional="hide"/>
+            </field>
         </field>
     </record>
+
+    <record id="is_view_invoice_tree" model="ir.ui.view">
+        <field name="name">is_view_invoice_tree</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree" />
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="is_enseigne_id" optional="show"/>
+            </field>
+            <field name="state" position="before">
+                <field name="is_export_compta_id" optional="show"/>
+            </field>
+            <field name="invoice_date_due" position="before">
+                <field name="invoice_payment_term_id" optional="show"/>
+                <field name="invoice_date_due"        optional="show"/>
+            </field>
+            <field name="date" position="replace">
+                <field name="is_date_relance" optional="show"/>
+                <field name="date"            optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+
+
+
     <record id="is_view_in_invoice_tree" model="ir.ui.view">
         <field name="name">is_view_in_invoice_tree</field>
         <field name="model">account.move</field>

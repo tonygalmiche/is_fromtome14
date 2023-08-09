@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- is.relance.facture -->
+    <record id="is_relance_facture_seq" model="ir.sequence">
+        <field name="name">Relance facture</field>
+        <field name="code">is.relance.facture</field>
+        <field name="prefix"></field>
+        <field name="padding">5</field>
+        <field eval="False" name="company_id"/>
+    </record>
+    <record id="is_relance_facture_form" model="ir.ui.view">
+        <field name="name">is.relance.facture.form</field>
+        <field name="model">is.relance.facture</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="generer_relance_action"
+                        type="object"
+                        string="Générer les relances"
+                        confirm="Confirmer l'envoi des mails ?"
+                        attrs="{'invisible': [('state', '=', 'envoye')]}"
+                    />
+                    <button
+                        name="voir_factures_action"
+                        type="object"
+                        string="Voir les factures"
+                    />
+                    <field name="state" widget="statusbar" clickable="true"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="partner_id"/>
+                            <field name="nb_jours"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="create_date" string="Date relance"/>
+                            <field name="amount_residual"/>
+                        </group>
+                    </group>
+                    <field name="ligne_ids">
+                        <tree editable="Bottom" limit="1000">
+                            <field name="sequence" widget="handle"/>
+                            <button name="voir_facture_action" type="object" icon="fa-search-plus" title="Voir facture"/>
+                            <field name="invoice_id"/>
+                            <field name="partner_id"/>
+                            <field name="invoice_date"/>
+                            <field name="invoice_date_due"/>
+                            <field name="invoice_date_due" widget="remaining_days"/>
+                            <field name="amount_residual" sum="Total"/>
+                            <field name="currency_id" invisible="1"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_relance_facture_tree" model="ir.ui.view">
+        <field name="name">is.relance.facture.tree</field>
+        <field name="model">is.relance.facture</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="create_date" string="Date relance"/>
+                <field name="partner_id"/>
+                <field name="nb_jours"/>
+                <field name="currency_id" invisible="1"/>
+                <field name="amount_residual" sum="Total"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_relance_facture_search" model="ir.ui.view">
+        <field name="name">is.relance.facture.search</field>
+        <field name="model">is.relance.facture</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_relance_facture_action" model="ir.actions.act_window">
+        <field name="name">Relance facture</field>
+        <field name="res_model">is.relance.facture</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_relance_facture_menu"
+        name="Relance facture"
+        parent="account.menu_finance_receivables"
+        sequence="900"
+        action="is_relance_facture_action"
+    />
+</odoo>

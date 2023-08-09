@@ -45,3 +45,6 @@ access_is_transporteur,access_is_transporteur,model_is_transporteur,base.group_u
 
 access_is_imprimante_etiquette,access_is_imprimante_etiquette,model_is_imprimante_etiquette,base.group_user,1,0,0,0
 access_is_imprimante_etiquette_manager,access_is_imprimante_etiquette_manager,model_is_imprimante_etiquette,base.group_system,1,1,1,1
+
+access_is_relance_facture_ligne,access_is_relance_facture_ligne,model_is_relance_facture_ligne,base.group_user,1,1,1,1
+access_is_relance_facture,access_is_relance_facture,model_is_relance_facture,base.group_user,1,1,1,1

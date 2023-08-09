@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 import codecs
 import unicodedata
 import base64
@@ -20,8 +20,9 @@ class IsImprimanteEtiquette(models.Model):
 
 class IsImprimerEtiquetteGS1(models.Model):
     _name = 'is.imprimer.etiquette.gs1'
-    _description = u"Imprimer des étiquettes GS1"
+    _description = "Imprimer des étiquettes GS1"
     _order='id desc'
+    _rec_name = 'id'
 
     code_gs1   = fields.Text("Code GS1")
     code_ean   = fields.Char("Code EAN (01)")
@@ -34,6 +35,31 @@ class IsImprimerEtiquetteGS1(models.Model):
     poids      = fields.Float("Poids (31xx)"    , required=True, digits='Stock Weight')
     qt_imprime = fields.Integer("Quantité à Imprimer", required=True, default=1)
     imprimante_id = fields.Many2one('is.imprimante.etiquette', 'Imprimante étiquettes',default=lambda self: self.get_imprimante())
+    alerte = fields.Text("Message")
+
+
+    @api.constrains('poids')
+    def constrains_poids(self):
+        for obj in self:
+            if obj.poids <= 0:
+                raise ValidationError("Le poids n'est pas renseigné")
+
+
+    @api.model
+    def create(self, vals):
+        res = super(IsImprimerEtiquetteGS1, self).create(vals)
+        print(res)
+        res.imprimer_etiquette_action()
+        return res
+
+
+    def write(self, vals):
+        res = super(IsImprimerEtiquetteGS1, self).write(vals)
+        if "alerte" not in vals:
+            print(res)
+            for obj in self:
+                obj.imprimer_etiquette_action()
+        return res
 
 
     def get_imprimante(self):
@@ -55,52 +81,57 @@ class IsImprimerEtiquetteGS1(models.Model):
 
     @api.onchange('code_gs1','product_id')
     def code_gs1_change(self):
-        if self.code_gs1:
-            lines = self.code_gs1.strip().split('\n')
-            if len(lines)==1:
-                self.code_ean = lines[0].strip()
-            if len(lines)>1:
-                for line in lines:
-                    line=line.strip()
-                    if line:
-                        if line[:2] in ['00','01','02']:
-                            code_ean = line[2:]
-                            self.code_ean = code_ean
-                        if line[:2]=='10':
-                            self.lot = line[2:]
+        self.alerte=False
+
+        # if self.code_gs1:
+        #     lines = self.code_gs1.strip().split('\n')
+        #     if len(lines)==1:
+        #         self.code_ean = lines[0].strip()
+        #     if len(lines)>1:
+        #         for line in lines:
+        #             line=line.strip()
+        #             if line:
+        #                 if line[:2] in ['00','01','02']:
+        #                     code_ean = line[2:]
+        #                     self.code_ean = code_ean
+        #                 if line[:2]=='10':
+        #                     self.lot = line[2:]
     
-                        if line[:2]=='15':
-                            dluo = self.str2date(line[2:])
-                            self.dluo = dluo
+        #                 if line[:2]=='15':
+        #                     dluo = self.str2date(line[2:])
+        #                     self.dluo = dluo
 
-                        if line[:2]=='17':
-                            dlc = self.str2date(line[2:])
-                            self.dlc = dlc
+        #                 if line[:2]=='17':
+        #                     dlc = self.str2date(line[2:])
+        #                     self.dlc = dlc
 
-                        if line[:2]=='31':
-                            nb_decimales = float(line[3:4])
-                            if nb_decimales>0:
-                                poids = float(line[4:]) / (10**nb_decimales)
-                                self.poids = poids
+        #                 if line[:2]=='31':
+        #                     nb_decimales = float(line[3:4])
+        #                     if nb_decimales>0:
+        #                         poids = float(line[4:]) / (10**nb_decimales)
+        #                         self.poids = poids
 
-                        if line[:2]=='37':
-                            self.nb_pieces = int(line[2:])
-        if self.code_ean:
-            products = self.env['product.product'].search([('barcode', '=', self.code_ean)])
-            for product in products:
-                self.product_id = product.id
-        if self.product_id and not self.lot:
-            self.lot=(self.product_id.default_code or '')+datetime.now().strftime("%j%y")
+        #                 if line[:2]=='37':
+        #                     self.nb_pieces = int(line[2:])
+        # if self.code_ean:
+        #     products = self.env['product.product'].search([('barcode', '=', self.code_ean)])
+        #     for product in products:
+        #         self.product_id = product.id
+        # if self.product_id and not self.lot:
+        #     self.lot=(self.product_id.default_code or '')+datetime.now().strftime("%j%y")
         if self.product_id:
             if self.product_id.barcode:
                 code_ean =  ((self.product_id.barcode or '')+"00000000000000")[:14]
             else:
                 code_ean =  ((self.product_id.default_code or '')+"00000000000000")[:14]
+                alerte="Création d'un code EAN, car l'article sélectionné n'a pas de code actuellement"
+                self.alerte=alerte
             self.code_ean = code_ean
 
 
     def imprimer_etiquette_action(self):
         for obj in self:
+            obj.alerte=False
             code_ean = self.code_ean or ''
             lot      = obj.lot or ''
            
@@ -141,13 +172,15 @@ class IsImprimerEtiquetteGS1(models.Model):
                 obj.poids,
                 obj.nb_pieces
             )
-            name='etiquette-gs1-zpl'
+
+            imprimante = obj.imprimante_id.name_cups or 'GX430T'
+
+            name='etiquette-gs1-%s-zpl'%(imprimante)
             dest = '/tmp/'+name
             f = codecs.open(dest,'wb',encoding='utf-8')
             f.write(ZPL)
             f.close()
 
-            imprimante = obj.imprimante_id.name_cups or 'GX430T'
 
             cmd = "lpr -P %s %s "%(imprimante,dest)
             for x in range(0, obj.qt_imprime):
@@ -155,6 +188,30 @@ class IsImprimerEtiquetteGS1(models.Model):
                 try:
                     output = check_output(cmd, shell=True, stderr=STDOUT)
                 except CalledProcessError as exc:
-                    raise UserError("%s \n%s"%(cmd,exc.output.decode("utf-8")))
+                    msg="%s \n%s"%(cmd,exc.output.decode("utf-8"))
+                    print(msg)
+                    obj.alerte=msg
+                    #raise UserError()
                 #else:
                 #    assert 0
+
+
+    def dupliquer_autre_poids_action(self):
+        for obj in self:
+            context = obj._context.copy()
+            context['default_product_id'] = obj.product_id.id
+            context['default_lot']        = obj.lot
+            context['default_dlc']        = obj.dlc
+            context['default_dluo']       = obj.dluo
+            context['default_imprimante_id'] = obj.imprimante_id.id
+            action = {
+                'name': "Dupliquer",
+                'view_mode': 'form',
+                'res_model': 'is.imprimer.etiquette.gs1',
+                #'view_id': self.env.ref('account.view_account_bnk_stmt_cashbox_footer').id,
+                'type': 'ir.actions.act_window',
+                #'res_id': cashbox_id,
+                'context': context,
+                #'target': 'new'
+            }
+            return action

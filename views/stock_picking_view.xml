@@ -90,9 +90,29 @@
                     <group>
                         <group>
                             <field name="type" readonly="1"/>
-                            <field name="ean" readonly="1"/>
+                            <field name="maj_code_ean_article_vsb" invisible="1"/>
+                            <field name="ean" readonly="1" attrs="{'invisible': [('maj_code_ean_article_vsb', '!=', False)]}"/>
+                            <field name="ean"              attrs="{'invisible': [('maj_code_ean_article_vsb', '=', False)]}"/>
+                            <button 
+                                name="maj_code_ean_article_action" 
+                                type="object" string="Mettre ce code EAN sur l'article sélectionné"
+                                class="oe_inline btn btn-sm btn-secondary"
+                                attrs="{'invisible': [('maj_code_ean_article_vsb', '=', False)]}"
+                            />
+
                             <field name="lot" readonly="1"/>
                             <field name="ajouter"/>
+
+                            <label for="picking_id"/>
+                            <div class="o_row no-gutters d-flex">
+                                <field name="picking_id" readonly="1" class="oe_inline"/>
+                            </div>
+                            <button 
+                                name="maj_picking_action" 
+                                type="object" string="Mise à jour du Picking"   
+                                confirm2="Attention, cela va supprimer et remplacer les lignes du picking"
+                                class="oe_inline btn btn-primary"
+                            />
                         </group>
                        <group>
                             <field name="product_id"/>
@@ -116,8 +136,6 @@
                         attrs="{'invisible': [('is_alerte','=', False)],'readonly':True}"
                     />
                     <field name="line_ids" nolabel="1" >
-
-
                         <tree 
                             string="Lots avec DLC" 
                             editable="bottom" 
@@ -153,17 +171,29 @@
                     </field>
                     <field name="product_ids" nolabel="1" readonly="1">
                         <tree editable="bottom" limit="500">
+                            <button 
+                                title="Imprimer étiquette GS1" 
+                                name="imprimer_etiquette_action" 
+                                type="object" icon="fa-print" 
+                            />
                             <field name="product_id"/>
                             <field name="nb_pieces" sum="Total"/>
                             <field name="uom_id"/>
                             <field name="nb_colis" sum="Total"/>
                         </tree>
                     </field>
-
                     <group>
                         <group  attrs="{'invisible': [('type','!=', 'picking'  )],'readonly':True}">
-                            <button name="maj_picking_action" type="object" string="Mise à jour du Picking"   confirm2="Attention, cela va supprimer et remplacer les lignes du picking"/>
-                            <field name="picking_id" readonly="1"/>
+                            <label for="picking_id"/>
+                            <div class="o_row no-gutters d-flex">
+                                <field name="picking_id" readonly="1" class="oe_inline"/>
+                            </div>
+                            <button 
+                                name="maj_picking_action" 
+                                type="object" string="Mise à jour du Picking"   
+                                confirm2="Attention, cela va supprimer et remplacer les lignes du picking"
+                                class="oe_inline btn btn-primary"
+                            />
                         </group>
                         <group  attrs="{'invisible': [('type','!=', 'inventory'  )],'readonly':True}">
                             <button 

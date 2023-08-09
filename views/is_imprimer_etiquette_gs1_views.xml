@@ -9,25 +9,39 @@
             <form>
                 <header>
                     <button
-                        name="imprimer_etiquette_action"
+                        name="dupliquer_autre_poids_action"
                         type="object"
-                        string="Imprimer les étiquettes"
+                        string="Dupliquer pour saisir autre poids"
                     />
-                </header>
+                 </header>
                 <sheet>
+                    <div style="background:orange;font-weight: bold;" attrs="{'invisible':[('alerte','=',False)]}">
+                        <field 
+                            name="alerte"
+                            readonly="1" nolabel="1" 
+                            attrs="{'invisible': [('alerte', '=', False)]}"
+                        />
+                    </div>
                     <group>
-                        <field name="code_gs1"/>
-                        <field name="code_ean"/>
+                        <!-- <field name="code_gs1"/> -->
                         <field name="product_id"/>
+                        <field name="code_ean"/>
                         <field name="type_tracabilite"/>
                         <field name="lot"/>
                         <field name="dluo" attrs="{'invisible': [('type_tracabilite', '!=', 'ddm')]}"/>
                         <field name="dlc"  attrs="{'invisible': [('type_tracabilite', '!=', 'dlc')]}"/>
                         <field name="poids"/>
-                        <field name="nb_pieces"/>
+                        <!-- <field name="nb_pieces"/> -->
                         <field name="qt_imprime"/>
                         <field name="imprimante_id" required="1"/>
                     </group>
+                    <footer>
+                        <button
+                            name="imprimer_etiquette_action"
+                            type="object"
+                            string="Imprimer les étiquettes"
+                        />
+                    </footer>
                 </sheet>
             </form>
         </field>
@@ -38,16 +52,16 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="product_id"/>
-                <field name="code_ean"/>
-                <field name="lot"/>
-                <field name="dluo"/>
-                <field name="dlc"/>
-                <field name="poids"      sum="Total"/>
-                <field name="nb_pieces"  sum="Total"/>
-                <field name="qt_imprime" sum="Total"/>
-                <field name="create_date" string="Créée le"/>
-                <field name="write_date"  string="Modifiée le"/>
-                <field name="imprimante_id"/>
+                <field name="code_ean"      optional="show" />
+                <field name="lot"           optional="show" />
+                <field name="dluo"          optional="show" />
+                <field name="dlc"           optional="show" />
+                <field name="poids"         optional="show" sum="Total"/>
+                <field name="nb_pieces"     optional="show" sum="Total"/>
+                <field name="qt_imprime"    optional="show" sum="Total"/>
+                <field name="create_date"   optional="show" string="Créée le"/>
+                <field name="write_date"    optional="show" string="Modifiée le"/>
+                <field name="imprimante_id" optional="hide"/>
             </tree>
         </field>
     </record>

@@ -89,6 +89,26 @@ class IsScanPickingLine(models.Model):
     nb_colis   = fields.Float('Nb colis prévus', digits=(14,2))
 
 
+    def imprimer_etiquette_action(self):
+        for obj in self:
+            context = obj._context.copy()
+            context['default_product_id'] = obj.product_id.id
+            #context['default_lot']        = obj.lot
+            #context['default_dlc']        = obj.dlc
+            #context['default_dluo']       = obj.dluo
+            #context['default_imprimante_id'] = obj.imprimante_id.id
+            action = {
+                'name': "Dupliquer",
+                'view_mode': 'form',
+                'res_model': 'is.imprimer.etiquette.gs1',
+                #'view_id': self.env.ref('account.view_account_bnk_stmt_cashbox_footer').id,
+                'type': 'ir.actions.act_window',
+                'context': context,
+                #'target': 'new'
+            }
+            return action
+
+
 class IsScanPicking(models.Model):
     _name = 'is.scan.picking'
     _inherit = 'barcodes.barcode_events_mixin'
@@ -124,6 +144,16 @@ class IsScanPicking(models.Model):
             obj.poids = obj.product_id.is_poids_net_colis
 
 
+    @api.depends('ean','product_id')
+    def _compute_maj_code_ean_article_vsb(self):
+        for obj in self:
+            vsb=False
+            if obj.ean and obj.product_id and not obj.product_id.barcode:
+                vsb=True
+            obj.maj_code_ean_article_vsb=vsb
+ 
+
+
     type         = fields.Selection(string='Type', selection=[('picking', 'Picking'), ('inventory', 'Inventaire')], required=True, default='picking')
     picking_id   = fields.Many2one('stock.picking', 'Picking'     , required=False)
     inventory_id = fields.Many2one('stock.inventory', 'Inventaire', required=False)
@@ -139,6 +169,7 @@ class IsScanPicking(models.Model):
     is_alerte    = fields.Text('Alerte', compute=_compute_is_alerte, readonly=True, store=False)
     line_ids     = fields.One2many('is.scan.picking.line', 'scan_id', 'Lignes')
     product_ids  = fields.One2many('is.scan.picking.product', 'scan_id', 'Articles')
+    maj_code_ean_article_vsb = fields.Boolean(string="Mettre ce code EAN sur l'article sélectionné vsb", compute='_compute_maj_code_ean_article_vsb')
 
 
     def reset_scan(self):
@@ -314,6 +345,17 @@ class IsScanPicking(models.Model):
                     "product_qty"       : qty,
                 }
                 res = self.env['stock.inventory.line'].create(vals)
+
+
+    def maj_code_ean_article_action(self):
+        for obj in self:
+            print("TEST 1",obj,obj.ean)
+            if obj.product_id and not obj.product_id.barcode:
+                print("TEST 2",obj,obj.ean)
+                obj.product_id.barcode=obj.ean
+
+
+
 
 
 
