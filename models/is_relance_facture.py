@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
+from odoo.tools.misc import formatLang, format_date, get_lang
+from odoo.http import request
 import codecs
 import unicodedata
 import base64
 from datetime import date,timedelta
-
 
 
 class IsRelanceFactureLigne(models.Model):
@@ -28,11 +29,12 @@ class IsRelanceFactureLigne(models.Model):
         ("state","=","posted"),("move_type","=","out_invoice"),('payment_state',"=","not_paid")
     ])
 
-    currency_id = fields.Many2one('res.currency', related='invoice_id.currency_id')
+    currency_id      = fields.Many2one('res.currency', related='invoice_id.currency_id')
     amount_residual  = fields.Monetary(string="Montant dû"           , compute='_compute', readonly=True, store=True)
     partner_id       = fields.Many2one('res.partner', string="Client", compute='_compute', readonly=True, store=True)
     invoice_date     = fields.Date(string="Date facture"             , compute='_compute', readonly=True, store=True)
     invoice_date_due = fields.Date(string="Date d'échéance"          , compute='_compute', readonly=True, store=True)
+    is_date_relance  = fields.Date(related='invoice_id.is_date_relance')
 
 
     def voir_facture_action(self):
@@ -46,54 +48,10 @@ class IsRelanceFactureLigne(models.Model):
             }
 
 
-
-    def ajout_notification(self):
-        for obj in self:
-
-            print(obj.invoice_id._name)
-
-            #email_from="tony.galmiche@infosaone.com"
-            email_to="tony.galmiche@infosaone.com"
-            email_cc="tony.galmiche@gmail.com"
-
-            body_html="""
-                <p>Bonjour,</p> 
-                <p>Sauf erreur de notre part, les factures ci-dessous restent impayées:</p> 
-                <ul>
-                    <li>Fact N°              à échéance au </li>
-                    <li>Fact N°              à échéance au </li>
-                    <li>Fact N°              à échéance au </li>
-                </ul>
-                <p>Total FROMTOME à devoir</p> 
-                <p>Merci de régulariser votre compte</p> 
-            """
-
-            vals={
-                #'email_from'    : email_from, 
-                'email_to'      : email_to, 
-                'email_cc'      : email_cc,
-                'subject'       : "Relance facture",
-                #'body'          : "Relance facture", 
-                'body_html'     : body_html, 
-                'model'         : obj.invoice_id._name,
-                'res_id'        : obj.invoice_id.id,
-                'notification'  : True,
-                'message_type'  : 'comment',
-                "subtype_id"    : 2, #Note
-            }
-            #notification=self.env['mail.message'].create(vals)
-            notification=self.env['mail.mail'].create(vals)
-
-
-
-
-
-
 class IsRelanceFacture(models.Model):
     _name = 'is.relance.facture'
     _description = "Relances de factures"
     _order = 'name desc'
-
 
     @api.depends('ligne_ids')
     def _compute(self):
@@ -105,22 +63,24 @@ class IsRelanceFacture(models.Model):
             obj.amount_residual = amount_residual
             obj.currency_id = currency.id
 
-    name            = fields.Char("N°Relance", readonly=True)
-    partner_id      = fields.Many2one('res.partner', string="Client")
-    nb_jours        = fields.Integer("Nombre de jours de retard mini", default=1, required=True)
-    ligne_ids       = fields.One2many('is.relance.facture.ligne', 'relance_id', 'Lignes')
-    currency_id     = fields.Many2one('res.currency'     , compute='_compute', readonly=True, store=True)
-    amount_residual = fields.Monetary(string="Montant dû", compute='_compute', readonly=True, store=True)
+    name             = fields.Char("N°Relance", readonly=True)
+    partner_id       = fields.Many2one('res.partner', string="Client")
+    nb_jours         = fields.Integer("Nombre de jours de retard mini", default=1, required=True)
+    nb_jours_relance = fields.Integer("Nombre de jours depuis la dernière relance", default=14, required=True)
+    ligne_ids        = fields.One2many('is.relance.facture.ligne', 'relance_id', 'Lignes')
+    currency_id      = fields.Many2one('res.currency'     , compute='_compute', readonly=True, store=True)
+    amount_residual  = fields.Monetary(string="Montant dû", compute='_compute', readonly=True, store=True)
     state      = fields.Selection([
             ('brouillon', 'Brouillon'),
             ('envoye'   , 'Envoyé'),
         ], 'Etat', default='brouillon')
 
 
-    @api.onchange('nb_jours','partner_id')
-    def cherche_receptions(self):
+    @api.onchange('nb_jours','nb_jours_relance','partner_id')
+    def cherche_factures(self):
         for obj in self:
-            date_maxi = date.today()-timedelta(days=obj.nb_jours)
+            date_maxi         = date.today()-timedelta(days=obj.nb_jours)
+            date_maxi_relance = date.today()-timedelta(days=obj.nb_jours_relance)
             lines=[]
             filtre=[
                 ("state","=","posted"),
@@ -132,14 +92,13 @@ class IsRelanceFacture(models.Model):
                 filtre.append(("partner_id","=",obj.partner_id.id))
             invoices = self.env['account.move'].search(filtre, order="partner_id,name")
             for invoice in invoices:
-                vals = {
-                    #'relance_id': obj.id,
-                    'invoice_id': invoice.id
-                }
-                lines.append([0,0,vals])
+                if invoice.is_date_relance==False or invoice.is_date_relance<=date_maxi_relance:
+                    vals = {
+                        'invoice_id': invoice.id
+                    }
+                    lines.append([0,0,vals])
             obj.ligne_ids = False
             obj.ligne_ids = lines
-
 
 
     @api.model
@@ -165,8 +124,6 @@ class IsRelanceFacture(models.Model):
             }
 
 
-
-
     def generer_relance_action(self):
         for obj in self:
             mails={}
@@ -176,79 +133,125 @@ class IsRelanceFacture(models.Model):
                 if partner not in mails:
                     mails[partner]=[]
                 mails[partner].append(line.invoice_id)
-
-
-            print(mails)
             for partner in mails:
-                #print(partner.name)
-                #for line in mails[partner]:
-                #    print("-",line.name)
-                obj.envoi_mail(partner,mails[partner])
-
-
-
-                #line.ajout_notification()
-            #obj.state="envoye"
+                obj.send_mail(partner,mails[partner])
+            obj.state="envoye"
         
 
+    def send_mail(self, partner, invoices):
+        invoice=invoices[0]
+        template = self.env.ref('account.email_template_edi_invoice', False)
+        compose_form = self.env.ref('mail.email_compose_message_wizard_form', False)
+        ctx = dict(
+            default_model="account.move",
+            default_res_id=invoice.id,
+            #default_use_template=bool(template),
+            #default_template_id=template.id,
+            default_composition_mode='comment',
+            #default_is_log=True,
+            custom_layout='mail.mail_notification_light', #Permet de définir la mise en page du mail
+        )
+         #** Recherche des factures PDF et génération si non trouvée **********
+        attachment_ids=[]
+        for invoice in invoices:
+            filtre=[
+                ("res_model","=","account.move"),
+                ("res_id","=",invoice.id),
+            ]
+            attachments = self.env['ir.attachment'].search(filtre,limit=1,order="id desc")
+            if len(attachments)>0:
+                attachment=attachments[0]
+            else:
+                pdf = request.env.ref('account.account_invoices_without_payment').sudo()._render_qweb_pdf([invoice.id])
+                if pdf:
+                    attachments = self.env['ir.attachment'].search(filtre,limit=1,order="id desc")
+                    if len(attachments)>0:
+                        attachment=attachments[0]
+            if attachment:
+                attachment_ids.append(attachment.id)
+        #**********************************************************************
+
+        #** body **************************************************************
+        body="""
+            <p>Bonjour,</p> 
+            <p>Sauf erreur de notre part, les factures ci-dessous restent impayées:</p> 
+            <ul>
+        """
+        total=0
+        for invoice in invoices:
+            total+=invoice.amount_residual
+            body+="<li>Facture N°%s à l'échéance du %s pour un montant de %0.2f€ </li>"%(invoice.name, invoice.invoice_date_due.strftime('%d/%m/%Y'), invoice.amount_residual)
+        body+="""
+                </ul>
+            <p>Total FROMTOME à devoir : %0.2f€</p> 
+            <p>Merci de régulariser votre compte</p> 
+        """%(total)
+        #**********************************************************************
+
+        #** subject ***********************************************************
+        invoice_name=[]
+        for invoice in invoices:
+            invoice_name.append(invoice.name)
+        subject="Relance facture %s (%s)"%(partner.parent_id.name or partner.name, ", ".join(invoice_name))
+        #**********************************************************************
+        vals={
+            "model"         : "account.move",
+            "subject"       : subject,
+            "body"          : body,
+            "partner_ids"   : [invoice.partner_id.id],
+            "attachment_ids": attachment_ids,
+            #"template_id"   : False,
+        }
+        wizard = self.env['mail.compose.message'].with_context(ctx).create(vals)
+        wizard.send_mail()
 
 
 
-
-
-    def envoi_mail(self, partner, invoices):
-        for obj in self:
-            print(partner.name)
-
-            body_html="""
-                <p>Bonjour,</p> 
-                <p>Sauf erreur de notre part, les factures ci-dessous restent impayées:</p> 
-                <ul>
-            """
-            for invoice in invoices:
-                body_html+="<li>Fact N°%s à échéance au %s </li>"%(invoice.name, invoice.invoice_date_due)
-            body_html+="""
-                 </ul>
-                <p>Total FROMTOME à devoir</p> 
-                <p>Merci de régulariser votre compte</p> 
-            """
-
-            #print(body_html)
-
-            email_to="tony.galmiche@infosaone.com"
-            email_cc="tony.galmiche@gmail.com"
-
-            vals={
-                #'email_from'    : email_from, 
-                'email_to'      : email_to, 
-                'email_cc'      : email_cc,
-                'subject'       : "Relance facture %s"%(partner.name),
-                'body'          : body_html, 
-                'body_html'     : body_html, 
-                'model'         : invoices[0]._name,
-                'res_id'        : invoices[0].id,
-                'notification'  : True,
-                'message_type'  : 'comment', # Choix : email, comment
-                "subtype_id"    : 1,         # 1=Discussions, 2=Note
-                #"parent_id"     : invoices[0].id,
-            }
-            email=self.env['mail.mail'].create(vals)
-            email.send()
-          
-
-        # for attachment in attachments:
-        #     attachment_data = {
-        #         'name': attachment[0],
-        #         'datas': attachment[1],
-        #         'type': 'binary',
-        #         'res_model': 'mail.message',
-        #         'res_id': mail.mail_message_id.id,
-        #     }
-        #     attachment_ids.append((4, Attachment.create(attachment_data).id))
-        # if attachment_ids:
-        #     mail.write({'attachment_ids': attachment_ids})
-
-        # if force_send:
-        #     mail.send(raise_exception=raise_exception)
-        # return mail.id  # TDE CLEANME: return mail + api.returns ?
+    #TODO  : Envoi du message directement sans passer par le wizard 'mail.compose.message' => L'enveloppe rouge n'apparait pas dans les logs
+    # def envoi_mail(self, partner, invoices):
+    #     for obj in self:
+    #         body_html="""
+    #             <p>Bonjour,</p> 
+    #             <p>Sauf erreur de notre part, les factures ci-dessous restent impayées:</p> 
+    #             <ul>
+    #         """
+    #         for invoice in invoices:
+    #             body_html+="<li>Fact N°%s à échéance au %s </li>"%(invoice.name, invoice.invoice_date_due)
+    #         body_html+="""
+    #              </ul>
+    #             <p>Total FROMTOME à devoir</p> 
+    #             <p>Merci de régulariser votre compte</p> 
+    #         """
+    #         email_to="tony.galmiche@infosaone.com"
+    #         email_cc="tony.galmiche@gmail.com"
+    #         vals={
+    #             #'email_from'    : email_from, 
+    #             'email_to'      : email_to, 
+    #             'email_cc'      : email_cc,
+    #             'subject'       : "Relance facture %s"%(partner.name),
+    #             'body'          : body_html, 
+    #             'body_html'     : body_html, 
+    #             'model'         : invoices[0]._name,
+    #             'res_id'        : invoices[0].id,
+    #             'notification'  : True,
+    #             'message_type'  : 'comment', # Choix : email, comment
+    #             "subtype_id"    : 1,         # 1=Discussions, 2=Note
+    #             #"parent_id"     : invoices[0].id,
+    #         }
+    #         email=self.env['mail.mail'].create(vals)
+    #         email.send()
+    #     # for attachment in attachments:
+    #     #     attachment_data = {
+    #     #         'name': attachment[0],
+    #     #         'datas': attachment[1],
+    #     #         'type': 'binary',
+    #     #         'res_model': 'mail.message',
+    #     #         'res_id': mail.mail_message_id.id,
+    #     #     }
+    #     #     attachment_ids.append((4, Attachment.create(attachment_data).id))
+    #     # if attachment_ids:
+    #     #     mail.write({'attachment_ids': attachment_ids})
+    #     # if force_send:
+    #     #     mail.send(raise_exception=raise_exception)
+    #     # return mail.id  # TDE CLEANME: return mail + api.returns ?
 

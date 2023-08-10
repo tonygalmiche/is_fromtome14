@@ -13,13 +13,21 @@
         <field name="model">is.relance.facture</field>
         <field name="arch" type="xml">
             <form>
+                <style>
+                    .o_form_view .o_form_sheet_bg > .o_form_sheet{
+                        max-width: 1800px;
+                    }
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
                 <header>
                     <button
                         name="generer_relance_action"
                         type="object"
                         string="Générer les relances"
-                        confirm="Confirmer l'envoi des mails ?"
                         attrs="{'invisible': [('state', '=', 'envoye')]}"
+                        confirm="Confirmer l'envoi des mails ?"
                     />
                     <button
                         name="voir_factures_action"
@@ -34,6 +42,7 @@
                             <field name="name"/>
                             <field name="partner_id"/>
                             <field name="nb_jours"/>
+                            <field name="nb_jours_relance"/>
                         </group>
                         <group>
                             <field name="currency_id" invisible="1"/>
@@ -50,6 +59,7 @@
                             <field name="invoice_date"/>
                             <field name="invoice_date_due"/>
                             <field name="invoice_date_due" widget="remaining_days"/>
+                            <field name="is_date_relance"/>
                             <field name="amount_residual" sum="Total"/>
                             <field name="currency_id" invisible="1"/>
                         </tree>

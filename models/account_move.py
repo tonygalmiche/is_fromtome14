@@ -168,8 +168,6 @@ class AccountMove(models.Model):
 
 
 
-
-
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
