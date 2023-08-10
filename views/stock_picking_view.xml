@@ -315,6 +315,36 @@
                 <field name="is_nb_colis"       optional="hide" sum="Total"/>
                 <field name="is_poids_net_reel" optional="hide" sum="Total"/>
             </xpath> 
+
+            <field name="move_ids_without_package" position="before">
+                <div style="margin-bottom:10px">
+                    <button 
+                        name="trier_par_ref_fromtome_action" 
+                        type="object"
+                        string="Trier par référence Fromtome"
+                        class="oe_inline btn btn-sm btn-secondary"
+                        style="margin-right:10px"
+                    />
+                    <button 
+                        name="trier_par_ref_fournisseur_action" 
+                        type="object"
+                        string="Trier par référence fournisseur"
+                        class="oe_inline btn btn-sm btn-secondary"
+                        style="margin-right:10px"
+                    />
+                    <button 
+                        name="trier_par_poids_action" 
+                        type="object"
+                        string="Trier par poids colis décroissant"
+                        class="oe_inline btn btn-sm btn-secondary"
+                        style="margin-right:10px"
+                    />
+                </div>
+            </field>
+
+
+
+
         </field>
     </record>
     <record id="vpicktree" model="ir.ui.view">

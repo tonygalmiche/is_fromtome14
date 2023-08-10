@@ -236,9 +236,6 @@
                 />
                 <field name="is_commande_soldee" readonly="1"/>
             </field>
-
-
-
             <xpath expr="//page[@name='order_lines']" position="after">
                 <page string="Import commande xlsx">
                     <group string="Fichier à importer">
@@ -257,12 +254,8 @@
                     </group>
                 </page>
             </xpath>
-
-
-
         </field>
     </record>
-
     <record id="is_view_order_tree" model="ir.ui.view">
         <field name="name">is_view_order_tree</field>
         <field name="model">sale.order</field>
@@ -289,8 +282,6 @@
             </field>
         </field>
     </record>
-
-
     <record id="is_view_quotation_tree_with_onboarding" model="ir.ui.view">
         <field name="name">is_view_order_tree</field>
         <field name="model">sale.order</field>
@@ -301,11 +292,10 @@
                 <field name="is_enseigne_id" optional="show"/>
                 <field name="warehouse_id" optional="show"/>
             </field>
-
-
             <field name="create_date" position="after">
                 <field name="is_date_livraison"  optional="show"/>
                 <field name="is_transporteur_id" optional="hide"/>
+                <field name="is_nb_lignes"       optional="hide"/>
             </field>
        </field>
     </record>

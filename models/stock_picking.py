@@ -349,15 +349,8 @@ class IsScanPicking(models.Model):
 
     def maj_code_ean_article_action(self):
         for obj in self:
-            print("TEST 1",obj,obj.ean)
             if obj.product_id and not obj.product_id.barcode:
-                print("TEST 2",obj,obj.ean)
                 obj.product_id.barcode=obj.ean
-
-
-
-
-
 
 
 class Picking(models.Model):
@@ -458,6 +451,49 @@ class Picking(models.Model):
             }
             return res
 
+
+
+    def trier_par_ref_fromtome_action(self):
+        for obj in self:
+            my_dict={}
+            for move in obj.move_ids_without_package:
+                key="%s-%s"%(move.product_id.default_code or 'zzzz', move.id)
+                my_dict[key]=move
+            sorted_dict = dict(sorted(my_dict.items()))
+            sequence=10
+            for key in sorted_dict:
+                move=sorted_dict[key]
+                move.sequence=sequence
+                sequence+=10
+
+
+    def trier_par_ref_fournisseur_action(self):
+        for obj in self:
+            my_dict={}
+            for move in obj.move_ids_without_package:
+                key="%s-%s"%(move.is_ref_fournisseur or 'zzzz', move.id)
+                my_dict[key]=move
+            sorted_dict = dict(sorted(my_dict.items()))
+            sequence=10
+            for key in sorted_dict:
+                move=sorted_dict[key]
+                move.sequence=sequence
+                sequence+=10
+
+
+    def trier_par_poids_action(self):
+        for obj in self:
+            my_dict={}
+            for move in obj.move_ids_without_package:
+                poids=str(int(move.product_id.is_poids_net_colis*100000)).zfill(10)
+                key="%s-%s"%(poids, move.id)
+                my_dict[key]=move
+            sorted_dict = dict(sorted(my_dict.items(),reverse=True))
+            sequence=10
+            for key in sorted_dict:
+                move=sorted_dict[key]
+                move.sequence=sequence
+                sequence+=10
 
 
 class PickingType(models.Model):

@@ -301,7 +301,8 @@ class SaleOrder(models.Model):
             nb=0
             for line in obj.order_line:
                 if line.product_id!=obj.partner_id.is_frais_port_id:
-                    nb+=1
+                    if line.product_uom_qty>0:
+                        nb+=1
             obj.is_nb_lignes = nb
 
 
