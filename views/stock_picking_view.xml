@@ -319,6 +319,13 @@
             <field name="move_ids_without_package" position="before">
                 <div style="margin-bottom:10px">
                     <button 
+                        name="trier_par_designation_action" 
+                        type="object"
+                        string="Trier par désignation"
+                        class="oe_inline btn btn-sm btn-secondary"
+                        style="margin-right:10px"
+                    />
+                    <button 
                         name="trier_par_ref_fromtome_action" 
                         type="object"
                         string="Trier par référence Fromtome"
@@ -341,10 +348,6 @@
                     />
                 </div>
             </field>
-
-
-
-
         </field>
     </record>
     <record id="vpicktree" model="ir.ui.view">
