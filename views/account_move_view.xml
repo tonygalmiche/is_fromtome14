@@ -69,7 +69,7 @@
             </notebook>
         </field>
     </record>
-    <record id="is_view_out_invoice_tree" model="ir.ui.view">
+    <!-- <record id="is_view_out_invoice_tree" model="ir.ui.view">
         <field name="name">is_view_out_invoice_tree</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_out_invoice_tree" />
@@ -80,16 +80,16 @@
             <field name="state" position="before">
                 <field name="is_export_compta_id" optional="show"/>
             </field>
-            <!-- <field name="invoice_date_due" position="before">
+            <field name="invoice_date_due" position="before">
                 <field name="invoice_payment_term_id" optional="show"/>
                 <field name="invoice_date_due"        optional="show"/>
-            </field> -->
-            <!-- <field name="company_id" position="before">
+            </field>
+            <field name="company_id" position="before">
                 <field name="is_date_relance" optional="show"/>
                 <field name="date"            optional="hide"/>
-            </field> -->
+            </field>
         </field>
-    </record>
+    </record> -->
 
     <record id="is_view_invoice_tree" model="ir.ui.view">
         <field name="name">is_view_invoice_tree</field>
@@ -125,12 +125,12 @@
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_in_invoice_tree" />
         <field name="arch" type="xml">
-            <field name="partner_id" position="after">
+            <!-- <field name="partner_id" position="after">
                 <field name="is_enseigne_id" optional="show"/>
-            </field>
-           <field name="state" position="before">
+            </field> -->
+           <!-- <field name="state" position="before">
                 <field name="is_export_compta_id" optional="show"/>
-            </field>
+            </field> -->
             <field name="invoice_date_due" position="before">
                 <field name="invoice_payment_term_id" optional="show"/>
                 <field name="invoice_date_due"        optional="show"/>
