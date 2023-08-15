@@ -9,18 +9,17 @@
                         
                     </div>
                     <div class="col-6 text-right mb4">
-                        <h4 class="mt0" t-field="res_company.report_header"/>
+                        <!-- <h3 class="mt0" t-field="res_company.report_header"/> -->
                         <div name="res_company" class="mb4">
-                            <h5 style="font-weight:700 !important;" t-field="o.enseigne_id.name.name"/>
-                            <span t-field="res_company.street"/>
-                            <br/>
+                            <div style="font-size:13pt;font-weight:700 !important;" t-field="o.nom_listing"/>
+                            <div style="font-size:11pt;font-weight:700 !important;" t-field="o.enseigne_id.name.name"/>
+                            <span t-field="res_company.street"/> - 
+                            <!-- <br/> -->
                             <span t-field="res_company.zip"/>
                             <![CDATA[
                             &nbsp;
                             ]]>
-                            <span t-field="res_company.city"/>
-                            <br/>
-                            <span t-field="res_company.country_id"/>
+                            <span t-field="res_company.city"/> - <span t-field="res_company.country_id"/>
                             <div t-if="res_company.is_gln">
                                 GLN:<span t-field="res_company.is_gln"/>
                             </div>

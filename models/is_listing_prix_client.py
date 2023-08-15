@@ -8,13 +8,24 @@ import sys
 class IsListingPrixClient(models.Model):
     _name = 'is.listing.prix.client'
     _description = "Listing prix client"
-    _order = 'name desc'
+    _order = 'nom_listing, name desc'
 
     name         = fields.Char("Listing", readonly=True)
     enseigne_id  = fields.Many2one('is.enseigne.commerciale', 'Enseigne', required=True, help="Enseigne commerciale")
     pricelist_id = fields.Many2one('product.pricelist', 'Liste de prix' , required=True)
-    partner_id   = fields.Many2one('res.partner', 'Partenaire')
+    partner_id   = fields.Many2one('res.partner', 'Client')
+    nom_listing  = fields.Char("Nom du listing")
     product_ids  = fields.Many2many('product.product', 'is_listing_prix_client_product_rel', 'doc_id', 'product_id', 'Articles')
+
+
+    @api.onchange('partner_id')
+    def onchange_partner_id(self):
+        print(self)
+        if self.partner_id:
+            self.nom_listing  = self.partner_id.name
+            self.enseigne_id  = self.partner_id.is_enseigne_id.id
+            self.pricelist_id = self.partner_id.property_product_pricelist.id
+
 
     @api.model
     def create(self, vals):

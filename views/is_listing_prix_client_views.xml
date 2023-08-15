@@ -22,11 +22,16 @@
                 </header>
                 <sheet>
                     <group>
-                        <field name="name"/>
-                        <field name="enseigne_id"/>
-                        <field name="pricelist_id"/>
-                        <!-- <field name="product_ids"/> -->
-                     </group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="nom_listing" required="1"/>
+                            <field name="enseigne_id"/>
+                            <field name="pricelist_id"/>
+                         </group>
+                         <group>
+                            <field name="name"/>
+                         </group>
+                    </group>
                     <field name="product_ids" nolabel="1" >
                         <tree editable="bottom">
                             <field name="default_code"/>
@@ -48,6 +53,10 @@
         <field name="model">is.listing.prix.client</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="nom_listing"/>
+                <field name="partner_id"/>
+                <field name="enseigne_id"/>
+                <field name="pricelist_id"/>
                 <field name="name"/>
             </tree>
         </field>
@@ -57,6 +66,10 @@
         <field name="model">is.listing.prix.client</field>
         <field name="arch" type="xml">
             <search>
+                <field name="nom_listing"/>
+                <field name="partner_id"/>
+                <field name="enseigne_id"/>
+                <field name="pricelist_id"/>
                 <field name="name"/>
            </search>
         </field>
