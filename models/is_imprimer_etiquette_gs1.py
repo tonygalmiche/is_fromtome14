@@ -117,8 +117,10 @@ class IsImprimerEtiquetteGS1(models.Model):
         #     products = self.env['product.product'].search([('barcode', '=', self.code_ean)])
         #     for product in products:
         #         self.product_id = product.id
-        # if self.product_id and not self.lot:
-        #     self.lot=(self.product_id.default_code or '')+datetime.now().strftime("%j%y")
+
+        if self.product_id and not self.lot:
+            self.lot=(self.product_id.default_code or '')+datetime.now().strftime("%j%y")
+
         if self.product_id:
             if self.product_id.barcode:
                 code_ean =  ((self.product_id.barcode or '')+"00000000000000")[:14]
@@ -127,6 +129,19 @@ class IsImprimerEtiquetteGS1(models.Model):
                 alerte="Création d'un code EAN, car l'article sélectionné n'a pas de code actuellement"
                 self.alerte=alerte
             self.code_ean = code_ean
+
+
+    # def generer_lot_action(self):
+    #     for obj in self:
+    #         obj.alerte=False
+    #         lot = (obj.product_id.default_code or '')+datetime.now().strftime("%j%y")
+    #         obj.lot=lot
+    #         alertes=[]
+    #         if obj.alerte:
+    #             alertes.append(obj.alerte)
+    #         alerte="Lot %s généré manuellement"%(lot)
+    #         alertes.append(obj.alerte)
+    #         obj.alerte="\n".join(alertes)
 
 
     def imprimer_etiquette_action(self):
@@ -189,8 +204,11 @@ class IsImprimerEtiquetteGS1(models.Model):
                     output = check_output(cmd, shell=True, stderr=STDOUT)
                 except CalledProcessError as exc:
                     msg="%s \n%s"%(cmd,exc.output.decode("utf-8"))
-                    print(msg)
-                    obj.alerte=msg
+                    alertes=[]
+                    if obj.alerte:
+                        alertes.append(obj.alerte)
+                    alertes.append(msg)
+                    obj.alerte="\n".join(alertes)
                     #raise UserError()
                 #else:
                 #    assert 0
