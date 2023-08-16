@@ -48,7 +48,6 @@ class IsImprimerEtiquetteGS1(models.Model):
     @api.model
     def create(self, vals):
         res = super(IsImprimerEtiquetteGS1, self).create(vals)
-        print(res)
         res.imprimer_etiquette_action()
         return res
 
@@ -56,7 +55,6 @@ class IsImprimerEtiquetteGS1(models.Model):
     def write(self, vals):
         res = super(IsImprimerEtiquetteGS1, self).write(vals)
         if "alerte" not in vals:
-            print(res)
             for obj in self:
                 obj.imprimer_etiquette_action()
         return res
@@ -184,19 +182,15 @@ class IsImprimerEtiquetteGS1(models.Model):
                 lot,
                 obj.dluo or '',
                 obj.dlc or '',
-                obj.poids,
+                round(obj.poids,4),
                 obj.nb_pieces
             )
-
             imprimante = obj.imprimante_id.name_cups or 'GX430T'
-
             name='etiquette-gs1-%s-zpl'%(imprimante)
             dest = '/tmp/'+name
             f = codecs.open(dest,'wb',encoding='utf-8')
             f.write(ZPL)
             f.close()
-
-
             cmd = "lpr -P %s %s "%(imprimante,dest)
             for x in range(0, obj.qt_imprime):
                 #subprocess.check_call(cmd, shell=True)
