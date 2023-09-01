@@ -41,6 +41,13 @@
                     <field name="ligne_ids">
                         <tree decoration-danger="weight==0" editable="bottom">
                             <field name="sequence"     widget="handle"/>
+                            <field name="alerte" invisible="1"/>
+                            <button 
+                                name="alerte_action" type="object" class="oe_stat_button" 
+                                icon="fa-exclamation-triangle"
+                                attrs="{'invisible': [('alerte', '=', False)]}"
+                                title="Articles désactivés"
+                            />
                             <field name="product_id"   widget="many2one_clickable"/>
                             <field name="product_name" optional="hide"/>
                             <field name="default_code"    optional="show"/>
@@ -59,6 +66,13 @@
         <field name="model">is.modele.commande</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="alerte" invisible="1"/>
+                <button 
+                    name="alerte_action" type="object" class="oe_stat_button" 
+                    icon="fa-exclamation-triangle"
+                    attrs="{'invisible': [('alerte', '=', False)]}"
+                    title="Articles désactivés"
+                />
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="enseigne_id"/>
@@ -80,7 +94,7 @@
     <record  id="is_modele_commande_action" model="ir.actions.act_window">
         <field name="name">Modèle de commande</field>
         <field name="res_model">is.modele.commande</field>
-        <field name="limit">100</field>
+        <field name="limit">200</field>
         <field name="view_mode">tree,form</field>
     </record>
     <menuitem

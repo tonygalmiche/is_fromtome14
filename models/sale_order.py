@@ -56,6 +56,21 @@ class IsModeleCommandeLigne(models.Model):
     weight          = fields.Float(string='Poids unitaire', digits='Stock Weight', compute='_compute', readonly=True, store=True)
     qt_livree       = fields.Float(string='Qt livrée', help="quantité livrée au moment de l'initialisation", readonly=True)
     price_unit      = fields.Float("Prix", digits='Product Price', compute='_compute_price_unit', readonly=True, store=False)
+    alerte          = fields.Boolean('Alerte', compute='_compute_alerte')
+
+
+    @api.depends('product_id')
+    def _compute_alerte(self):
+        for obj in self:
+            alerte=False
+            if obj.product_id.active==False:
+                alerte=True
+            obj.alerte=alerte
+         
+
+    def alerte_action(self):
+        for obj in self:
+             print(obj)
 
 
 class IsModeleCommande(models.Model):
@@ -69,7 +84,23 @@ class IsModeleCommande(models.Model):
     enseigne_id         = fields.Many2one(related='partner_id.is_enseigne_id')
     modele_commande_ids = fields.Many2many('ir.attachment', 'is_modele_commande_modele_commande_rel', 'enseigne_id', 'file_id', 'Modèle de commande client')
     ligne_ids           = fields.One2many('is.modele.commande.ligne', 'modele_id', 'Lignes')
+    alerte              = fields.Boolean('Alerte', compute='_compute_alerte')
 
+
+    @api.depends('ligne_ids')
+    def _compute_alerte(self):
+        for obj in self:
+            alerte=False
+            for line in obj.ligne_ids:
+                if line.product_id.active==False:
+                    alerte=True
+                    break
+            obj.alerte=alerte
+         
+
+    def alerte_action(self):
+        for obj in self:
+             print(obj)
 
 
     def actualiser_modele_excel_action(self):
@@ -597,7 +628,6 @@ class SaleOrder(models.Model):
                                     }
                                     res = self.env['sale.order.line'].create(vals)
                                     res.onchange_is_colis_cde()
-                                    #print(num,code, colis, products[0].default_code, res, designation)
                                 else:
                                     alertes.append("Ligne %s : Article %s non trouvé"%((lig+1),code))
                     lig+=1
