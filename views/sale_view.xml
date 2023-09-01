@@ -39,7 +39,7 @@
                         <field name="modele_commande_ids" widget="many2many_binary"/>
                     </group>
                     <field name="ligne_ids">
-                        <tree decoration-danger="weight==0" editable="bottom">
+                        <tree decoration-danger="weight==0" editable="bottom" limit="200">
                             <field name="sequence"     widget="handle"/>
                             <field name="alerte" invisible="1"/>
                             <button 
