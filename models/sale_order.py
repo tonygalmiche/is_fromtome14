@@ -33,18 +33,40 @@ class IsModeleCommandeLigne(models.Model):
 
     @api.depends('product_id')
     def _compute_price_unit(self):
+        company = self.env.user.company_id
         for obj in self:
-            prix = False
-            pricelist = obj.modele_id.partner_id.property_product_pricelist
-            if pricelist:
-                filtre=[
-                    ('pricelist_id'   ,'=',pricelist.id),
-                    ('product_tmpl_id','=',obj.product_id.product_tmpl_id.id),
-                ]
-                lines = self.env['product.pricelist.item'].search(filtre, limit=1)
-                for line in lines:
-                    prix=line.fixed_price
+            prix=False
+            partner = obj.modele_id.partner_id
+            if partner:
+                pricelist=partner.property_product_pricelist
+                product = obj.product_id.with_context(
+                    partner=partner,
+                    quantity=1,
+                    date=datetime.date.today(),
+                    pricelist=pricelist,
+                    uom=obj.product_id.uom_id.id
+                )
+                product_context = dict(
+                    self.env.context, 
+                    partner_id=partner.id, 
+                    date=datetime.date.today(), 
+                    uom=obj.product_id.uom_id.id
+                )
+                prix, rule_id = pricelist.with_context(product_context).get_product_price_rule(product, 1.0, partner)
             obj.price_unit = prix
+
+            # prix = False
+            # pricelist = obj.modele_id.partner_id.property_product_pricelist
+            # if pricelist:
+            #     filtre=[
+            #         ('pricelist_id'   ,'=',pricelist.id),
+            #         ('product_tmpl_id','=',obj.product_id.product_tmpl_id.id),
+            #     ]
+            #     lines = self.env['product.pricelist.item'].search(filtre, limit=1)
+            #     for line in lines:
+            #         prix=line.fixed_price
+            # obj.price_unit = prix
+
 
 
     modele_id       = fields.Many2one('is.modele.commande', 'Modèle de commandes', required=True, ondelete='cascade')
