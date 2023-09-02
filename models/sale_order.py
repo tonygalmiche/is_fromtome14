@@ -37,7 +37,7 @@ class IsModeleCommandeLigne(models.Model):
         for obj in self:
             prix=False
             partner = obj.modele_id.partner_id
-            if partner:
+            if partner and obj.product_id:
                 pricelist=partner.property_product_pricelist
                 product = obj.product_id.with_context(
                     partner=partner,
