@@ -134,8 +134,7 @@
                                         <td class="text-right" t-if="o.partner_id.is_enseigne_id.prix_sur_livraison">
                                             <span t-field="line.sale_line_id.price_unit"/>€/<span t-field="line.sale_line_id.product_uom"/>
                                         </td>
-
-                                        <td class="text-center"><span t-field="line.is_nb_colis"/></td>
+                                        <td class="text-center"><b><span t-field="line.is_nb_colis"/></b></td>
                                         <td class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
                                         <td class="text-right" style="border-right:none"><span t-field="line.quantity_done"/></td>
                                         <td class="text-left"  style="border-left:none"><span t-field="line.product_uom"/></td>
