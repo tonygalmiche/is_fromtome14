@@ -40,6 +40,29 @@ class PurchaseOrder(models.Model):
             obj.is_maj_commande_client_vsb=vsb
 
 
+    @api.depends('partner_id')
+    def _compute_is_heure_envoi_mail(self):
+        for obj in self:
+            heure=False
+            filtre=[
+                ('model','=',self._name),
+                ('res_id','=',obj.id),
+                ('subject','!=',False),
+                
+            ]
+            messages = self.env['mail.message'].search(filtre, order="date desc")
+            for message in messages:
+                test=True
+                for notification in message.notification_ids:
+                    if notification.notification_status!='sent':
+                        test=False
+                        break
+                if test:
+                    heure=message.date
+                    break
+            obj.is_heure_envoi_mail=heure
+
+
     is_commande_soldee         = fields.Boolean(string='Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
     is_fromtome_order_id       = fields.Many2one('sale.order', 'Commande Fromtome', copy=False,readonly=True)
     is_fromtome_order_vsb      = fields.Boolean(string='Créer commande dans Fromtome vsb', compute='_compute_is_fromtome_order_vsb')
@@ -47,6 +70,7 @@ class PurchaseOrder(models.Model):
     is_enseigne_id             = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
     #is_heure_envoi            = fields.Char(related='partner_id.is_heure_envoi')
     is_heure_envoi_id          = fields.Many2one(related='partner_id.is_heure_envoi_id')
+    is_heure_envoi_mail        = fields.Datetime(string="Heure d'envoi du mail", compute='_compute_is_heure_envoi_mail' )
 
 
     @api.onchange('partner_id')
