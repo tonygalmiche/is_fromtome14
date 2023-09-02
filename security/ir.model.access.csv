@@ -48,3 +48,5 @@ access_is_imprimante_etiquette_manager,access_is_imprimante_etiquette_manager,mo
 
 access_is_relance_facture_ligne,access_is_relance_facture_ligne,model_is_relance_facture_ligne,base.group_user,1,1,1,1
 access_is_relance_facture,access_is_relance_facture,model_is_relance_facture,base.group_user,1,1,1,1
+
+access_is_heure_maxi,access_is_heure_maxi,model_is_heure_maxi,base.group_user,1,1,1,1

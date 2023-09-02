@@ -185,6 +185,7 @@
                 <field name="is_date_livraison"/>
                 <field name="is_transporteur_id"/>
                 <field name="is_nb_lignes"/>
+                <field name="is_heure_envoi_id"/>
             </field>
             <field name="validity_date" position="attributes">
                  <attribute name="invisible">1</attribute>
@@ -283,6 +284,7 @@
                 <field name="is_date_livraison"  optional="show"/>
                 <field name="is_transporteur_id" optional="hide"/>
                 <field name="is_nb_lignes"       optional="hide"/>
+                <field name="is_heure_envoi_id"  optional="hide"/>
             </field>
             <field name="invoice_status" position="before">
                 <field name="is_commande_soldee" optional="show"/>
@@ -310,6 +312,7 @@
                 <field name="is_date_livraison"  optional="show"/>
                 <field name="is_transporteur_id" optional="hide"/>
                 <field name="is_nb_lignes"       optional="hide"/>
+                <field name="is_heure_envoi_id"  optional="hide"/>
             </field>
        </field>
     </record>
@@ -323,6 +326,7 @@
                 <field name="warehouse_id"/>
                 <field name="is_transporteur_id"/>
                 <field name="is_frequence_facturation"/>
+                <field name="is_heure_envoi_id"/>
             </field>
             <filter name="order_month" position="after">
                 <filter string="Date livraison client"    name="group_by_is_date_livraison" domain="[]" context="{'group_by': 'is_date_livraison'}"/>

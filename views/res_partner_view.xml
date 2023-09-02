@@ -108,6 +108,53 @@
     />
 
 
+    <!-- is.heure.maxi -->
+    <record id="is_heure_maxi_tree_view" model="ir.ui.view">
+        <field name="name">is_heure_maxi_tree_view</field>
+        <field name="model">is.heure.maxi</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_heure_maxi_form_view" model="ir.ui.view">
+        <field name="name">is_heure_maxi_form_view</field>
+        <field name="model">is.heure.maxi</field>
+        <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <field name="name"/>
+                </group>
+            </sheet>
+        </form>
+        </field>
+    </record>
+    <record id="is_heure_maxi_search_view" model="ir.ui.view">
+        <field name="name">is_heure_maxi_search_view</field>
+        <field name="model">is.heure.maxi</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+    <record id="is_heure_maxi_action" model="ir.actions.act_window" >
+        <field name="name">Heure maxi</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">is.heure.maxi</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem 
+        id="is_heure_maxi_menu" 
+        name="Heure maxi" 
+        parent="sale.menu_sale_config" 
+        sequence="920"
+        action="is_heure_maxi_action"
+    />
+
+
     <!-- res.partner -->
     <record id="is_view_partner_tree" model="ir.ui.view" >
         <field name="name">view_partner_tree</field>
@@ -159,7 +206,7 @@
                 <field name="is_transporteur_id"                optional="hide"/>
                 <field name="is_warehouse_id"                   optional="hide"/>
                 <field name="is_frais_port_id"                  optional="hide"/>
-                <field name="is_heure_envoi"                    optional="hide"/>
+                <field name="is_heure_envoi_id"                 optional="hide"/>
                 <field name="is_encours_client"                 optional="hide"/>
             </field>
         </field>
@@ -186,7 +233,7 @@
                 <field name="is_transporteur_id" widget="selection"/>
                 <field name="is_warehouse_id"    widget="selection"/>
                 <field name="is_frais_port_id"/>
-                <field name="is_heure_envoi"    attrs="{'invisible': ['|',('is_supplier', '=', False),('is_company', '=', False)]}"/>
+                <field name="is_heure_envoi_id" attrs="{'invisible': ['|',('is_supplier', '=', False),('is_company', '=', False)]}"/>
                 <field name="is_encours_client" attrs="{'invisible': ['|',('is_customer', '=', False),('is_company', '=', False)]}"/>
             </field>
             <xpath expr="//page[@name='sales_purchases']/group/group/field[@name='user_id']" position="before">
@@ -267,6 +314,7 @@
                 <field name="is_transporteur_id"/>
                 <field name="is_warehouse_id"/>
                 <field name="is_frais_port_id"/>
+                <field name="is_heure_envoi_id"/>
             </field>
             <filter name="type_company" position="after">
                 <filter string="Clients"      name="is_customer" domain="[('is_customer', '=', True)]"/>

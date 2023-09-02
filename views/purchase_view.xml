@@ -128,7 +128,7 @@
                 <field name="is_adresse_livraison_id"/>
                 <field name="picking_type_id"/>
                 <field name="is_fromtome_order_id"/>
-                <field name="is_heure_envoi"/>
+                <field name="is_heure_envoi_id"/>
             </xpath>
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_uom']" position='attributes'>
                 <attribute name="readonly">1</attribute>
@@ -146,7 +146,7 @@
             </field>
             <field name="state" position="before">
                 <field name="is_commande_soldee" optional="show"/>
-                <field name="is_heure_envoi"     optional="hide"/>
+                <field name="is_heure_envoi_id"  optional="hide"/>
             </field>
        </field>
     </record>
@@ -160,7 +160,7 @@
                 <field name="is_enseigne_id" optional="show"/>
             </field>
             <field name="state" position="before">
-                <field name="is_heure_envoi"     optional="hide"/>
+                <field name="is_heure_envoi_id" optional="hide"/>
             </field>
        </field>
     </record>
@@ -174,7 +174,7 @@
                 <field name="is_enseigne_id"/>
             </field>
             <field name="product_id" position="after">
-                <field name="is_heure_envoi"/>
+                <field name="is_heure_envoi_id"/>
             </field>
        </field>
     </record>
@@ -185,6 +185,7 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id"/>
+                <field name="is_heure_envoi_id"/>
             </field>
        </field>
     </record>

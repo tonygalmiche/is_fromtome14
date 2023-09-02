@@ -348,6 +348,7 @@ class SaleOrder(models.Model):
     is_import_excel_ids      = fields.Many2many('ir.attachment' , 'sale_order_is_import_excel_ids_rel', 'order_id'     , 'attachment_id'    , 'Commande .xlsx à importer')
     is_import_alerte         = fields.Text('Alertes importation')
     is_nb_lignes             = fields.Integer('Nb lignes (hors transport)', compute='_compute_is_nb_lignes')
+    is_heure_envoi_id        = fields.Many2one('is.heure.maxi', 'Heure', help="Heure maxi d'envoi de la commande au fournisseur")
 
 
     def _message_auto_subscribe_notify(self, partner_ids, template):
@@ -486,89 +487,95 @@ class SaleOrder(models.Model):
                     if not supplierinfo:
                         raise Warning("Fournisseur non trouvé pour article '%s'"%(line.product_id.display_name))
                     if supplierinfo:
+
+
+                        
+
+
                         if not supplierinfo.name.active:
                             raise Warning("Fournisseur '%s' désactivé pour l'article '%s'"%(supplierinfo.name.name,line.product_id.display_name))
                         if not supplierinfo.name.is_warehouse_id:
                             raise Warning("Entrepôt non renseigné pour le fournisseur '%s' de l'article '%s'"%(supplierinfo.name.name,line.product_id.display_name))
-                        partner_id = supplierinfo.name.id
-                        date_reception = str(line.is_date_reception)
-                        date_planned  = date_reception+' 08:00:00'
-                        filtre=[
-                            ('partner_id'  ,'='   , partner_id),
-                            ('state'       ,'='   , 'draft'),
-                            ('date_planned','>=', date_reception+' 00:00:00'),
-                            ('date_planned','<=', date_reception+' 23:59:59'),
-                        ]
-                        if line.is_livraison_directe:
-                            filtre.append(('is_adresse_livraison_id','=', obj.partner_shipping_id.id))
-                        orders=self.env['purchase.order'].search(filtre,limit=1)
-                        if orders:
-                            order=orders[0]
-                        else:
-                            vals={
-                                'partner_id'  : partner_id,
-                                'date_planned': date_planned,
-                                'picking_type_id': supplierinfo.name.is_warehouse_id.in_type_id.id,
-                                'is_adresse_livraison_id': supplierinfo.name.is_enseigne_id.name.id,
-                            }
-                            order=self.env['purchase.order'].create(vals)
-                            if order:
-                                order.onchange_partner_id()
-                                if line.is_livraison_directe:
-                                    order.is_adresse_livraison_id = obj.partner_shipping_id.id
+                        
 
-                        #** Création des lignes ************************************
-
-
-                        if company.is_regroupe_cde=="Oui":
+                        if supplierinfo.name.is_heure_envoi_id==obj.is_heure_envoi_id or obj.is_heure_envoi_id==False:
+                            partner_id = supplierinfo.name.id
+                            date_reception = str(line.is_date_reception)
+                            date_planned  = date_reception+' 08:00:00'
                             filtre=[
-                                ('order_id'  ,'=', order.id),
-                                ('product_id','=', line.product_id.id),
+                                ('partner_id'  ,'='   , partner_id),
+                                ('state'       ,'='   , 'draft'),
+                                ('date_planned','>=', date_reception+' 00:00:00'),
+                                ('date_planned','<=', date_reception+' 23:59:59'),
                             ]
-                        else:
-                            filtre=[
-                                ('order_id'             ,'=' , order.id),
-                                ('product_id'           ,'=' , line.product_id.id),
-                                ('is_sale_order_line_id','=' , line.id),
-                                ('is_sale_order_line_id','!=', False),
-                            ]
-                        order_lines=self.env['purchase.order.line'].search(filtre,limit=1)
-                        if not order_lines:
-                            if order:
+                            if line.is_livraison_directe:
+                                filtre.append(('is_adresse_livraison_id','=', obj.partner_shipping_id.id))
+                            orders=self.env['purchase.order'].search(filtre,limit=1)
+                            if orders:
+                                order=orders[0]
+                            else:
                                 vals={
-                                    'order_id'    : order.id,
-                                    'product_id'  : line.product_id.id,
-                                    'name'        : line.name,
-                                    'product_qty' : line.product_uom_qty,
-                                    'product_uom' : line.product_uom.id,
+                                    'partner_id'  : partner_id,
                                     'date_planned': date_planned,
-                                    'price_unit'  : line.price_unit,
+                                    'picking_type_id': supplierinfo.name.is_warehouse_id.in_type_id.id,
+                                    'is_adresse_livraison_id': supplierinfo.name.is_enseigne_id.name.id,
                                 }
+                                order=self.env['purchase.order'].create(vals)
+                                if order:
+                                    order.onchange_partner_id()
+                                    if line.is_livraison_directe:
+                                        order.is_adresse_livraison_id = obj.partner_shipping_id.id
 
-                                if company.is_regroupe_cde=="Non":
-                                    vals["is_sale_order_line_id"]=line.id
-
-                                order_line=self.env['purchase.order.line'].create(vals)
-                                order_line.onchange_product_id()
-                                order_line.date_planned = date_planned
-                        else:
-                            order_line = order_lines[0]
-
-
-                        if order_line:
-                            line.is_purchase_line_id=order_line.id
-                            if company.is_regroupe_cde=="Non":
-                                order_line.product_qty = line.product_uom_qty
+                            #** Création des lignes ************************************
+                            if company.is_regroupe_cde=="Oui":
+                                filtre=[
+                                    ('order_id'  ,'=', order.id),
+                                    ('product_id','=', line.product_id.id),
+                                ]
                             else:
                                 filtre=[
-                                    ('is_purchase_line_id'  ,'=', order_line.id),
+                                    ('order_id'             ,'=' , order.id),
+                                    ('product_id'           ,'=' , line.product_id.id),
+                                    ('is_sale_order_line_id','=' , line.id),
+                                    ('is_sale_order_line_id','!=', False),
                                 ]
-                                order_lines=self.env['sale.order.line'].search(filtre)
-                                qty=0
-                                for l in order_lines:
-                                    qty+=l.product_uom_qty
-                                order_line.product_qty = qty
-                        # ***********************************************************
+                            order_lines=self.env['purchase.order.line'].search(filtre,limit=1)
+                            if not order_lines:
+                                if order:
+                                    vals={
+                                        'order_id'    : order.id,
+                                        'product_id'  : line.product_id.id,
+                                        'name'        : line.name,
+                                        'product_qty' : line.product_uom_qty,
+                                        'product_uom' : line.product_uom.id,
+                                        'date_planned': date_planned,
+                                        'price_unit'  : line.price_unit,
+                                    }
+
+                                    if company.is_regroupe_cde=="Non":
+                                        vals["is_sale_order_line_id"]=line.id
+
+                                    order_line=self.env['purchase.order.line'].create(vals)
+                                    order_line.onchange_product_id()
+                                    order_line.date_planned = date_planned
+                            else:
+                                order_line = order_lines[0]
+
+
+                            if order_line:
+                                line.is_purchase_line_id=order_line.id
+                                if company.is_regroupe_cde=="Non":
+                                    order_line.product_qty = line.product_uom_qty
+                                else:
+                                    filtre=[
+                                        ('is_purchase_line_id'  ,'=', order_line.id),
+                                    ]
+                                    order_lines=self.env['sale.order.line'].search(filtre)
+                                    qty=0
+                                    for l in order_lines:
+                                        qty+=l.product_uom_qty
+                                    order_line.product_qty = qty
+                            # ***********************************************************
 
 
     def import_fichier_xlsx(self):

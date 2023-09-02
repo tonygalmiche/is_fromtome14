@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from odoo import api, fields, models
 from datetime import datetime, timedelta, date
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
@@ -46,7 +45,8 @@ class PurchaseOrder(models.Model):
     is_fromtome_order_vsb      = fields.Boolean(string='Créer commande dans Fromtome vsb', compute='_compute_is_fromtome_order_vsb')
     is_maj_commande_client_vsb = fields.Boolean(string='MAJ commandes clients', compute='_compute_is_maj_commande_client_vsb', readonly=True, store=False)
     is_enseigne_id             = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
-    is_heure_envoi             = fields.Char(related='partner_id.is_heure_envoi')
+    #is_heure_envoi            = fields.Char(related='partner_id.is_heure_envoi')
+    is_heure_envoi_id          = fields.Many2one(related='partner_id.is_heure_envoi_id')
 
 
     @api.onchange('partner_id')
