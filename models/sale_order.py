@@ -507,10 +507,6 @@ class SaleOrder(models.Model):
 
                 _logger.info("creer_commande_fournisseur_action : article=%s (%s)"%(line.product_id.display_name,line.product_id.id))
                 if not line.is_purchase_line_id:
-
-
-
-
                     suppliers=self.env['product.supplierinfo'].search([('product_tmpl_id', '=', line.product_id.product_tmpl_id.id)])
                     partner_id=False
                     supplierinfo=False
@@ -521,26 +517,13 @@ class SaleOrder(models.Model):
                     if not supplierinfo:
                         raise Warning("Fournisseur non trouvé pour article '%s'"%(line.product_id.display_name))
                     if supplierinfo:
-
-
-                        print("## TEST 1",line.product_id.name, supplierinfo.name.name, obj.is_heure_envoi_id.id)
-
-                        
-
-
+                        #print("## TEST 1",line.product_id.name, supplierinfo.name.name, obj.is_heure_envoi_id.id)
                         if not supplierinfo.name.active:
                             raise Warning("Fournisseur '%s' désactivé pour l'article '%s'"%(supplierinfo.name.name,line.product_id.display_name))
                         if not supplierinfo.name.is_warehouse_id:
                             raise Warning("Entrepôt non renseigné pour le fournisseur '%s' de l'article '%s'"%(supplierinfo.name.name,line.product_id.display_name))
-                        
-
                         if supplierinfo.name.is_heure_envoi_id==obj.is_heure_envoi_id or obj.is_heure_envoi_id.id==False:
-
-                            print("## TEST 2",line.product_id.name, supplierinfo.name.name)
-
-
-
-
+                            #print("## TEST 2",line.product_id.name, supplierinfo.name.name)
                             partner_id = supplierinfo.name.id
                             date_reception = str(line.is_date_reception)
                             date_planned  = date_reception+' 08:00:00'

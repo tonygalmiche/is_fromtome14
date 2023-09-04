@@ -22,6 +22,7 @@ class IsSuiviCommandeHebdoLigne(models.Model):
     nb_cde_transporteur = fields.Integer(string="Nb cde transporteur", compute="_compute_nb_cde_transporteur")
     picking_id  = fields.Many2one('stock.picking', 'Livraison')
     nb_colis_picking = fields.Float(string="Nb colis livraison")
+    ecart_colis      = fields.Float(string="Ecart colis")
 
 
     @api.depends('transporteur_id','order_id')
@@ -71,6 +72,7 @@ class IsSuiviCommandeHebdo(models.Model):
                 orders=self.env['sale.order'].search(filtre, order="id desc", limit=1)
                 order_id=False
                 nb_colis=0
+                nb_colis_picking=0
                 for order in orders:
                     order_id = order.id
                     for line in order.order_line:
@@ -87,9 +89,8 @@ class IsSuiviCommandeHebdo(models.Model):
                     for picking in pickings:
                         print(picking)
                         picking_id = picking.id
-
-                    #move_ids_without_package
-
+                        for line in picking.move_ids_without_package:
+                            nb_colis_picking+=line.is_nb_colis
                     #**********************************************************
 
                 vals={
@@ -102,6 +103,8 @@ class IsSuiviCommandeHebdo(models.Model):
                     "order_id"         : order_id,
                     "nb_colis"         : nb_colis,
                     "picking_id"       : picking_id,
+                    "nb_colis_picking" : nb_colis_picking,
+                    "ecart_colis"      : nb_colis_picking-nb_colis,
                 }
                 self.env['is.suivi.commande.hebdo.ligne'].create(vals)
             
