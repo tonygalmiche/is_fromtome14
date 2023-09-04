@@ -57,6 +57,7 @@
                 <field name="product_uom" optional="hide"/>
                 <field name="is_commande_soldee" optional="hide"/>
                 <field name="purchase_order_id" optional="hide"/>
+                <field name="write_date" optional="hide"/>
                 <field name="state" optional="hide"/>
             </tree>
         </field>

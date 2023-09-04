@@ -27,6 +27,7 @@ class is_sale_order_line(models.Model):
     order_id                = fields.Many2one('sale.order', 'Commande')
     order_line_id           = fields.Many2one('sale.order.line', 'Ligne de commande')
     is_purchase_line_id     = fields.Many2one('purchase.order.line', 'Ligne cde fournisseur')
+    write_date              = fields.Datetime('Date modification')
     purchase_order_id       = fields.Many2one('purchase.order', 'Cde fournisseur')
     state                   = fields.Selection([
             ('draft', 'Brouillon'),
@@ -68,7 +69,8 @@ class is_sale_order_line(models.Model):
                     so.state,
                     so.user_id,
                     rp.is_enseigne_id,
-                    sol.is_poids_net
+                    sol.is_poids_net,
+                    sol.write_date
                 from sale_order so    inner join sale_order_line     sol on so.id=sol.order_id
                                       inner join product_product     pp on sol.product_id=pp.id
                                       inner join product_template    pt on pp.product_tmpl_id=pt.id
