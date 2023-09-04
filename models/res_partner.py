@@ -82,3 +82,9 @@ class ResPartner(models.Model):
             modele=self.env['is.modele.commande'].create(vals)
             obj.is_modele_commande_id = modele.id
             modele.initialiser_action()
+
+
+    def _message_auto_subscribe_notify(self, partner_ids, template):
+        "Désactiver les notifications d'envoi des mails"
+        return True
+
