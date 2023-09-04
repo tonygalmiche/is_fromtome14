@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- is.suivi.commande.hebdo -->
+    <record id="is_suivi_commande_hebdo_form" model="ir.ui.view">
+        <field name="name">is_suivi_commande_hebdo_form</field>
+        <field name="model">is.suivi.commande.hebdo</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="generer_lignes_action"
+                        type="object"
+                        string="Voir les lignes"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="date"/>
+                        <field name="enseigne_id"/>
+                        <field name="commentaire"/>
+                        <field name="ligne_ids" invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_suivi_commande_hebdo_tree" model="ir.ui.view">
+        <field name="name">is_suivi_commande_hebdo_tree</field>
+        <field name="model">is.suivi.commande.hebdo</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>
+                <field name="enseigne_id"/>
+                <field name="commentaire" optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_suivi_commande_hebdo_search" model="ir.ui.view">
+        <field name="name">is_suivi_commande_hebdo_search</field>
+        <field name="model">is.suivi.commande.hebdo</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="date"/>
+                <field name="enseigne_id"/>
+                <field name="commentaire" optional="show"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_suivi_commande_hebdo_action" model="ir.actions.act_window">
+        <field name="name">Suivi commande hebdo</field>
+        <field name="res_model">is.suivi.commande.hebdo</field>
+        <field name="limit">100</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_suivi_commande_hebdo_menu"
+        name="Suivi commande hebdo"
+        parent="sale.sale_order_menu"
+        sequence="920"
+        action="is_suivi_commande_hebdo_action"
+    />
+
+
+    <!-- is.suivi.commande.hebdo.ligne -->
+    <record id="is_suivi_commande_hebdo_ligne_tree" model="ir.ui.view">
+        <field name="name">is_suivi_commande_hebdo_ligne_tree</field>
+        <field name="model">is.suivi.commande.hebdo.ligne</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="partner_id" widget="many2one_clickable"/>
+                <field name="heure_appel"       optional="show"/>
+                <field name="phone"             optional="show"/>
+                <field name="habitude_commande" optional="show"/>
+                <field name="transporteur_id"   optional="show"/>
+                <field name="order_id"          optional="show" widget="many2one_clickable"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_suivi_commande_hebdo_ligne_search" model="ir.ui.view">
+        <field name="name">is_suivi_commande_hebdo_ligne_search</field>
+        <field name="model">is.suivi.commande.hebdo.ligne</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="heure_appel"/>
+                <field name="habitude_commande"/>
+                <field name="transporteur_id"/>
+                <field name="order_id"/>
+                <filter string="Avec commande" name="avec_commande" domain="[('order_id', '!=', False)]"/>
+                <filter string="Sans commande" name="sans_commande" domain="[('order_id', '=', False)]"/>
+                <filter name="group_by_transporteur_id" string="Transporteur"  context="{'group_by': 'transporteur_id'}"/>
+                <filter name="sans_commande" string="Transporteur"  context="{'group_by': 'transporteur_id'}"/>
+            </search>
+        </field>
+    </record>
+</odoo>

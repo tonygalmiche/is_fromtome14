@@ -67,8 +67,11 @@ class ResPartner(models.Model):
     #is_heure_envoi              = fields.Char('Heure', help="Heure maxi d'envoi de la commande au fournisseur")
     is_heure_envoi_id           = fields.Many2one('is.heure.maxi', 'Heure', help="Heure maxi d'envoi de la commande au fournisseur")
     is_encours_client           = fields.Float(string='En-cours client', digits=(14,2), compute='_compute_is_encours_client')
-
-
+    is_heure_appel              = fields.Char(string="Heure d'appel", help="Heure d'appel des clients")
+    is_habitude_commande        = fields.Selection([
+        ('telephone', 'Téléphone'),
+        ('mail'     , 'Mail'),
+    ], 'Habitude commande')
 
 
     def creer_modele_commande(self):

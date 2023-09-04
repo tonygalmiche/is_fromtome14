@@ -206,6 +206,8 @@
                 <field name="is_transporteur_id"                optional="hide"/>
                 <field name="is_warehouse_id"                   optional="hide"/>
                 <field name="is_frais_port_id"                  optional="hide"/>
+                <field name="is_heure_appel"                    optional="hide"/>
+                <field name="is_habitude_commande"              optional="hide"/>
                 <field name="is_heure_envoi_id"                 optional="hide"/>
                 <field name="is_encours_client"                 optional="hide"/>
             </field>
@@ -233,8 +235,10 @@
                 <field name="is_transporteur_id" widget="selection"/>
                 <field name="is_warehouse_id"    widget="selection"/>
                 <field name="is_frais_port_id"/>
-                <field name="is_heure_envoi_id" attrs="{'invisible': ['|',('is_supplier', '=', False),('is_company', '=', False)]}"/>
-                <field name="is_encours_client" attrs="{'invisible': ['|',('is_customer', '=', False),('is_company', '=', False)]}"/>
+                <field name="is_heure_envoi_id"    attrs="{'invisible': ['|',('is_supplier', '=', False),('is_company', '=', False)]}"/>
+                <field name="is_heure_appel"       attrs="{'invisible': ['|',('is_customer', '=', False),('is_company', '=', False)]}"/>
+                <field name="is_habitude_commande" attrs="{'invisible': ['|',('is_customer', '=', False),('is_company', '=', False)]}"/>
+                <field name="is_encours_client"    attrs="{'invisible': ['|',('is_customer', '=', False),('is_company', '=', False)]}"/>
             </field>
             <xpath expr="//page[@name='sales_purchases']/group/group/field[@name='user_id']" position="before">
                 <field name="is_customer"/>
@@ -314,6 +318,7 @@
                 <field name="is_transporteur_id"/>
                 <field name="is_warehouse_id"/>
                 <field name="is_frais_port_id"/>
+                <field name="is_heure_appel"/>
                 <field name="is_heure_envoi_id"/>
             </field>
             <filter name="type_company" position="after">
@@ -323,6 +328,7 @@
         </field>
     </record>
 
+    <!-- <field name="duration" widget="float_time" readonly="1"/> -->
 
 
 
