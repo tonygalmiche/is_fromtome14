@@ -18,6 +18,7 @@ class IsSuiviCommandeHebdoLigne(models.Model):
     ], 'Habitude commande')
     transporteur_id = fields.Many2one('is.transporteur', 'Transporteur')
     order_id  = fields.Many2one('sale.order', 'Commande')
+    nb_colis  = fields.Float(string="Nb colis")
 
 
 class IsSuiviCommandeHebdo(models.Model):
@@ -53,8 +54,11 @@ class IsSuiviCommandeHebdo(models.Model):
                 ]
                 orders=self.env['sale.order'].search(filtre, order="id desc", limit=1)
                 order_id=False
+                nb_colis=0
                 for order in orders:
                     order_id = order.id
+                    for line in order.order_line:
+                        nb_colis+=line.is_nb_colis
                 vals={
                     "suivi_id"   : obj.id,
                     "partner_id" : partner.id,
@@ -63,6 +67,7 @@ class IsSuiviCommandeHebdo(models.Model):
                     "habitude_commande": partner.is_habitude_commande,
                     "transporteur_id"  : partner.is_transporteur_id.id,
                     "order_id"         : order_id,
+                    "nb_colis"         : nb_colis,
                 }
                 self.env['is.suivi.commande.hebdo.ligne'].create(vals)
             

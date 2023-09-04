@@ -74,6 +74,7 @@
                 <field name="habitude_commande" optional="show"/>
                 <field name="transporteur_id"   optional="show"/>
                 <field name="order_id"          optional="show" widget="many2one_clickable"/>
+                <field name="nb_colis"          optional="show" sum="Total"/>
             </tree>
         </field>
     </record>
