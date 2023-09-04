@@ -514,6 +514,11 @@ class Picking(models.Model):
                 sequence+=10
 
 
+    def _message_auto_subscribe_notify(self, partner_ids, template):
+        "Désactiver les notifications d'envoi des mails"
+        return True
+
+
 class PickingType(models.Model):
     _inherit = 'stock.picking.type'
 

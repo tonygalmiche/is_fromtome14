@@ -7,7 +7,6 @@ from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
 
-
     @api.depends('partner_id','is_fromtome_order_id')
     def _compute_is_fromtome_order_vsb(self):
         cr,uid,context,su = self.env.args
@@ -139,6 +138,11 @@ class PurchaseOrder(models.Model):
                     }
                     res=self.env['sale.order.line'].create(vals)
                     line.price_unit = res.price_unit
+
+
+    def _message_auto_subscribe_notify(self, partner_ids, template):
+        "Désactiver les notifications d'envoi des mails"
+        return True
 
 
 class PurchaseOrderLine(models.Model):
