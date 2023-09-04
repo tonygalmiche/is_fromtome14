@@ -18,7 +18,23 @@ class IsSuiviCommandeHebdoLigne(models.Model):
     ], 'Habitude commande')
     transporteur_id = fields.Many2one('is.transporteur', 'Transporteur')
     order_id  = fields.Many2one('sale.order', 'Commande')
-    nb_colis  = fields.Float(string="Nb colis")
+    nb_colis  = fields.Float(string="Nb colis commande")
+    nb_cde_transporteur = fields.Integer(string="Nb cde transporteur", compute="_compute_nb_cde_transporteur")
+    picking_id  = fields.Many2one('stock.picking', 'Livraison')
+    nb_colis_picking = fields.Float(string="Nb colis livraison")
+
+
+    @api.depends('transporteur_id','order_id')
+    def _compute_nb_cde_transporteur(self):
+        for obj in self:
+            filtre=[
+                ('order_id'       , '!=', False),
+                ('suivi_id'       , '=' , obj.suivi_id.id),
+                ('transporteur_id', '=' , obj.transporteur_id.id),
+            ]
+            orders=self.env['is.suivi.commande.hebdo.ligne'].search(filtre)
+            nb=len(orders)
+            obj.nb_cde_transporteur = nb
 
 
 class IsSuiviCommandeHebdo(models.Model):
@@ -59,6 +75,23 @@ class IsSuiviCommandeHebdo(models.Model):
                     order_id = order.id
                     for line in order.order_line:
                         nb_colis+=line.is_nb_colis
+
+
+                    #** Recherche du picking **********************************
+                    filtre=[
+                        ('sale_id', '=', order.id),
+                        ('state'     , '=', 'done'),
+                    ]
+                    picking_id=False
+                    pickings=self.env['stock.picking'].search(filtre, order="id")
+                    for picking in pickings:
+                        print(picking)
+                        picking_id = picking.id
+
+                    #move_ids_without_package
+
+                    #**********************************************************
+
                 vals={
                     "suivi_id"   : obj.id,
                     "partner_id" : partner.id,
@@ -68,6 +101,7 @@ class IsSuiviCommandeHebdo(models.Model):
                     "transporteur_id"  : partner.is_transporteur_id.id,
                     "order_id"         : order_id,
                     "nb_colis"         : nb_colis,
+                    "picking_id"       : picking_id,
                 }
                 self.env['is.suivi.commande.hebdo.ligne'].create(vals)
             

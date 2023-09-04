@@ -490,6 +490,10 @@ class SaleOrder(models.Model):
     def creer_commande_fournisseur_action(self):
         company = self.env.user.company_id
         for obj in self:
+
+
+
+
             if not len(obj.order_line):
                 raise Warning(u"Il n'y a aucune ligne de commandes à traiter !")
             for line in obj.order_line:
@@ -497,8 +501,16 @@ class SaleOrder(models.Model):
                     raise Warning(u"La date de réception n'est pas renseignée sur toutes les lignes")
             now = datetime.date.today()
             for line in obj.order_line:
+
+
+
+
                 _logger.info("creer_commande_fournisseur_action : article=%s (%s)"%(line.product_id.display_name,line.product_id.id))
                 if not line.is_purchase_line_id:
+
+
+
+
                     suppliers=self.env['product.supplierinfo'].search([('product_tmpl_id', '=', line.product_id.product_tmpl_id.id)])
                     partner_id=False
                     supplierinfo=False
@@ -511,6 +523,8 @@ class SaleOrder(models.Model):
                     if supplierinfo:
 
 
+                        print("## TEST 1",line.product_id.name, supplierinfo.name.name, obj.is_heure_envoi_id.id)
+
                         
 
 
@@ -520,7 +534,13 @@ class SaleOrder(models.Model):
                             raise Warning("Entrepôt non renseigné pour le fournisseur '%s' de l'article '%s'"%(supplierinfo.name.name,line.product_id.display_name))
                         
 
-                        if supplierinfo.name.is_heure_envoi_id==obj.is_heure_envoi_id or obj.is_heure_envoi_id==False:
+                        if supplierinfo.name.is_heure_envoi_id==obj.is_heure_envoi_id or obj.is_heure_envoi_id.id==False:
+
+                            print("## TEST 2",line.product_id.name, supplierinfo.name.name)
+
+
+
+
                             partner_id = supplierinfo.name.id
                             date_reception = str(line.is_date_reception)
                             date_planned  = date_reception+' 08:00:00'
