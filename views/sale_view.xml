@@ -50,6 +50,8 @@
                             />
                             <field name="product_id"   widget="many2one_clickable"/>
                             <field name="product_name" optional="hide"/>
+                            <field name="is_mise_en_avant" optional="hide"/>
+                            <field name="is_preco"         optional="hide"/>
                             <field name="default_code"    optional="show"/>
                             <field name="ref_fournisseur" optional="show"/>
                             <field name="price_unit"      optional="show"/>

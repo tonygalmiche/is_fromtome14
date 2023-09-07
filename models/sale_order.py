@@ -4,9 +4,9 @@ from odoo.exceptions import UserError, ValidationError, Warning
 from odoo.tools.float_utils import float_compare, float_is_zero, float_round
 import time
 from odoo.osv import expression
-
 from openpyxl import Workbook, load_workbook
-
+from openpyxl.styles import Font, Color, Fill, Alignment,PatternFill
+from copy import copy
 import base64
 import datetime
 import logging
@@ -73,12 +73,14 @@ class IsModeleCommandeLigne(models.Model):
     sequence        = fields.Integer('Séquence')
     product_id      = fields.Many2one('product.product', 'Article', required=True)
     product_name    = fields.Char('Désignation article'  , compute='_compute', readonly=True, store=True)
-    default_code    = fields.Char('Référence Fromtome'   , compute='_compute', readonly=True, store=True)
-    ref_fournisseur = fields.Char('Référence Fournisseur', compute='_compute', readonly=True, store=True)
+    default_code    = fields.Char('Réf Fromtome'   , compute='_compute', readonly=True, store=True)
+    ref_fournisseur = fields.Char('Réf Fournisseur', compute='_compute', readonly=True, store=True)
     weight          = fields.Float(string='Poids unitaire', digits='Stock Weight', compute='_compute', readonly=True, store=True)
     qt_livree       = fields.Float(string='Qt livrée', help="quantité livrée au moment de l'initialisation", readonly=True)
     price_unit      = fields.Float("Prix", digits='Product Price', compute='_compute_price_unit', readonly=True, store=False)
     alerte          = fields.Boolean('Alerte', compute='_compute_alerte')
+    is_mise_en_avant = fields.Boolean(related="product_id.is_mise_en_avant")
+    is_preco         = fields.Boolean(related="product_id.is_preco")
 
 
     @api.depends('product_id')
@@ -129,9 +131,6 @@ class IsModeleCommande(models.Model):
         for obj in self:
             if not obj.enseigne_id:
                 raise Warning("Enseigne obligatoire pour générer la commande Excel !")
-
-
-
             for modele in obj.enseigne_id.modele_commande_ids:
                 name = obj.name
 
@@ -161,10 +160,31 @@ class IsModeleCommande(models.Model):
                         sheet.cell(row=row, column=4).value = line.product_id.is_ref_fournisseur or ''
                         sheet.cell(row=row, column=5).value = line.price_unit or ''
                         sheet.cell(row=row, column=6).value = line.product_id.uom_id.name
+                        if line.is_mise_en_avant or line.is_preco:
+                            if line.is_mise_en_avant:
+                                txt = "Produit mis en avant"
+                            if line.is_preco:
+                                txt = "Produit recommandé"
+                            sheet.cell(row=row, column=1).alignment = Alignment(vertical='center', horizontal='center') 
+                            sheet.cell(row=row, column=2).alignment = Alignment(vertical='center', horizontal='left') 
+                            sheet.cell(row=row, column=3).alignment = Alignment(vertical='center', horizontal='center') 
+                            sheet.cell(row=row, column=4).alignment = Alignment(vertical='center', horizontal='center') 
+                            sheet.cell(row=row, column=5).alignment = Alignment(vertical='center', horizontal='right') 
+                            sheet.cell(row=row, column=6).alignment = Alignment(vertical='center', horizontal='center') 
+                            sheet.cell(row=row, column=2).value = "%s:\n%s"%(txt,line.product_id.name)
+                            sheet.row_dimensions[row].height=34 
+                            for i in  range(1,7):
+                                cell = sheet.cell(row=row,column=i)
+                                font = copy(cell.font)
+                                font.size = 12
+                                cell.font = font
+                                fill = PatternFill(fill_type='solid', start_color='FFFBCC', end_color='FFFBCC')
+                                cell.fill=fill
                         row+=1
                         lig+=1
                 wb.save(path)
                 #**************************************************************
+
 
                 # ** Creation ou modification de la pièce jointe **************
                 attachments = obj.modele_commande_ids
