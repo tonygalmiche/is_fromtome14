@@ -72,6 +72,7 @@ class IsSuiviCommandeHebdo(models.Model):
                 ]
                 orders=self.env['sale.order'].search(filtre, order="id desc", limit=1)
                 order_id=False
+                picking_id=False
                 nb_colis=0
                 nb_colis_picking=0
                 poids=0
@@ -86,7 +87,6 @@ class IsSuiviCommandeHebdo(models.Model):
                         ('sale_id', '=', order.id),
                         ('state'     , '=', 'done'),
                     ]
-                    picking_id=False
                     pickings=self.env['stock.picking'].search(filtre, order="id")
                     for picking in pickings:
                         picking_id = picking.id
