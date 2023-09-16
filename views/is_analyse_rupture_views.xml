@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- is.analyse.rupture -->
+    <record id="is_analyse_rupture_form" model="ir.ui.view">
+        <field name="name">is_analyse_rupture_form</field>
+        <field name="model">is.analyse.rupture</field>
+        <field name="arch" type="xml">
+            <form>
+                <style>
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
+                <header>
+                    <button
+                        name="generer_lignes_action"
+                        type="object"
+                        string="Voir les ruptures"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="date"/>
+                        <field name="date_livraison_mini"/>
+                        <field name="date_livraison_maxi"/>
+                        <field name="commentaire"/>
+                        <field name="ligne_ids" invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_analyse_rupture_tree" model="ir.ui.view">
+        <field name="name">is_analyse_rupture_tree</field>
+        <field name="model">is.analyse.rupture</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>
+                <field name="date_livraison_mini"/>
+                <field name="date_livraison_maxi"/>
+                <field name="commentaire" optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_analyse_rupture_search" model="ir.ui.view">
+        <field name="name">is_analyse_rupture_search</field>
+        <field name="model">is.analyse.rupture</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="date"/>
+                <field name="commentaire" optional="show"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_analyse_rupture_action" model="ir.actions.act_window">
+        <field name="name">Analyse des ruptures</field>
+        <field name="res_model">is.analyse.rupture</field>
+        <field name="limit">100</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_analyse_rupture_menu"
+        name="Analyse des ruptures"
+        parent="sale.sale_order_menu"
+        sequence="930"
+        action="is_analyse_rupture_action"
+    />
+
+
+    <!-- is.analyse.rupture.ligne -->
+    <record id="is_analyse_rupture_ligne_tree" model="ir.ui.view">
+        <field name="name">is_analyse_rupture_ligne_tree</field>
+        <field name="model">is.analyse.rupture.ligne</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="product_id" widget="many2one_clickable"/>
+                <field name="demande_client" sum="Total"/>
+                <field name="demande_totale"/>
+                <field name="stock"   sum="Total"/>
+                <field name="manque"  sum="Total"/>
+                <field name="order_id"    widget="many2one_clickable" optional="show"/>
+                <field name="line_id"     widget="many2one_clickable" optional="hide"/>
+                <field name="partner_id"  widget="many2one_clickable" optional="show"/>
+                <field name="enseigne_id" widget="many2one_clickable" optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_analyse_rupture_ligne_search" model="ir.ui.view">
+        <field name="name">is_analyse_rupture_ligne_search</field>
+        <field name="model">is.analyse.rupture.ligne</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+                <field name="order_id"/>
+                <field name="partner_id"/>
+                <field name="enseigne_id"/>
+                <filter name="group_by_product_id"  string="Article"  context="{'group_by': 'product_id'}"/>
+                <filter name="group_by_partner_id"  string="Client"   context="{'group_by': 'partner_id'}"/>
+                <filter name="group_by_enseigne_id" string="Enseigne" context="{'group_by': 'enseigne_id'}"/>
+             </search>
+        </field>
+    </record>
+</odoo>
