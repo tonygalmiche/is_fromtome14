@@ -69,9 +69,9 @@ class IsExportCompta(models.Model):
                     aa.code,
                     aa.name,
                     am.invoice_date,
-                    aml.name,
-                    aml.debit,
-                    aml.credit,
+                    'aml.name',
+                    sum(aml.debit),
+                    sum(aml.credit),
                     rp.name,
                     rp.ref,
                     am.id,
@@ -84,7 +84,19 @@ class IsExportCompta(models.Model):
                 WHERE 
                     am.is_export_compta_id is null and
                     am.invoice_date<=%s and aj.name in ('VE','AC')
-                ORDER BY am.invoice_date
+                GROUP BY 
+                    aj.name,
+                    am.name,
+                    am.invoice_date,
+                    aa.code,
+                    aa.name,
+                    am.invoice_date,
+                    rp.name,
+                    rp.ref,
+                    am.id,
+                    aj.code,
+                    am.partner_id
+                ORDER BY am.invoice_date,am.name,aa.code
             """
             cr.execute(sql,[obj.date_fin])
             ct=0
