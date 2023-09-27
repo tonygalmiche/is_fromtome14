@@ -141,7 +141,8 @@ class AccountMove(models.Model):
     is_bl               = fields.Text('BL'         , compute='_is_is_bl')
     is_poids_net        = fields.Float(string='Poids net', digits=(14,3), compute='_compute_poids_colis')
     is_nb_colis         = fields.Float(string='Nb colis' , digits=(14,1), compute='_compute_poids_colis')
-    is_date_relance     = fields.Date(string='Date dernière relance')
+    is_date_relance     = fields.Date(string='Date dernière relance', readonly=1)
+    is_date_releve      = fields.Date(string='Date dernier relevé'  , readonly=1)
 
 
     def write(self, vals):

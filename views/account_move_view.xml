@@ -34,7 +34,8 @@
             </field>
             <div name="journal_div" position="after">
                 <field name="is_export_compta_id" readonly="1"/>
-                <field name="is_date_relance"/>
+                <field name="is_date_relance" attrs="{'invisible':[('is_date_relance','=',False)]}"/>
+                <field name="is_date_releve"  attrs="{'invisible':[('is_date_releve','=',False)]}"/>
             </div>
             <label for="invoice_payment_term_id" position="replace"/>
             <xpath expr="//field[@name='invoice_date_due']/.." position="replace">
@@ -107,7 +108,8 @@
                 <field name="invoice_date_due"        optional="show"/>
             </field> -->
             <field name="company_id" position="before">
-                <field name="is_date_relance" optional="show"/>
+                <field name="is_date_relance" optional="hide"/>
+                <field name="is_date_releve"  optional="hide"/>
                 <field name="date"            optional="hide"/>
             </field>
             <!-- <field name="date" position="replace">
