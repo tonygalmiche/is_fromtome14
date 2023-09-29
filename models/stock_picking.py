@@ -395,8 +395,8 @@ class Picking(models.Model):
                 if date_scan>date_picking:
                     alertes.append("La 'Mise à jour du picking' n'a pas été faite, car le scan est plus récent que le picking")
             if poids_scan and poids_picking:
-                if round(poids_scan,2)!=round(poids_picking,2):
-                    alertes.append("Le poids du scan (%.4f) est différent du poids du picking (%.4f)"%(poids_scan,poids_picking))
+                if round(poids_scan,4)!=round(poids_picking,4):
+                    alertes.append("Le poids du scan (%.2f) est différent du poids du picking (%.2f)"%(poids_scan,poids_picking))
             obj.is_alerte = '\n'.join(alertes) or False
 
 
