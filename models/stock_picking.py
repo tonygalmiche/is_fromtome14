@@ -115,10 +115,20 @@ class IsScanPicking(models.Model):
     _rec_name = 'id'
 
 
-    @api.depends('ean','lot','product_id','lot_id')
+    @api.depends('ean','lot','product_id','lot_id','line_ids')
     def _compute_is_alerte(self):
         for obj in self:
             alertes=[]
+            if obj.picking_id.picking_type_id.code=='outgoing':
+                nb_creation_lot=0
+                for line in obj.line_ids:
+                    if line.creation_lot:
+                        nb_creation_lot+=1
+                if nb_creation_lot:
+                    alertes.append("Attention : Vous avez créé %s nouveaux lots sur cette livraison ce qui n'est pas normal"%nb_creation_lot)
+
+
+
             if obj.ean and not obj.product_id:
                 alertes.append("Article non trouvé pour ce code ean")
             obj.is_alerte = '\n'.join(alertes) or False

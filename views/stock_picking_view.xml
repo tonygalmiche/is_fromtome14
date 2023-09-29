@@ -225,9 +225,13 @@
         <field name="model">is.scan.picking</field>
         <field name="arch" type="xml">
             <tree>
+                <field name="id"/>
+                <field name="type"/>
                 <field name="picking_id"/>
                 <field name="inventory_id"/>
-                <field name="id"/>
+                <field name="create_date"/>
+                <field name="write_date"/>
+                <field name="is_alerte"/>
             </tree>
         </field>
     </record>
