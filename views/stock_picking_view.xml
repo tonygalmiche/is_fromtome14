@@ -224,7 +224,7 @@
         <field name="name">is_scan_picking_tree</field>
         <field name="model">is.scan.picking</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree decoration-danger="is_alerte!=False" limit="200">
                 <field name="id"/>
                 <field name="type"/>
                 <field name="picking_id"/>
