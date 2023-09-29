@@ -75,8 +75,6 @@ class IsScanPickingLine(models.Model):
     alerte              = fields.Text('Alerte', compute=_compute_alerte, readonly=True, store=True)
 
 
-
-
 class IsScanPickingLine(models.Model):
     _name = 'is.scan.picking.product'
     _description = "Articles à scanner du Picking"
@@ -356,6 +354,67 @@ class IsScanPicking(models.Model):
 class Picking(models.Model):
     _inherit = 'stock.picking'
 
+    is_poids_net      = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_poids_colis')
+    is_nb_colis       = fields.Float(string='Nb colis' , digits=(14,1)        , compute='_compute_poids_colis')
+    is_date_livraison = fields.Date('Date livraison client', help="Date d'arrivée chez le client prévue sur la commande"    , related='sale_id.is_date_livraison')
+    is_date_reception = fields.Datetime('Date réception'   , help="Date de réception chez Fromtome indiquée sur la commande", related='purchase_id.date_planned')
+    is_enseigne_id    = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
+    is_transporteur_id = fields.Many2one(related='partner_id.is_transporteur_id')
+    is_alerte          = fields.Text('Alerte', compute="_compute_is_alerte", readonly=True, store=False)
+
+
+    @api.depends('move_line_ids_without_package')
+    def _compute_is_alerte(self):
+        for obj in self:
+            alertes=[]
+            scans = self.env['is.scan.picking'].search([('picking_id','=',obj.id)],limit=1)
+            date_scan=False
+            poids_scan=False
+            for scan in scans:
+                if not date_scan:
+                    date_scan=scan.write_date
+                if date_scan<scan.write_date:
+                    date_scan=scan.write_date
+                for line in scan.line_ids:
+                    unite = line.product_id.uom_id.category_id.name
+                    if unite=="Poids":
+                        poids_scan+=line.poids
+            date_picking=False
+            poids_picking=False
+            for line in obj.move_ids_without_package:
+                if not date_picking:
+                    date_picking=line.write_date
+                if date_picking<line.write_date:
+                    date_picking=line.write_date
+                unite = line.product_id.uom_id.category_id.name
+                if unite=="Poids":
+                    poids_picking+=line.quantity_done
+                    if line.quantity_done!=line.is_poids_net_reel:
+                        alertes.append("[%s] Poids net réel différent de Fait (%.4f!=%.4f)"%(line.product_id.default_code, line.is_poids_net_reel, line.quantity_done))
+            if date_scan and date_picking:
+                if date_scan>date_picking:
+                    alertes.append("La 'Mise à jour du picking' n'a pas été faite, car le scan est plus récent que le picking")
+            if poids_scan and poids_picking and poids_scan!=poids_picking:
+                alertes.append("Le poids du scan (%.4f) est différent du poids du picking (%.4f)"%(poids_scan,poids_picking))
+            obj.is_alerte = '\n'.join(alertes) or False
+
+
+    @api.depends('move_line_ids_without_package','state')
+    def _compute_poids_colis(self):
+        for obj in self:
+            poids=0
+            colis=0
+            for line in obj.move_line_ids_without_package:
+                poids+=line.is_poids_net_reel
+                colis+=line.is_nb_colis
+            obj.is_poids_net=poids
+            obj.is_nb_colis=colis
+            if obj.sale_id:
+                obj.sale_id.commande_soldee_action_server()
+            if obj.purchase_id:
+                obj.purchase_id.commande_soldee_action_server()
+
+
     def action_picking_send(self):
         self.ensure_one()
         template = self.env.ref(
@@ -385,30 +444,6 @@ class Picking(models.Model):
             'target': 'new',
             'context': ctx,
         }
-
-
-    @api.depends('move_line_ids_without_package','state')
-    def _compute_poids_colis(self):
-        for obj in self:
-            poids=0
-            colis=0
-            for line in obj.move_line_ids_without_package:
-                poids+=line.is_poids_net_reel
-                colis+=line.is_nb_colis
-            obj.is_poids_net=poids
-            obj.is_nb_colis=colis
-            if obj.sale_id:
-                obj.sale_id.commande_soldee_action_server()
-            if obj.purchase_id:
-                obj.purchase_id.commande_soldee_action_server()
-
-
-    is_poids_net      = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_poids_colis')
-    is_nb_colis       = fields.Float(string='Nb colis' , digits=(14,1)        , compute='_compute_poids_colis')
-    is_date_livraison = fields.Date('Date livraison client', help="Date d'arrivée chez le client prévue sur la commande"    , related='sale_id.is_date_livraison')
-    is_date_reception = fields.Datetime('Date réception'   , help="Date de réception chez Fromtome indiquée sur la commande", related='purchase_id.date_planned')
-    is_enseigne_id    = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
-    is_transporteur_id = fields.Many2one(related='partner_id.is_transporteur_id')
 
 
     def scan_picking_action(self):

@@ -7,6 +7,9 @@
         <field name="model">stock.move.line</field>
         <field name="inherit_id" ref="stock.view_stock_move_line_detailed_operation_tree"/>
         <field name="arch" type="xml">
+            <tree position="attributes">
+                <attribute name="limit">500</attribute>
+            </tree>
             <field name="lot_id" position="after">
                 <field name="is_type_tracabilite" optional="show"/>
                 <field name="is_dlc_ddm" optional="show"/>
@@ -23,6 +26,10 @@
                     class="oe_stat_button" 
                 />
                 <field name="status_move" optional="show"/>
+                <field name="create_date" optional="hide" string="Créé le"/>
+                <field name="create_uid"  optional="hide" string="Créé par"/>
+                <field name="write_date"  optional="hide" string="Modifié Le"/>
+                <field name="write_uid"   optional="hide" string="Modifié par"/>
             </field>
             <field name="qty_done" position="attributes">
                 <attribute name="sum">Total</attribute>
@@ -167,6 +174,8 @@
                             <field name="poids"             sum="Total"  optional="show"/>
                             <field name="alerte"                         optional="show"/>
                             <field name="info"        style="color:gray" optional="show"/>
+                            <field name="write_date"                     optional="hide" string="Modifié par"/>
+                            <field name="write_uid"                      optional="hide" string="Le"/>
                         </tree>
                     </field>
                     <field name="product_ids" nolabel="1" readonly="1">
@@ -301,6 +310,18 @@
            <field name="partner_id" position="after">
                 <button name="scan_picking_action" type="object" string="Scan"/>
             </field>
+            <xpath expr="//notebook" position="before">
+                <div style="background:orange;font-size:11pt" attrs="{'invisible':[('is_alerte','=',False)]}">
+                    <field 
+                        name="is_alerte"
+                        readonly="1" nolabel="1" 
+                        attrs="{'invisible': [('is_alerte','=', False)],'readonly':True}"
+                    />
+                </div>
+            </xpath>
+            <xpath expr="//page[@name='operations']/field/tree" position="attributes">
+                <attribute name="limit">500</attribute>
+            </xpath>
             <xpath expr="//page[@name='operations']/field/tree/field[@name='description_picking']" position="after">
                 <field name="is_description_cde" optional="show"/>
                 <field name="is_ref_fournisseur" optional="show"/>
@@ -315,6 +336,14 @@
                 <field name="is_nb_colis"       optional="hide" sum="Total"/>
                 <field name="is_poids_net_reel" optional="hide" sum="Total"/>
             </xpath> 
+
+            <xpath expr="//page[@name='operations']/field/tree/field[@name='lot_ids']" position="after">
+                <field name="write_date" optional="hide" string="Modifié par"/>
+                <field name="write_uid"  optional="hide" string="Le"/>
+            </xpath> 
+
+
+            
 
             <field name="move_ids_without_package" position="before">
                 <div style="margin-bottom:10px">
