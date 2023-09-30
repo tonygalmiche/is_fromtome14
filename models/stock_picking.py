@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 from odoo import fields, api, models, _
 import time
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from dateutil.parser import parse
 import dateparser
 from odoo.exceptions import UserError, ValidationError
 from odoo.osv import expression
 from odoo.tools.float_utils import float_compare, float_is_zero
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, format_datetime
-from datetime import datetime
-from datetime import timedelta
 import pytz
 import logging
 
@@ -281,6 +279,37 @@ class IsScanPicking(models.Model):
     def maj_picking_action(self):
         for obj in self:
             obj.picking_id.move_line_ids_without_package.unlink()
+
+            #** Recherche des lignes à ajouter sur la commande ****************
+            if obj.picking_id.purchase_id:
+                products=[]
+                for line in obj.picking_id.purchase_id.order_line:
+                    if line.product_id not in products:
+                        products.append(line.product_id)
+                if products:
+                    products_scan=[]
+                    for line in obj.line_ids:
+                        if line.product_id not in products:
+                            if line.product_id not in products_scan:
+                                products_scan.append(line.product_id)
+                    if products_scan:
+                        for product in products_scan:
+                            vals={
+                                'order_id'    : obj.picking_id.purchase_id.id,
+                                'sequence'    : 9999,
+                                'product_id'  : product.id,
+                                'name'        : 'x',
+                                'product_qty' : 0,
+                                'product_uom' : product.uom_po_id.id,
+                                'date_planned': str(date.today())+' 08:00:00',
+                                'price_unit'  : 0,
+                            }
+                            order_line=self.env['purchase.order.line'].create(vals)
+                            order_line.onchange_product_id()
+                            order_line.product_qty = 0
+                            order_line.name = '## Ajouté en reception ##'
+            #******************************************************************
+
             for line in obj.line_ids:
                 unite = line.uom_id.category_id.name
                 if unite=="Poids":

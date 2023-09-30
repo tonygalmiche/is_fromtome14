@@ -3,7 +3,7 @@ from odoo import api, fields, models, _
 import codecs
 import unicodedata
 import base64
-import datetime
+from datetime import datetime, date, timedelta
 from odoo.exceptions import Warning
 from math import *
 
@@ -24,7 +24,8 @@ class IsCommandeFromtomeLigne(models.Model):
     purchase_qty     = fields.Float("Qt Fromtome déja en commande", digits=(14,4))
     product_qty      = fields.Float("Qt Fromtome à commander"     , digits=(14,4))
     #product_po_qty   = fields.Float(u"Qt Fromtome à commander (UA)"     , digits=(14,4))
-    stock            = fields.Float("Stock", digits=(14,2))
+    stock            = fields.Float("Stock FT", digits=(14,2))
+    stock_lc         = fields.Float("Stock LC", digits=(14,2))
     stock_mini       = fields.Float("Stock mini", digits=(14,2))
     order_line_id    = fields.Many2one('purchase.order.line', 'Ligne commande fournisseur')
 
@@ -51,11 +52,9 @@ class IsCommandeFromtome(models.Model):
 
 
     def calcul_besoins_action(self):
-        #cr,uid,context = self.env.args
         cr,uid,context,su = self.env.args
+        warehouses = self.env['stock.warehouse'].search([])
         for obj in self:
-            #Emplacement de stock de l'enseigne
-            location_id =  obj.enseigne_id.warehouse_id.lot_stock_id.id
 
             if obj.order_id and obj.order_id.state!='draft':
                 raise Warning(u"La commande Fromtome associée est déjà validée. Le calcul n'est pas autorisé !")
@@ -74,7 +73,7 @@ class IsCommandeFromtome(models.Model):
             if order:
                 order.onchange_partner_id()
             order.order_line.unlink()
-            now = datetime.date.today()
+            now = date.today()
             #products = self.env['product.product'].search([('sale_ok','=',True),('is_enseigne_id','=',obj.enseigne_id.id)],order='name')
             products = self.env['product.product'].search([('sale_ok','=',True)],order='name')
             sequence=0
@@ -136,18 +135,36 @@ class IsCommandeFromtome(models.Model):
                     if obj.stock_mini==True:
                         stock_mini = product.is_stock_mini
 
+                    # #** Recherche du stock dans l'Entrepôt ********************
+                    # location_id =  obj.enseigne_id.warehouse_id.lot_stock_id.id #Emplacement de stock de l'enseigne
+                    # #stock = product.qty_available
+                    # stock = 0
+                    # quants = self.env['stock.quant'].search([('product_id','=',product.id),('location_id','=',location_id)])
+                    # for quant in quants:
+                    #     stock+=quant.quantity
+                    # #***********************************************************
+
+
                     #** Recherche du stock dans l'Entrepôt ********************
-                    #stock = product.qty_available
-                    stock = 0
-                    quants = self.env['stock.quant'].search([('product_id','=',product.id),('location_id','=',location_id)])
-                    for quant in quants:
-                        #print(product.name, quant, quant.location_id.name )
-                        stock+=quant.quantity
+                    stock_ft=0
+                    stock_lc=0
+                    for warehouse in warehouses:
+                        location_id =  warehouse.lot_stock_id.id
+                        stock = 0
+                        quants = self.env['stock.quant'].search([('product_id','=',product.id),('location_id','=',location_id)])
+                        for quant in quants:
+                            stock+=quant.quantity
+                        if warehouse.code=='LC':
+                            stock_lc = stock
+                        if warehouse.code=='FT':
+                            stock_ft = stock
                     #***********************************************************
+
+
 
                     #Convertir la quantité en UA en US
                     purchase_qty = product.uom_po_id._compute_quantity(purchase_qty, product.uom_id, round=True, rounding_method='UP', raise_if_failure=True)
-                    product_qty = sale_qty - stock + stock_mini - purchase_qty
+                    product_qty = sale_qty - stock_ft - stock_lc + stock_mini - purchase_qty
 
                     if product_qty<0:
                         product_qty=0
@@ -195,7 +212,8 @@ class IsCommandeFromtome(models.Model):
                             'purchase_qty'  : purchase_qty,
                             'product_qty'   : product_qty,
                             #'product_po_qty': product_po_qty,
-                            'stock'         : stock,
+                            'stock'         : stock_ft,
+                            'stock_lc'      : stock_lc,
                             'stock_mini'    : stock_mini,
                             'order_line_id' : order_line_id,
                         }
