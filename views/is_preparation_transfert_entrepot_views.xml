@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- is.preparation.transfert.entrepot.ligne -->
+    <record id="is_preparation_transfert_entrepot_ligne_tree" model="ir.ui.view">
+        <field name="name">is.preparation.transfert.entrepot.ligne.tree</field>
+        <field name="model">is.preparation.transfert.entrepot.ligne</field>
+        <field name="arch" type="xml">
+            <tree>
+                <button 
+                    title="Article" 
+                    name="acceder_article_action" 
+                    type="object" icon="fa-search-plus" 
+                />
+                <button 
+                    title="Mouvements de stock" 
+                    name="mouvement_stock_action" 
+                    type="object" icon="fa-list" 
+                />
+                <field name="designation"  optional="show"/>
+                <field name="default_code" optional="show"/>
+                <field name="stock_mini" optional="show"/>
+                <field name="stock_ft" optional="show"/>
+                <field name="reception_ft" optional="show"/>
+                <field name="livraison_ft" optional="show"/>
+                <field name="solde_ft" optional="show"/>
+                <field name="stock_lc" optional="show"/>
+                <field name="reception_lc" optional="show"/>
+                <field name="livraison_lc" optional="show"/>
+                <field name="solde_lc" optional="show"/>
+                <field name="solde" optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_preparation_transfert_entrepot_ligne_search" model="ir.ui.view">
+        <field name="name">is.preparation.transfert.entrepot.ligne.search</field>
+        <field name="model">is.preparation.transfert.entrepot.ligne</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+           </search>
+        </field>
+    </record>
+ 
+
+    <!-- is.preparation.transfert.entrepot -->
+    <record id="is_preparation_transfert_entrepot_form" model="ir.ui.view">
+        <field name="name">is.preparation.transfert.entrepot.form</field>
+        <field name="model">is.preparation.transfert.entrepot</field>
+        <field name="arch" type="xml">
+            <form>
+                <style>
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
+                <header>
+                    <field name="ligne_ids" invisible="1"/>
+                    <button
+                        name="actualiser_lignes_action"
+                        type="object"
+                        string="Actualiser les lignes"
+                        confirm="Confirmer ?"
+                        attrs="{'invisible': [('ligne_ids', '!=', [])]}"
+                    />
+                    <button
+                        name="voir_lignes_action"
+                        type="object"
+                        string="Voir les lignes"
+                        attrs="{'invisible': [('ligne_ids', '=', [])]}"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="date_debut"/>
+                            <field name="date_fin"/>
+                        </group>
+                        <group>
+                            <field name="date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="commentaire"/>
+                    </group>    
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_preparation_transfert_entrepot_tree" model="ir.ui.view">
+        <field name="name">is.preparation.transfert.entrepot.tree</field>
+        <field name="model">is.preparation.transfert.entrepot</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="commentaire"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_preparation_transfert_entrepot_search" model="ir.ui.view">
+        <field name="name">is.preparation.transfert.entrepot.search</field>
+        <field name="model">is.preparation.transfert.entrepot</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="date"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_preparation_transfert_entrepot_action" model="ir.actions.act_window">
+        <field name="name">Préparation transfert entrepôt</field>
+        <field name="res_model">is.preparation.transfert.entrepot</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_preparation_transfert_entrepot_menu"
+        name="Préparation transfert entrepôt"
+        parent="stock.menu_stock_warehouse_mgmt"
+        sequence="992"
+        action="is_preparation_transfert_entrepot_action"
+    />
+
+</odoo>
