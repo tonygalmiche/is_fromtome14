@@ -8,7 +8,7 @@ class is_preparation_transfert_entrepot_ligne(models.Model):
     _description = "Lignes préparation transfert entrepôt"
     _order='designation'
 
-    preparation_id = fields.Many2one('is.analyse.rupture', 'Analyse', required=True, ondelete='cascade')
+    preparation_id = fields.Many2one('is.preparation.transfert.entrepot', 'Préparation', required=True, ondelete='cascade')
     product_id     = fields.Many2one('product.product', 'Article')
     designation    = fields.Char("Désignation" )
     default_code   = fields.Char("Référence interne")
@@ -90,6 +90,7 @@ class is_preparation_transfert_entrepot(models.Model):
             filtre=[]
             products=self.env['product.product'].search(filtre, order="name")
             for product in products:
+
                 solde_ft = solde_lc = solde = 0
                 #** Recherche du stock par entrepôt ***************************
                 stock_ft=0
