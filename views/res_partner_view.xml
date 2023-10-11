@@ -201,6 +201,7 @@
                 <field name="property_account_payable_id"       optional="hide"/>
                 <field name="property_payment_term_id"          optional="hide"/>
                 <field name="property_supplier_payment_term_id" optional="hide"/>
+                <field name="property_product_pricelist"        optional="hide"/>
                 <field name="is_modele_commande_id"             optional="hide"/>
                 <field name="is_presentation_bl"                optional="hide"/>
                 <field name="is_transporteur_id"                optional="hide"/>

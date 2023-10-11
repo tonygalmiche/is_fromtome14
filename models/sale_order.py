@@ -302,6 +302,47 @@ class SaleOrderLine(models.Model):
     is_ref_fournisseur        = fields.Char(string='Réf Fournisseur', compute='_compute_ref', readonly=True, store=True)
 
 
+    def write(self, vals):
+        res = super().write(vals)
+        if 'product_uom_qty' in vals:
+            for obj in self:
+                filtre=[
+                    ('sale_line_id','=',obj.id),
+                ]
+                moves = self.env['stock.move'].search(filtre)
+                if len(moves)==1:
+                    for move in moves:
+                        if move.picking_id.state not in ['done','cancel']:
+                            move.product_uom_qty = vals["product_uom_qty"]
+        return res
+
+
+    @api.onchange('product_uom_qty')
+    def _onchange_product_uom_qty(self):
+        # When modifying a one2many, _origin doesn't guarantee that its values will be the ones
+        # in database. Hence, we need to explicitly read them from there.
+        if self._origin:
+            product_uom_qty_origin = self._origin.read(["product_uom_qty"])[0]["product_uom_qty"]
+        else:
+            product_uom_qty_origin = 0
+
+        if self.state == 'sale' and self.product_id.type in ['product', 'consu'] and self.product_uom_qty < product_uom_qty_origin:
+            # Do not display this warning if the new quantity is below the delivered
+            # one; the `write` will raise an `UserError` anyway.
+            if self.product_uom_qty < self.qty_delivered:
+                return {}
+            #warning_mess = {
+            #    'title': _('Ordered quantity decreased!'),
+            #    'message' : _('You are decreasing the ordered quantity! Do not forget to manually update the delivery order if needed.'),
+            #}
+            #return {'warning': warning_mess}
+        if self.product_packaging:
+            return self._check_package()
+        return {}
+
+
+
+
     def get_fournisseur_par_defaut(self):
         now = datetime.date.today()
         suppliers=self.env['product.supplierinfo'].search([('product_tmpl_id', '=', self.product_id.product_tmpl_id.id)])
