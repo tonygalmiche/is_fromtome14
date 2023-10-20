@@ -76,6 +76,9 @@
         <div class="text-center"  position="replace">
             <div class="text-center" style="font-size:10pt">
                 <div t-field="company.report_footer"/>
+                <t t-if="o and o.partner_id and o.partner_id.is_enseigne_id and o.partner_id.is_enseigne_id.rib">
+                    <div t-field="o.partner_id.is_enseigne_id.rib"/>
+                </t> 
                 <div t-if="report_type == 'pdf'">
                     Page: <span class="page"/> / <span class="topage"/>
                 </div>

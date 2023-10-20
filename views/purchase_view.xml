@@ -233,7 +233,7 @@
         id="is_edit_purchase_order_line_menu"
         name="Modif lignes de commandes"
         parent="purchase.menu_procurement_management"
-        sequence="900"
+        sequence="910"
         action="is_edit_purchase_order_line_action"
     />
 

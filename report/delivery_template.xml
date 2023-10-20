@@ -192,6 +192,10 @@
                         </tr>
                     </thead>
                 </table>
+                <t t-if="o.partner_id.is_enseigne_id.note_bl">
+                    <br />
+                    <strong><div t-field="o.partner_id.is_enseigne_id.note_bl"/></strong>
+                </t>
             </div>
         </div>
     </template>

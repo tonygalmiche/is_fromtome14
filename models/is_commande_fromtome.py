@@ -13,16 +13,16 @@ class IsCommandeFromtomeLigne(models.Model):
     _description = "Commande fromtome Lignes"
     _order='sequence,id'
 
-    commande_id      = fields.Many2one('is.commande.fromtome', 'Commande Fromtome', required=True, ondelete='cascade')
-    sequence         = fields.Integer("Ordre")
+    commande_id      = fields.Many2one('is.commande.fromtome', 'Cde', required=True, ondelete='cascade')
+    sequence         = fields.Integer("Ord")
     product_id       = fields.Many2one('product.product', 'Article')
     nb_pieces_par_colis = fields.Integer(string='PCB', related="product_id.is_nb_pieces_par_colis")
     uom_id           = fields.Many2one('uom.uom', "Unité")
     #uom_po_id        = fields.Many2one('uom.uom', "Unité d'achat")
     #factor_inv       = fields.Float("Multiple de", digits=(14,4))
-    sale_qty         = fields.Float("Qt commande client"          , digits=(14,4))
-    purchase_qty     = fields.Float("Qt Fromtome déja en commande", digits=(14,4))
-    product_qty      = fields.Float("Qt Fromtome à commander"     , digits=(14,4))
+    sale_qty         = fields.Float("Qt cde client"          , digits=(14,4))
+    purchase_qty     = fields.Float("Qt déja en cde", digits=(14,4))
+    product_qty      = fields.Float("Qt à cde"     , digits=(14,4))
     #product_po_qty   = fields.Float(u"Qt Fromtome à commander (UA)"     , digits=(14,4))
     stock            = fields.Float("Stock FT", digits=(14,2))
     stock_lc         = fields.Float("Stock LC", digits=(14,2))
