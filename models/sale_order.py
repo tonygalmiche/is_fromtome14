@@ -317,6 +317,27 @@ class SaleOrderLine(models.Model):
         return res
 
 
+    def _check_line_unlink(self):
+        "Permet de désactiver ce controle pour pouvoir supprimer des lignes de commandes"
+        res = self.filtered(lambda line: line.state in ('sale', 'done') and (line.invoice_lines or not line.is_downpayment) and not line.display_type)
+        return False
+
+
+    def unlink(self):
+        for obj in self:
+            moves=self.env['stock.move'].search([('sale_line_id', '=', obj.id)])
+            for move in moves:
+                if move.state not in ['cancel', 'done'] and move.picking_id.state not in ['cancel', 'done']:
+                    move._action_cancel()
+                    move.unlink()
+                    msg = "Suppression de la ligne et du mouvement de stock associé pour %s " % (obj.product_id.display_name)
+                    obj.order_id.message_post(body=msg)
+                else:
+                    raise UserError("Il n'est pas possible de supprimer une ligne livrée")
+        res = super(SaleOrderLine, self).unlink()
+        return res
+
+
     @api.onchange('product_uom_qty')
     def _onchange_product_uom_qty(self):
         # When modifying a one2many, _origin doesn't guarantee that its values will be the ones
