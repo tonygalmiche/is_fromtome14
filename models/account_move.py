@@ -184,3 +184,10 @@ class AccountMoveReversal(models.TransientModel):
     _inherit = 'account.move.reversal'
 
     is_motif_avoir_id = fields.Many2one('is.motif.avoir', "Motif de l'avoir")
+
+
+    @api.onchange('is_motif_avoir_id')
+    def onchange_action_curative_date(self):
+        for obj in self:
+            if obj.is_motif_avoir_id:
+                obj.reason=obj.is_motif_avoir_id.name

@@ -176,9 +176,65 @@
     </record>
 
 
-    <!-- is.motif.avoir -->
+    <!-- account.move.reversal -->
+    <record id="is_view_account_move_reversal" model="ir.ui.view">
+        <field name="name">is_view_account_move_reversal</field>
+        <field name="model">account.move.reversal</field>
+        <field name="inherit_id" ref="account.view_account_move_reversal" />
+        <field name="arch" type="xml">
+            <field name="reason" position="before">
+                <field name="is_motif_avoir_id"/>
+            </field>
+        </field>
+    </record>
 
-    <!-- account.account_invoicing_menu -->
+
+    <!-- is.motif.avoir -->
+    <record id="is_motif_avoir_tree_view" model="ir.ui.view">
+        <field name="name">is_motif_avoir_tree_view</field>
+        <field name="model">is.motif.avoir</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_motif_avoir_form_view" model="ir.ui.view">
+        <field name="name">is_motif_avoir_form_view</field>
+        <field name="model">is.motif.avoir</field>
+        <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <field name="name"/>
+                </group>
+            </sheet>
+        </form>
+        </field>
+    </record>
+    <record id="is_motif_avoir_search_view" model="ir.ui.view">
+        <field name="name">is_motif_avoir_search_view</field>
+        <field name="model">is.motif.avoir</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+    <record id="is_motif_avoir_action" model="ir.actions.act_window" >
+        <field name="name">Motif avoir</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">is.motif.avoir</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem 
+        id="is_motif_avoir_menu" 
+        name="Motif avoir" 
+        parent="account.account_invoicing_menu" 
+        sequence="30"
+        action="is_motif_avoir_action"
+    />
+
 
 
     
