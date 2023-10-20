@@ -6,6 +6,7 @@
 
             <div name="right_box" position="replace"/>
 
+            <h1 t-field="o.name" position="replace"/>
 
             <div name="div_sched_date" position="replace">
                 <div class="col-auto" name="div_sched_date">
