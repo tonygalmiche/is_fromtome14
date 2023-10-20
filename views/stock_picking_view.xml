@@ -333,6 +333,12 @@
             <xpath expr="//page[@name='operations']/field/tree" position="attributes">
                 <attribute name="limit">500</attribute>
             </xpath>
+
+            <xpath expr="//page[@name='operations']/field/tree/field[@name='product_id']" position="before">
+                <button name="voir_mouvement_action" type="object" title="Mouvement" icon="fa-search-plus"/>
+            </xpath> 
+
+
             <xpath expr="//page[@name='operations']/field/tree/field[@name='description_picking']" position="after">
                 <field name="is_description_cde" optional="show"/>
                 <field name="is_ref_fournisseur" optional="show"/>

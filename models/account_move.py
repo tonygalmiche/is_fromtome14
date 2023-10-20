@@ -173,3 +173,14 @@ class AccountPayment(models.Model):
     is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
 
 
+class IsMotifAvoir(models.Model):
+    _name = "is.motif.avoir"
+    _description = "Motif avoir"
+    _order = "name"
+    name = fields.Char("Motif avoir", required=True)
+
+
+class AccountMoveReversal(models.TransientModel):
+    _inherit = 'account.move.reversal'
+
+    is_motif_avoir_id = fields.Many2one('is.motif.avoir', "Motif de l'avoir")

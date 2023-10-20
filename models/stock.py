@@ -176,6 +176,22 @@ class StockMove(models.Model):
         return round(nb_colis)
 
 
+    def voir_mouvement_action(self):
+        for obj in self:
+            res= {
+                'name': 'Mouvement',
+                'view_mode': 'form,tree',
+                'view_type': 'form',
+                'res_model': 'stock.move',
+                'type': 'ir.actions.act_window',
+                'res_id':obj.id,
+            }
+            return res
+
+
+
+
+
 class StockScrap(models.Model):
     _inherit = "stock.scrap"
 

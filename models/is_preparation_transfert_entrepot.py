@@ -87,7 +87,9 @@ class is_preparation_transfert_entrepot(models.Model):
         warehouses = self.env['stock.warehouse'].search([])
         for obj in self:
             obj.ligne_ids.unlink()
-            filtre=[]
+            filtre=[
+                #('id','=', 1469),
+            ]
             products=self.env['product.product'].search(filtre, order="name")
             for product in products:
 
@@ -113,18 +115,33 @@ class is_preparation_transfert_entrepot(models.Model):
                 for warehouse in warehouses:
                     location_id =  warehouse.lot_stock_id.id
                     filtre=[
-                        ('location_dest_id', '=', location_id),
-                        ('state'             , 'not in', ['done','cancel']),
-                        ('product_id','=', product.id),
-                        ('date_deadline', '>='   , obj.date_debut),
-                        ('date_deadline', '<='   , obj.date_fin),
+                        ('location_dest_id', '='     , location_id),
+                        ('state'      , 'not in', ['done','cancel']),
+                        ('is_date_reception', '>='   , obj.date_debut),
+                        ('is_date_reception', '<='   , obj.date_fin),
                     ]
-                    moves=self.env['stock.move'].search(filtre)
-                    for move in moves:
-                        if warehouse.code=='LC':
-                            reception_lc+=move.product_qty
-                        if warehouse.code=='FT':
-                            reception_ft+=move.product_qty
+                    pickings=self.env['stock.picking'].search(filtre)
+                    print(pickings,filtre)
+                    for picking in pickings:
+                        for move in picking.move_ids_without_package:
+                            if move.state not in ['done','cancel'] and move.product_id==product:
+                                if warehouse.code=='LC':
+                                    reception_lc+=move.product_qty
+                                if warehouse.code=='FT':
+                                    reception_ft+=move.product_qty
+                    # filtre=[
+                    #     ('location_dest_id', '=', location_id),
+                    #     ('state'             , 'not in', ['done','cancel']),
+                    #     ('product_id','=', product.id),
+                    #     ('date_deadline', '>='   , obj.date_debut),
+                    #     ('date_deadline', '<='   , obj.date_fin),
+                    # ]
+                    # moves=self.env['stock.move'].search(filtre)
+                    # for move in moves:
+                    #     if warehouse.code=='LC':
+                    #         reception_lc+=move.product_qty
+                    #     if warehouse.code=='FT':
+                    #         reception_ft+=move.product_qty
                 #**************************************************************
 
                 #** Recherche des livraisons par entrepôt *********************
@@ -135,16 +152,30 @@ class is_preparation_transfert_entrepot(models.Model):
                     filtre=[
                         ('location_id', '='     , location_id),
                         ('state'      , 'not in', ['done','cancel']),
-                        ('product_id' , '='     , product.id),
-                        ('date_deadline', '>='   , obj.date_debut),
-                        ('date_deadline', '<='   , obj.date_fin),
+                        ('is_date_livraison', '>='   , obj.date_debut),
+                        ('is_date_livraison', '<='   , obj.date_fin),
                     ]
-                    moves=self.env['stock.move'].search(filtre)
-                    for move in moves:
-                        if warehouse.code=='LC':
-                            livraison_lc+=move.product_qty
-                        if warehouse.code=='FT':
-                            livraison_ft+=move.product_qty
+                    pickings=self.env['stock.picking'].search(filtre)
+                    for picking in pickings:
+                        for move in picking.move_ids_without_package:
+                            if move.state not in ['done','cancel'] and move.product_id==product:
+                                if warehouse.code=='LC':
+                                    livraison_lc+=move.product_qty
+                                if warehouse.code=='FT':
+                                    livraison_ft+=move.product_qty
+                    # filtre=[
+                    #     ('location_id', '='     , location_id),
+                    #     ('state'      , 'not in', ['done','cancel']),
+                    #     ('product_id' , '='     , product.id),
+                    #     ('date_deadline', '>='   , obj.date_debut),
+                    #     ('date_deadline', '<='   , obj.date_fin),
+                    # ]
+                    # moves=self.env['stock.move'].search(filtre)
+                    # for move in moves:
+                    #     if warehouse.code=='LC':
+                    #         livraison_lc+=move.product_qty
+                    #     if warehouse.code=='FT':
+                    #         livraison_ft+=move.product_qty
                 #**************************************************************
 
                 #** Solde *****************************************************
