@@ -310,7 +310,9 @@ class IsScanPicking(models.Model):
                             order_line.name = '## Ajouté en reception ##'
             #******************************************************************
 
+            poids_net_total=0
             for line in obj.line_ids:
+                poids_net_total+=line.poids
                 unite = line.uom_id.category_id.name
                 if unite=="Poids":
                     qty=line.poids
@@ -339,14 +341,22 @@ class IsScanPicking(models.Model):
                         test=True
                         break
                 if test:
+                    #** Calcul du poids si frais de port au kg ****************
+                    product_uom = obj.picking_id.sale_id.partner_id.is_frais_port_id.uom_id
+                    unite = product_uom.category_id.name
+                    if unite=="Poids":
+                        qty_done = poids_net_total
+                    else:
+                        qty_done = 1
+                    #**********************************************************
                     vals={
                         "picking_id"        : obj.picking_id.id,
                         "product_id"        : obj.picking_id.sale_id.partner_id.is_frais_port_id.id,
                         "company_id"        : obj.picking_id.company_id.id,
-                        "product_uom_id"    : obj.picking_id.sale_id.partner_id.is_frais_port_id.uom_id.id,
+                        "product_uom_id"    : product_uom.id,
                         "location_id"       : obj.picking_id.location_id.id,
                         "location_dest_id"  : obj.picking_id.location_dest_id.id,
-                        "qty_done"          : 1,
+                        "qty_done"          : qty_done,
                     }
                     res = self.env['stock.move.line'].create(vals)
             #******************************************************************

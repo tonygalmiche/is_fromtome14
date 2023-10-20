@@ -12,6 +12,11 @@ class StockProductionLot(models.Model):
     active           = fields.Boolean("Actif", default=True)
 
 
+    def _check_create(self):
+        "Autorise tout le temps la création des lots"
+        return True
+
+
     @api.constrains('name', 'product_id', 'company_id', 'is_dlc_ddm')
     def _check_unique_lot(self):
         domain = [
