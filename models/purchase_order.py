@@ -70,6 +70,7 @@ class PurchaseOrder(models.Model):
     #is_heure_envoi            = fields.Char(related='partner_id.is_heure_envoi')
     is_heure_envoi_id          = fields.Many2one(related='partner_id.is_heure_envoi_id')
     is_heure_envoi_mail        = fields.Datetime(string="Heure d'envoi du mail", compute='_compute_is_heure_envoi_mail' )
+    is_fusion_order_id         = fields.Many2one('purchase.order', 'Fusionnée dans', copy=False,readonly=True)
 
 
     @api.onchange('partner_id')
@@ -143,6 +144,80 @@ class PurchaseOrder(models.Model):
     def _message_auto_subscribe_notify(self, partner_ids, template):
         "Désactiver les notifications d'envoi des mails"
         return True
+
+
+    def fusion_commande_action(self):
+        "Permet de fusionner les commandes validées et non livrées de la même date et du même fournisseur"
+        dict={}
+        #** Recherche des commandes par fournissseur et par date **************
+        for obj in self:
+            if obj.partner_id and obj.date_planned and obj.state=='purchase':
+                test=False
+                for picking in obj.picking_ids:
+                    if picking.state not in ['done','cancel']:
+                        test=True
+                        break
+                if test:
+                    key = "%s-%s"%(obj.partner_id.id, obj.date_planned.strftime('%Y-%m-%d'))
+                    if key not in dict:
+                        dict[key]=[]
+                    dict[key].append(obj.id)
+        #*** Suppresion des clés avec une seule commande => Pas de fusion *****
+        for key in list(dict):
+            if len(dict[key])==1:
+                dict.pop(key)
+        #** Fusion des commandes **********************************************
+        for key in dict:
+            first_order=False
+            orders = dict[key]
+            #orders.sort() #Cela permet de conserver la première commande et d'annuler les autres
+            for order_id in orders:
+                order = self.env['purchase.order'].browse(order_id)
+                if not first_order:
+                    first_order=order
+                else:
+                    #** Recherche sequence pour mettre la ligne à la fin ******
+                    sequence=0
+                    for line in first_order.order_line:
+                        if line.sequence>sequence:
+                            sequence=line.sequence
+                    #**********************************************************
+                    for line in order.order_line:
+
+                        #** Recherche si ligne existe pour cet article ********
+                        test=False
+                        for l in first_order.order_line:
+                            if l.product_id == line.product_id:
+                                qty = line.product_qty + l.product_qty
+                                l.product_qty = qty
+                                test=True
+                                break
+                        #** Création d'une nouvelle ligne *********************
+                        if test==False:
+                            sequence+=10
+                            vals={
+                                'order_id'    : first_order.id,
+                                'sequence'    : sequence,
+                                'product_id'  : line.product_id.id,
+                                'name'        : line.name,
+                                'product_qty' : line.product_qty,
+                                'product_uom' : line.product_uom.id,
+                                'date_planned': line.date_planned,
+                                'price_unit'  : 0,
+                            }
+                            order_line=self.env['purchase.order.line'].create(vals)
+                            order_line.onchange_product_id()
+                            order_line.product_qty = line.product_qty
+
+                    order.button_cancel()
+                    order.is_fusion_order_id = first_order.id
+                    msg = "Commande annulée et fusionnée avec %s" % (first_order.name)
+                    order.message_post(body=msg)
+                    msg = "Fusion de la commande %s" % (order.name)
+                    first_order.message_post(body=msg)
+
+
+
 
 
 class PurchaseOrderLine(models.Model):

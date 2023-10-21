@@ -3,6 +3,13 @@
 
 
     <!-- purchase.order  -->
+    <record id="fusion_commande_action_server" model="ir.actions.server">
+        <field name="name">Fusionner les commandes</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+        <field name="state">code</field>
+        <field name="code">action = records.fusion_commande_action()</field>
+    </record>
     <record id="purchase_order_soldee_action_server" model="ir.actions.server">
         <field name="name">Mise à jour champ commmande soldée</field>
         <field name="model_id" ref="purchase.model_purchase_order"/>
@@ -128,7 +135,8 @@
             <xpath expr="//field[@name='partner_ref']" position="after">
                 <field name="is_adresse_livraison_id"/>
                 <field name="picking_type_id"/>
-                <field name="is_fromtome_order_id"/>
+                <field name="is_fromtome_order_id" attrs="{'invisible': [('is_fromtome_order_id', '=', False)]}"/>
+                <field name="is_fusion_order_id"   attrs="{'invisible': [('is_fusion_order_id', '=', False)]}"/>
                 <field name="is_heure_envoi_id"/>
             </xpath>
             <xpath expr="//field[@name='order_line']//tree//field[@name='product_uom']" position='attributes'>
@@ -142,6 +150,9 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
         <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="is_fusion_order_id" optional="show" widget="many2one_clickable" />
+            </field>
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id" optional="show"/>
             </field>
@@ -158,8 +169,14 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
         <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="is_fusion_order_id" optional="show" widget="many2one_clickable" />
+            </field>
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id" optional="show"/>
+            </field>
+            <field name="date_order" position="after">
+                <field name="date_planned"        optional="show"/>
             </field>
             <field name="state" position="before">
                 <field name="is_heure_envoi_id"   optional="hide"/>
@@ -175,6 +192,7 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id"/>
+                <field name="is_fusion_order_id"/>
             </field>
             <field name="product_id" position="after">
                 <field name="is_heure_envoi_id"/>
