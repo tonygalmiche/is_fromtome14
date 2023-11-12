@@ -89,6 +89,9 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+
+
+
                     <style>
                         .o_form_view .o_form_sheet_bg > .o_form_sheet{
                             max-width: 1800px;
@@ -107,7 +110,7 @@
                                 attrs="{'invisible': [('maj_code_ean_article_vsb', '=', False)]}"
                             />
 
-                            <field name="lot" readonly="1"/>
+                            <!-- <field name="lot" readonly="1"/> -->
                             <field name="ajouter"/>
 
                             <label for="picking_id"/>
@@ -123,6 +126,10 @@
                         </group>
                        <group>
                             <field name="product_id"/>
+
+                            <field name="lot" attrs="{'invisible': [('lot','=', False)]}"/>
+
+
                             <field 
                                 name="lot_id" 
                                 context="{

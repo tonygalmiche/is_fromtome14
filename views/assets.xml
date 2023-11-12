@@ -4,6 +4,8 @@
         <xpath expr="." position="inside">
             <link rel="stylesheet" href="/is_fromtome14/static/src/css/style.css" media="screen"/>
             <link rel="stylesheet" type="text/scss" href="/is_fromtome14/static/src/scss/style.scss"/>
+            <!--TODO : J'ai voulu remplacer la fonction start du module barcodes.BarcodeEvents mais cela n'a pas fonctionné -->
+            <!-- <script type="text/javascript" src="/is_fromtome14/static/barcodes/barcode_events.js"></script> -->
         </xpath>
     </template>
 </odoo>

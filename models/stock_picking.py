@@ -130,14 +130,22 @@ class IsScanPicking(models.Model):
             if obj.ean and not obj.product_id:
                 alertes.append("Article non trouvé pour ce code ean")
             obj.is_alerte = '\n'.join(alertes) or False
-            if obj.lot and not obj.lot_id:
-                alertes.append("Lot non trouvé")
+            if obj.lot and not obj.dlc_ddm and not obj.lot_id:
+                alertes.append("DLC/DDM non trouvée => Lot non valide")
+            else:
+                if obj.lot and not obj.lot_id:
+                    alertes.append("Lot non trouvé")
+
+
+
+
             obj.is_alerte = '\n'.join(alertes) or False
 
     @api.onchange('ajouter')
     def _onchange_ajouter(self):
         for obj in self:
             obj.ajouter_ligne()
+            obj.reset_scan()
 
     @api.onchange('lot_id')
     def _onchange_lot_id(self):
@@ -146,8 +154,9 @@ class IsScanPicking(models.Model):
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
-        for obj in self:
-            obj.poids = obj.product_id.is_poids_net_colis
+        if not self.env.context.get("noonchange"): 
+            for obj in self:
+                obj.poids = obj.product_id.is_poids_net_colis
 
 
     @api.depends('ean','product_id')
@@ -189,8 +198,30 @@ class IsScanPicking(models.Model):
             obj.nb_colis   = 1
 
 
-    def ajouter_ligne(self, creation_lot=False):
+    def ajouter_ligne(self): #, creation_lot=False):
         for obj in self:
+            creation_lot=False
+            if obj.product_id and obj.lot and obj.dlc_ddm:
+                filtre=[
+                    ('name'      ,'=', obj.lot ),
+                    ('product_id','=', obj.product_id.id),
+                    ('is_dlc_ddm','=', obj.dlc_ddm),
+                ]
+                lot = self.env['stock.production.lot'].search(filtre,limit=1)
+                if lot:
+                    lot_id = lot.id
+                else:
+                    vals={
+                        "company_id": 1,
+                        "name"      : obj.lot,
+                        "product_id": obj.product_id.id,
+                        "is_dlc_ddm": obj.dlc_ddm,
+                    }
+                    lot = self.env['stock.production.lot'].create(vals)
+                    lot_id = lot.id
+                    creation_lot=True
+                obj.lot_id = lot_id
+
             if obj.product_id and obj.lot_id and obj.dlc_ddm:
                 nb_colis = obj.nb_colis or 1
                 nb_pieces=obj.product_id.is_nb_pieces_par_colis*nb_colis
@@ -234,46 +265,115 @@ class IsScanPicking(models.Model):
 
     def on_barcode_scanned(self, barcode):
         for obj in self:
-            creation_lot=False
-            code   = str(barcode)[2:]
-            prefix = str(barcode)[:2]
-            if prefix in ("01","02"):
-                obj.reset_scan()
-                obj.ean = code
-                products = self.env['product.product'].search([('barcode', '=',code)])
-                for product in products:
-                    obj.product_id = product.id
-            if prefix=="10":
-                obj.lot = code.strip()
-            if prefix in ["15","17"]:
-                date = dateparser.parse(code, date_formats=['%y%m%d'])
-                obj.dlc_ddm = date.strftime('%Y-%m-%d')
-            if prefix=="31":
-                decimal = int(str(barcode)[3])
-                poids    = float(str(barcode)[4:-decimal] + '.' + str(barcode)[-decimal:])
-                obj.poids = poids
+            barcodes = barcode.split(chr(16))
+            for barcode in barcodes:
+                barcode_reste = False
+                code   = str(barcode)[2:]
+                prefix = str(barcode)[:2]
+                if prefix in ("01","02"):
+                    barcode_reste = barcode[16:]
+                    obj.reset_scan()
+                    ean = code[:14]
+                    obj.ean = ean
+                    products = self.env['product.product'].search([('barcode', '=',ean)])
+                    for product in products:
+                        self.env.context = self.with_context(noonchange=True).env.context
+                        obj.product_id = product.id
 
-            if obj.product_id and obj.lot and obj.dlc_ddm:
-                filtre=[
-                    ('name'      ,'=', obj.lot ),
-                    ('product_id','=', obj.product_id.id),
-                    ('is_dlc_ddm','=', obj.dlc_ddm),
-                ]
-                lot = self.env['stock.production.lot'].search(filtre,limit=1)
-                if lot:
-                    lot_id = lot.id
-                else:
-                    vals={
-                        "company_id": 1,
-                        "name"      : obj.lot,
-                        "product_id": obj.product_id.id,
-                        "is_dlc_ddm": obj.dlc_ddm,
-                    }
-                    lot = self.env['stock.production.lot'].create(vals)
-                    lot_id = lot.id
-                    creation_lot=True
-                obj.lot_id = lot_id
-            obj.ajouter_ligne(creation_lot=creation_lot)
+                #Lot : Longueur varialbe
+                if prefix=="10":
+                    obj.lot = code.strip()
+
+                if prefix in ["15","17"]:
+                    barcode_reste = barcode[8:]
+                    date = code[:6]
+                    date = dateparser.parse(date, date_formats=['%y%m%d'])
+                    obj.dlc_ddm = date.strftime('%Y-%m-%d')
+
+                if prefix=="31":
+                    barcode_reste = barcode[10:]
+                    barcode = barcode[0:10]
+                    decimal = int(str(barcode)[3])
+                    poids    = float(str(barcode)[4:-decimal] + '.' + str(barcode)[-decimal:])
+                    obj.poids = poids
+
+                if barcode_reste:
+                    obj.on_barcode_scanned(barcode_reste)
+
+            if not barcode_reste:
+                # if obj.product_id and obj.lot and obj.dlc_ddm:
+                #     filtre=[
+                #         ('name'      ,'=', obj.lot ),
+                #         ('product_id','=', obj.product_id.id),
+                #         ('is_dlc_ddm','=', obj.dlc_ddm),
+                #     ]
+                #     lot = self.env['stock.production.lot'].search(filtre,limit=1)
+                #     if lot:
+                #         lot_id = lot.id
+                #     else:
+                #         vals={
+                #             "company_id": 1,
+                #             "name"      : obj.lot,
+                #             "product_id": obj.product_id.id,
+                #             "is_dlc_ddm": obj.dlc_ddm,
+                #         }
+                #         lot = self.env['stock.production.lot'].create(vals)
+                #         lot_id = lot.id
+                #         creation_lot=True
+                #     obj.lot_id = lot_id
+
+
+                    unite = obj.product_id.uom_id.category_id.name
+                    test=False
+                    if unite=="Poids" and obj.poids>0:
+                        test=True
+                    if unite!="Poids":
+                        test=True
+                    if test:
+                        obj.ajouter_ligne() #creation_lot=creation_lot)
+
+
+    # def on_barcode_scanned(self, barcode):
+    #     for obj in self:
+    #         creation_lot=False
+    #         code   = str(barcode)[2:]
+    #         prefix = str(barcode)[:2]
+    #         if prefix in ("01","02"):
+    #             obj.reset_scan()
+    #             obj.ean = code
+    #             products = self.env['product.product'].search([('barcode', '=',code)])
+    #             for product in products:
+    #                 obj.product_id = product.id
+    #         if prefix=="10":
+    #             obj.lot = code.strip()
+    #         if prefix in ["15","17"]:
+    #             date = dateparser.parse(code, date_formats=['%y%m%d'])
+    #             obj.dlc_ddm = date.strftime('%Y-%m-%d')
+    #         if prefix=="31":
+    #             decimal = int(str(barcode)[3])
+    #             poids    = float(str(barcode)[4:-decimal] + '.' + str(barcode)[-decimal:])
+    #             obj.poids = poids
+    #         if obj.product_id and obj.lot and obj.dlc_ddm:
+    #             filtre=[
+    #                 ('name'      ,'=', obj.lot ),
+    #                 ('product_id','=', obj.product_id.id),
+    #                 ('is_dlc_ddm','=', obj.dlc_ddm),
+    #             ]
+    #             lot = self.env['stock.production.lot'].search(filtre,limit=1)
+    #             if lot:
+    #                 lot_id = lot.id
+    #             else:
+    #                 vals={
+    #                     "company_id": 1,
+    #                     "name"      : obj.lot,
+    #                     "product_id": obj.product_id.id,
+    #                     "is_dlc_ddm": obj.dlc_ddm,
+    #                 }
+    #                 lot = self.env['stock.production.lot'].create(vals)
+    #                 lot_id = lot.id
+    #                 creation_lot=True
+    #             obj.lot_id = lot_id
+    #         obj.ajouter_ligne(creation_lot=creation_lot)
 
 
     def maj_picking_action(self):
