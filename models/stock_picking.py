@@ -280,9 +280,6 @@ class IsScanPicking(models.Model):
                         self.env.context = self.with_context(noonchange=True).env.context
                         obj.product_id = product.id
 
-                #Lot : Longueur varialbe
-                if prefix=="10":
-                    obj.lot = code.strip()
 
                 if prefix in ["15","17"]:
                     barcode_reste = barcode[8:]
@@ -296,6 +293,18 @@ class IsScanPicking(models.Model):
                     decimal = int(str(barcode)[3])
                     poids    = float(str(barcode)[4:-decimal] + '.' + str(barcode)[-decimal:])
                     obj.poids = poids
+
+                #TODO : 15/11/23 : Normalement le champ 37 est de Longueur variable, mais le MOELLEUX D'ARINTHOD ne met pas de séparateur
+                #⁼> Dans ce cas, je recherche si le champ '10 (Lot)' est disponible juste après 1 caractère
+                if prefix=="37":
+                    if code[1:3]=="10":
+                        barcode_reste = code[1:]
+
+                #Lot : Longueur variable => Prendre tout le reste
+                if prefix=="10":
+                    obj.lot = code.strip()
+
+
 
                 if barcode_reste:
                     obj.on_barcode_scanned(barcode_reste)
