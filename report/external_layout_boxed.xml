@@ -59,6 +59,16 @@
                                 <t t-if="doc_model in ['stock.picking']">
                                     - <span t-field="o.name"/>
                                 </t>
+                                <t t-if="doc_model in ['account.move']">
+                                    <span> - </span>
+                                    <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">Facture</span>
+                                    <span t-if="o.move_type == 'out_invoice' and o.state == 'draft'">Facture brouillon</span>
+                                    <span t-if="o.move_type == 'out_invoice' and o.state == 'cancel'">Facture annulée</span>
+                                    <span t-if="o.move_type == 'out_refund'">Avoir</span>
+                                    <span t-if="o.move_type == 'in_refund'">Avoir Fournisseur</span>
+                                    <span t-if="o.move_type == 'in_invoice'">Facture Fournisseur</span>
+                                    <span t-if="o.name != '/'" t-field="o.name"/>
+                                </t>
                             </h5> 
                             <span t-field="o.partner_id.is_enseigne_id.name.street"/>
                             <t t-if="o.partner_id.is_enseigne_id.name.street2">

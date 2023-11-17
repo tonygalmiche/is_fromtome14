@@ -61,6 +61,7 @@ class IsExportCompta(models.Model):
             for invoice in invoices:
                 invoice.is_export_compta_id=False
             obj.ligne_ids.unlink()
+            self._cr.commit()
             sql="""
                 SELECT  
                     aj.name,
@@ -135,8 +136,16 @@ class IsExportCompta(models.Model):
 
             if obj.escompte:
                 payments = self.env['account.payment'].search([('is_export_compta_id','=',obj.id)])
+
+                print(payments)
+
+
                 for payment in payments:
                     payment.is_export_compta_id=False
+                self._cr.commit()
+
+
+
                 sql="""
                     SELECT  
                         am.partner_id,
@@ -163,8 +172,16 @@ class IsExportCompta(models.Model):
                         aa.code is not null
                     ORDER BY am.date
                 """
+
+                print(sql)
+
+
                 cr.execute(sql)
                 for row in cr.fetchall():
+
+                    print(row)
+
+
                     payment_id = row[10]
                     payments = self.env['account.payment'].search([('id','=',payment_id)])
                     partner=False
