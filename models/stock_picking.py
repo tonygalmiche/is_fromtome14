@@ -33,19 +33,21 @@ class IsScanPickingLine(models.Model):
             if obj.lot_id and obj.lot_id.is_dlc_ddm:
                 now = datetime.now().date()
                 if obj.lot_id.is_dlc_ddm<now:
-                    alertes.append("DLC/DDM dépassée")
+                    depassement = (now-obj.lot_id.is_dlc_ddm).days
+                    alertes.append("DLC/DDM dépassée de %s jours"%depassement)
                 if obj.product_id:
                     contrats = self.env['contrat.date.client'].search([('product_id', '=',obj.product_id.product_tmpl_id.id)])
                     for contrat in contrats:
+                        date_limite = now+timedelta(days=contrat.name)
+                        depassement = (date_limite-obj.lot_id.is_dlc_ddm).days
                         if not contrat.partner_id:
-                            date_limite = obj.lot_id.is_dlc_ddm-timedelta(days=contrat.name)
-                            if date_limite<=now:
-                                alertes.append("Contrat date de %s jours dépassé (Date limite=%s)"%(contrat.name,date_limite.strftime('%d/%m/%Y')))
+                            #date_limite = obj.lot_id.is_dlc_ddm-timedelta(days=contrat.name)
+                            if obj.lot_id.is_dlc_ddm<=date_limite:
+                                alertes.append("Contrat date de %s jours dépassé de %s jours (Date mini DLC=%s)"%(contrat.name, depassement, date_limite.strftime('%d/%m/%Y')))
                         else:
                             if obj.scan_id.picking_id:
                                 if  obj.scan_id.picking_id.partner_id==contrat.partner_id:
-                                    date_limite = obj.lot_id.is_dlc_ddm-timedelta(days=contrat.name)
-                                    alertes.append("Contrat date client de %s jours dépassé (Date limite=%s)"%(contrat.name,date_limite.strftime('%d/%m/%Y')))
+                                    alertes.append("Contrat date client de %s jours dépassé de %s jours (Date mini DLC=%s)"%(contrat.name, depassement, date_limite.strftime('%d/%m/%Y')))
             obj.alerte = '\n'.join(alertes) or False
 
 
@@ -268,17 +270,10 @@ class IsScanPicking(models.Model):
     def on_barcode_scanned(self, barcode):
         for obj in self:
             barcodes = barcode.split(chr(16))
-
-            print(barcodes)
-
             for barcode in barcodes:
                 barcode_reste = False
                 code   = str(barcode)[2:]
                 prefix = str(barcode)[:2]
-
-                print(barcode, prefix,code)
-
-
                 if prefix in ("01","02"):
                     barcode_reste = barcode[16:]
                     obj.reset_scan()
@@ -288,12 +283,7 @@ class IsScanPicking(models.Model):
                     for product in products:
                         self.env.context = self.with_context(noonchange=True).env.context
                         obj.product_id = product.id
-
-
                 if prefix in ["15","17"]:
-
-
-
                     barcode_reste = barcode[8:]
                     date = code[:6]
                     date = dateparser.parse(date, date_formats=['%y%m%d'])
@@ -315,11 +305,6 @@ class IsScanPicking(models.Model):
                 #Lot : Longueur variable => Prendre tout le reste
                 if prefix=="10":
                     obj.lot = code.strip()
-
-
-                    print("Lot : ",code)
-
-
                 if barcode_reste:
                     obj.on_barcode_scanned(barcode_reste)
 

@@ -174,8 +174,8 @@
                             <field name="poids"             sum="Total"  optional="show"/>
                             <field name="alerte"                         optional="show"/>
                             <field name="info"        style="color:gray" optional="show"/>
-                            <field name="write_date"                     optional="hide" string="Modifié par"/>
-                            <field name="write_uid"                      optional="hide" string="Le"/>
+                            <field name="write_uid"                      optional="hide" string="Modifié par"/>
+                            <field name="write_date"                     optional="hide" string="Le"/>
                         </tree>
                     </field>
                     <field name="product_ids" nolabel="1" readonly="1">
@@ -285,8 +285,8 @@
                 <field name="poids"               optional="show" sum="Total"/>
                 <field name="alerte"              optional="show"/>
                 <field name="info"                optional="show"/>
-                <field name="write_date"          optional="hide" string="Modifié par"/>
-                <field name="write_uid"           optional="hide" string="Le"/>
+                <field name="write_uid"           optional="hide" string="Modifié par"/>
+                <field name="write_date"          optional="hide" string="Le"/>
             </tree>
         </field>
     </record>
@@ -313,23 +313,6 @@
             </pivot>
         </field>
     </record>
-
-
-
-    <!-- <record id="is_account_invoice_line_pivot" model="ir.ui.view">
-        <field name="name">is_account_invoice_line_pivot</field>
-        <field name="model">is.account.invoice.line</field>
-        <field name="arch" type="xml">
-            <pivot>
-                <field name="date_invoice"   type="col"/>
-                <field name="partner_id"     type="row"/>
-                <field name="price_subtotal" type="measure"/>
-            </pivot>
-        </field>
-    </record> -->
-
-
-
     <record id="is_scan_picking_line_search" model="ir.ui.view">
         <field name="name">is_scan_picking_line_search</field>
         <field name="model">is.scan.picking.line</field>
