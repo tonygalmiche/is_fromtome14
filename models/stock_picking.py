@@ -54,7 +54,9 @@ class IsScanPickingLine(models.Model):
         for obj in self:
             obj.product_name = obj.product_id.name
 
-    scan_id             = fields.Many2one('is.scan.picking', 'Picking', required=True, ondelete='cascade')
+    scan_id             = fields.Many2one('is.scan.picking', 'Scan', required=True, ondelete='cascade')
+    picking_id          = fields.Many2one('stock.picking', 'Picking', related='scan_id.picking_id')
+    picking_type_id     = fields.Many2one('stock.picking.type', "Type d'opération", related='scan_id.picking_id.picking_type_id')
     product_id          = fields.Many2one('product.product', 'Article', required=True)
     product_name        = fields.Text('Désignation article', compute=_compute_product_name, readonly=True, store=True)
     product_code        = fields.Char('Code'                , related='product_id.default_code')
@@ -266,10 +268,17 @@ class IsScanPicking(models.Model):
     def on_barcode_scanned(self, barcode):
         for obj in self:
             barcodes = barcode.split(chr(16))
+
+            print(barcodes)
+
             for barcode in barcodes:
                 barcode_reste = False
                 code   = str(barcode)[2:]
                 prefix = str(barcode)[:2]
+
+                print(barcode, prefix,code)
+
+
                 if prefix in ("01","02"):
                     barcode_reste = barcode[16:]
                     obj.reset_scan()
@@ -282,6 +291,9 @@ class IsScanPicking(models.Model):
 
 
                 if prefix in ["15","17"]:
+
+
+
                     barcode_reste = barcode[8:]
                     date = code[:6]
                     date = dateparser.parse(date, date_formats=['%y%m%d'])
@@ -304,6 +316,8 @@ class IsScanPicking(models.Model):
                 if prefix=="10":
                     obj.lot = code.strip()
 
+
+                    print("Lot : ",code)
 
 
                 if barcode_reste:
