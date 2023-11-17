@@ -133,19 +133,11 @@ class IsExportCompta(models.Model):
                 }
                 self.env['is.export.compta.ligne'].create(vals)
 
-
             if obj.escompte:
                 payments = self.env['account.payment'].search([('is_export_compta_id','=',obj.id)])
-
-                print(payments)
-
-
                 for payment in payments:
                     payment.is_export_compta_id=False
                 self._cr.commit()
-
-
-
                 sql="""
                     SELECT  
                         am.partner_id,
@@ -158,7 +150,8 @@ class IsExportCompta(models.Model):
                         aml.credit,
                         rp.name,
                         rp.ref,
-                        aml.payment_id
+                        aml.payment_id,
+                        am.invoice_date
                     FROM account_move_line aml inner join account_move am                on aml.move_id=am.id
                                             inner join account_account aa             on aml.account_id=aa.id
                                             left outer join res_partner rp            on aml.partner_id=rp.id
@@ -172,16 +165,8 @@ class IsExportCompta(models.Model):
                         aa.code is not null
                     ORDER BY am.date
                 """
-
-                print(sql)
-
-
                 cr.execute(sql)
                 for row in cr.fetchall():
-
-                    print(row)
-
-
                     payment_id = row[10]
                     payments = self.env['account.payment'].search([('id','=',payment_id)])
                     partner=False
