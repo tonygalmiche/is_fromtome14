@@ -202,6 +202,54 @@
                     attrs="{'invisible': [('is_creer_commande_fournisseur_vsb', '=', False)]}"
                 />
             </xpath>
+
+
+
+
+
+
+            <field name="order_line" position="before">
+                <div style="margin-bottom:10px">
+                    <button 
+                        name="trier_par_designation_action" 
+                        type="object"
+                        string="Trier par désignation"
+                        class="oe_inline btn btn-sm btn-secondary"
+                        style="margin-right:10px"
+                    />
+                    <button 
+                        name="trier_par_ref_fromtome_action" 
+                        type="object"
+                        string="Trier par référence Fromtome"
+                        class="oe_inline btn btn-sm btn-secondary"
+                        style="margin-right:10px"
+                    />
+                    <button 
+                        name="trier_par_ref_fournisseur_action" 
+                        type="object"
+                        string="Trier par référence fournisseur"
+                        class="oe_inline btn btn-sm btn-secondary"
+                        style="margin-right:10px"
+                    />
+                    <button 
+                        name="trier_par_poids_action" 
+                        type="object"
+                        string="Trier par poids colis décroissant"
+                        class="oe_inline btn btn-sm btn-secondary"
+                        style="margin-right:10px"
+                    />
+                </div>
+            </field>
+
+
+
+
+
+
+
+
+
+
             <xpath expr="//notebook/page/field/tree" position="attributes">
                  <attribute name="limit">1000</attribute>
             </xpath>
