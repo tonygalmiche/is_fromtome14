@@ -40,7 +40,9 @@
                 <field name="is_dlc_ddm"/>
                 <field name="product_qty" sum="Total"/>
                 <field name="create_date"/>
+                <field name="create_uid"/>
                 <field name="write_date"/>
+                <field name="write_uid"/>
             </tree>
         </field>
     </record>

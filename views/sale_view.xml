@@ -282,11 +282,14 @@
                 <attribute name="invisible">1</attribute>
             </xpath>
             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom_qty']" position="before">
-                <field name="is_colis_cde" optional="show"/>
+                <field name="is_colis_cde" optional="show" sum="Total"/>
             </xpath>
-             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='price_unit']" position="before">
+            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='qty_delivered']" position="after">
+                <field name="is_colis_liv" optional="hide" sum="Total"/>
+            </xpath>
+            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='price_unit']" position="before">
                 <field name="is_nb_pieces_par_colis" optional="hide"/>
-                <field name="is_nb_colis" sum="Total"/>
+                <!-- <field name="is_nb_colis" sum="Total"/> -->
                 <field name="is_poids_net"  sum="Total" optional="hide"/>
             </xpath>
             <xpath expr="//form/sheet/notebook/page/field/form/group/group/field[@name='tax_id']" position="before">

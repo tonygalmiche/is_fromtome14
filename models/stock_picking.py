@@ -468,7 +468,7 @@ class IsScanPicking(models.Model):
                     }
                     res = self.env['stock.move.line'].create(vals)
             #******************************************************************
-
+            obj.picking_id._compute_is_alerte()
 
     def maj_inventory_action(self):
         cr,uid,context,su = self.env.args
@@ -539,15 +539,18 @@ class Picking(models.Model):
             date_picking=False
             poids_picking=False
             for line in obj.move_ids_without_package:
-                if not date_picking:
-                    date_picking=line.write_date
-                if date_picking<line.write_date:
-                    date_picking=line.write_date
                 unite = line.product_id.uom_id.category_id.name
                 if unite=="Poids":
                     poids_picking+=line.quantity_done
                     if line.quantity_done!=line.is_poids_net_reel:
                         alertes.append("[%s] Poids net réel différent de Fait (%.4f!=%.4f)"%(line.product_id.default_code, line.is_poids_net_reel, line.quantity_done))
+
+            for line in obj.move_line_ids_without_package:
+                if not date_picking:
+                    date_picking=line.write_date
+                if date_picking<line.write_date:
+                    date_picking=line.write_date
+ 
             if date_scan and date_picking:
                 if date_scan>date_picking:
                     alertes.append("La 'Mise à jour du picking' n'a pas été faite, car le scan est plus récent que le picking")
@@ -555,6 +558,11 @@ class Picking(models.Model):
                 if round(poids_scan,4)!=round(poids_picking,4):
                     alertes.append("Le poids du scan (%.2f) est différent du poids du picking (%.2f)"%(poids_scan,poids_picking))
             obj.is_alerte = '\n'.join(alertes) or False
+
+
+
+
+
 
 
     @api.depends('move_line_ids_without_package','state')

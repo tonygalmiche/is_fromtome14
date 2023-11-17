@@ -290,6 +290,20 @@ class SaleOrderLine(models.Model):
             obj.is_ref_fournisseur = obj.product_id.is_ref_fournisseur
 
 
+    @api.depends('product_id','name','product_uom_qty','qty_delivered')
+    def _compute_is_colis_liv(self):
+        for obj in self:
+            colis_liv = 0
+            filtre=[
+                ('sale_line_id','=',obj.id),
+                ('state'       ,'=','done'),
+            ]
+            moves = self.env['stock.move'].search(filtre)
+            for move in moves:
+                print(move,move.state, move.is_nb_colis)
+                colis_liv+= move.is_nb_colis
+            obj.is_colis_liv = colis_liv
+
     is_purchase_line_id       = fields.Many2one('purchase.order.line', string=u'Ligne commande fournisseur', index=True, copy=False)
     is_date_reception         = fields.Date(string=u'Date réception')
     is_livraison_directe      = fields.Boolean(string=u'Livraison directe', help=u"Si cette case est cochée, une commande fournisseur spécifique pour ce client sera créée",default=False)
@@ -300,6 +314,9 @@ class SaleOrderLine(models.Model):
     is_correction_prix_achat  = fields.Float(string="Correction Prix d'achat", digits='Product Price', help="Utilsé dans 'Lignes des mouvements valorisés'")
     is_default_code           = fields.Char(string='Réf Fromtome'   , compute='_compute_ref', readonly=True, store=True)
     is_ref_fournisseur        = fields.Char(string='Réf Fournisseur', compute='_compute_ref', readonly=True, store=True)
+
+    is_colis_liv              = fields.Float(string='Colis Liv', digits=(14,2), compute='_compute_is_colis_liv', readonly=True, store=False)
+
 
 
     def write(self, vals):
