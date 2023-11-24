@@ -150,6 +150,20 @@
         </field>
     </record>
 
+
+    <!-- account.move.line -->
+    <record id="is_account_view_move_line_form" model="ir.ui.view">
+        <field name="name">is_account_view_move_line_form</field>
+        <field name="model">account.move.line</field>
+        <field name="inherit_id" ref="account.view_move_line_form" />
+        <field name="arch" type="xml">
+            <field name="quantity" position="after">
+                <field name="is_poids_net" readonly="False"/>
+            </field>
+        </field>
+    </record>
+
+
     <!-- account.payment -->
     <record id="is_view_account_payment_tree" model="ir.ui.view">
         <field name="name">is_view_account_payment_tree</field>

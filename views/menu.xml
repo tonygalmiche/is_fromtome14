@@ -54,7 +54,7 @@
 
 
     <menuitem
-        name="Poids net facturé par semaine hors Fromtome"
+        name="Poids net facturé par semaine FT+LF (hors JERMI)"
         id="poids_net_facture_menu"
         parent="is_analyse_facturation_main_menu"
         sequence="20"

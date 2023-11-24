@@ -143,9 +143,9 @@
                 <filter name="group_by_product_id"   string="Article"         context="{'group_by': 'product_id'}"/>
                 <filter name="group_by_invoice_date" string="Date"            context="{'group_by': 'invoice_date'}"/>
                 <filter name="filter_bloquer"        string="Bloquer"         domain="[('bloquer', '=', True)]"/>
-                <filter name="hors_fromtome"         string="Hors Fromtome"   domain="[('enseigne' , 'in', ['CELLIER DU FROMAGER','LE FROMELIER'])]"/>
                 <filter name="facture_client"        string="Factures client" domain="[('move_type', 'in', ['Facture client'])]"/>
-                <filter name="facture_client_hors_fromtome" string="Factures client hors Fromtome" domain="[('enseigne' , 'in', ['CELLIER DU FROMAGER','LE FROMELIER']),('move_type', 'in', ['Facture client'])]"/>
+                <filter name="facture_client_ft_lf_jermi" string="Factures client FT+LF (hors JERMI)" domain="[('partner_id' , 'not ilike', 'JERMI'),('enseigne' , 'in', ['FROMTOME','LE FROMELIER']),('move_type', 'in', ['Facture client'])]"/>
+                <filter name="facture_client_lc"          string="Factures client LC" domain="[('enseigne' , 'in', ['CELLIER DU FROMAGER']),('move_type', 'in', ['Facture client'])]"/>
            </search>
         </field>
     </record>
@@ -202,11 +202,11 @@
         </field>
     </record>
     <record  id="poids_net_facture_action" model="ir.actions.act_window">
-        <field name="name">Poids net facturé par semaine hors Fromtome</field>
+        <field name="name">Poids net facturé par semaine FT+LF (hors JERMI)</field>
         <field name="res_model">is.analyse.facturation</field>
         <field name="view_mode">graph,pivot,tree,form</field>
         <field name="domain">[]</field>
-        <field name="context">{'search_default_facture_client_hors_fromtome':1}</field>
+        <field name="context">{'search_default_facture_client_ft_lf_jermi':1}</field>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'graph', 'view_id': ref('poids_net_facture_graph')}),
                 (0, 0, {'view_mode': 'pivot', 'view_id': ref('poids_net_facture_pivot')}),
