@@ -292,6 +292,7 @@ records.exporter_article_fromelier_action()
                 <!-- <field name="mode_vente" /> -->
                 <field name="is_nb_pieces_par_colis"/>
                 <field name="is_poids_net_colis"/>
+                <field name="is_forcer_poids_colis"/>
                 <!-- <label for="product_weight"  string="Poids Net / Colis"/>
                 <div class="o_row" name="product_weight">
                     <field name="product_weight"/>

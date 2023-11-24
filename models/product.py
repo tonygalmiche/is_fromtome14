@@ -262,6 +262,8 @@ class ProductTemplate(models.Model):
 
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis')
     is_poids_net_colis     = fields.Float(string='Poids net colis (Kg)', digits='Stock Weight')
+    is_forcer_poids_colis  = fields.Boolean(string='Forcer le scan au poids du colis', default=False, help="Cocher cette case si l'article est configuré par erreur au poids alors qu'il fallait le configuer à la pièce")
+
 
 
     is_note_importation = fields.Text(string='Note importation Fusion Fromtome / Le Cellier')

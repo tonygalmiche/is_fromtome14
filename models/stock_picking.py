@@ -38,7 +38,8 @@ class IsScanPickingLine(models.Model):
                 now = datetime.now().date()
                 if obj.lot_id.is_dlc_ddm<now:
                     depassement = (now-obj.lot_id.is_dlc_ddm).days
-                    alertes.append("DLC/DDM dépassée de %s jours"%depassement)
+                    if depassement>=0:
+                        alertes.append("DLC/DDM dépassée de %s jours"%depassement)
                 if obj.product_id:
                     contrats = self.env['contrat.date.client'].search([('product_id', '=',obj.product_id.product_tmpl_id.id)])
                     for contrat in contrats:
@@ -47,11 +48,13 @@ class IsScanPickingLine(models.Model):
                         if not contrat.partner_id:
                             #date_limite = obj.lot_id.is_dlc_ddm-timedelta(days=contrat.name)
                             if obj.lot_id.is_dlc_ddm<=date_limite:
-                                alertes.append("Contrat date de %s jours dépassé de %s jours (Date mini DLC=%s)"%(contrat.name, depassement, date_limite.strftime('%d/%m/%Y')))
+                                if depassement>=0:
+                                    alertes.append("Contrat date de %s jours dépassé de %s jours (Date mini DLC=%s)"%(contrat.name, depassement, date_limite.strftime('%d/%m/%Y')))
                         else:
                             if obj.scan_id.picking_id:
                                 if  obj.scan_id.picking_id.partner_id==contrat.partner_id:
-                                    alertes.append("Contrat date client de %s jours dépassé de %s jours (Date mini DLC=%s)"%(contrat.name, depassement, date_limite.strftime('%d/%m/%Y')))
+                                    if depassement>=0:
+                                        alertes.append("Contrat date client de %s jours dépassé de %s jours (Date mini DLC=%s)"%(contrat.name, depassement, date_limite.strftime('%d/%m/%Y')))
             obj.alerte = '\n'.join(alertes) or False
 
 
@@ -133,20 +136,15 @@ class IsScanPicking(models.Model):
                 if nb_creation_lot:
                     alertes.append("Attention : Vous avez créé %s nouveaux lots sur cette livraison ce qui n'est pas normal"%nb_creation_lot)
 
-
-
             if obj.ean and not obj.product_id:
                 alertes.append("Article non trouvé pour ce code ean")
-            obj.is_alerte = '\n'.join(alertes) or False
-            if obj.lot and not obj.dlc_ddm and not obj.lot_id:
+            #obj.is_alerte = '\n'.join(alertes) or False
+            #if obj.lot and not obj.lot_id:
+            #    alertes.append("Lot non trouvé ou non valide (manque DLC/DDM ou poids)")
+            if obj.lot and not obj.lot_id and not obj.dlc_ddm :
                 alertes.append("DLC/DDM non trouvée => Lot non valide")
-            else:
-                if obj.lot and not obj.lot_id:
-                    alertes.append("Lot non trouvé")
-
-
-
-
+            if obj.lot and not obj.lot_id and not obj.poids:
+                alertes.append("Poids non trouvé pour un article vendu au poids")
             obj.is_alerte = '\n'.join(alertes) or False
 
     @api.onchange('ajouter')
@@ -338,6 +336,8 @@ class IsScanPicking(models.Model):
                     unite = obj.product_id.uom_id.category_id.name
                     test=False
                     if unite=="Poids" and obj.poids>0:
+                        test=True
+                    if unite=="Poids" and obj.product_id.is_forcer_poids_colis:
                         test=True
                     if unite!="Poids":
                         test=True
