@@ -31,6 +31,46 @@
     />
 
 
+    <!-- Analyses -->
+    <menuitem
+        name="Analyses"
+        id="is_analyse_top_menu"
+        sequence="306"
+        groups="account.group_account_manager" 
+    />
+    <menuitem
+        name="Analyse facturation"
+        id="is_analyse_facturation_main_menu"
+        parent="is_analyse_top_menu"
+        sequence="10"
+    />
+    <menuitem
+        name="Analyse facturation"
+        id="is_analyse_facturation_menu"
+        parent="is_analyse_facturation_main_menu"
+        sequence="10"
+        action="is_analyse_facturation_action"
+    />
+
+
+    <menuitem
+        name="Poids net facturé par semaine hors Fromtome"
+        id="poids_net_facture_menu"
+        parent="is_analyse_facturation_main_menu"
+        sequence="20"
+        action="poids_net_facture_action"
+    />
+
+
+    <menuitem
+        id="is_analyse_facturation_update_menu"
+        name="Mise à jour analyse facturation"
+        parent="is_analyse_facturation_main_menu"
+        sequence="900"
+        action="is_analyse_facturation_update_action"
+    />
+
+    
 
 
     <!-- Déplacement des menus inutiles -->
