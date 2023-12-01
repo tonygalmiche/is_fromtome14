@@ -42,6 +42,8 @@ class IsCommandeFromtome(models.Model):
     stock_mini   = fields.Boolean(u"Stock mini", default=True, help=u"Si cette case est cochée, il faut tenir compte du stock mini")
     order_id     = fields.Many2one('purchase.order', u'Commande Fromtome')
     ligne_ids    = fields.One2many('is.commande.fromtome.ligne', 'commande_id', u'Lignes')
+    date_fin     = fields.Date("Date de fin de prise en compte des commandes", required=True, default=lambda self: fields.Datetime.now()+timedelta(7), 
+                        help="Date prise en compte:\nCommande client: Date livraison client entête\nCommande fournisseur: Date de réception entête")
 
 
     @api.model
@@ -93,11 +95,12 @@ class IsCommandeFromtome(models.Model):
                             so.state='sale' and
                             (so.is_commande_soldee='f' or so.is_commande_soldee is null) and 
                             so.is_date_livraison>='2020-10-01' and
+                            so.is_date_livraison<=%s and 
                             sol.product_id=%s and rp.is_enseigne_id=%s
                         GROUP BY pt.default_code,sol.product_id 
                         ORDER BY pt.default_code,sol.product_id
                     """
-                    cr.execute(sql,[product.id,obj.enseigne_id.id])
+                    cr.execute(sql,[obj.date_fin, product.id,obj.enseigne_id.id])
                     sale_qty = 0
                     for row in cr.fetchall():
                         sale_qty = row[2]
@@ -117,13 +120,14 @@ class IsCommandeFromtome(models.Model):
                         WHERE 
                             po.state not in ('done','cancel','draft') and
                             po.date_planned>='2020-10-01' and
+                            po.date_planned<=%s and 
                             pol.product_id=%s and
                             po.is_commande_soldee='f'
                     """
                     # po.partner_id=%s
 
                     #(select sum(product_uom_qty) from stock_move sm where sm.purchase_line_id=pol.id and state='done')
-                    cr.execute(sql,[product.id])  # ,obj.partner_id.id
+                    cr.execute(sql,[obj.date_fin,product.id])  # ,obj.partner_id.id
                     purchase_qty = 0
                     for row in cr.fetchall():
                         qt = row[2]-(row[3] or 0)

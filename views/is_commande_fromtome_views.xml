@@ -37,11 +37,11 @@
                 <field name="product_id"                          widget="many2one_clickable"/>
                 <field name="uom_id"              optional="show"/>
                 <field name="stock_mini"          optional="show"/>
-                <field name="stock"               optional="show"/>
-                <field name="stock_lc"            optional="show"/>
-                <field name="sale_qty"            optional="show"/>
-                <field name="purchase_qty"        optional="show"/>
-                <field name="product_qty"         optional="show"/>
+                <field name="stock"               optional="show" sum="Total"/>
+                <field name="stock_lc"            optional="show" sum="Total"/>
+                <field name="sale_qty"            optional="show" sum="Total"/>
+                <field name="purchase_qty"        optional="show" sum="Total"/>
+                <field name="product_qty"         optional="show" sum="Total"/>
                 <field name="nb_pieces_par_colis" optional="show"/>
                 <field name="create_date"         optional="hide"/>
                 <field name="write_date"          optional="hide"/>
@@ -112,6 +112,7 @@
                 <sheet>
                     <group>
                         <field name="name"/>
+                        <field name="date_fin"/>
                         <field name="enseigne_id"/>
                         <field name="warehouse_id"/>
                         <field name="partner_id"/>
@@ -128,6 +129,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
+                <field name="date_fin"/>
                 <field name="enseigne_id"/>
                 <field name="warehouse_id"/>
                 <field name="partner_id"/>
