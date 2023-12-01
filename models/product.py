@@ -251,7 +251,6 @@ class ProductTemplate(models.Model):
     is_germe_ids                 = fields.One2many('is.germe.line'                , 'product_id', "Germes" , copy=True)
     is_valeur_nutritionnelle_ids = fields.One2many('is.valeur.nutritionnelle.line', 'product_id', "Valeurs", copy=True)
 
-
     product_label_ids = fields.Many2many('product.label','product_label_rel','product_id','label_id', string='Labels')
     mode_vente        = fields.Selection(selection=[('colis', 'Colis'),('piece', 'Pièce'),('decoupe', 'Découpe')], string="Mode Vente")
     douane            = fields.Char(string='Nomenclature Douane')
@@ -259,22 +258,16 @@ class ProductTemplate(models.Model):
     is_stock_mini         = fields.Float("Stock mini", digits=(14,4))
     is_pricelist_item_ids = fields.One2many('product.pricelist.item', 'product_tmpl_id', 'Liste de prix')
 
-
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis')
     is_poids_net_colis     = fields.Float(string='Poids net colis (Kg)', digits='Stock Weight')
     is_forcer_poids_colis  = fields.Boolean(string='Forcer le scan au poids du colis', default=False, help="Cocher cette case si l'article est configuré par erreur au poids alors qu'il fallait le configuer à la pièce")
 
-
-
     is_note_importation = fields.Text(string='Note importation Fusion Fromtome / Le Cellier')
-
 
 
     def init_emplacement_inventaire_action(self):
         for obj in self:
             if not obj.property_stock_inventory:
-                print(obj, obj.default_code, obj.create_date, obj.create_uid, obj.write_date, obj.write_uid, obj.name, obj.property_stock_inventory)
-
                 obj.property_stock_inventory = 14
 
 

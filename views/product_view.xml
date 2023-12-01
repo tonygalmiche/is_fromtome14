@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-
-
     <record id="init_emplacement_inventaire_action_server" model="ir.actions.server">
         <field name="name">Init emplacement d'inventaire</field>
         <field name="model_id" ref="product.model_product_template"/>
@@ -11,52 +8,14 @@
         <field name="code">action = records.init_emplacement_inventaire_action()</field>
     </record>
 
-
-
-
-    <!-- Exporter cet article dans Fromelier  -->
-    <!--
-    <record id="exporter_article_fromelier_action_server" model="ir.actions.server">
-        <field name="name">Exporter cet article dans Fromelier</field>
-        <field name="type">ir.actions.server</field>
-        <field name="state">code</field>
-        <field name="model_id" ref="is_fromtome.model_product_template"/>
-        <field name="binding_model_id" ref="is_fromtome.model_product_template"/>
-        <field name="code">
-records.exporter_article_fromelier_action()
-        </field>
-    </record>
-    -->
-
-
-
-
     <record id="is_product_template_form_view" model="ir.ui.view">
         <field name="name">is_product_template_form_view</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_form_view"/>
         <field name="arch" type="xml">
-            <!--
-            <button name="toggle_active" position="before">
-                <button
-                    name="exporter_article_fromelier_action"
-                    type="object"
-                    string="Exporter dans Fromelier"
-                />
-            </button>
-            -->
-            <!-- <group name="group_lots_and_weight" string="Logistics" attrs="{'invisible': [('type', 'not in', ['product', 'consu'])]}"> -->
-            <!-- <group name="group_lots_and_weight" position="attributes">
-                <attribute name="invisible">1</attribute>
-                <attribute name="attrs">{}</attribute>
-            </group> -->
-
             <field name="categ_id" position="after">
                 <field name="is_ref_fournisseur"/>
             </field>
-
-
-
             <field name="type" position="after">
                 <field name="is_stock_mini"/>
             </field>
@@ -77,21 +36,6 @@ records.exporter_article_fromelier_action()
             </xpath>
         </field>
     </record>
-
-
-
-
-    <!-- <record id="is_product_template_kanban_view" model="ir.ui.view">
-        <field name="name">is_product_template_kanban_view</field>
-        <field name="model">product.template</field>
-        <field name="inherit_id" ref="product.product_template_kanban_view"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='lst_price']/../.." position="attributes">
-                <attribute name="invisible">1</attribute>
-            </xpath>
-        </field>
-    </record>
-    -->
     <record id="is_product_template_tree_view" model="ir.ui.view">
         <field name="name">is_product_template_tree_view</field>
         <field name="model">product.template</field>
@@ -117,7 +61,6 @@ records.exporter_article_fromelier_action()
             </field>
         </field>
     </record>
-
     <record id="is_product_template_search_view" model="ir.ui.view">
         <field name="name">is_product_template_search_view</field>
         <field name="model">product.template</field>
@@ -129,7 +72,6 @@ records.exporter_article_fromelier_action()
             </field>
         </field>
     </record>
-
     <record id="is_product_normal_form_view" model="ir.ui.view">
         <field name="name">is_product_normal_form_view</field>
         <field name="model">product.product</field>
