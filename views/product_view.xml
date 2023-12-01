@@ -3,6 +3,16 @@
 
 
 
+    <record id="init_emplacement_inventaire_action_server" model="ir.actions.server">
+        <field name="name">Init emplacement d'inventaire</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="state">code</field>
+        <field name="code">action = records.init_emplacement_inventaire_action()</field>
+    </record>
+
+
+
 
     <!-- Exporter cet article dans Fromelier  -->
     <!--
@@ -103,6 +113,7 @@ records.exporter_article_fromelier_action()
                 <field name="is_note_importation" optional="hide"/>
                 <field name="property_account_income_id"  optional="hide"/>
                 <field name="property_account_expense_id" optional="hide"/>
+                <field name="property_stock_inventory" optional="hide"/>
             </field>
         </field>
     </record>

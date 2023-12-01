@@ -270,6 +270,14 @@ class ProductTemplate(models.Model):
 
 
 
+    def init_emplacement_inventaire_action(self):
+        for obj in self:
+            if not obj.property_stock_inventory:
+                print(obj, obj.default_code, obj.create_date, obj.create_uid, obj.write_date, obj.write_uid, obj.name, obj.property_stock_inventory)
+
+                obj.property_stock_inventory = 14
+
+
 
 
 
