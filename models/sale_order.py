@@ -300,7 +300,6 @@ class SaleOrderLine(models.Model):
             ]
             moves = self.env['stock.move'].search(filtre)
             for move in moves:
-                print(move,move.state, move.is_nb_colis)
                 colis_liv+= move.is_nb_colis
             obj.is_colis_liv = colis_liv
 
@@ -470,6 +469,7 @@ class SaleOrder(models.Model):
     is_import_alerte         = fields.Text('Alertes importation')
     is_nb_lignes             = fields.Integer('Nb lignes (hors transport)', compute='_compute_is_nb_lignes')
     is_heure_envoi_id        = fields.Many2one('is.heure.maxi', 'Heure', help="Heure maxi d'envoi de la commande au fournisseur")
+    is_fusion_order_id       = fields.Many2one('sale.order', 'Fusionnée dans', copy=False,readonly=True)
 
 
     def _message_auto_subscribe_notify(self, partner_ids, template):
@@ -838,4 +838,82 @@ class SaleOrder(models.Model):
                 move=sorted_dict[key]
                 move.sequence=sequence
                 sequence+=10
+
+
+
+
+
+
+    def fusion_commande_client_action(self):
+        "Permet de fusionner les commandes validées et non livrées de la même date et du même client"
+        dict={}
+        #** Recherche des commandes par client et par date **************
+        for obj in self:
+            if obj.partner_id and obj.is_date_livraison and obj.state!='cancel':
+                test=False
+                if obj.state in ['draft', 'sent']:
+                    test=True
+                else:
+                    for picking in obj.picking_ids:
+                        if picking.state in ['done','cancel']:
+                            test=True
+                            break
+                if test:
+                    key = "%s-%s"%(obj.partner_id.id, obj.is_date_livraison.strftime('%Y-%m-%d'))
+                    if key not in dict:
+                        dict[key]=[]
+                    dict[key].append(obj.id)
+        #*** Suppresion des clés avec une seule commande => Pas de fusion *****
+        for key in list(dict):
+            if len(dict[key])==1:
+                dict.pop(key)
+
+        #** Fusion des commandes **********************************************
+        for key in dict:
+            first_order=False
+            orders = dict[key]
+            #orders.sort() #Cela permet de conserver la première commande et d'annuler les autres
+            for order_id in orders:
+                order = self.env['sale.order'].browse(order_id)
+                if not first_order:
+                    first_order=order
+                else:
+                    #** Recherche sequence pour mettre la ligne à la fin ******
+                    sequence=0
+                    for line in first_order.order_line:
+                        if line.sequence>sequence:
+                            sequence=line.sequence
+                    #**********************************************************
+                    for line in order.order_line:
+
+                        #** Recherche si ligne existe pour cet article ********
+                        test=False
+                        for l in first_order.order_line:
+                            if l.product_id == line.product_id:
+                                qty = line.product_uom_qty + l.product_uom_qty
+                                l.product_uom_qty = qty
+                                l.onchange_product_uom_qty_colis()
+                                test=True
+                                break
+                        #** Création d'une nouvelle ligne *********************
+                        if test==False:
+                            sequence+=10
+                            vals={
+                                'order_id'    : first_order.id,
+                                'sequence'    : sequence,
+                                'product_id'  : line.product_id.id,
+                                'name'        : line.name,
+                                'product_uom_qty' : line.product_uom_qty,
+                                'product_uom' : line.product_uom.id,
+                            }
+                            order_line=self.env['sale.order.line'].create(vals)
+                            order_line.onchange_product_uom_qty_colis()
+
+                    order.action_cancel()
+                    first_order.trier_par_designation_action()
+                    order.is_fusion_order_id = first_order.id
+                    msg = "Commande annulée et fusionnée avec %s" % (first_order.name)
+                    order.message_post(body=msg)
+                    msg = "Fusion de la commande %s" % (order.name)
+                    first_order.message_post(body=msg)
 
