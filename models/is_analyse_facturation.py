@@ -136,6 +136,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
 
                 price_unit = 0
                 partner_id=enseigne_id=user_id=False
+                enseigne = False
                 for purchase in scrap.lot_id.purchase_order_ids:
                     partner_id  = purchase.partner_id.id
                     enseigne    = purchase.partner_id.is_enseigne_id.name.name
