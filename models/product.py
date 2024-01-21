@@ -328,7 +328,7 @@ class ProductTemplate(models.Model):
         for obj in self:
             #** Recherche du prix d'achat *************************************
             now     = datetime.now().date()
-            bascule = company.is_date_bascule_tarif
+            bascule = company.is_date_bascule_tarif or now
             prix_actuel = 0
             prix_futur  = 0
             for line in obj.seller_ids:
