@@ -7,7 +7,6 @@
         <field name="state">code</field>
         <field name="code">action = records.init_emplacement_inventaire_action()</field>
     </record>
-
     <record id="is_product_template_form_view" model="ir.ui.view">
         <field name="name">is_product_template_form_view</field>
         <field name="model">product.template</field>
@@ -41,11 +40,9 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_tree_view"/>
         <field name="arch" type="xml">
-
             <field name="default_code" position="after">
                 <field name="is_ref_fournisseur" optional="show"/>
             </field>
-
              <field name="uom_id" position="after">
                 <field name="is_stock_mini" optional="hide"/>
                 <field name="is_nb_pieces_par_colis" optional="hide"/>
@@ -82,19 +79,12 @@
             </field>
         </field>
     </record>
-
-
-
-
-<!-- purchase.view_product_supplier_inherit -->
-
     <record id="is_view_product_supplier_inherit" model="ir.ui.view">
         <field name="name">is_view_product_supplier_inherit</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="purchase.view_product_supplier_inherit"/>
         <field name="priority">0</field>
         <field name="arch" type="xml">
-
             <field name="seller_ids" position="attributes">
                 <attribute name="context">
                     {
@@ -105,57 +95,8 @@
                     }
                 </attribute>
             </field>
-
-            <!-- <field name="seller_ids" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </field>
- -->
-            <!-- <group name="purchase" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </group> -->
-
-
-            <!-- <group name="purchase" position="replace">
-                <group name="purchase" invisible="1" string="TEST">
-                    <field name="seller_ids" context="{'default_product_tmpl_id':context.get('product_tmpl_id',active_id), 'product_template_invisible_variant': True, 'tree_view_ref':'purchase.product_supplierinfo_tree_view2'}" nolabel="1" attrs="{'invisible': [('product_variant_count','&gt;',1)]}"/>
-                    <field name="variant_seller_ids" context="{'default_product_tmpl_id': context.get('product_tmpl_id', active_id), 'tree_view_ref':'purchase.product_supplierinfo_tree_view2'}" nolabel="1" attrs="{'invisible': [('product_variant_count','&lt;=',1)]}"/>
-                </group>
-            </group> -->
         </field>
     </record>
-
-        <!-- <record id="view_product_supplier_inherit" model="ir.ui.view">
-            <field name="name">product.template.supplier.form.inherit</field>
-            <field name="model">product.template</field>
-            <field name="inherit_id" ref="product.product_template_form_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//page[@name='purchase']" position="attributes">
-                    <attribute name="invisible">0</attribute>
-                </xpath>
-                <group name="purchase" position="before">
-                    <field name="seller_ids" context="{'default_product_tmpl_id':context.get('product_tmpl_id',active_id), 'product_template_invisible_variant': True, 'tree_view_ref':'purchase.product_supplierinfo_tree_view2'}" nolabel="1" attrs="{'invisible': [('product_variant_count','&gt;',1)]}"/>
-                    <field name="variant_seller_ids" context="{'default_product_tmpl_id': context.get('product_tmpl_id', active_id), 'tree_view_ref':'purchase.product_supplierinfo_tree_view2'}" nolabel="1" attrs="{'invisible': [('product_variant_count','&lt;=',1)]}"/>
-                </group>
-                <group name="bill" position="attributes">
- -->
-
-
-    <!-- <record id="view_stock_product_tree2_inherit" model="ir.ui.view">
-        <field name="name">product.stock.tree.inherit</field>
-        <field name="model">product.product</field>
-        <field name="inherit_id" ref="stock_account.view_stock_product_tree2"/>
-        <field name="arch" type="xml">
-            <field name="stock_value" position="after">
-                <field name="weight_qty_available" sum="Poids"/>
-                <field name="weight_stock_value" sum="Evaluation" widget="monetary"
-                       options="{'currency_field': 'cost_currency_id'}"/>
-            </field>
-            <field name="stock_value" position="attributes">
-                <attribute name="invisible">1</attribute>
-            </field>
-        </field>
-    </record> -->
-
     <record id="product_normal_form_view_inherit" model="ir.ui.view">
         <field name="name">product.product.form.inherit</field>
         <field name="model">product.product</field>
@@ -171,63 +112,23 @@
              <field name="uom_po_id" position="attributes">
                 <attribute name="string">Unité d'achat</attribute>
             </field>
-
-            <!-- <field name="uom_po_id" position="after"> -->
-                <!-- <hr/>
-                <hr/> -->
-                <!-- <label for="product_weight" string="Poids Net / Colis"/>
-                <div class="o_row" name="product_weight">
-                    <field name="product_weight"/>
-                    <span>
-                        Kg
-                    </span>
-                </div> -->
-                <!-- <label for="weight" string="Nbr PC / Colis"/>
-                <div class="o_row" name="weight">
-                    <field name="weight"/>
-                    <span> PC
-                        <field name="weight_uom_name" invisible="1"/>
-                    </span>
-                </div> -->
-                <!-- <field name="weight_uom_id" invisible="1"/> -->
-            <!-- </field> -->
-
-
-
-            <!-- <button name="toggle_active" position="before">
-                <button class="oe_stat_button" name="#" type="object" icon="fa-cubes" help="Poids des colis en stock">
-                    <div class="o_field_widget o_stat_info">
-                        <span class="o_stat_value">
-                            <field name="weight_qty_available" widget="statinfo" nolabel="1" class="mr4"/>
-                            <field name="weight_uom_name"/>
-                        </span>
-                        <span class="o_stat_text">En Stock</span>
-                    </div>
-                </button>
-                <button class="oe_stat_button" name="#" type="object" icon="fa-linode" help="Cout des poids en stock">
-                    <div class="o_field_widget o_stat_info">
-                        <span class="o_stat_value">
-                            <field name="weight_stock_value" widget="statinfo" nolabel="1" class="mr4"/>
-                            <field name="stock_value_currency_id"/>
-                        </span>
-                    </div>
-                </button>
-            </button> -->
             <field name="barcode" position="attributes">
                 <attribute name="string">code barre interne</attribute>
             </field>
-
         </field>
     </record>
-
     <record id="product_template_form_inherit" model="ir.ui.view">
         <field name="name">product.template.form.inherit</field>
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
-
-
-
+            <xpath expr="//sheet[1]" position="inside">
+                <style>
+                     .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
+            </xpath>
             <field name="barcode" position="attributes">
                 <attribute name="string">code barre interne</attribute>
             </field>
@@ -242,25 +143,9 @@
             </field>
             <field name="uom_po_id" position="after">
                 <hr/><hr/>
-                <!-- <field name="mode_vente" /> -->
                 <field name="is_nb_pieces_par_colis"/>
                 <field name="is_poids_net_colis"/>
                 <field name="is_forcer_poids_colis"/>
-                <!-- <label for="product_weight"  string="Poids Net / Colis"/>
-                <div class="o_row" name="product_weight">
-                    <field name="product_weight"/>
-                    <span>
-                        Kg
-                    </span>
-                </div> -->
-                <!-- <label for="weight" string="Nbr PC / Colis"/>
-                <div class="o_row" name="weight">
-                    <field name="weight"/>
-                    <span> PC
-                        <field name="weight_uom_name"  invisible="1"/>
-                    </span>
-                </div> -->
-                <!-- <field name="weight_uom_id" invisible="1"/> -->
             </field>
             <xpath expr="//page[@name='sales']" position="inside">
                 <group string="Contrat Date ">
@@ -349,6 +234,51 @@
                     </field>
                     <button string="Recharger les valeurs" name="recharger_valeurs_action" type="object" confirm="Cela va remplacer les données ci-dessus"/>
                 </page>
+                <page string="Gestion des tarifs">
+                    <group>
+                        <field name="is_date_bascule_tarif"/>
+                    </group>
+                    <group string="Prix d'achat">
+                        <group>
+                            <field name="is_prix_achat_actuel"/>
+                        </group>
+                        <group>
+                            <field name="is_prix_achat_futur"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Prix de vente actuel">
+                            <field name="is_prix_vente_actuel_cdf_quai"/>
+                            <field name="is_prix_vente_actuel_cdf_franco"/>
+                            <field name="is_prix_vente_actuel_lf"/>
+                            <field name="is_prix_vente_actuel_lf_coll"/>
+                            <field name="is_prix_vente_actuel_ft"/>
+                        </group>
+                        <group string="Prix de vente actuel forcé">
+                            <field name="is_prix_vente_actuel_force_cdf_quai"/>
+                            <field name="is_prix_vente_actuel_force_cdf_franco"/>
+                            <field name="is_prix_vente_actuel_force_lf"/>
+                            <field name="is_prix_vente_actuel_force_lf_coll"/>
+                            <field name="is_prix_vente_actuel_force_ft"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Prix de vente futur">
+                            <field name="is_prix_vente_futur_cdf_quai"/>
+                            <field name="is_prix_vente_futur_cdf_franco"/>
+                            <field name="is_prix_vente_futur_lf"/>
+                            <field name="is_prix_vente_futur_lf_coll"/>
+                            <field name="is_prix_vente_futur_ft"/>
+                        </group>
+                        <group string="Prix de vente futur forcé">
+                            <field name="is_prix_vente_futur_force_cdf_quai"/>
+                            <field name="is_prix_vente_futur_force_cdf_franco"/>
+                            <field name="is_prix_vente_futur_force_lf"/>
+                            <field name="is_prix_vente_futur_force_lf_coll"/>
+                            <field name="is_prix_vente_futur_force_ft"/>
+                        </group>
+                    </group>
+                </page>
             </xpath>
             <field name="description" position="after">
                 <field name="_barcode_scanned" widget="barcode_handler"/>
@@ -357,8 +287,102 @@
     </record>
 
 
+    <!-- Gestion des tarifs (vue Formulaire) -->
+    <record id="is_gestion_tarif_product_tree_view" model="ir.ui.view">
+        <field name="name">is_gestion_tarif_product_tree_view</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" optional="show"/>
+                <field name="default_code" optional="show"/>
+                <field name="is_date_bascule_tarif" optional="show"/>
+                <field name="is_prix_achat_actuel" optional="show"/>
+                <field name="is_prix_achat_futur" optional="show"/>
+                <field name="is_prix_vente_actuel_cdf_quai" optional="show"/>
+                <field name="is_prix_vente_actuel_cdf_franco" optional="show"/>
+                <field name="is_prix_vente_actuel_lf" optional="show"/>
+                <field name="is_prix_vente_actuel_lf_coll" optional="show"/>
+                <field name="is_prix_vente_actuel_ft" optional="show"/>
+                <field name="is_prix_vente_actuel_force_cdf_quai" optional="show"/>
+                <field name="is_prix_vente_actuel_force_cdf_franco" optional="show"/>
+                <field name="is_prix_vente_actuel_force_lf" optional="show"/>
+                <field name="is_prix_vente_actuel_force_lf_coll" optional="show"/>
+                <field name="is_prix_vente_actuel_force_ft" optional="show"/>
+                <field name="is_prix_vente_futur_cdf_quai" optional="show"/>
+                <field name="is_prix_vente_futur_cdf_franco" optional="show"/>
+                <field name="is_prix_vente_futur_lf" optional="show"/>
+                <field name="is_prix_vente_futur_lf_coll" optional="show"/>
+                <field name="is_prix_vente_futur_ft" optional="show"/>
+                <field name="is_prix_vente_futur_force_cdf_quai" optional="show"/>
+                <field name="is_prix_vente_futur_force_cdf_franco" optional="show"/>
+                <field name="is_prix_vente_futur_force_lf" optional="show"/>
+                <field name="is_prix_vente_futur_force_lf_coll" optional="show"/>
+                <field name="is_prix_vente_futur_force_ft" optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_gestion_tarif_product_action" model="ir.actions.act_window" >
+        <field name="name">Gestion des tarifs</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="view_id" ref="is_fromtome14.is_gestion_tarif_product_tree_view"/>
+    </record>
+    <menuitem 
+        id="is_gestion_tarif_product_menu" 
+        name="Gestion des tarifs" 
+        parent="sale.product_menu_catalog" sequence="10"
+        action="is_gestion_tarif_product_action"
+    />
+
+    <!-- Gestion des tarifs (Liste modifiable) -->
+    <record id="is_gestion_tarif_product_editable_tree_view" model="ir.ui.view">
+        <field name="name">is_gestion_tarif_product_tree_view</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <tree editable="top">
+                <field name="name" optional="show"/>
+                <field name="default_code" optional="show"/>
+                <field name="is_date_bascule_tarif" optional="show"/>
+                <field name="is_prix_achat_actuel" optional="show"/>
+                <field name="is_prix_achat_futur" optional="show"/>
+                <field name="is_prix_vente_actuel_cdf_quai" optional="show"/>
+                <field name="is_prix_vente_actuel_cdf_franco" optional="show"/>
+                <field name="is_prix_vente_actuel_lf" optional="show"/>
+                <field name="is_prix_vente_actuel_lf_coll" optional="show"/>
+                <field name="is_prix_vente_actuel_ft" optional="show"/>
+                <field name="is_prix_vente_actuel_force_cdf_quai" optional="show"/>
+                <field name="is_prix_vente_actuel_force_cdf_franco" optional="show"/>
+                <field name="is_prix_vente_actuel_force_lf" optional="show"/>
+                <field name="is_prix_vente_actuel_force_lf_coll" optional="show"/>
+                <field name="is_prix_vente_actuel_force_ft" optional="show"/>
+                <field name="is_prix_vente_futur_cdf_quai" optional="show"/>
+                <field name="is_prix_vente_futur_cdf_franco" optional="show"/>
+                <field name="is_prix_vente_futur_lf" optional="show"/>
+                <field name="is_prix_vente_futur_lf_coll" optional="show"/>
+                <field name="is_prix_vente_futur_ft" optional="show"/>
+                <field name="is_prix_vente_futur_force_cdf_quai" optional="show"/>
+                <field name="is_prix_vente_futur_force_cdf_franco" optional="show"/>
+                <field name="is_prix_vente_futur_force_lf" optional="show"/>
+                <field name="is_prix_vente_futur_force_lf_coll" optional="show"/>
+                <field name="is_prix_vente_futur_force_ft" optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_gestion_tarif_product_editable_action" model="ir.actions.act_window" >
+        <field name="name">Gestion des tarifs (Liste modifiable)</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="view_id" ref="is_fromtome14.is_gestion_tarif_product_editable_tree_view"/>
+    </record>
+    <menuitem 
+        id="is_gestion_tarif_product_editable_menu" 
+        name="Gestion des tarifs (Liste modifiable)" 
+        parent="sale.product_menu_catalog" sequence="20"
+        action="is_gestion_tarif_product_editable_action"
+    />
 
 
+    <!-- milk.type -->
     <record model="ir.actions.act_window" id="milk_type_act">
         <field name="name">Type de Lait</field>
         <field name="res_model">milk.type</field>
@@ -368,10 +392,6 @@
     </record>
     <menuitem id="menu_milk_type" name="Type de Lait" parent="stock.menu_product_in_config_stock" sequence="4"
               action="milk_type_act"/>
-
-
-
-
     <record model="ir.actions.act_window" id="product_label_category_act">
         <field name="name">Categories Labels Produit</field>
         <field name="res_model">product.label.category</field>
@@ -401,7 +421,6 @@
     </record>
     <menuitem id="menu_mois_fromage" name="Mois du fromage" parent="stock.menu_product_in_config_stock" sequence="5"
               action="mois_fromage_act"/>
-
 
     <!-- is.ingredient -->
     <record id="is_ingredient_tree_view" model="ir.ui.view">
@@ -449,8 +468,6 @@
         sequence="900"
         action="is_ingredient_action"
     />
-
-
 
     <!-- is.germe -->
     <record id="is_germe_tree_view" model="ir.ui.view">
@@ -500,8 +517,6 @@
         action="is_germe_action"
     />
 
-
-
     <!-- is.valeur.nutritionnelle -->
     <record id="is_valeur_nutritionnelle_tree_view" model="ir.ui.view">
         <field name="name">is_valeur_nutritionnelle_tree_view</field>
@@ -550,8 +565,6 @@
         action="is_valeur_nutritionnelle_action"
     />
 
-
-
     <!-- is.bio -->
     <record id="is_bio_tree_view" model="ir.ui.view">
         <field name="name">is_bio_tree_view</field>
@@ -597,7 +610,4 @@
         sequence="930"
         action="is_bio_action"
     />
-
-
-
 </odoo>

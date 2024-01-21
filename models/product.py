@@ -5,10 +5,19 @@ from odoo.tools import float_is_zero, pycompat
 from odoo.tools.float_utils import float_round
 from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError, ValidationError
+from datetime import datetime
+import logging
+_logger = logging.getLogger(__name__)
 
 
 _TRAITEMENT_THERMIQUE = [('laitcru', 'Lait Cru'), ('laitthermise', 'Lait Thermise'), ('laitpasteurisé', 'Lait Pasteurise')]
-
+_PRICELISTS = {
+    'cdf_quai'  : 'Cdf quai',
+    'cdf_franco': 'Cdf franco',
+    'lf'        : 'LF',
+    'lf_coll'   : 'LF coll.',
+    'ft'        : 'FT',
+}
 
 class MilkType(models.Model):
     _name="milk.type"
@@ -263,6 +272,101 @@ class ProductTemplate(models.Model):
     is_forcer_poids_colis  = fields.Boolean(string='Forcer le scan au poids du colis', default=False, help="Cocher cette case si l'article est configuré par erreur au poids alors qu'il fallait le configuer à la pièce")
 
     is_note_importation = fields.Text(string='Note importation Fusion Fromtome / Le Cellier')
+
+    is_date_bascule_tarif = fields.Date(string='Date bascule tarif client'                   , compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_achat_actuel  = fields.Float(string="Prix d'achat actuel", digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_achat_futur   = fields.Float(string="Prix d'achat futur" , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+
+    is_prix_vente_actuel_cdf_quai   = fields.Float(string='Prix vente actuel Cdf quai'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_actuel_cdf_franco = fields.Float(string='Prix vente actuel Cdf franco', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_actuel_lf         = fields.Float(string='Prix vente actuel LF'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_actuel_lf_coll    = fields.Float(string='Prix vente actuel LF coll.'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_actuel_ft         = fields.Float(string='Prix vente actuel FT'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+
+    is_prix_vente_actuel_force_cdf_quai   = fields.Float(string='Prix vente actuel forcé Cdf quai'  , digits='Product Price')
+    is_prix_vente_actuel_force_cdf_franco = fields.Float(string='Prix vente actuel forcé Cdf franco', digits='Product Price')
+    is_prix_vente_actuel_force_lf         = fields.Float(string='Prix vente actuel forcé LF'        , digits='Product Price')
+    is_prix_vente_actuel_force_lf_coll    = fields.Float(string='Prix vente actuel forcé LF coll.'  , digits='Product Price')
+    is_prix_vente_actuel_force_ft         = fields.Float(string='Prix vente actuel forcé FT'        , digits='Product Price')
+
+    is_prix_vente_futur_cdf_quai   = fields.Float(string='Prix vente futur Cdf quai'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_futur_cdf_franco = fields.Float(string='Prix vente futur Cdf franco', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_futur_lf         = fields.Float(string='Prix vente futur LF'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_futur_lf_coll    = fields.Float(string='Prix vente futur LF coll.'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_futur_ft         = fields.Float(string='Prix vente futur FT'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+
+    is_prix_vente_futur_force_cdf_quai   = fields.Float(string='Prix vente futur forcé Cdf quai'  , digits='Product Price')
+    is_prix_vente_futur_force_cdf_franco = fields.Float(string='Prix vente futur forcé Cdf franco', digits='Product Price')
+    is_prix_vente_futur_force_lf         = fields.Float(string='Prix vente futur forcé LF'        , digits='Product Price')
+    is_prix_vente_futur_force_lf_coll    = fields.Float(string='Prix vente futur forcé LF coll.'  , digits='Product Price')
+    is_prix_vente_futur_force_ft         = fields.Float(string='Prix vente futur forcé FT'        , digits='Product Price')
+
+
+    @api.depends('seller_ids','seller_ids.price','seller_ids.date_start',
+                 'is_prix_vente_actuel_force_cdf_quai',
+                 'is_prix_vente_actuel_force_cdf_franco',
+                 'is_prix_vente_actuel_force_lf',
+                 'is_prix_vente_actuel_force_lf_coll',
+                 'is_prix_vente_actuel_force_ft',
+                 'is_prix_vente_futur_force_cdf_quai',
+                 'is_prix_vente_futur_force_cdf_franco',
+                 'is_prix_vente_futur_force_lf',
+                 'is_prix_vente_futur_force_lf_coll',
+                 'is_prix_vente_futur_force_ft'
+    )
+    def _compute_tarifs(self):
+        company = self.env.user.company_id
+
+        #** Coefficients à appliquer ******************************************
+        coefs={}
+        for price in _PRICELISTS:
+            name = "is_coef_%s"%price
+            coef = getattr(company, name)
+            coefs[price] = coef
+        #**********************************************************************
+
+        for obj in self:
+            #** Recherche du prix d'achat *************************************
+            now     = datetime.now().date()
+            bascule = company.is_date_bascule_tarif
+            prix_actuel = 0
+            prix_futur  = 0
+            for line in obj.seller_ids:
+                if now>=line.date_start and now<=line.date_end:
+                    prix_actuel = line.price
+                if bascule>=line.date_start and bascule<=line.date_end:
+                    prix_futur = line.price
+            obj.is_date_bascule_tarif = bascule
+            obj.is_prix_achat_actuel  = prix_actuel
+            obj.is_prix_achat_futur   = prix_futur
+            #******************************************************************
+
+            #** Prix de vente actuel ******************************************
+            for price in _PRICELISTS:
+                coef = coefs[price]
+                name = "is_prix_vente_actuel_force_%s"%price
+                force = getattr(obj, name)
+                if force>0:
+                    val = force
+                else:
+                    val = round(prix_actuel * coef,4)
+                name = "is_prix_vente_actuel_%s"%price
+                setattr(obj, name, val)
+            #******************************************************************
+
+            #** Prix de vente futur *******************************************
+            for price in _PRICELISTS:
+                coef = coefs[price]
+                name = "is_prix_vente_futur_force_%s"%price
+                force = getattr(obj, name)
+                if force>0:
+                    val = force
+                else:
+                    val = round(prix_futur * coef,4)
+                name = "is_prix_vente_futur_%s"%price
+                setattr(obj, name, val)
+            #******************************************************************
+            _logger.info("_compute_tarifs %s"%obj.name)
 
 
     def init_emplacement_inventaire_action(self):

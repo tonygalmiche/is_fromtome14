@@ -16,6 +16,53 @@
                 <field name="is_gln"/>
                 <field name="is_regroupe_cde"/>
             </field>
+            <page name="general_info" position="after">
+                <page string="Fromtome">
+                    <group string="Gestion des tarifs"/>
+                    <!-- <div style="background:#DCDCDC;font-weight: normal;">
+                        La bascule vers les nouveaux tarfis éffecturea les opérations suivantes :
+                        <ul>
+                            <li>Copie pour archivage des 5 listes de prix</li>
+                            <li>Copie des 5 tarifs « futurs » dans les 5 tarifs « en cours » pour tous les articles</li>
+                            <li>Initialisation à 0 des 5 tarifs futurs</li>
+                        </ul> 
+                    </div> -->
+                    <group>
+                        <field name="is_date_bascule_tarif"/>
+                        <field name="is_coef_cdf_quai"/>
+                        <field name="is_coef_cdf_franco"/>
+                        <field name="is_coef_lf"/>
+                        <field name="is_coef_lf_coll"/>
+                        <field name="is_coef_ft"/>
+                    </group>
+                    <button
+                        name="actualiser_tarif_action"
+                        type="object"
+                        string="Actualiser tous les tarifs en fonction du prix du fournisseur, des coefficients et de la date de bascule"
+                        confirm="ATTENTION : Cela va actualiser tous les tarifs"
+                    />
+                    <!-- <button
+                        name="initialiser_tarif_en_cours_action"
+                        type="object"
+                        string="Initialiser les 5 tarifs en cours pour tous les articles en fonction du prix fournisseur"
+                        confirm="ATTENTION : Cela va initialiser les 5 tarifs en cours pour tous les articles en fonction du prix fournisseur"
+                    />
+                    <br /> <br />
+                    <button
+                        name="initialiser_tarif_futur_action"
+                        type="object"
+                        string="Initialiser les 5 futurs tarifs en fonction de la date indiquée et des dates de validité des fournisseurs"
+                        confirm="ATTENTION : Cela va initialiser les 5 futurs tarifs en fonction de la date indiquée et des dates de validité des fournisseurs"
+                    />
+                    <br /> <br />
+                    <button
+                        name="basculer_vers_nouveau_tarif_action"
+                        type="object"
+                        string="Basculer vers les nouveaux tarifs"
+                        confirm="ATTENTION : Cela va actualiser les 5 listes de prix concernées en appliquant le coefficient indiqué au prix d'achat"
+                    /> -->
+                </page>
+            </page>
         </field>
     </record>
 </odoo>
