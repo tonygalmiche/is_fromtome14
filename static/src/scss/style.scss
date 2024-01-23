@@ -28,6 +28,33 @@ td [name="name"]{
     min-width: fit-content;
 }
 
+
+
+.prix_vente_actuel{
+    font-weight: bold;
+}
+
+.prix_vente_force{
+    font-weight: bold;
+    color:Red;
+}
+
+.prix_vente_futur{
+    font-weight: bold;
+    color:green;
+}
+
+.prix_vente_futur_force{
+    font-weight: bold;
+    color:darkorange;
+}
+
+.fond_gris{
+    background-color: #E8E8E8;
+}
+
+
+
 /*
 table {
     white-space: normal;

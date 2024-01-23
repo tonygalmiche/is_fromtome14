@@ -273,33 +273,33 @@ class ProductTemplate(models.Model):
 
     is_note_importation = fields.Text(string='Note importation Fusion Fromtome / Le Cellier')
 
-    is_date_bascule_tarif = fields.Date(string='Date bascule tarif client'                   , compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_achat_actuel  = fields.Float(string="Prix d'achat actuel", digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_achat_futur   = fields.Float(string="Prix d'achat futur" , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_date_bascule_tarif = fields.Date(string="Date bascule", help='Date bascule tarif client'                   , compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_achat_actuel  = fields.Float(string="PA actuel", digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_achat_futur   = fields.Float(string="PA futur" , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
 
-    is_prix_vente_actuel_cdf_quai   = fields.Float(string='Prix vente actuel Cdf quai'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_vente_actuel_cdf_franco = fields.Float(string='Prix vente actuel Cdf franco', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_vente_actuel_lf         = fields.Float(string='Prix vente actuel LF'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_vente_actuel_lf_coll    = fields.Float(string='Prix vente actuel LF coll.'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_vente_actuel_ft         = fields.Float(string='Prix vente actuel FT'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_actuel_cdf_quai   = fields.Float(string='PV actuel Cdf quai'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_actuel_cdf_franco = fields.Float(string='PV actuel Cdf franco', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_actuel_lf         = fields.Float(string='PV actuel LF'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_actuel_lf_coll    = fields.Float(string='PV actuel LF coll.'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_actuel_ft         = fields.Float(string='PV actuel FT'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
 
-    is_prix_vente_actuel_force_cdf_quai   = fields.Float(string='Prix vente actuel forcé Cdf quai'  , digits='Product Price')
-    is_prix_vente_actuel_force_cdf_franco = fields.Float(string='Prix vente actuel forcé Cdf franco', digits='Product Price')
-    is_prix_vente_actuel_force_lf         = fields.Float(string='Prix vente actuel forcé LF'        , digits='Product Price')
-    is_prix_vente_actuel_force_lf_coll    = fields.Float(string='Prix vente actuel forcé LF coll.'  , digits='Product Price')
-    is_prix_vente_actuel_force_ft         = fields.Float(string='Prix vente actuel forcé FT'        , digits='Product Price')
+    is_prix_vente_actuel_force_cdf_quai   = fields.Float(string='PV actuel forcé Cdf quai'  , digits='Product Price')
+    is_prix_vente_actuel_force_cdf_franco = fields.Float(string='PV actuel forcé Cdf franco', digits='Product Price')
+    is_prix_vente_actuel_force_lf         = fields.Float(string='PV actuel forcé LF'        , digits='Product Price')
+    is_prix_vente_actuel_force_lf_coll    = fields.Float(string='PV actuel forcé LF coll.'  , digits='Product Price')
+    is_prix_vente_actuel_force_ft         = fields.Float(string='PV actuel forcé FT'        , digits='Product Price')
 
-    is_prix_vente_futur_cdf_quai   = fields.Float(string='Prix vente futur Cdf quai'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_vente_futur_cdf_franco = fields.Float(string='Prix vente futur Cdf franco', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_vente_futur_lf         = fields.Float(string='Prix vente futur LF'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_vente_futur_lf_coll    = fields.Float(string='Prix vente futur LF coll.'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_vente_futur_ft         = fields.Float(string='Prix vente futur FT'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_futur_cdf_quai   = fields.Float(string='PV futur Cdf quai'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_futur_cdf_franco = fields.Float(string='PV futur Cdf franco', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_futur_lf         = fields.Float(string='PV futur LF'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_futur_lf_coll    = fields.Float(string='PV futur LF coll.'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_futur_ft         = fields.Float(string='PV futur FT'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
 
-    is_prix_vente_futur_force_cdf_quai   = fields.Float(string='Prix vente futur forcé Cdf quai'  , digits='Product Price')
-    is_prix_vente_futur_force_cdf_franco = fields.Float(string='Prix vente futur forcé Cdf franco', digits='Product Price')
-    is_prix_vente_futur_force_lf         = fields.Float(string='Prix vente futur forcé LF'        , digits='Product Price')
-    is_prix_vente_futur_force_lf_coll    = fields.Float(string='Prix vente futur forcé LF coll.'  , digits='Product Price')
-    is_prix_vente_futur_force_ft         = fields.Float(string='Prix vente futur forcé FT'        , digits='Product Price')
+    is_prix_vente_futur_force_cdf_quai   = fields.Float(string='PV futur forcé Cdf quai'  , digits='Product Price')
+    is_prix_vente_futur_force_cdf_franco = fields.Float(string='PV futur forcé Cdf franco', digits='Product Price')
+    is_prix_vente_futur_force_lf         = fields.Float(string='PV futur forcé LF'        , digits='Product Price')
+    is_prix_vente_futur_force_lf_coll    = fields.Float(string='PV futur forcé LF coll.'  , digits='Product Price')
+    is_prix_vente_futur_force_ft         = fields.Float(string='PV futur forcé FT'        , digits='Product Price')
 
 
     @api.depends('seller_ids','seller_ids.price','seller_ids.date_start',
@@ -413,6 +413,21 @@ class ProductTemplate(models.Model):
                     'ordre': ordre,
                 }))
             self.is_valeur_nutritionnelle_ids = res
+
+
+
+    def voir_article_action(self):
+        for obj in self:
+            res= {
+                'name': 'Article',
+                'view_mode': 'form,tree',
+                'view_type': 'form',
+                'res_model': 'product.template',
+                'type': 'ir.actions.act_window',
+                'res_id':obj.id,
+            }
+            return res
+
 
 
 #     def _get_makebuy_route(self):
