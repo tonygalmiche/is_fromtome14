@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-
 from odoo import api, fields, models
+from datetime import datetime, timedelta, date
 
 
 class Pricelist(models.Model):
@@ -43,6 +43,7 @@ class PricelistItem(models.Model):
 
     @api.depends('product_id')
     def _compute_is_alerte(self):
+        today = date.today()
         product_ids={}
         if len(self)>0:
             for line in self[0].pricelist_id.item_ids:
@@ -55,7 +56,12 @@ class PricelistItem(models.Model):
             if not obj.product_tmpl_id.active:
                 alerte.append("Article désactivé")
             prix_achat=0
-            suppliers=self.env['product.supplierinfo'].search([('product_tmpl_id', '=', obj.product_tmpl_id.id)],limit=1)
+            filtre = [
+                ('product_tmpl_id', '=', obj.product_tmpl_id.id),
+                ('date_start', '<=', today),
+                ('date_end'  , '>=', today),
+            ]
+            suppliers=self.env['product.supplierinfo'].search(filtre,limit=1)
             for line in suppliers:
                 prix_achat=line.price
             taux=0

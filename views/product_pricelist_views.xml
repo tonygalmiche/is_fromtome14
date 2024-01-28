@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- product.pricelist.item -->
         <record id="is_product_pricelist_item_tree" model="ir.ui.view">
             <field name="name">is_product_pricelist_item_tree</field>
             <field name="model">product.pricelist.item</field>
@@ -26,13 +27,6 @@
                         title="Alertes"
                     />
                     <field name="is_alerte"     optional="show"/>
-                    <!-- <field name="is_alerte_marge" invisible="1"/> -->
-                    <!-- <button 
-                        name="is_product_action" type="object" class="oe_stat_button" 
-                        icon="fa-exclamation-triangle"
-                        attrs="{'invisible': [('is_alerte_marge', '=', False)]}"
-                        title="Article avec marge inférieure à 5%"
-                    /> -->
                 </tree>
             </field>
         </record>
@@ -58,6 +52,20 @@
 
 
         <!-- product.pricelist -->
+        <record id="is_product_pricelist_view_tree" model="ir.ui.view">
+            <field name="name">is_product_pricelist_view_tree</field>
+            <field name="model">product.pricelist</field>
+            <field name="inherit_id" ref="product.product_pricelist_view_tree"/>
+            <field name="arch" type="xml">
+                <field name="discount_policy" position="replace"/>
+                <field name="company_id" position="after">
+                    <field name="create_uid"/>
+                    <field name="create_date"/>
+                    <field name="write_uid"/>
+                    <field name="write_date"/>
+                </field>
+            </field>
+        </record>
         <record id="is_product_pricelist_view" model="ir.ui.view">
             <field name="name">is_product_pricelist_view</field>
             <field name="model">product.pricelist</field>
@@ -75,7 +83,7 @@
                 <field name="currency_id" position="before">
                     <field name="partner_id"/>
                 </field>
-                <xpath expr="//field[@name='item_ids']" position="after">
+                <!-- <xpath expr="//field[@name='item_ids']" position="after">
                     <group col="4" style="text-align:right">
                         <label for="is_augmentation" string="Pourcentage d'augmentation à appliquer"/>
                         <div class="o_row">
@@ -89,7 +97,7 @@
                             />
                         </div>
                     </group>
-                </xpath>
+                </xpath> -->
                 <xpath expr="//field[@name='item_ids']/tree/field[@name='date_end']" position="after">
                     <field name="is_prix_achat" optional="show"/>
                     <field name="is_taux_marge" optional="show"/>
