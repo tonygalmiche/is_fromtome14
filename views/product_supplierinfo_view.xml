@@ -9,17 +9,11 @@
         <field name="arch" type="xml">
             <xpath expr="//label[@for='price']" position="before">
                 <field name="prix_brut"/>
-                <!-- <field name="last_prix_brut" /> -->
                 <field name="discount_ids">
                     <tree editable="Bottom">
                         <field name="name" string="Remises %"/>
                     </tree>
                 </field>
-                <!-- <field name="last_discount_ids">
-                    <tree>
-                        <field name="name" string="Dernières Remises %"/>
-                    </tree>
-                </field> -->
             </xpath>
              <xpath expr="//field[@name='delay']" position="attributes">
                  <attribute name="invisible">1</attribute>
@@ -27,9 +21,6 @@
              <xpath expr="//label[@for='delay']" position="attributes">
                  <attribute name="invisible">1</attribute>
             </xpath>            
-            <!-- <xpath expr="//field[@name='price']" position="after">
-                <field name="last_price"/>
-            </xpath> -->
             <xpath expr="//field[@name='company_id']" position="attributes">
                  <attribute name="invisible">1</attribute>
             </xpath>
@@ -41,101 +32,14 @@
     </record>
 
 
-
-   <!-- <record id="product_supplierinfo_search_view_inherit" model="ir.ui.view">
-            <field name="name">product.supplierinfo.search.view</field>
-            <field name="model">product.supplierinfo</field>
-            <field name="inherit_id" ref="product.product_supplierinfo_search_view"/>
-            <field name="arch" type="xml">
-                <field name="name" position="before">
-                    <field name="barcode"/>
-                </field>
-            </field>
-    </record> -->
-
-
-
-<!-- 
-
-    <record id="product_supplierinfo_form_view" model="ir.ui.view">
-        <field name="name">product.supplierinfo.form.view</field>
+    <record id="is_product_supplierinfo_tree_view2" model="ir.ui.view">
+        <field name="name">is_product_supplierinfo_tree_view2</field>
         <field name="model">product.supplierinfo</field>
-        <field name="inherit_id" ref="product.product_supplierinfo_form_view"/>
+        <field name="inherit_id" ref="product.product_supplierinfo_tree_view"/>
         <field name="arch" type="xml">
-
-
-
-
-
-            <xpath expr="//label[@for='price']" position="before">
-                <style>
-                    .o_form_view .oe_inline{
-                        width: 45% !important;
-                        }
-                </style>
-                <field name="prix_brut"  style2="width:45% !important;text-align: center;margin-right: 10%;float: left;background-color: #ccc;padding: 1%;"  class="oe_inline" />
-                <field name="last_prix_brut" class2="oe_inline"  style2="width: 45% !important;
-text-align: center;
-float: right;
-background-color: #17a2b8;
-color: white;
-font-weight: 500;
-padding: 1%;
-color: white;"/>
-                <br style="clear:both;"/>
-                <field name="discount_ids" style2="height: 100%;width: 45%; margin-right: 10%;clear:both;" class2="text-center">
-                    <tree editable="Bottom">
-                        <field name="name" string="Remises %"/>
-                    </tree>
-                </field>
-                <field name="last_discount_ids" style2="height: 100%;width: 45%;" class2="text-center">
-                    <tree>
-                        <field name="name" string="Dernières Remises %"/>
-                    </tree>
-                </field>
-            </xpath>
-
-            <xpath expr="//field[@name='company_id']" position="after">
-                <field name="Last_supp_info"/>
-            </xpath>
-             <xpath expr="//field[@name='delay']" position="attributes">
-                 <attribute name="invisible">1</attribute>
-            </xpath>
-             <xpath expr="//label[@for='delay']" position="attributes">
-                 <attribute name="invisible">1</attribute>
-            </xpath>
-            <xpath expr="//field[@name='product_code']" position="after">
-                <field name="barcode"/>
-            </xpath>
-            <xpath expr="//field[@name='price']" position="attributes">
-                <attribute name="style2">
-                    background: #20c997;
-                    padding: 1%;
-                    width: 45%  !important;
-                    color: white;
-                    font-weight:700;
-                    text-align: center;
-                </attribute>
-                <attribute name="class2">oe_inline</attribute>
-            </xpath>
-            <xpath expr="//field[@name='price']" position="after">
-            <field name="last_price" class2="oe_inline"  style2="width: 45% !important;
-text-align: center;
-float: right;
-background-color: #17a2b8;
-color: white;
-font-weight: 500;
-padding: 1%;
-color: white;"/>
-            </xpath>
-
-
-            <xpath expr="//field[@name='company_id']" position="attributes">
-                 <attribute name="invisible">1</attribute>
-            </xpath>
-
-
+            <field name="name" position="before">
+                <button title="Dupliquer" name= "dupliquer_action" type="object" icon="fa-copy"/>
+            </field>
         </field>
-    </record> -->
-
+    </record>
 </odoo>

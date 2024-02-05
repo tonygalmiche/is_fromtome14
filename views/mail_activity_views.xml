@@ -1,38 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-
-    <!-- <record id="is_mail_activity_form" model="ir.ui.view">
-        <field name="name">is_mail_activity_form</field>
-        <field name="model">mail.activity</field>
-        <field name="arch" type="xml">
-            <form>
-               <sheet>
-                    <group>
-                        <group>
-                            <field name="res_model_id"/>
-                            <field name="res_model"/>
-                            <field name="res_id"/>
-                            <field name="res_name"/>
-                            <field name="activity_type_id"/>
-                            <field name="summary"/>
-                            <field name="note"/>
-                            <field name="date_deadline"/>
-                            <field name="automated"/>
-                            <field name="user_id"/>
-                            <field name="request_partner_id"/>
-                            <field name="recommended_activity_type_id"/>
-                            <field name="previous_activity_type_id"/>
-                            <field name="create_date"/>
-                            <field name="create_uid"/>
-                            <field name="write_uid"/>
-                            <field name="write_date"/>
-                     </group>
-                    </group>
-                </sheet>
-            </form>
-        </field>
+    <record id="is_mail_activity_update_partner_action_server" model="ir.actions.server">
+        <field name="name">Mise à jour Partenaire</field>
+        <field name="model_id" ref="mail.model_mail_activity"/>
+        <field name="binding_model_id" ref="mail.model_mail_activity"/>
+        <field name="state">code</field>
+        <field name="code">action = records._compute_partner_id()</field>
+    </record>
+    <!-- <record id="is_fnc_update_ir_cron" model="ir.cron">
+        <field name="name">Mise à jour FNC</field>
+        <field name="model_id" ref="is_fromtome14.model_is_fnc"/>
+        <field name="state">code</field>
+        <field name="code">model.fnc_update_ir_cron()</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
     </record> -->
+
+    
+
+    <record id="is_mail_activity_view_form_popup" model="ir.ui.view">
+        <field name="name">is_mail_activity_view_form_popup</field>
+        <field name="model">mail.activity</field>
+        <field name="inherit_id" ref="mail.mail_activity_view_form_popup"/>
+        <field name="arch" type="xml">
+            <field name="activity_type_id" position="after">
+                <field name="partner_id"/>
+            </field>
+        </field>
+    </record>
+
+
     <record id="is_mail_activity_tree" model="ir.ui.view">
         <field name="name">is_mail_activity_tree</field>
         <field name="model">mail.activity</field>

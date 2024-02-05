@@ -99,7 +99,7 @@
                         'default_product_tmpl_id':context.get('product_tmpl_id',active_id), 
                         'product_template_invisible_variant': True, 
                         'form_view_ref':'is_fromtome14.product_supplierinfo_form_view',
-                        'tree_view_ref':'purchase.product_supplierinfo_tree_view'
+                        'tree_view_ref':'product.product_supplierinfo_tree_view'
                     }
                 </attribute>
             </field>

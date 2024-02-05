@@ -215,6 +215,8 @@
                 <field name="is_habitude_commande"              optional="hide"/>
                 <field name="is_heure_envoi_id"                 optional="hide"/>
                 <field name="is_encours_client"                 optional="hide"/>
+                <field name="is_date_debut_nouveau_tarif"       optional="hide"/>
+                <field name="is_date_fin_nouveau_tarif"         optional="hide"/>
             </field>
         </field>
     </record>
@@ -307,6 +309,8 @@
         <field name="arch" type="xml">
             <field name="property_supplier_payment_term_id" position="before">
                 <field name="is_supplier"/>
+                <field name="is_date_debut_nouveau_tarif"/>
+                <field name="is_date_fin_nouveau_tarif"/>
                 <field name="is_date_reception" readonly="1"/>
             </field>
         </field>

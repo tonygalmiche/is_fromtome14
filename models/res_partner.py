@@ -74,6 +74,8 @@ class ResPartner(models.Model):
         ('telephone', 'Téléphone'),
         ('mail'     , 'Mail'),
     ], 'Habitude commande')
+    is_date_debut_nouveau_tarif = fields.Date(string="Date début nouveau tarif", help="Date utilisée lors de la copie d'un tarif dans un article")
+    is_date_fin_nouveau_tarif   = fields.Date(string="Date fin nouveau tarif"  , help="Date utilisée lors de la copie d'un tarif dans un article")
 
 
     def creer_modele_commande(self):
