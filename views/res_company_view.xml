@@ -28,7 +28,7 @@
                         </ul> 
                     </div> -->
                     <group>
-                        <field name="is_date_bascule_tarif"/>
+                        <!-- <field name="is_date_bascule_tarif"/> -->
                         <field name="is_coef_cdf_quai"/>
                         <field name="is_coef_cdf_franco"/>
                         <field name="is_coef_lf"/>
@@ -38,7 +38,7 @@
                     <button
                         name="actualiser_tarif_action"
                         type="object"
-                        string="Actualiser tous les tarifs en fonction du prix du fournisseur, des coefficients et de la date de bascule"
+                        string="Actualiser tous les tarifs en fonction du prix du fournisseur et du taux de marge"
                         confirm="ATTENTION : Cela va actualiser tous les tarifs"
                     />
                     <!-- <button

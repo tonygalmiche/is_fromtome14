@@ -268,17 +268,17 @@ class ProductTemplate(models.Model):
     is_prix_achat_actuel  = fields.Float(string="PA actuel", digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
     is_prix_achat_futur   = fields.Float(string="PA futur" , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
 
-    is_prix_vente_actuel_cdf_quai   = fields.Float(string='PV actuel Cdf quai'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_vente_actuel_cdf_franco = fields.Float(string='PV actuel Cdf franco', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_vente_actuel_lf         = fields.Float(string='PV actuel LF'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_vente_actuel_lf_coll    = fields.Float(string='PV actuel LF coll.'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
-    is_prix_vente_actuel_ft         = fields.Float(string='PV actuel FT'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_actuel_cdf_quai   = fields.Float(string='PV actuel Cdf quai'  , digits='Product Price', readonly=True, store=True)
+    is_prix_vente_actuel_cdf_franco = fields.Float(string='PV actuel Cdf franco', digits='Product Price', readonly=True, store=True)
+    is_prix_vente_actuel_lf         = fields.Float(string='PV actuel LF'        , digits='Product Price', readonly=True, store=True)
+    is_prix_vente_actuel_lf_coll    = fields.Float(string='PV actuel LF coll.'  , digits='Product Price', readonly=True, store=True)
+    is_prix_vente_actuel_ft         = fields.Float(string='PV actuel FT'        , digits='Product Price', readonly=True, store=True)
 
-    is_prix_vente_actuel_force_cdf_quai   = fields.Float(string='PV actuel forcé Cdf quai'  , digits='Product Price')
-    is_prix_vente_actuel_force_cdf_franco = fields.Float(string='PV actuel forcé Cdf franco', digits='Product Price')
-    is_prix_vente_actuel_force_lf         = fields.Float(string='PV actuel forcé LF'        , digits='Product Price')
-    is_prix_vente_actuel_force_lf_coll    = fields.Float(string='PV actuel forcé LF coll.'  , digits='Product Price')
-    is_prix_vente_actuel_force_ft         = fields.Float(string='PV actuel forcé FT'        , digits='Product Price')
+    is_prix_vente_actuel_marge_cdf_quai   = fields.Float(string='TM actuel forcé Cdf quai'  , digits='Product Price')
+    is_prix_vente_actuel_marge_cdf_franco = fields.Float(string='TM actuel forcé Cdf franco', digits='Product Price')
+    is_prix_vente_actuel_marge_lf         = fields.Float(string='TM actuel forcé LF'        , digits='Product Price')
+    is_prix_vente_actuel_marge_lf_coll    = fields.Float(string='TM actuel forcé LF coll.'  , digits='Product Price')
+    is_prix_vente_actuel_marge_ft         = fields.Float(string='TM actuel forcé FT'        , digits='Product Price')
 
     is_prix_vente_futur_cdf_quai   = fields.Float(string='PV futur Cdf quai'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
     is_prix_vente_futur_cdf_franco = fields.Float(string='PV futur Cdf franco', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
@@ -286,28 +286,32 @@ class ProductTemplate(models.Model):
     is_prix_vente_futur_lf_coll    = fields.Float(string='PV futur LF coll.'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
     is_prix_vente_futur_ft         = fields.Float(string='PV futur FT'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
 
-    is_prix_vente_futur_force_cdf_quai   = fields.Float(string='PV futur forcé Cdf quai'  , digits='Product Price')
-    is_prix_vente_futur_force_cdf_franco = fields.Float(string='PV futur forcé Cdf franco', digits='Product Price')
-    is_prix_vente_futur_force_lf         = fields.Float(string='PV futur forcé LF'        , digits='Product Price')
-    is_prix_vente_futur_force_lf_coll    = fields.Float(string='PV futur forcé LF coll.'  , digits='Product Price')
-    is_prix_vente_futur_force_ft         = fields.Float(string='PV futur forcé FT'        , digits='Product Price')
+    is_prix_vente_futur_marge_cdf_quai   = fields.Float(string='TM futur forcé Cdf quai'  , digits='Product Price')
+    is_prix_vente_futur_marge_cdf_franco = fields.Float(string='TM futur forcé Cdf franco', digits='Product Price')
+    is_prix_vente_futur_marge_lf         = fields.Float(string='TM futur forcé LF'        , digits='Product Price')
+    is_prix_vente_futur_marge_lf_coll    = fields.Float(string='TM futur forcé LF coll.'  , digits='Product Price')
+    is_prix_vente_futur_marge_ft         = fields.Float(string='TM futur forcé FT'        , digits='Product Price')
+
+
+    def update_prix_actuel_action(self):
+        self._compute_tarifs(update_prix_actuel=True)
 
 
     @api.depends('seller_ids','seller_ids.price',
                  'seller_ids.date_start',
-                 'is_prix_vente_actuel_force_cdf_quai',
-                 'is_prix_vente_actuel_force_cdf_franco',
-                 'is_prix_vente_actuel_force_lf',
-                 'is_prix_vente_actuel_force_lf_coll',
-                 'is_prix_vente_actuel_force_ft',
-                 'is_prix_vente_futur_force_cdf_quai',
-                 'is_prix_vente_futur_force_cdf_franco',
-                 'is_prix_vente_futur_force_lf',
-                 'is_prix_vente_futur_force_lf_coll',
-                 'is_prix_vente_futur_force_ft',
+                 'is_prix_vente_actuel_marge_cdf_quai',
+                 'is_prix_vente_actuel_marge_cdf_franco',
+                 'is_prix_vente_actuel_marge_lf',
+                 'is_prix_vente_actuel_marge_lf_coll',
+                 'is_prix_vente_actuel_marge_ft',
+                 'is_prix_vente_futur_marge_cdf_quai',
+                 'is_prix_vente_futur_marge_cdf_franco',
+                 'is_prix_vente_futur_marge_lf',
+                 'is_prix_vente_futur_marge_lf_coll',
+                 'is_prix_vente_futur_marge_ft',
                  'active'
     )
-    def _compute_tarifs(self):
+    def _compute_tarifs(self, update_prix_actuel=False):
         company = self.env.user.company_id
 
         #** Coefficients à appliquer ******************************************
@@ -322,50 +326,64 @@ class ProductTemplate(models.Model):
         nb=len(self)
         ct=1
         for obj in self:
-            #** Recherche du prix d'achat *************************************
-            now     = datetime.now().date()
-            bascule = company.is_date_bascule_tarif or now
+            #** Recherche du prix d'achat actuel ******************************
+            now = datetime.now().date()
             prix_actuel = 0
-            prix_futur  = 0
             for line in obj.seller_ids:
                 if now>=line.date_start and now<=line.date_end:
                     prix_actuel = line.price
-                if bascule>=line.date_start and bascule<=line.date_end:
-                    prix_futur = line.price
-            obj.is_date_bascule_tarif = bascule
             obj.is_prix_achat_actuel  = prix_actuel
+            #******************************************************************
+
+            #** Recherche du prix d'achat futur *******************************
+            prix_futur  = 0
+            mem_date=False
+            for line in obj.seller_ids:
+                if mem_date==False:
+                    mem_date = line.date_start
+                    prix_futur = line.price
+                if line.date_start>mem_date:
+                    mem_date = line.date_start
+                    prix_futur = line.price
             obj.is_prix_achat_futur   = prix_futur
             #******************************************************************
 
             #** Prix de vente actuel ******************************************
-            for price in _PRICELISTS:
-                coef = coefs[price]
-                name = "is_prix_vente_actuel_force_%s"%price
-                force = getattr(obj, name)
-                if force>0:
-                    val = force
-                else:
-                    val = round(prix_actuel * coef,4)
-                name = "is_prix_vente_actuel_%s"%price
-                setattr(obj, name, val)
+            if update_prix_actuel:
+                for price in _PRICELISTS:
+                    taux_marge = coefs[price]
+                    name = "is_prix_vente_actuel_marge_%s"%price
+                    force = getattr(obj, name)
+                    if force>0:
+                        taux_marge = force
+                    val=0
+                    if taux_marge<100 and taux_marge>0:
+                        val = round(100 * prix_actuel / (100 - taux_marge),4) # PrixVente = 100 x PrixAchat / (100 - TauxMarge)
+                    name = "is_prix_vente_actuel_%s"%price
+                    setattr(obj, name, val)
+            #******************************************************************
+
+            #** Mise à jour des liste de prix *********************************
+            if update_prix_actuel:
+                for product in obj.product_variant_ids:
+                    if type(product.id)==int:
+                        product.update_pricelist_ir_cron(product_tmpl_id=obj.id)
             #******************************************************************
 
             #** Prix de vente futur *******************************************
             for price in _PRICELISTS:
-                coef = coefs[price]
-                name = "is_prix_vente_futur_force_%s"%price
+                taux_marge = coefs[price]
+                name = "is_prix_vente_futur_marge_%s"%price
                 force = getattr(obj, name)
                 if force>0:
-                    val = force
-                else:
-                    val = round(prix_futur * coef,4)
+                    taux_marge = force
+                val=0
+                if taux_marge<100 and taux_marge>0:
+                    val = round(100 * prix_futur / (100 - taux_marge),4) # PrixVente = 100 x PrixAchat / (100 - TauxMarge)
                 name = "is_prix_vente_futur_%s"%price
                 setattr(obj, name, val)
             #******************************************************************
             _logger.info("_compute_tarifs : %s/%s : %s"%(ct,nb,obj.name))
-            for product in obj.product_variant_ids:
-                if type(product.id)==int:
-                    product.update_pricelist_ir_cron(product_tmpl_id=obj.id)
             ct+=1
 
 
@@ -459,7 +477,6 @@ class ProductProduct(models.Model):
                 }
                 pricelist = self.env['product.pricelist'].create(vals)
             if pricelist:
-                #pricelist.item_ids.unlink() #TODO : A supprimer une fois le script opérationnel
                 field_name = "is_prix_vente_actuel_%s"%key
                 filtre=[
                     (field_name, '>', 0)

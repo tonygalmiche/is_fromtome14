@@ -243,9 +243,6 @@
                     <button string="Recharger les valeurs" name="recharger_valeurs_action" type="object" confirm="Cela va remplacer les données ci-dessus"/>
                 </page>
                 <page string="Gestion des tarifs">
-                    <group>
-                        <field name="is_date_bascule_tarif"/>
-                    </group>
                     <group string="Prix d'achat">
                         <group>
                             <field name="is_prix_achat_actuel"/>
@@ -262,12 +259,17 @@
                             <field name="is_prix_vente_actuel_lf_coll"/>
                             <field name="is_prix_vente_actuel_ft"/>
                         </group>
-                        <group string="Prix de vente actuel forcé">
-                            <field name="is_prix_vente_actuel_force_cdf_quai"/>
-                            <field name="is_prix_vente_actuel_force_cdf_franco"/>
-                            <field name="is_prix_vente_actuel_force_lf"/>
-                            <field name="is_prix_vente_actuel_force_lf_coll"/>
-                            <field name="is_prix_vente_actuel_force_ft"/>
+                        <group string="Taux de marge actuel forcé">
+                            <field name="is_prix_vente_actuel_marge_cdf_quai"/>
+                            <field name="is_prix_vente_actuel_marge_cdf_franco"/>
+                            <field name="is_prix_vente_actuel_marge_lf"/>
+                            <field name="is_prix_vente_actuel_marge_lf_coll"/>
+                            <field name="is_prix_vente_actuel_marge_ft"/>
+                            <button
+                                name="update_prix_actuel_action"
+                                type="object"
+                                string="Mise à jour prix actuel"
+                            />
                         </group>
                     </group>
                     <group>
@@ -278,12 +280,12 @@
                             <field name="is_prix_vente_futur_lf_coll"/>
                             <field name="is_prix_vente_futur_ft"/>
                         </group>
-                        <group string="Prix de vente futur forcé">
-                            <field name="is_prix_vente_futur_force_cdf_quai"/>
-                            <field name="is_prix_vente_futur_force_cdf_franco"/>
-                            <field name="is_prix_vente_futur_force_lf"/>
-                            <field name="is_prix_vente_futur_force_lf_coll"/>
-                            <field name="is_prix_vente_futur_force_ft"/>
+                        <group string="Taux de marge futur forcé">
+                            <field name="is_prix_vente_futur_marge_cdf_quai"/>
+                            <field name="is_prix_vente_futur_marge_cdf_franco"/>
+                            <field name="is_prix_vente_futur_marge_lf"/>
+                            <field name="is_prix_vente_futur_marge_lf_coll"/>
+                            <field name="is_prix_vente_futur_marge_ft"/>
                         </group>
                     </group>
                 </page>
@@ -309,29 +311,29 @@
                 <field name="is_prix_achat_futur" optional="show"/>
 
                 <field name="is_prix_vente_actuel_cdf_quai" optional="show"/>
-                <field name="is_prix_vente_actuel_force_cdf_quai" optional="show"/>
+                <field name="is_prix_vente_actuel_marge_cdf_quai" optional="show"/>
                 <field name="is_prix_vente_futur_cdf_quai" optional="show"/>
-                <field name="is_prix_vente_futur_force_cdf_quai" optional="show"/>
+                <field name="is_prix_vente_futur_marge_cdf_quai" optional="show"/>
 
                 <field name="is_prix_vente_actuel_cdf_franco" optional="show"/>
-                <field name="is_prix_vente_actuel_force_cdf_franco" optional="show"/>
+                <field name="is_prix_vente_actuel_marge_cdf_franco" optional="show"/>
                 <field name="is_prix_vente_futur_cdf_franco" optional="show"/>
-                <field name="is_prix_vente_futur_force_cdf_franco" optional="show"/>
+                <field name="is_prix_vente_futur_marge_cdf_franco" optional="show"/>
 
                 <field name="is_prix_vente_actuel_lf" optional="show"/>
-                <field name="is_prix_vente_actuel_force_lf" optional="show"/>
+                <field name="is_prix_vente_actuel_marge_lf" optional="show"/>
                 <field name="is_prix_vente_futur_lf" optional="show"/>
-                <field name="is_prix_vente_futur_force_lf" optional="show"/>
+                <field name="is_prix_vente_futur_marge_lf" optional="show"/>
 
                 <field name="is_prix_vente_actuel_lf_coll" optional="show"/>
-                <field name="is_prix_vente_actuel_force_lf_coll" optional="show"/>
+                <field name="is_prix_vente_actuel_marge_lf_coll" optional="show"/>
                 <field name="is_prix_vente_futur_lf_coll" optional="show"/>
-                <field name="is_prix_vente_futur_force_lf_coll" optional="show"/>
+                <field name="is_prix_vente_futur_marge_lf_coll" optional="show"/>
 
                 <field name="is_prix_vente_actuel_ft" optional="show"/>
-                <field name="is_prix_vente_actuel_force_ft" optional="show"/>
+                <field name="is_prix_vente_actuel_marge_ft" optional="show"/>
                 <field name="is_prix_vente_futur_ft" optional="show"/>
-                <field name="is_prix_vente_futur_force_ft" optional="show"/>
+                <field name="is_prix_vente_futur_marge_ft" optional="show"/>
             </tree>
         </field>
     </record>
@@ -368,29 +370,29 @@
                 <field name="is_prix_achat_futur"   optional="show"/>
 
                 <field name="is_prix_vente_actuel_cdf_quai"         optional="show" class="fond_gris prix_vente_actuel"/>
-                <field name="is_prix_vente_actuel_force_cdf_quai"   optional="show" class="fond_gris prix_vente_force"/>
+                <field name="is_prix_vente_actuel_marge_cdf_quai"   optional="show" class="fond_gris prix_vente_force"/>
                 <field name="is_prix_vente_futur_cdf_quai"          optional="show" class="fond_gris prix_vente_futur"/>
-                <field name="is_prix_vente_futur_force_cdf_quai"    optional="show" class="fond_gris prix_vente_futur_force"/>
+                <field name="is_prix_vente_futur_marge_cdf_quai"    optional="show" class="fond_gris prix_vente_futur_force"/>
 
                 <field name="is_prix_vente_actuel_cdf_franco"       optional="show" class="prix_vente_actuel "/>
-                <field name="is_prix_vente_actuel_force_cdf_franco" optional="show" class="prix_vente_force"/>
+                <field name="is_prix_vente_actuel_marge_cdf_franco" optional="show" class="prix_vente_force"/>
                 <field name="is_prix_vente_futur_cdf_franco"        optional="show" class="prix_vente_futur"/>
-                <field name="is_prix_vente_futur_force_cdf_franco"  optional="show" class="prix_vente_futur_force"/>
+                <field name="is_prix_vente_futur_marge_cdf_franco"  optional="show" class="prix_vente_futur_force"/>
 
                 <field name="is_prix_vente_actuel_lf"               optional="show" class="fond_gris prix_vente_actuel"/>
-                <field name="is_prix_vente_actuel_force_lf"         optional="show" class="fond_gris prix_vente_force"/>
+                <field name="is_prix_vente_actuel_marge_lf"         optional="show" class="fond_gris prix_vente_force"/>
                 <field name="is_prix_vente_futur_lf"                optional="show" class="fond_gris prix_vente_futur"/>
-                <field name="is_prix_vente_futur_force_lf"          optional="show" class="fond_gris prix_vente_futur_force"/>
+                <field name="is_prix_vente_futur_marge_lf"          optional="show" class="fond_gris prix_vente_futur_force"/>
 
                 <field name="is_prix_vente_actuel_lf_coll"          optional="show" class="prix_vente_actuel"/>
-                <field name="is_prix_vente_actuel_force_lf_coll"    optional="show" class="prix_vente_force"/>
+                <field name="is_prix_vente_actuel_marge_lf_coll"    optional="show" class="prix_vente_force"/>
                 <field name="is_prix_vente_futur_lf_coll"           optional="show" class="prix_vente_futur"/>
-                <field name="is_prix_vente_futur_force_lf_coll"     optional="show" class="prix_vente_futur_force"/>
+                <field name="is_prix_vente_futur_marge_lf_coll"     optional="show" class="prix_vente_futur_force"/>
 
                 <field name="is_prix_vente_actuel_ft"               optional="show" class="fond_gris prix_vente_actuel"/>
-                <field name="is_prix_vente_actuel_force_ft"         optional="show" class="fond_gris prix_vente_force"/>
+                <field name="is_prix_vente_actuel_marge_ft"         optional="show" class="fond_gris prix_vente_force"/>
                 <field name="is_prix_vente_futur_ft"                optional="show" class="fond_gris prix_vente_futur"/>
-                <field name="is_prix_vente_futur_force_ft"          optional="show" class="fond_gris prix_vente_futur_force"/>
+                <field name="is_prix_vente_futur_marge_ft"          optional="show" class="fond_gris prix_vente_futur_force"/>
             </tree>
         </field>
     </record>
