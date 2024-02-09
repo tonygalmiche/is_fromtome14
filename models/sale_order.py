@@ -691,8 +691,6 @@ class SaleOrder(models.Model):
                                     order_line.date_planned = date_planned
                             else:
                                 order_line = order_lines[0]
-
-
                             if order_line:
                                 line.is_purchase_line_id=order_line.id
                                 if company.is_regroupe_cde=="Non":
@@ -706,6 +704,7 @@ class SaleOrder(models.Model):
                                     for l in order_lines:
                                         qty+=l.product_uom_qty
                                     order_line.product_qty = qty
+                                    order_line.onchange_product_qty_fromtome()
                             # ***********************************************************
 
 
