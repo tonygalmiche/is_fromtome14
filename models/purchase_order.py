@@ -190,6 +190,7 @@ class PurchaseOrder(models.Model):
                             if l.product_id == line.product_id:
                                 qty = line.product_qty + l.product_qty
                                 l.product_qty = qty
+                                l.onchange_product_qty_fromtome()
                                 test=True
                                 break
                         #** Création d'une nouvelle ligne *********************
@@ -208,6 +209,7 @@ class PurchaseOrder(models.Model):
                             order_line=self.env['purchase.order.line'].create(vals)
                             order_line.onchange_product_id()
                             order_line.product_qty = line.product_qty
+                            order_line.onchange_product_qty_fromtome()
 
                     order.button_cancel()
                     order.is_fusion_order_id = first_order.id
@@ -228,17 +230,49 @@ class PurchaseOrderLine(models.Model):
         for obj in self:
             nb        = obj.product_id.is_nb_pieces_par_colis
             poids_net = obj.product_id.is_poids_net_colis
-            unite     = obj.product_uom.category_id.name
             obj.is_nb_pieces_par_colis = nb
-            nb_colis  = 0
-            if unite=="Poids":
-                if poids_net>0:
-                    nb_colis = obj.product_qty/poids_net
-            else:
-                if nb>0:
-                    nb_colis = obj.product_qty / nb
-            obj.is_nb_colis = nb_colis
-            obj.is_poids_net = nb_colis * poids_net
+            #unite     = obj.product_uom.category_id.name
+            #nb_colis  = 0
+            #if unite=="Poids":
+            #    if poids_net>0:
+            #        nb_colis = obj.product_qty/poids_net
+            #else:
+            #    if nb>0:
+            #        nb_colis = obj.product_qty / nb
+            #obj.is_nb_colis = nb_colis
+            obj.is_poids_net = obj.is_nb_colis * poids_net
+
+
+    @api.onchange('is_nb_colis')
+    def onchange_is_nb_colis(self):
+        unite = self.product_uom.category_id.name
+        if unite=="Poids":
+            self.product_qty =  self.is_nb_colis * self.product_id.is_poids_net_colis
+        else:
+            self.product_qty =  self.is_nb_colis * self.is_nb_pieces_par_colis
+
+
+    @api.onchange('product_qty')
+    def onchange_product_qty_fromtome(self):
+        if self.is_nb_pieces_par_colis>0:
+            self.is_nb_colis = self.get_nb_colis()
+
+            print("TEST onchange_product_qty_fromtome", self, self.is_nb_colis)
+
+
+
+    def get_nb_colis(self):
+        nb        = self.product_id.is_nb_pieces_par_colis
+        poids_net = self.product_id.is_poids_net_colis
+        unite     = self.product_uom.category_id.name
+        nb_colis  = 0
+        if unite=="Poids":
+            if poids_net>0:
+                nb_colis = self.product_qty/poids_net
+        else:
+            if nb>0:
+                nb_colis = self.product_qty / nb
+        return round(nb_colis)
 
 
     @api.depends('product_id','is_nb_colis','price_unit')
@@ -271,7 +305,8 @@ class PurchaseOrderLine(models.Model):
 
     is_sale_order_line_id  = fields.Many2one('sale.order.line', string=u'Ligne commande client', index=True)
     is_nb_pieces_par_colis = fields.Integer(string='PCB', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
-    is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2) , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
+    #is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2) , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
+    is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2))
     is_poids_net           = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
     is_alerte              = fields.Text(string='Alerte', compute='_compute_is_alerte')
     is_client_id           = fields.Many2one('res.partner', 'Client', related='is_sale_order_line_id.order_id.partner_id')

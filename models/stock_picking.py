@@ -419,6 +419,7 @@ class IsScanPicking(models.Model):
                             order_line=self.env['purchase.order.line'].create(vals)
                             order_line.onchange_product_id()
                             order_line.product_qty = 0
+                            order_line.onchange_product_qty_fromtome()
                             order_line.name = '## Ajouté en reception ##'
             #******************************************************************
 

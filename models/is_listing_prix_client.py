@@ -108,7 +108,7 @@ class IsListingPrixClient(models.Model):
                 products = self.env['product.product'].search([('id','in',ids)], order="name")
                 if products:
                     html+='<div style="height:2mm"></div>'
-                    html+="<h1>Type de lait : %s</h1>"%(milk.name)
+                    html+="<h1>%s</h1>"%(milk.name)
                     html+="<table>"
                     html+='<thead><tr style="height:0">'
                     html+='<th style="width:25%"></th>'

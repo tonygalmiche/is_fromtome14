@@ -203,6 +203,7 @@ class IsCommandeFromtome(models.Model):
                         order_line=self.env['purchase.order.line'].create(vals)
                         order_line.onchange_product_id()
                         order_line.product_qty = product_qty
+                        order_line.onchange_product_qty_fromtome()
                         order_line_id=order_line.id
                     if sale_qty>0 or product_qty>0:
                         vals={

@@ -102,7 +102,7 @@
                                     <td style="width:48%;vertical-align:top">
                                         <table class="table" style="width:100%">
                                             <tr><td>Région d'origine:     </td><td><span t-field="doc.is_region_id.name"/></td></tr>
-                                            <tr><td>Type de lait:     </td><td><span t-field="doc.milk_type"/></td></tr>
+                                            <tr><td>Type article:         </td><td><span t-field="doc.milk_type"/></td></tr>
                                             <tr><td>Traitement thermique: </td><td><span t-field="doc.traitement_thermique"/></td></tr>
                                             <tr><td>Famille de fromage:   </td><td><span t-field="doc.is_famille_fromage_id.name"/></td></tr>
                                             <tr><td>Durée d'affinage:     </td><td><span t-field="doc.duree_affinage"/></td></tr>

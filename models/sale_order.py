@@ -687,6 +687,7 @@ class SaleOrder(models.Model):
 
                                     order_line=self.env['purchase.order.line'].create(vals)
                                     order_line.onchange_product_id()
+                                    order_line.onchange_product_qty_fromtome()
                                     order_line.date_planned = date_planned
                             else:
                                 order_line = order_lines[0]

@@ -412,13 +412,13 @@
 
     <!-- milk.type -->
     <record model="ir.actions.act_window" id="milk_type_act">
-        <field name="name">Type de Lait</field>
+        <field name="name">Type article</field>
         <field name="res_model">milk.type</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[]</field>
         <field name="context">{}</field>
     </record>
-    <menuitem id="menu_milk_type" name="Type de Lait" parent="stock.menu_product_in_config_stock" sequence="4"
+    <menuitem id="menu_milk_type" name="Type article" parent="stock.menu_product_in_config_stock" sequence="4"
               action="milk_type_act"/>
     <record model="ir.actions.act_window" id="product_label_category_act">
         <field name="name">Categories Labels Produit</field>

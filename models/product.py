@@ -21,7 +21,7 @@ _PRICELISTS = {
 
 class MilkType(models.Model):
     _name="milk.type"
-    _description = "Type de lait"
+    _description = "Type d'article"
     name=fields.Char('Nom')
     logo=fields.Binary('Logo')
     description=fields.Text('Desciption')
@@ -222,8 +222,8 @@ class ProductTemplate(models.Model):
 
     # CARACTÉRISTIQUES GÉNÉRALES DU PRODUIT:
     is_region_id          = fields.Many2one('is.region.origine', string="Region d'origine")
-    milk_type_ids         = fields.Many2many('milk.type','product_milk_type_rel','product_id','milk_type_id', string='Type de Lait')
-    milk_type             = fields.Char(string='Types de Lait', compute='_compute_milk_type')
+    milk_type_ids         = fields.Many2many('milk.type','product_milk_type_rel','product_id','milk_type_id', string='Type article')
+    milk_type             = fields.Char(string='Types article', compute='_compute_milk_type')
     traitement_thermique  = fields.Selection(string='Traitement Thermique', selection=_TRAITEMENT_THERMIQUE)
     is_famille_fromage_id = fields.Many2one('is.famille.fromage', string="Famille de fromage")
     duree_affinage        = fields.Char(string="Durée d'affinage")
