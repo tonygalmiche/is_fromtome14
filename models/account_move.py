@@ -133,7 +133,13 @@ class AccountMove(models.Model):
             obj.is_nb_colis  = colis
 
 
-    is_enseigne_id      = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
+    @api.depends('partner_id')
+    def _compute_is_enseigne_id(self):
+        for obj in self:
+            obj.is_enseigne_id = obj.partner_id.is_enseigne_id.id
+        
+
+    is_enseigne_id      = fields.Many2one('is.enseigne.commerciale', 'Enseigne', compute='_compute_is_enseigne_id', store=True, readonly=False) #, related='partner_id.is_enseigne_id')
     is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
     is_alerte           = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
     is_ref_client       = fields.Text('Ref Client' , compute='_is_ref_client_int_cde')

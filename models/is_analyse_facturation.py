@@ -102,7 +102,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                             "invoice_date"  : invoice.invoice_date,
                             "partner_id"    : invoice.partner_id.id,
                             "user_id"       : invoice.partner_id.user_id.id,
-                            "enseigne"      : invoice.partner_id.is_enseigne_id.name.name,
+                            "enseigne"      : invoice.is_enseigne_id.name.name,
                             "product_id"    : line.product_id.id,
                             "product_uom_id": line.product_uom_id.id,
                             "libelle"       : line.name,
