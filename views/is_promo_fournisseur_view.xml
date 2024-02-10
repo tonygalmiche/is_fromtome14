@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    
+    <!-- is.promo.fournisseur -->
+    <record id="is_promo_fournisseur_seq" model="ir.sequence">
+        <field name="name">Promo fournisseur</field>
+        <field name="code">is.promo.fournisseur</field>
+        <field name="prefix"></field>
+        <field name="padding">5</field>
+        <field eval="False" name="company_id"/>
+    </record>
+    <record id="is_promo_fournisseur_tree_view" model="ir.ui.view">
+        <field name="name">is_promo_fournisseur_tree_view</field>
+        <field name="model">is.promo.fournisseur</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="partner_id" widget="many2one_clickable"/>
+                <field name="date_debut_promo"/>
+                <field name="date_fin_promo"/>
+                <field name="intitule"/>
+                <field name="taux_remise"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_promo_fournisseur_form_view" model="ir.ui.view">
+        <field name="name">is_promo_fournisseur_form_view</field>
+        <field name="model">is.promo.fournisseur</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <style>
+                        .o_form_label{
+                            white-space: nowrap;
+                        }
+                    </style>
+                    <group>
+                        <field name="name"/>
+                        <field name="partner_id"/>
+                        <field name="date_debut_promo"/>
+                        <field name="date_fin_promo"/>
+                        <field name="intitule"/>
+                        <field name="taux_remise"/>
+                        <field name="product_ids" widget="many2many_tags" domain="[('is_fournisseur_id','=',partner_id)]"/>
+                        <label for="product_ids" string=" "/>
+                        <div>
+                            <button
+                                name="ajouter_articles_action"
+                                type="object"
+                                string="Ajouter ces articles"
+                                class="oe_inline oe_highlight"
+                                attrs="{'invisible':[('product_ids','=',[])]}"
+                            />
+                        </div>
+                    </group>
+                    <field  name="ligne_ids" nolabel="1">
+                        <tree editable="bottom" limit="1000">
+                            <field name="product_id" domain="[('is_fournisseur_id','=',parent.partner_id)]" widget="many2one_clickable"/>
+                            <field name="taux_remise"/>
+                        </tree>
+                    </field>
+                    <button
+                        name="appliquer_promo_action"
+                        type="object"
+                        string="Appliquer la promo sur ces articles"
+                        class="oe_inline oe_highlight"
+                        attrs="{'invisible':[('ligne_ids','=',[])]}"
+                    />
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="is_promo_fournisseur_calendar" model="ir.ui.view" >
+        <field name="name">is_promo_fournisseur_calendar</field>
+        <field name="model">is.promo.fournisseur</field>
+        <field name="arch" type="xml">
+            <calendar date_start="date_debut_promo" date_stop="date_fin_promo" mode="month" color="partner_id" event_limit="5">
+                <field name="partner_id" filters="1"/>
+                <field name="intitule"/>
+                <field name="taux_remise"/>
+            </calendar>
+        </field>
+    </record>
+    <record id="is_promo_fournisseur_search_view" model="ir.ui.view">
+        <field name="name">is_promo_fournisseur_search_view</field>
+        <field name="model">is.promo.fournisseur</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="intitule"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="is_promo_fournisseur_action" model="ir.actions.act_window">
+        <field name="name">Promos</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">is.promo.fournisseur</field>
+        <field name="view_mode">tree,form,calendar</field>
+    </record>
+    <record id="is_promo_fournisseur_calendar_action" model="ir.actions.act_window">
+        <field name="name">Agenda des promos</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">is.promo.fournisseur</field>
+        <field name="view_mode">calendar,tree,form</field>
+    </record>
+
+     
+    <menuitem 
+        id="is_promo_fournisseur_main_menu" 
+        name="Promos" 
+        parent="purchase.menu_purchase_root" 
+        sequence="6"
+    />
+    <menuitem 
+        id="is_promo_fournisseur_menu" 
+        name="Promos" 
+        parent="is_promo_fournisseur_main_menu" 
+        sequence="10"
+        action="is_promo_fournisseur_action"
+    />
+    <menuitem 
+        id="is_promo_fournisseur_calendar_menu" 
+        name="Agenda des promos" 
+        parent="is_promo_fournisseur_main_menu" 
+        sequence="20"
+        action="is_promo_fournisseur_calendar_action"
+    />
+
+</odoo>

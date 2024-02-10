@@ -32,5 +32,6 @@ from . import is_relance_facture
 from . import is_suivi_commande_hebdo
 from . import is_analyse_rupture
 from . import is_preparation_transfert_entrepot
+from . import is_promo_fournisseur
 
 

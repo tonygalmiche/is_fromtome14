@@ -49,6 +49,7 @@
         <field name="inherit_id" ref="product.product_template_tree_view"/>
         <field name="arch" type="xml">
             <field name="default_code" position="after">
+                <field name="is_fournisseur_id"  optional="hide" widget="many2one_clickable"/>
                 <field name="is_ref_fournisseur" optional="show"/>
             </field>
              <field name="uom_id" position="after">

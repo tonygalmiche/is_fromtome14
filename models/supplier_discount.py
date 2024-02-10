@@ -12,11 +12,12 @@ class SupplierDiscount(models.Model):
     _name = "product.supplierdiscount"
     _description = "SupplierDiscount"
 
-    name = fields.Float('Discount')
+    promo_id         = fields.Many2one('is.promo.fournisseur.ligne', 'Promo', index=True)
+    name             = fields.Float('Discount')
     supplier_info_id = fields.Many2one('product.supplierinfo')
-    date_start = fields.Date('Start Date', help="Start date for this vendor price", related='supplier_info_id.date_start')
-    date_end = fields.Date('End Date', help="End date for this vendor price", related='supplier_info_id.date_end')
-    delay = fields.Integer(
+    date_start       = fields.Date('Start Date', help="Start date for this vendor price", related='supplier_info_id.date_start')
+    date_end         = fields.Date('End Date'  , help="End date for this vendor price"  , related='supplier_info_id.date_end')
+    delay            = fields.Integer(
         'Delivery Lead Time', default=0, required=True,
         help="Lead time in days between the confirmation of the purchase order and the receipt of the products in your warehouse. Used by the scheduler for automatic computation of the purchase order planning.")
 

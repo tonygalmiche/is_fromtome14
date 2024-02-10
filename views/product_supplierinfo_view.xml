@@ -11,7 +11,8 @@
                 <field name="prix_brut"/>
                 <field name="discount_ids">
                     <tree editable="Bottom">
-                        <field name="name" string="Remises %"/>
+                        <field name="promo_id" widget="many2one_clickable" readonly="1"/>
+                        <field name="name"     string="Remises %"/>
                     </tree>
                 </field>
             </xpath>

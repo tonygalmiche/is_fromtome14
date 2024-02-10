@@ -198,13 +198,18 @@ class ProductTemplate(models.Model):
                 ('product_tmpl_id', '=', obj.id),
             ]
             ref=False
+            fournisseur_id = False
             suppliers=self.env['product.supplierinfo'].search(filtre,limit=1)
             for s in suppliers:
                 ref=s.product_code
+                fournisseur_id = s.name.id
             obj.is_ref_fournisseur = ref
+            obj.is_fournisseur_id  = fournisseur_id
 
 
-    is_ref_fournisseur = fields.Char(string='Réf fournisseur', compute='_compute_is_ref_fournisseur', readonly=True, store=True)
+    is_ref_fournisseur = fields.Char(string='Réf fournisseur'        , compute='_compute_is_ref_fournisseur', readonly=True, store=True)
+    is_fournisseur_id  = fields.Many2one('res.partner', 'Fournisseur', compute='_compute_is_ref_fournisseur', readonly=True, store=True)
+
 
     contrat_date_id = fields.One2many('contrat.date.client','product_id','Contrat Date')
 
