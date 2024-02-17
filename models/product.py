@@ -302,6 +302,20 @@ class ProductTemplate(models.Model):
         self._compute_tarifs(update_prix_actuel=True)
 
 
+    # Prix FRANCO = Prix A QUAI + montant en € => 12€ + 0,8 = 12,80 pour les produit facturé au Kg
+    # Prix FRANCO = Prix A QUAI + (montant en € x poids du produit) =>  fromage de 300g => 2,5€ + (0,8x0,3) = 2,74€/pièce pour les produits facturés à la pièce
+    def get_frais_port(self,port=0):
+        for obj in self:
+            res = 0
+            unite = obj.uom_id.category_id.name
+            if unite=="Poids":
+                res=port
+            else:
+                nb = obj.is_nb_pieces_par_colis or 1
+                res= port*obj.is_poids_net_colis/nb
+            return res
+
+
     @api.depends('seller_ids','seller_ids.price',
                  'seller_ids.date_start',
                  'is_prix_vente_actuel_marge_cdf_quai',
@@ -327,6 +341,13 @@ class ProductTemplate(models.Model):
             coefs[price] = coef
         #**********************************************************************
 
+        #** Frais de port à appliquer *****************************************
+        ports={}
+        for price in _PRICELISTS:
+            name = "is_port_%s"%price
+            port = getattr(company, name)
+            ports[price] = port
+        #**********************************************************************
 
         nb=len(self)
         ct=1
@@ -364,6 +385,7 @@ class ProductTemplate(models.Model):
                     val=0
                     if taux_marge<100 and taux_marge>0:
                         val = round(100 * prix_actuel / (100 - taux_marge),4) # PrixVente = 100 x PrixAchat / (100 - TauxMarge)
+                    val+=obj.get_frais_port(ports[price])
                     name = "is_prix_vente_actuel_%s"%price
                     setattr(obj, name, val)
             #******************************************************************
@@ -385,6 +407,7 @@ class ProductTemplate(models.Model):
                 val=0
                 if taux_marge<100 and taux_marge>0:
                     val = round(100 * prix_futur / (100 - taux_marge),4) # PrixVente = 100 x PrixAchat / (100 - TauxMarge)
+                val+=obj.get_frais_port(ports[price])
                 name = "is_prix_vente_futur_%s"%price
                 setattr(obj, name, val)
             #******************************************************************
