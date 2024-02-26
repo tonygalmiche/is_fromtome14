@@ -3,6 +3,23 @@
 
     
     <!-- is.promo.fournisseur -->
+    <record id="desactiver_promo_fournisseur_action_server" model="ir.actions.server">
+        <field name="name">Désactiver la promo sur les articles</field>
+        <field name="model_id" ref="is_fromtome14.model_is_promo_fournisseur"/>
+        <field name="binding_model_id" ref="is_fromtome14.model_is_promo_fournisseur"/>
+        <field name="state">code</field>
+        <field name="code">action = records.desactiver_promo_action()</field>
+    </record>
+    <record id="appliquer_promo_fournisseur_action_server" model="ir.actions.server">
+        <field name="name">Appliquer la promo sur les articles</field>
+        <field name="model_id" ref="is_fromtome14.model_is_promo_fournisseur"/>
+        <field name="binding_model_id" ref="is_fromtome14.model_is_promo_fournisseur"/>
+        <field name="state">code</field>
+        <field name="code">action = records.appliquer_promo_action()</field>
+    </record>
+
+
+
     <record id="is_promo_fournisseur_seq" model="ir.sequence">
         <field name="name">Promo fournisseur</field>
         <field name="code">is.promo.fournisseur</field>

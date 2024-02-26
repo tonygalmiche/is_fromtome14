@@ -87,14 +87,10 @@ class IsPromoFournisseur(models.Model):
             print(obj)
             now = datetime.now().date()
             for l in obj.ligne_ids:
-
                 filtre=[
                     ('promo_id', '=', l.id),
                 ]
                 self.env['product.supplierdiscount'].search(filtre).unlink()
-
-
-
                 filtre=[
                     ('product_tmpl_id', '=', l.product_id.product_tmpl_id.id),
                     ('date_start', '<=', now),
@@ -111,6 +107,16 @@ class IsPromoFournisseur(models.Model):
                     self.env['product.supplierdiscount'].create(vals)
 
 
+    def desactiver_promo_action(self):
+        for obj in self:
+            for l in obj.ligne_ids:
+                filtre=[
+                    ('promo_id', '=', l.id),
+                ]
+                lines = self.env['product.supplierdiscount'].search(filtre)
+                print(filtre, lines)
+                lines.unlink()
+    
 
 class IsPromoFournisseurLigne(models.Model):
     _name = 'is.promo.fournisseur.ligne'
