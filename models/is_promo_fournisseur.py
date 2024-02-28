@@ -2,6 +2,8 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from datetime import datetime
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class IsPromoFournisseur(models.Model):
@@ -30,7 +32,6 @@ class IsPromoFournisseur(models.Model):
     def create(self, vals):
         vals['name'] = self.env['ir.sequence'].next_by_code('is.promo.fournisseur')
         res = super(IsPromoFournisseur, self).create(vals)
-        print('create : res=',res)
         res.remove_doublons()
         return res
 
@@ -41,14 +42,10 @@ class IsPromoFournisseur(models.Model):
         return res
 
 
-
     def unlink(self):
         self.ligne_ids.unlink()
         res = super(IsPromoFournisseur, self).unlink()
         return res
-
-
-
 
 
     def remove_doublons(self):
@@ -59,7 +56,6 @@ class IsPromoFournisseur(models.Model):
                     product_ids.append(l.product_id)
                 else:
                     l.unlink()
-
 
 
     def ajouter_articles_action(self):
@@ -84,27 +80,32 @@ class IsPromoFournisseur(models.Model):
 
     def appliquer_promo_action(self):
         for obj in self:
-            print(obj)
             now = datetime.now().date()
             for l in obj.ligne_ids:
+                #** Suppressions des promos ***********************************
                 filtre=[
                     ('promo_id', '=', l.id),
                 ]
                 self.env['product.supplierdiscount'].search(filtre).unlink()
-                filtre=[
-                    ('product_tmpl_id', '=', l.product_id.product_tmpl_id.id),
-                    ('date_start', '<=', now),
-                    ('date_end', '>=', now),
-                ]
-                lines=self.env['product.supplierinfo'].search(filtre)
-                for line in lines:
-                    print(line, line.discount_ids)
-                    vals={
-                        'supplier_info_id': line.id,
-                        'promo_id'        : l.id,
-                        'name'            : l.taux_remise,
-                    }
-                    self.env['product.supplierdiscount'].create(vals)
+                #**************************************************************
+
+                #** Ajout des promos en fonction de la date du jour ***********
+                if now>=obj.date_debut_promo and now<=obj.date_fin_promo:
+                    filtre=[
+                        ('product_tmpl_id', '=', l.product_id.product_tmpl_id.id),
+                        ('date_start', '<=', now),
+                        ('date_end', '>=', now),
+                    ]
+                    lines=self.env['product.supplierinfo'].search(filtre)
+                    for line in lines:
+                        _logger.info("appliquer_promo_action : %s => [%s]%s"%(obj.name, l.product_id.default_code,l.product_id.name))
+                        vals={
+                            'supplier_info_id': line.id,
+                            'promo_id'        : l.id,
+                            'name'            : l.taux_remise,
+                        }
+                        self.env['product.supplierdiscount'].create(vals)
+                #**************************************************************
 
 
     def desactiver_promo_action(self):
@@ -114,9 +115,13 @@ class IsPromoFournisseur(models.Model):
                     ('promo_id', '=', l.id),
                 ]
                 lines = self.env['product.supplierdiscount'].search(filtre)
-                print(filtre, lines)
                 lines.unlink()
     
+
+
+    def update_promo_fournisseur_ir_cron(self):
+        self.env['is.promo.fournisseur'].search([]).appliquer_promo_action()
+
 
 class IsPromoFournisseurLigne(models.Model):
     _name = 'is.promo.fournisseur.ligne'
@@ -148,7 +153,6 @@ class IsPromoFournisseurLigne(models.Model):
                 ('promo_id', '=', obj.id),
             ]
             self.env['product.supplierdiscount'].search(filtre).unlink()
-            print("TEST unlink",obj)
         res = super(IsPromoFournisseurLigne, self).unlink()
         return res
 

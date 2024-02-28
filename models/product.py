@@ -297,6 +297,8 @@ class ProductTemplate(models.Model):
     is_prix_vente_futur_marge_lf_coll    = fields.Float(string='TM futur forcé LF coll.'  , digits='Product Price')
     is_prix_vente_futur_marge_ft         = fields.Float(string='TM futur forcé FT'        , digits='Product Price')
 
+    is_nb_promos = fields.Integer(string='Nb promos', help="Nombre de promos en cours (actualisé la nuit par la gestion des promos)", readonly=True)
+
 
     def update_prix_actuel_action(self):
         self._compute_tarifs(update_prix_actuel=True)
@@ -316,6 +318,15 @@ class ProductTemplate(models.Model):
             return res
 
 
+    def compute_nb_promos(self,supplierinfo):
+        for obj in self:
+            nb=0
+            for line in supplierinfo.discount_ids:
+                if line.promo_id:
+                    nb+=1
+            obj.is_nb_promos = nb
+
+
     @api.depends('seller_ids','seller_ids.price',
                  'seller_ids.date_start',
                  'is_prix_vente_actuel_marge_cdf_quai',
@@ -332,6 +343,14 @@ class ProductTemplate(models.Model):
     )
     def _compute_tarifs(self, update_prix_actuel=False):
         company = self.env.user.company_id
+
+
+        #** Recherche du nombre de promos en cours ****************************
+
+
+        #**********************************************************************
+
+
 
         #** Coefficients à appliquer ******************************************
         coefs={}
@@ -358,6 +377,7 @@ class ProductTemplate(models.Model):
             for line in obj.seller_ids:
                 if now>=line.date_start and now<=line.date_end:
                     prix_actuel = line.price
+                    obj.compute_nb_promos(line)
             obj.is_prix_achat_actuel  = prix_actuel
             #******************************************************************
 

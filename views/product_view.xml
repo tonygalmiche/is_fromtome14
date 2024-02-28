@@ -41,6 +41,11 @@
                     </field>
                 </group>
             </xpath>
+            <xpath expr="//page/group[@name='purchase']" position="before">
+                <group>
+                    <field name="is_nb_promos"/>
+                </group>
+            </xpath>
         </field>
     </record>
     <record id="is_product_template_tree_view" model="ir.ui.view">
@@ -409,6 +414,36 @@
         parent="sale.product_menu_catalog" sequence="20"
         action="is_gestion_tarif_product_editable_action"
     />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     <!-- milk.type -->
