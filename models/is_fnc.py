@@ -38,6 +38,12 @@ class IsFNC(models.Model):
             ('en_retard', 'En retard'),
             ('fait'     , 'Fait'),
         ], 'Statut action curative', default="en_cours", copy=False)
+    
+    efficacite_action_curative                = fields.Text("Efficacité de l'action curative", copy=False)
+    efficacite_action_curative_date           = fields.Date("Date de vérification action curative", copy=False)
+    efficacite_action_curative_responsable_id = fields.Many2one('res.users', 'Responsable vérification action curative')
+    efficacite_action_curative_date_validee   = fields.Date("Date efficacité action curative validée", copy=False)
+
     decision          = fields.Text('Décision', copy=False)
     analyse           = fields.Text('Analyse des causes', copy=False)
 
@@ -61,7 +67,6 @@ class IsFNC(models.Model):
             ('en_cours', 'En cours'),
             ('solde'   , 'Soldé'),
         ], 'État', default="en_cours", copy=False)
-
 
     fnc_origine_id    = fields.Many2one('is.fnc', "FNC client d'origine", copy=False)
     fnc_associees_ids = fields.One2many('is.fnc', 'fnc_origine_id', 'FNC associées', copy=False)
@@ -128,8 +133,6 @@ class IsFNC(models.Model):
             if statut:
                 if obj.action_corrective_statut != statut:
                     obj.action_corrective_statut = statut
-
-
 
 
     def get_statut(self):

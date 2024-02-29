@@ -75,6 +75,12 @@
                         <field name="action_curative_responsable_id"/>
                         <field name="action_curative_statut"/>
                     </group>
+                    <group string="Efficacité action curative">
+                        <field name="efficacite_action_curative"/>
+                        <field name="efficacite_action_curative_date"/>
+                        <field name="efficacite_action_curative_responsable_id"/>
+                        <field name="efficacite_action_curative_date_validee"/>
+                    </group>
                     <group string="Décision / Analyse">
                         <field name="decision"/>
                         <field name="analyse"/>
@@ -144,6 +150,11 @@
                 <field name="action_curative_date" optional="hide"/>
                 <field name="action_curative_responsable_id" optional="hide"/>
                 <field name="action_curative_statut" optional="hide"/>
+
+                <field name="efficacite_action_curative" optional="hide"/>
+                <field name="efficacite_action_curative_date" optional="hide"/>
+                <field name="efficacite_action_curative_responsable_id" optional="hide"/>
+                <field name="efficacite_action_curative_date_validee" optional="hide"/>
 
                 <field name="action_corrective" optional="hide"/>
                 <field name="action_corrective_responsable_id" optional="hide"/>

@@ -174,6 +174,16 @@ class AccountMove(models.Model):
         return True
 
 
+    def action_invoice_sent(self):
+        for invoice in self:        
+            invoice.sudo().message_follower_ids.unlink()
+        res = super(AccountMove, self).action_invoice_sent()
+
+        print("TEST",invoice,invoice.message_follower_ids)
+
+        return res
+
+
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
