@@ -33,6 +33,7 @@
                 <field name="is_enseigne_id"/>
             </field>
             <div name="journal_div" position="after">
+                <field name="is_motif_avoir_id" attrs="{'invisible':[('move_type','not in',['in_refund','out_refund'])]}"/>
                 <field name="is_export_compta_id" readonly="1"/>
                 <field name="is_date_relance" attrs="{'invisible':[('is_date_relance','=',False)]}"/>
                 <field name="is_date_releve"  attrs="{'invisible':[('is_date_releve','=',False)]}"/>
@@ -108,9 +109,10 @@
                 <field name="invoice_date_due"        optional="show"/>
             </field> -->
             <field name="company_id" position="before">
-                <field name="is_date_relance" optional="hide"/>
-                <field name="is_date_releve"  optional="hide"/>
-                <field name="date"            optional="hide"/>
+                <field name="is_date_relance"   optional="hide"/>
+                <field name="is_date_releve"    optional="hide"/>
+                <field name="date"              optional="hide"/>
+                <field name="is_motif_avoir_id" optional="hide"/>
             </field>
             <!-- <field name="date" position="replace">
                 <field name="is_date_relance" optional="show"/>
@@ -136,6 +138,7 @@
             <field name="invoice_date_due" position="before">
                 <field name="invoice_payment_term_id" optional="show"/>
                 <field name="invoice_date_due"        optional="show"/>
+                <field name="is_motif_avoir_id"       optional="hide"/>
             </field>
         </field>
     </record>
@@ -146,6 +149,7 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id"/>
+                <field name="is_motif_avoir_id"/>
             </field>
         </field>
     </record>
@@ -191,7 +195,7 @@
 
 
     <!-- account.move.reversal -->
-    <record id="is_view_account_move_reversal" model="ir.ui.view">
+    <!-- <record id="is_view_account_move_reversal" model="ir.ui.view">
         <field name="name">is_view_account_move_reversal</field>
         <field name="model">account.move.reversal</field>
         <field name="inherit_id" ref="account.view_account_move_reversal" />
@@ -200,7 +204,7 @@
                 <field name="is_motif_avoir_id"/>
             </field>
         </field>
-    </record>
+    </record> -->
 
 
     <!-- is.motif.avoir -->

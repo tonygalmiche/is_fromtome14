@@ -5,10 +5,12 @@ from odoo import api, exceptions, fields, models, _
 class MailActivity(models.Model):
     _inherit = 'mail.activity'
  
+
     active      = fields.Boolean("Actif", default=True)
     partner_id  = fields.Many2one('res.partner','Partenaire', compute='_compute_partner_id', readonly=True, store=True)
     is_customer = fields.Boolean("Est un Client"            , compute='_compute', readonly=True, store=True)
     is_supplier = fields.Boolean("Est un Fournisseur"       , compute='_compute', readonly=True, store=True)
+    is_attachment_ids = fields.Many2many('ir.attachment', 'mail_activity_is_attachment_ids_rel', 'activity_id', 'file_id', 'Pièce jointe')
 
 
     @api.depends('partner_id','partner_id.is_customer','partner_id.is_supplier')

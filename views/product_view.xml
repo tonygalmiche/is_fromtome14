@@ -25,22 +25,8 @@
             </field>
             <field name="type" position="after">
                 <field name="is_stock_mini"/>
+                <field name="is_stock_mini_lc"/>
             </field>
-            <xpath expr="//page/group/field[@name='description']/.." position="before">
-                <group>
-                    <field name="is_note_importation" nolabel="1" readonly="1"/>
-                </group>
-                <group>
-                    <field name="is_pricelist_item_ids" nolabel="1">
-                        <tree>
-                            <field name="pricelist_id" string="Liste de prix"/>
-                            <field name="fixed_price"  string="Prix de vente"/>
-                            <field name="date_start"/>
-                            <field name="date_end"/>
-                        </tree>
-                    </field>
-                </group>
-            </xpath>
             <xpath expr="//page/group[@name='purchase']" position="before">
                 <group>
                     <field name="is_nb_promos"/>
@@ -294,6 +280,20 @@
                             <field name="is_prix_vente_futur_marge_ft"/>
                         </group>
                     </group>
+
+
+                    <group string="Listes de prix">
+                        <field name="is_pricelist_item_ids" nolabel="1">
+                            <tree>
+                                <field name="pricelist_id" string="Liste de prix"/>
+                                <field name="fixed_price"  string="Prix de vente"/>
+                                <field name="date_start"/>
+                                <field name="date_end"/>
+                            </tree>
+                        </field>
+                    </group>
+    
+
                 </page>
             </xpath>
             <field name="description" position="after">
@@ -414,36 +414,6 @@
         parent="sale.product_menu_catalog" sequence="20"
         action="is_gestion_tarif_product_editable_action"
     />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     <!-- milk.type -->

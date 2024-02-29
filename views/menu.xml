@@ -2,6 +2,34 @@
 <odoo>
 
 
+    <!-- Activités -->
+    <menuitem
+        id="is_mail_activity_main_menu"
+        name="Activités"
+        parent="contacts.menu_contacts"
+        sequence="4"
+    />
+    <menuitem
+        id="is_mail_activity_menu"
+        name="Activités"
+        parent="is_mail_activity_main_menu"
+        sequence="10"
+        action="is_mail_activity_action"
+    />
+
+    <menuitem
+    id="activites_a_faire_menu"
+    name="Activités à faire"
+    parent="is_mail_activity_main_menu"
+    sequence="20"
+    action="activites_a_faire_action"
+/>
+
+
+
+    
+
+
     <!-- res.bank -->
     <record  id="is_res_bank_action" model="ir.actions.act_window">
         <field name="name">Banques</field>
@@ -60,6 +88,16 @@
         sequence="20"
         action="poids_net_facture_action"
     />
+
+
+    <menuitem
+        name="Achats et ventes par enseigne"
+        id="achat_vente_par_enseigne_menu"
+        parent="is_analyse_facturation_main_menu"
+        sequence="30"
+        action="achat_vente_par_enseigne_action"
+    />
+
 
 
     <menuitem

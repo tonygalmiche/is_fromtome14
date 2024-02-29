@@ -149,6 +149,7 @@ class AccountMove(models.Model):
     is_nb_colis         = fields.Float(string='Nb colis' , digits=(14,1), compute='_compute_poids_colis')
     is_date_relance     = fields.Date(string='Date dernière relance', readonly=1)
     is_date_releve      = fields.Date(string='Date dernier relevé'  , readonly=1)
+    is_motif_avoir_id   = fields.Many2one('is.motif.avoir', "Motif de l'avoir")
 
 
     def write(self, vals):

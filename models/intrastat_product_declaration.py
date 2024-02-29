@@ -246,7 +246,6 @@ class IntrastatProductDeclaration(models.Model):
                 intrastat_transaction = \
                     self._get_intrastat_transaction(inv_line)
 
-                print('#TEST',invoice,invoice.number)
                 try:
                     weight, suppl_unit_qty, weight_net = self._get_weight_and_supplunits(inv_line, hs_code)
                 except ValueError:

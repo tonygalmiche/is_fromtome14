@@ -27,6 +27,9 @@ class Company(models.Model):
             self.env['product.template'].search([])._compute_tarifs(update_prix_actuel=True)
 
 
+    def appliquer_nouveaux_tarifs_action(self):
+        self.env['product.template'].appliquer_nouveaux_tarifs_action()
+
 
     # def initialiser_tarif_en_cours_action(self):
     #     for obj in self:

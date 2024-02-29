@@ -146,6 +146,8 @@
                 <filter name="facture_client"        string="Factures client" domain="[('move_type', 'in', ['Facture client'])]"/>
                 <filter name="facture_client_ft_lf_jermi" string="Factures client FT+LF (hors JERMI)" domain="[('partner_id' , 'not ilike', 'JERMI'),('enseigne' , 'in', ['FROMTOME','LE FROMELIER']),('move_type', 'in', ['Facture client'])]"/>
                 <filter name="facture_client_lc"          string="Factures client LC" domain="[('enseigne' , 'in', ['CELLIER DU FROMAGER']),('move_type', 'in', ['Facture client'])]"/>
+                <filter name="2023" string="2023" domain="[('invoice_date', '&gt;=', '2023-01-01'),('invoice_date', '&lt;=', '2023-12-31')]"/>
+                <filter name="2024" string="2024" domain="[('invoice_date', '&gt;=', '2024-01-01'),('invoice_date', '&lt;=', '2024-12-31')]"/>
            </search>
         </field>
     </record>
@@ -214,4 +216,42 @@
         />
     </record>
 
+
+    <!-- Achats et ventes par enseigne -->
+    <record id="achat_vente_par_enseigne_action_pivot" model="ir.ui.view">
+        <field name="name">achat_vente_par_enseigne_action_pivot</field>
+        <field name="model">is.analyse.facturation</field>
+        <field name="arch" type="xml">
+            <pivot >
+                <field name="move_type"      type="row"/>
+                <field name="enseigne"       type="col"/>
+                <field name="montant_achat"  type="measure"/>
+                <field name="price_subtotal" type="measure"/>
+                <field name="marge_brute"    type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="achat_vente_par_enseigne_action_graph" model="ir.ui.view">
+        <field name="name">achat_vente_par_enseigne_action_graph</field>
+        <field name="model">is.analyse.facturation</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="True">
+                <field name="invoice_date" type="row" interval="week"/>
+                <field name="enseigne"     type="row"/>
+                <field name="marge_brute"    type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record  id="achat_vente_par_enseigne_action" model="ir.actions.act_window">
+        <field name="name">Achats et ventes par enseigne</field>
+        <field name="res_model">is.analyse.facturation</field>
+        <field name="view_mode">pivot,graph,tree,form</field>
+        <field name="domain">[('move_type','in',['Facture client','Avoir client','Rebut']),('enseigne','!=',False)]</field>
+        <field name="context">{}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'pivot', 'view_id': ref('achat_vente_par_enseigne_action_pivot')}),
+                (0, 0, {'view_mode': 'graph', 'view_id': ref('achat_vente_par_enseigne_action_graph')}),
+            ]"
+        />
+    </record>
 </odoo>

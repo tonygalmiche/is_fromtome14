@@ -192,9 +192,9 @@
             <field name="activity_ids" position="attributes">
                 <attribute name="optional">hide</attribute>
             </field>
-
-
-
+            <field name="email" position="after">
+                <field name="is_contact_relance_facture_id" optional="hide"/>
+            </field>
            <field name="parent_id" position="after">
                 <field name="is_gln"                            optional="hide"/>
                 <field name="is_code_fromtome"                  optional="hide"/>
@@ -214,6 +214,7 @@
                 <field name="is_heure_appel"                    optional="hide"/>
                 <field name="is_habitude_commande"              optional="hide"/>
                 <field name="is_heure_envoi_id"                 optional="hide"/>
+                <field name="is_mini_cde"                       optional="hide"/>
                 <field name="is_encours_client"                 optional="hide"/>
                 <field name="is_date_debut_nouveau_tarif"       optional="hide"/>
                 <field name="is_date_fin_nouveau_tarif"         optional="hide"/>
@@ -235,6 +236,17 @@
                     }
                 </style>
             </xpath>
+            <xpath expr="//sheet/group/group/field[@name='website']" position="before">
+                 <field 
+                    name="is_contact_relance_facture_id" 
+                    attrs="{'invisible': ['|',('is_customer', '=', False),('is_company', '=', False)]}"
+
+                    domain="[('parent_id','=',id)]"
+
+
+
+                />
+            </xpath>
             <field name="vat" position="after">
                 <field name="is_gln"/>
                 <field name="is_code_fromtome"/>
@@ -243,6 +255,7 @@
                 <field name="is_warehouse_id"    widget="selection"/>
                 <field name="is_frais_port_id"/>
                 <field name="is_heure_envoi_id"    attrs="{'invisible': ['|',('is_supplier', '=', False),('is_company', '=', False)]}"/>
+                <field name="is_mini_cde"          attrs="{'invisible': ['|',('is_supplier', '=', False),('is_company', '=', False)]}"/>
                 <field name="is_heure_appel"       attrs="{'invisible': ['|',('is_customer', '=', False),('is_company', '=', False)]}"/>
                 <field name="is_habitude_commande" attrs="{'invisible': ['|',('is_customer', '=', False),('is_company', '=', False)]}"/>
                 <field name="is_encours_client"    attrs="{'invisible': ['|',('is_customer', '=', False),('is_company', '=', False)]}"/>

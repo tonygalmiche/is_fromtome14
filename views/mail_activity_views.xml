@@ -7,17 +7,6 @@
         <field name="state">code</field>
         <field name="code">action = records._compute_partner_id()</field>
     </record>
-    <!-- <record id="is_fnc_update_ir_cron" model="ir.cron">
-        <field name="name">Mise à jour FNC</field>
-        <field name="model_id" ref="is_fromtome14.model_is_fnc"/>
-        <field name="state">code</field>
-        <field name="code">model.fnc_update_ir_cron()</field>
-        <field name="interval_type">days</field>
-        <field name="numbercall">-1</field>
-    </record> -->
-
-    
-
     <record id="is_mail_activity_view_form_popup" model="ir.ui.view">
         <field name="name">is_mail_activity_view_form_popup</field>
         <field name="model">mail.activity</field>
@@ -25,10 +14,10 @@
         <field name="arch" type="xml">
             <field name="activity_type_id" position="after">
                 <field name="partner_id"/>
+                <field name="is_attachment_ids" widget="many2many_binary"/>
             </field>
         </field>
     </record>
-
 
     <record id="is_mail_activity_tree" model="ir.ui.view">
         <field name="name">is_mail_activity_tree</field>
@@ -107,19 +96,14 @@
         <field name="view_mode">tree,form,pivot,graph</field>
         <field name="domain">['|',('active','=',True),('active','=',False)]</field>
     </record>
-    <menuitem
-        id="is_mail_activity_main_menu"
-        name="Activités"
-        parent="contacts.menu_contacts"
-        sequence="4"
-    />
-    <menuitem
-        id="is_mail_activity_menu"
-        name="Activités"
-        parent="is_mail_activity_main_menu"
-        sequence="10"
-        action="is_mail_activity_action"
-    />
+
+
+    <record  id="activites_a_faire_action" model="ir.actions.act_window">
+        <field name="name">Activités à faire</field>
+        <field name="res_model">mail.activity</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">[('active','=',True),('activity_type_id.name','!=','Exception')]</field>
+    </record>
 
 
 

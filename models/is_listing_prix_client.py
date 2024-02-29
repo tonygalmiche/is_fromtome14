@@ -40,7 +40,7 @@ class IsListingPrixClient(models.Model):
             ids=[]
             for item in obj.pricelist_id.item_ids:
                 ids.append(item.product_tmpl_id.id)
-            products = self.env['product.product'].search([('product_tmpl_id','in',ids)],limit=2000)
+            products = self.env['product.product'].search([('product_tmpl_id','in',ids)]) #,limit=2000)
             ids=[]
             for p in products:
                 ids.append(p.id)

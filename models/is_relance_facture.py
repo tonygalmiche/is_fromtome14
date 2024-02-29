@@ -169,16 +169,18 @@ class IsRelanceFacture(models.Model):
         
 
     def send_mail(self, partner, invoices):
+        #** Suppression des abonnés à la facture ******************************
+        for invoice in invoices:
+            invoice.sudo().message_follower_ids.unlink()
+        #**********************************************************************
+
         invoice=invoices[0]
         template = self.env.ref('account.email_template_edi_invoice', False)
         compose_form = self.env.ref('mail.email_compose_message_wizard_form', False)
         ctx = dict(
             default_model="account.move",
             default_res_id=invoice.id,
-            #default_use_template=bool(template),
-            #default_template_id=template.id,
             default_composition_mode='comment',
-            #default_is_log=True,
             custom_layout='mail.mail_notification_light', #Permet de définir la mise en page du mail
         )
          #** Recherche des factures PDF et génération si non trouvée **********
@@ -245,65 +247,19 @@ class IsRelanceFacture(models.Model):
             subject="Relance de factures %s (%s)"%(partner.parent_id.name or partner.name, ", ".join(invoice_name))
         if self.type_document=="releve_facture":
             subject="Relevé de factures %s (%s)"%(partner.parent_id.name or partner.name, ", ".join(invoice_name))
+
+
+
         #**********************************************************************
+        destinataire = invoice.partner_id.is_contact_relance_facture_id or invoice.partner_id
         vals={
             "model"         : "account.move",
             "subject"       : subject,
             "body"          : body,
-            "partner_ids"   : [invoice.partner_id.id],
+            #"partner_ids"   : [invoice.partner_id.id],
+            "partner_ids"   : [destinataire.id],
             "attachment_ids": attachment_ids,
-            #"template_id"   : False,
         }
         wizard = self.env['mail.compose.message'].with_context(ctx).create(vals)
         wizard.send_mail()
-
-
-
-    #TODO  : Envoi du message directement sans passer par le wizard 'mail.compose.message' => L'enveloppe rouge n'apparait pas dans les logs
-    # def envoi_mail(self, partner, invoices):
-    #     for obj in self:
-    #         body_html="""
-    #             <p>Bonjour,</p> 
-    #             <p>Sauf erreur de notre part, les factures ci-dessous restent impayées:</p> 
-    #             <ul>
-    #         """
-    #         for invoice in invoices:
-    #             body_html+="<li>Fact N°%s à échéance au %s </li>"%(invoice.name, invoice.invoice_date_due)
-    #         body_html+="""
-    #              </ul>
-    #             <p>Total FROMTOME à devoir</p> 
-    #             <p>Merci de régulariser votre compte</p> 
-    #         """
-    #         email_to="tony.galmiche@infosaone.com"
-    #         email_cc="tony.galmiche@gmail.com"
-    #         vals={
-    #             #'email_from'    : email_from, 
-    #             'email_to'      : email_to, 
-    #             'email_cc'      : email_cc,
-    #             'subject'       : "Relance facture %s"%(partner.name),
-    #             'body'          : body_html, 
-    #             'body_html'     : body_html, 
-    #             'model'         : invoices[0]._name,
-    #             'res_id'        : invoices[0].id,
-    #             'notification'  : True,
-    #             'message_type'  : 'comment', # Choix : email, comment
-    #             "subtype_id"    : 1,         # 1=Discussions, 2=Note
-    #             #"parent_id"     : invoices[0].id,
-    #         }
-    #         email=self.env['mail.mail'].create(vals)
-    #         email.send()
-    #     # for attachment in attachments:
-    #     #     attachment_data = {
-    #     #         'name': attachment[0],
-    #     #         'datas': attachment[1],
-    #     #         'type': 'binary',
-    #     #         'res_model': 'mail.message',
-    #     #         'res_id': mail.mail_message_id.id,
-    #     #     }
-    #     #     attachment_ids.append((4, Attachment.create(attachment_data).id))
-    #     # if attachment_ids:
-    #     #     mail.write({'attachment_ids': attachment_ids})
-    #     # if force_send:
-    #     #     mail.send(raise_exception=raise_exception)
-    #     # return mail.id  # TDE CLEANME: return mail + api.returns ?
 

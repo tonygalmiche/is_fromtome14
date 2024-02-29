@@ -66,10 +66,16 @@
                         name="actualiser_tarif_action"
                         type="object"
                         string="Actualiser tous les tarifs en fonction du prix du fournisseur, du taux de marge et des frais de port"
-                        confirm="ATTENTION : Cela va actualiser tous les tarifs"
+                        confirm="ATTENTION : Cela va actualiser tous les tarifs en cours"
                     />
-
-
+                    <br />
+                    <br />
+                    <button
+                        name="appliquer_nouveaux_tarifs_action"
+                        type="object"
+                        string="Archiver les listes de prix et appliquer les nouveaux tarifs (copie du nouveau tarif dans le tarif actuel)"
+                        confirm="ATTENTION : Cela va actualiser tous les tarifs en cours"
+                    />
                 </page>
             </page>
         </field>

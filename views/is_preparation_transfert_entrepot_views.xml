@@ -17,18 +17,25 @@
                     name="mouvement_stock_action" 
                     type="object" icon="fa-list" 
                 />
-                <field name="designation"  optional="show"/>
-                <field name="default_code" optional="show"/>
-                <field name="stock_mini" optional="show"/>
-                <field name="stock_ft" optional="show"/>
-                <field name="reception_ft" optional="show"/>
-                <field name="livraison_ft" optional="show"/>
-                <field name="solde_ft" optional="show"/>
-                <field name="stock_lc" optional="show"/>
-                <field name="reception_lc" optional="show"/>
-                <field name="livraison_lc" optional="show"/>
-                <field name="solde_lc" optional="show"/>
-                <field name="solde" optional="show"/>
+                <field name="designation"   optional="show"/>
+                <field name="default_code"  optional="show"/>
+
+                <field name="poids_net_colis"     optional="hide"/>
+                <field name="nb_pieces_par_colis" optional="hide"/>
+                <field name="uom_id"              optional="hide"/>
+                <field name="unite"/>
+
+                <field name="stock_mini"    optional="show" sum="Total"/>
+                <field name="stock_ft"      optional="show" sum="Total"/>
+                <field name="reception_ft"  optional="show" sum="Total"/>
+                <field name="livraison_ft"  optional="show" sum="Total"/>
+                <field name="solde_ft"      optional="show" sum="Total"/>
+                <field name="stock_mini_lc" optional="show" sum="Total"/>
+                <field name="stock_lc"      optional="show" sum="Total"/>
+                <field name="reception_lc"  optional="show" sum="Total"/>
+                <field name="livraison_lc"  optional="show" sum="Total"/>
+                <field name="solde_lc"      optional="show" sum="Total"/>
+                <field name="solde"         optional="show" sum="Total"/>
             </tree>
         </field>
     </record>
@@ -75,6 +82,7 @@
                         <group>
                             <field name="date_debut"/>
                             <field name="date_fin"/>
+                            <field name="calcul_en_colis"/>
                         </group>
                         <group>
                             <field name="date"/>
@@ -95,6 +103,7 @@
                 <field name="date"/>
                 <field name="date_debut"/>
                 <field name="date_fin"/>
+                <field name="calcul_en_colis"/>
                 <field name="commentaire"/>
             </tree>
         </field>

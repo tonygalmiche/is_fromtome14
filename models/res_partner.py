@@ -66,7 +66,6 @@ class ResPartner(models.Model):
     is_transporteur_id          = fields.Many2one('is.transporteur', 'Transporteur', help="Enseigne commerciale")
     is_warehouse_id             = fields.Many2one('stock.warehouse', 'Entrepôt', help="Entrepôt à utiliser dans les réceptions ou les livraisons")
     is_frais_port_id            = fields.Many2one('product.product', 'Frais de port', domain=[('categ_id.name','=','TRANSPORT')], help="Utilisé pour ajouter automatiquement une ligne de frais de port sur les commandes")
-    #is_heure_envoi              = fields.Char('Heure', help="Heure maxi d'envoi de la commande au fournisseur")
     is_heure_envoi_id           = fields.Many2one('is.heure.maxi', 'Heure', help="Heure maxi d'envoi de la commande au fournisseur")
     is_encours_client           = fields.Float(string='En-cours client', digits=(14,2), compute='_compute_is_encours_client')
     is_heure_appel              = fields.Char(string="Heure d'appel", help="Heure d'appel des clients")
@@ -76,6 +75,9 @@ class ResPartner(models.Model):
     ], 'Habitude commande')
     is_date_debut_nouveau_tarif = fields.Date(string="Date début nouveau tarif", help="Date utilisée lors de la copie d'un tarif dans un article")
     is_date_fin_nouveau_tarif   = fields.Date(string="Date fin nouveau tarif"  , help="Date utilisée lors de la copie d'un tarif dans un article")
+    is_mini_cde                 = fields.Float(string="Mini de commande", help='Minimum de commande fournisseur', digits=(14,4))
+    # is_mail_relance_facture     = fields.Char('Mail relance facture')
+    is_contact_relance_facture_id = fields.Many2one('res.partner', 'Contact relance facture')
 
 
     def creer_modele_commande(self):

@@ -257,9 +257,6 @@ class PurchaseOrderLine(models.Model):
         if self.is_nb_pieces_par_colis>0:
             self.is_nb_colis = self.get_nb_colis()
 
-            print("TEST onchange_product_qty_fromtome", self, self.is_nb_colis)
-
-
 
     def get_nb_colis(self):
         nb        = self.product_id.is_nb_pieces_par_colis

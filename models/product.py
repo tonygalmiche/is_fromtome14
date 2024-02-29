@@ -6,6 +6,8 @@ from odoo.tools.float_utils import float_round
 from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError, ValidationError
 from datetime import datetime
+import pytz
+import math
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -260,7 +262,8 @@ class ProductTemplate(models.Model):
     mode_vente        = fields.Selection(selection=[('colis', 'Colis'),('piece', 'Pièce'),('decoupe', 'Découpe')], string="Mode Vente")
     douane            = fields.Char(string='Nomenclature Douane')
 
-    is_stock_mini         = fields.Float("Stock mini", digits=(14,4))
+    is_stock_mini         = fields.Float("Stock mini FT", digits=(14,4))
+    is_stock_mini_lc      = fields.Float("Stock mini LC", digits=(14,4))
     is_pricelist_item_ids = fields.One2many('product.pricelist.item', 'product_tmpl_id', 'Liste de prix')
 
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis')
@@ -343,14 +346,6 @@ class ProductTemplate(models.Model):
     )
     def _compute_tarifs(self, update_prix_actuel=False):
         company = self.env.user.company_id
-
-
-        #** Recherche du nombre de promos en cours ****************************
-
-
-        #**********************************************************************
-
-
 
         #** Coefficients à appliquer ******************************************
         coefs={}
@@ -435,6 +430,44 @@ class ProductTemplate(models.Model):
             ct+=1
 
 
+    def appliquer_nouveaux_tarifs_action(self):
+        tz = pytz.timezone('Europe/Paris')
+        now = datetime.now(tz).strftime("%Y-%m-%d à %H:%M:%S")
+        for key in _PRICELISTS:
+            name = _PRICELISTS[key]
+            pricelists = self.env['product.pricelist'].search([('name', '=', name)])
+            if pricelists:
+                pricelist = pricelists[0]
+                name = "%s archivée le %s"%(name,now)
+                default={
+                    "name"  : name,
+                    "active": False,
+                }
+                copy = pricelist.copy(default=default)
+                _logger.info("appliquer_nouveaux_tarifs_action : Archivage liste de prix '%s'"%name)
+        filtre=[
+            #("default_code","=","0111001")
+        ]
+        products = self.env['product.template'].search(filtre)
+        nb=len(products)
+        ct=1
+        for product in products:
+            _logger.info("appliquer_nouveaux_tarifs_action : %s/%s : %s"%(ct,nb,product.default_code))
+            vals={}
+            for price in _PRICELISTS:
+                name = "is_prix_vente_futur%s"%price
+                is_prix_vente_futur       = getattr(product, "is_prix_vente_futur_%s"%price)
+                is_prix_vente_futur_marge = getattr(product, "is_prix_vente_futur_marge_%s"%price)
+                vals.update({
+                    "is_prix_vente_actuel_%s"%price     : is_prix_vente_futur,
+                    "is_prix_vente_actuel_marge_%s"%price: is_prix_vente_futur_marge,
+                })
+            product.write(vals)
+            for variante in product.product_variant_ids:
+                variante.update_pricelist_ir_cron(product_tmpl_id=product.id)
+            ct+=1
+
+
     def init_emplacement_inventaire_action(self):
         for obj in self:
             if not obj.property_stock_inventory:
@@ -484,6 +517,25 @@ class ProductTemplate(models.Model):
             return res
 
 
+    def uom2colis(self,qty,arrondir="round"):
+        nb        = self.is_nb_pieces_par_colis
+        poids_net = self.is_poids_net_colis
+        unite     = self.uom_id.category_id.name
+        nb_colis  = 0
+        if unite=="Poids":
+            if poids_net>0:
+                nb_colis = qty / poids_net
+        else:
+            if nb>0:
+                nb_colis = qty / nb
+        nb_colis = round(nb_colis,2)       # Arrondir à 2 decimales pour éviter les problèmes de virgules flotante
+        if arrondir=="round":             
+            nb_colis = round(nb_colis)     # Arrondir à l'entier le plus proche
+        if arrondir=="ceil":
+            nb_colis = math.ceil(nb_colis) # Arrondir à l'entier supérieur
+        return nb_colis
+
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
@@ -502,15 +554,10 @@ class ProductProduct(models.Model):
                     raise Warning("Le code barre doit-être unique !") 
 
  
-
     def name_get(self):
         self.browse(self.ids).read(['name', 'default_code'])
-
-
-
         return [(template.id, (template.default_code and '%s [%s]' % (template.name, template.default_code) or '%s' % (template.name) ))
             for template in self]
-
 
 
     def update_pricelist_ir_cron(self, product_tmpl_id=False):
@@ -557,6 +604,6 @@ class ProductProduct(models.Model):
                         item = self.env['product.pricelist.item'].create(vals)
                     if item:
                         item.fixed_price = price
-                        _logger.info("update_pricelist_ir_cron : %s : %s/%s : %s : %s"%(key,ct,nb,product.default_code,price))
+                        #_logger.info("update_pricelist_ir_cron : %s : %s/%s : %s : %s"%(key,ct,nb,product.default_code,price))
                     ct+=1
 
