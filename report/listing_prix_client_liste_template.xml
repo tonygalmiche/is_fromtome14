@@ -47,7 +47,7 @@
                                     <td class="text-right">
                                         <t 
                                             t-esc="product.get_product_pricelist(o.pricelist_id)"
-                                            t-options='{"widget": "monetary", "display_currency": o.partner_id.currency_id}'
+                                            t-options='{"widget": "monetary", "display_currency": o.enseigne_id.name.currency_id}'
                                         />
                                     </td>
                                 </tr>
