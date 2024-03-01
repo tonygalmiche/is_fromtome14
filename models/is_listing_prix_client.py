@@ -187,8 +187,25 @@ class IsListingPrixClient(models.Model):
 
 
     def get_products(self):
+
+        print("TEST 1 : self=",self)
+
+
         ids=[]
         for product in self.product_ids:
             ids.append(product.id)
         products = self.env['product.product'].search([('id','in',ids)],order='is_type_article,name')
-        return products
+
+        print(products)
+
+        res={}
+        for product in products:
+            print(product.default_code)
+            type = product.is_type_article 
+            if type not in res:
+                res[type]=[]
+            res[type].append(product)
+
+        print("TEST : res=",res)
+
+        return res

@@ -6,53 +6,41 @@
                 <t t-call="is_fromtome14.external_layout">
                     <div class="page listing_prix_client">
                         <div class="oe_structure"/>
-                         <table class="table table-sm o_main_table">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">Type<br />article</th>
-                                    <th class="text-center">Référence<br />Interne</th>
-                                    <th class="text-center">Nom<br />Article</th>
-                                    <th class="text-center">Fournisseur<br />  <br /></th>
-                                    <th class="text-center">Poids<br />pièce	</th>
-                                    <th class="text-center">PCB<br /></th>
-                                    <th class="text-center">Traitement<br />Thermique</th>
-                                    <th class="text-center">Tarif HT<br />(en €)</th>
-                                 </tr>
-                            </thead>
-                            <tbody>
-
-
-
-
-                                <t t-set="products" t-value="o.get_products()"/>
-
-
-                                <tr t-foreach="products" t-as="product">
-
-                                    <!-- <td class="text-center">
-                                        <t t-foreach="product.milk_type_ids" t-as="type">
-                                            <span t-field="type.name"/>
-                                        </t> 
-                                    </td>-->
-                                    <td class="text-left"><span t-field="product.is_type_article"/></td>
-
-
-
-                                    <td class="text-center"><span t-field="product.default_code"/></td>
-                                    <td class="text-left"><span t-field="product.name"/></td>
-                                    <td class="text-left"><span t-field="product.is_fournisseur_id.name"/></td>
-                                    <td class="text-right text-nowrap"><span t-esc="round(product.is_poids_net_colis/(product.is_nb_pieces_par_colis or 1),2)"/> Kg</td>
-                                    <td class="text-center"><span t-field="product.is_nb_pieces_par_colis"/></td>
-                                    <td class="text-center text-nowrap"><span t-field="product.traitement_thermique"/></td>                               
-                                    <td class="text-right">
-                                        <t 
-                                            t-esc="product.get_product_pricelist(o.pricelist_id)"
-                                            t-options='{"widget": "monetary", "display_currency": o.enseigne_id.name.currency_id}'
-                                        />
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <t t-set="res" t-value="o.get_products()"/>
+                        <t t-foreach="res" t-as="type">
+                            <table class="table table-sm o_main_table">
+                                <thead>
+                                    <tr><th colspan="8" style="color:black;background-color:Gainsboro;font-size:12pt"><t t-esc="type"/></th></tr>
+                                    <tr>
+                                        <!-- <th class="text-center">Type<br />article</th> -->
+                                        <th class="text-center">Référence<br />Interne</th>
+                                        <th class="text-center">Nom<br />Article</th>
+                                        <th class="text-center">Fournisseur<br />  <br /></th>
+                                        <th class="text-center">Poids<br />pièce	</th>
+                                        <th class="text-center">PCB<br /></th>
+                                        <th class="text-center">Traitement<br />Thermique</th>
+                                        <th class="text-center">Tarif HT<br />(en €)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="res[type]" t-as="product">
+                                        <!-- <td class="text-left"><span t-field="product.is_type_article"/></td> -->
+                                        <td class="text-center"><span t-field="product.default_code"/></td>
+                                        <td class="text-left"><span t-field="product.name"/></td>
+                                        <td class="text-left"><span t-field="product.is_fournisseur_id.name"/></td>
+                                        <td class="text-right text-nowrap"><span t-esc="round(product.is_poids_net_colis/(product.is_nb_pieces_par_colis or 1),2)"/> Kg</td>
+                                        <td class="text-center"><span t-field="product.is_nb_pieces_par_colis"/></td>
+                                        <td class="text-center text-nowrap"><span t-field="product.traitement_thermique"/></td>                               
+                                        <td class="text-right">
+                                            <t 
+                                                t-esc="product.get_product_pricelist(o.pricelist_id)"
+                                                t-options='{"widget": "monetary", "display_currency": o.enseigne_id.name.currency_id}'
+                                            />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
                     </div>
                 </t>
             </t>
