@@ -10,12 +10,13 @@ class IsListingPrixClient(models.Model):
     _description = "Listing prix client"
     _order = 'nom_listing, name desc'
 
-    name         = fields.Char("Listing", readonly=True)
-    enseigne_id  = fields.Many2one('is.enseigne.commerciale', 'Enseigne', required=True, help="Enseigne commerciale")
-    pricelist_id = fields.Many2one('product.pricelist', 'Liste de prix' , required=True)
-    partner_id   = fields.Many2one('res.partner', 'Client')
-    nom_listing  = fields.Char("Nom du listing")
-    product_ids  = fields.Many2many('product.product', 'is_listing_prix_client_product_rel', 'doc_id', 'product_id', 'Articles')
+    name          = fields.Char("Listing", readonly=True)
+    enseigne_id   = fields.Many2one('is.enseigne.commerciale', 'Enseigne', required=True, help="Enseigne commerciale")
+    pricelist_id  = fields.Many2one('product.pricelist', 'Liste de prix' , required=True)
+    partner_id    = fields.Many2one('res.partner', 'Client')
+    nom_listing   = fields.Char("Nom du listing")
+    product_ids   = fields.Many2many('product.product', 'is_listing_prix_client_product_rel', 'doc_id', 'product_id', 'Articles')
+    afficher_prix = fields.Boolean("Afficher les prix", default=True)
 
 
     @api.onchange('partner_id')
@@ -187,17 +188,10 @@ class IsListingPrixClient(models.Model):
 
 
     def get_products(self):
-
-        print("TEST 1 : self=",self)
-
-
         ids=[]
         for product in self.product_ids:
             ids.append(product.id)
         products = self.env['product.product'].search([('id','in',ids)],order='is_type_article,name')
-
-        print(products)
-
         res={}
         for product in products:
             print(product.default_code)
@@ -205,7 +199,4 @@ class IsListingPrixClient(models.Model):
             if type not in res:
                 res[type]=[]
             res[type].append(product)
-
-        print("TEST : res=",res)
-
         return res
