@@ -229,7 +229,10 @@ class ProductTemplate(models.Model):
 
     # CARACTÉRISTIQUES GÉNÉRALES DU PRODUIT:
     is_region_id          = fields.Many2one('is.region.origine', string="Region d'origine")
-    milk_type_ids         = fields.Many2many('milk.type','product_milk_type_rel','product_id','milk_type_id', string='Type article')
+    milk_type_ids         = fields.Many2many('milk.type','product_milk_type_rel','product_id','milk_type_id', string='Types articles')
+
+    is_type_article = fields.Char(string='Type article', compute='_compute_is_type_article', readonly=True, store=True)
+
     milk_type             = fields.Char(string='Types article', compute='_compute_milk_type')
     traitement_thermique  = fields.Selection(string='Traitement Thermique', selection=_TRAITEMENT_THERMIQUE)
     is_famille_fromage_id = fields.Many2one('is.famille.fromage', string="Famille de fromage")
@@ -301,6 +304,19 @@ class ProductTemplate(models.Model):
     is_prix_vente_futur_marge_ft         = fields.Float(string='TM futur forcé FT'        , digits='Product Price')
 
     is_nb_promos = fields.Integer(string='Nb promos', help="Nombre de promos en cours (actualisé la nuit par la gestion des promos)", readonly=True)
+
+
+    @api.depends('milk_type_ids','milk_type_ids.name')
+    def _compute_is_type_article(self):
+        for obj in self:
+            l=[]
+            for line in obj.milk_type_ids:
+                if line.name:
+                    l.append(line.name)
+            val=""
+            if len(l)>0:
+                val = ",".join(l)
+            obj.is_type_article = val
 
 
     def update_prix_actuel_action(self):
@@ -606,4 +622,20 @@ class ProductProduct(models.Model):
                         item.fixed_price = price
                         #_logger.info("update_pricelist_ir_cron : %s : %s/%s : %s : %s"%(key,ct,nb,product.default_code,price))
                     ct+=1
+
+
+
+    def get_product_pricelist(self,pricelist):
+        print(self, pricelist)
+        items = self.env['product.pricelist.item'].search([
+                ('pricelist_id','=',pricelist.id),('product_tmpl_id','=',self.product_tmpl_id.id)
+            ], order="date_start desc", limit=1)
+        price=0
+        for item in items:
+            price=item.fixed_price
+
+        print(price, type(price))
+
+        return price
+
 

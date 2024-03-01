@@ -6,15 +6,12 @@
                 <div class="row mb8">
                     <div class="col-6">
                         <img t-if="o.enseigne_id.name.image_1920" t-att-src="image_data_uri(o.enseigne_id.name.image_1920)" alt="Logo"/>
-                        
                     </div>
                     <div class="col-6 text-right mb4">
-                        <!-- <h3 class="mt0" t-field="res_company.report_header"/> -->
                         <div name="res_company" class="mb4">
                             <div style="font-size:13pt;font-weight:700 !important;" t-field="o.nom_listing"/>
                             <div style="font-size:11pt;font-weight:700 !important;" t-field="o.enseigne_id.name.name"/>
                             <span t-field="res_company.street"/> - 
-                            <!-- <br/> -->
                             <span t-field="res_company.zip"/>
                             <![CDATA[
                             &nbsp;
@@ -29,11 +26,9 @@
                 </div>
             </div>
         </div>
-
         <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout"  t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
             <t t-raw="0"/>
         </div>
-
         <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
             <div class="text-center" style="border-top: 1px solid black;">
                 <div t-if="report_type == 'pdf'" class="text-muted">
@@ -42,7 +37,6 @@
             </div>
         </div>
     </template>
-
     <template id="external_layout">
         <t t-if="not o" t-set="o" t-value="doc"/>
         <t t-if="not company">
@@ -56,13 +50,10 @@
                 <t t-set="company" t-value="res_company"/>
             </t>
         </t>
-
         <t t-call="is_fromtome14.external_layout_standard">
             <t t-raw="0"/>
         </t>
-
     </template>
-
     <template id="report_layout" name="Report layout">&lt;!DOCTYPE html&gt;
         <html t-att-lang="lang and lang.replace('_', '-')"
               t-att-data-report-margin-top="data_report_margin_top"
@@ -87,14 +78,12 @@
             </body>
         </html>
     </template>
-
     <template id="html_container">
         <t t-set="body_classname" t-value="'container'"/>
         <t t-call="is_fromtome14.report_layout">
             <t t-raw="0"/>
         </t>
     </template>
-
     <template id="listing_prix_client_report">
         <t t-call="is_fromtome14.html_container">
             <t t-foreach="docs" t-as="o">
@@ -110,48 +99,12 @@
 
                     <div class="page" style="background-color:#F2F2F5">
                         <div class="oe_structure"/>
-
-                        <!-- <t t-set="ct" t-value="0"/>
-                        <t t-foreach="o.product_ids" t-as="p">
-                            <t t-set="ct" t-value="ct+1"/>
-                            <t t-if="ct==4">
-                                <div>test</div>
-                                <t t-set="ct" t-value="0"/>
-                            </t>
-                            <div class="box" t-if="p.image_1920">
-                                <div t-field="p.name" style="font-size:10pt"/>
-                                <img t-att-src="image_data_uri(p.image_1920)" alt="Logo" style="max-height:25mm;max-width:35mm"/>
-                            </div>
-                        </t> -->
-
-
-                        <!-- <table style="border:1px solid black;width:100%;border-collapse: collapse;">
-                        <t t-set="col" t-value="0"/>
-                        <t t-foreach="o.product_ids" t-as="p">
-                            <t t-set="col" t-value="col+1"/>
-                            <t t-if="col==1">
-                                <t t-set="x" t-value="&lt;tr&gt;"/>
-                                <t t-raw="x"/>
-                            </t>
-                            <td style="border:1px solid black;width:25%;height:30mm;padding:3mm">
-                                <div t-field="p.name"/>
-                                <img t-att-src="image_data_uri(p.image_1920)" alt="Logo" style="max-height:25mm;max-width:45mm"/>
-                            </td>
-
-                            <t t-if="col==4">
-                                <t t-set="col" t-value="0"/>
-                                <t t-set="x" t-value="&lt;/tr&gt;"/>
-                                <t t-raw="x"/>
-                            </t>
-                        </t>
-                        </table> -->
                         <div t-raw="o.get_html4()"/>
                     </div>
                 </t>
             </t>
         </t>
     </template>
-
     <record id="listing_prix_client_paperformat" model="report.paperformat">
         <field name="name">Listing prix client</field>
         <field name="default" eval="True"/>
@@ -177,6 +130,4 @@
         <field name="binding_model_id" ref="model_is_listing_prix_client"/>
         <field name="binding_type">report</field>
     </record>
-
-
 </odoo>

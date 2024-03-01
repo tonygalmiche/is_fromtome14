@@ -181,6 +181,7 @@
                         <group>
                             <field name="is_region_id"/>
                             <field name="milk_type_ids" widget="many2many_tags"/>
+                            <field name="is_type_article"/>
                             <field name="traitement_thermique"/>
                             <field name="is_famille_fromage_id"/>
                             <field name="duree_affinage"/>

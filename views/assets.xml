@@ -8,4 +8,36 @@
             <!-- <script type="text/javascript" src="/is_fromtome14/static/barcodes/barcode_events.js"></script> -->
         </xpath>
     </template>
+
+    <template id="is_report_assets_common" name="is_report_assets_common" inherit_id="web.report_assets_common">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" type="text/scss" href="/is_fromtome14/static/src/scss/report.scss"/>
+        </xpath>
+    </template>
+
+
+
+
+
 </odoo>
+
+
+
+<!-- 'assets': {
+    'web.assets_backend': [
+        'is_clair_sarl/static/src/scss/styles.scss',
+        'is_clair_sarl/static/src/planning_chantier/planning_chantier.scss',
+        'is_clair_sarl/static/src/planning_chantier/planning_chantier_controller.js',
+        'is_clair_sarl/static/src/planning_chantier/planning_chantier_model.js',
+        'is_clair_sarl/static/src/planning_chantier/planning_chantier_record.js',
+        'is_clair_sarl/static/src/planning_chantier/planning_chantier_renderer.js',
+        'is_clair_sarl/static/src/planning_chantier/planning_chantier_view.js',
+    ],
+    'web.assets_qweb': [
+        'is_clair_sarl/static/src/xml/**/*',
+        'is_clair_sarl/static/src/planning_chantier/planning_chantier_view.xml',
+    ],
+   'web.report_assets_common': [
+        'is_clair_sarl/static/src/scss/report.scss',
+    ]
+}, -->

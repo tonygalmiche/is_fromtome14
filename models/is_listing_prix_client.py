@@ -184,3 +184,11 @@ class IsListingPrixClient(models.Model):
                     html+="</table>"
                     html+='<div style="page-break-after: always;"></div>'
             return html
+
+
+    def get_products(self):
+        ids=[]
+        for product in self.product_ids:
+            ids.append(product.id)
+        products = self.env['product.product'].search([('id','in',ids)],order='is_type_article,name')
+        return products
