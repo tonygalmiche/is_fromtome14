@@ -620,7 +620,7 @@ class ProductProduct(models.Model):
                         item = self.env['product.pricelist.item'].create(vals)
                     if item:
                         item.fixed_price = price
-                        #_logger.info("update_pricelist_ir_cron : %s : %s/%s : %s : %s"%(key,ct,nb,product.default_code,price))
+                        _logger.info("update_pricelist_ir_cron : %s : %s/%s : %s : %s"%(key,ct,nb,product.default_code,price))
                     ct+=1
 
 
