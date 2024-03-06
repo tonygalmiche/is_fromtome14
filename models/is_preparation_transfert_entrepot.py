@@ -96,7 +96,7 @@ class is_preparation_transfert_entrepot(models.Model):
             obj.ligne_ids.unlink()
             filtre=[
                 #('id','=', 1469),
-                ('default_code','in',['0107001','1212017','1212022','1212035','0901019','1501008','1907005','1901010','1217002','1217001','0107002'])
+                #('default_code','in',['0107001','1212017','1212022','1212035','0901019','1501008','1907005','1901010','1217002','1217001','0107002'])
             ]
             products=self.env['product.product'].search(filtre, order="name")
             for product in products:
