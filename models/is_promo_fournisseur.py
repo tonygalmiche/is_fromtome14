@@ -82,16 +82,14 @@ class IsPromoFournisseur(models.Model):
     def appliquer_promo_action(self):
         now = datetime.now().date()
         for obj in self:
-            obj.desactiver_promo_action()
-            #** Appliquer les promos ******************************************
             if now>=obj.date_debut_promo and now<=obj.date_fin_promo:
+                obj.desactiver_promo_action()
                 for l in obj.ligne_ids:
                     seller = l.product_id._select_seller(
                         partner_id=obj.partner_id,
                     )
                     if seller:
                         seller.discount = l.taux_remise
-            #******************************************************************
 
 
     # def appliquer_promo_action(self):
