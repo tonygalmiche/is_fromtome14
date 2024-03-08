@@ -78,34 +78,34 @@ class IsPromoFournisseur(models.Model):
             obj.product_ids=False
 
 
-    def appliquer_promo_action(self):
-        for obj in self:
-            now = datetime.now().date()
-            for l in obj.ligne_ids:
-                #** Suppressions des promos ***********************************
-                filtre=[
-                    ('promo_id', '=', l.id),
-                ]
-                self.env['product.supplierdiscount'].search(filtre).unlink()
-                #**************************************************************
+    # def appliquer_promo_action(self):
+    #     for obj in self:
+    #         now = datetime.now().date()
+    #         for l in obj.ligne_ids:
+    #             #** Suppressions des promos ***********************************
+    #             filtre=[
+    #                 ('promo_id', '=', l.id),
+    #             ]
+    #             self.env['product.supplierdiscount'].search(filtre).unlink()
+    #             #**************************************************************
 
-                #** Ajout des promos en fonction de la date du jour ***********
-                if now>=obj.date_debut_promo and now<=obj.date_fin_promo:
-                    filtre=[
-                        ('product_tmpl_id', '=', l.product_id.product_tmpl_id.id),
-                        ('date_start', '<=', now),
-                        ('date_end', '>=', now),
-                    ]
-                    lines=self.env['product.supplierinfo'].search(filtre)
-                    for line in lines:
-                        _logger.info("appliquer_promo_action : %s => [%s]%s"%(obj.name, l.product_id.default_code,l.product_id.name))
-                        vals={
-                            'supplier_info_id': line.id,
-                            'promo_id'        : l.id,
-                            'name'            : l.taux_remise,
-                        }
-                        self.env['product.supplierdiscount'].create(vals)
-                #**************************************************************
+    #             #** Ajout des promos en fonction de la date du jour ***********
+    #             if now>=obj.date_debut_promo and now<=obj.date_fin_promo:
+    #                 filtre=[
+    #                     ('product_tmpl_id', '=', l.product_id.product_tmpl_id.id),
+    #                     ('date_start', '<=', now),
+    #                     ('date_end', '>=', now),
+    #                 ]
+    #                 lines=self.env['product.supplierinfo'].search(filtre)
+    #                 for line in lines:
+    #                     _logger.info("appliquer_promo_action : %s => [%s]%s"%(obj.name, l.product_id.default_code,l.product_id.name))
+    #                     vals={
+    #                         'supplier_info_id': line.id,
+    #                         'promo_id'        : l.id,
+    #                         'name'            : l.taux_remise,
+    #                     }
+    #                     self.env['product.supplierdiscount'].create(vals)
+    #             #**************************************************************
 
 
     def desactiver_promo_action(self):
@@ -118,9 +118,8 @@ class IsPromoFournisseur(models.Model):
                 lines.unlink()
     
 
-
-    def update_promo_fournisseur_ir_cron(self):
-        self.env['is.promo.fournisseur'].search([]).appliquer_promo_action()
+    # def update_promo_fournisseur_ir_cron(self):
+    #     self.env['is.promo.fournisseur'].search([]).appliquer_promo_action()
 
 
 class IsPromoFournisseurLigne(models.Model):
