@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- is.promo.fournisseur -->
-    <!-- <record id="is_promo_fournisseur_ir_cron" model="ir.cron">
+    <record id="is_promo_fournisseur_ir_cron" model="ir.cron">
         <field name="name">Mise à jour des promos des fournisseurs</field>
         <field name="model_id" ref="is_fromtome14.model_is_promo_fournisseur"/>
         <field name="state">code</field>
         <field name="code">model.update_promo_fournisseur_ir_cron()</field>
         <field name="interval_type">days</field>
         <field name="numbercall">-1</field>
-    </record> -->
+    </record>
     <record id="desactiver_promo_fournisseur_action_server" model="ir.actions.server">
         <field name="name">Désactiver la promo sur les articles</field>
         <field name="model_id" ref="is_fromtome14.model_is_promo_fournisseur"/>
@@ -16,13 +16,13 @@
         <field name="state">code</field>
         <field name="code">action = records.desactiver_promo_action()</field>
     </record>
-    <!-- <record id="appliquer_promo_fournisseur_action_server" model="ir.actions.server">
+    <record id="appliquer_promo_fournisseur_action_server" model="ir.actions.server">
         <field name="name">Appliquer la promo sur les articles</field>
         <field name="model_id" ref="is_fromtome14.model_is_promo_fournisseur"/>
         <field name="binding_model_id" ref="is_fromtome14.model_is_promo_fournisseur"/>
         <field name="state">code</field>
         <field name="code">action = records.appliquer_promo_action()</field>
-    </record> -->
+    </record>
     <record id="is_promo_fournisseur_seq" model="ir.sequence">
         <field name="name">Promo fournisseur</field>
         <field name="code">is.promo.fournisseur</field>
@@ -78,15 +78,16 @@
                         <tree editable="bottom" limit="1000">
                             <field name="product_id" domain="[('is_fournisseur_id','=',parent.partner_id)]" widget="many2one_clickable"/>
                             <field name="taux_remise"/>
+                            <field name="taux_remise_actuel"/>
                         </tree>
                     </field>
-                    <!-- <button
+                    <button
                         name="appliquer_promo_action"
                         type="object"
                         string="Appliquer la promo sur ces articles"
                         class="oe_inline oe_highlight"
                         attrs="{'invisible':[('ligne_ids','=',[])]}"
-                    /> -->
+                    />
                 </sheet>
             </form>
         </field>
@@ -163,7 +164,7 @@
                 <field name="is_fournisseur_id"    optional="show" widget="many2one_clickable"/>
                 <field name="is_ref_fournisseur"   optional="show"/>
                 <field name="is_prix_achat_actuel" optional="show"/>
-                <field name="is_nb_promos"         optional="show"/>
+                <field name="is_discount"          optional="show"/>
             </tree>
         </field>
     </record>
@@ -172,7 +173,7 @@
         <field name="res_model">product.template</field>
         <field name="view_mode">tree,form,kanban</field>
         <field name="view_id" ref="is_fromtome14.is_promo_fournisseur_product_tree_view"/>
-        <field name="domain">[('is_nb_promos','&gt;',0)]</field>
+        <field name="domain">[('is_discount','&gt;',0)]</field>
     </record>
     <menuitem 
         id="is_promo_fournisseur_product_menu" 

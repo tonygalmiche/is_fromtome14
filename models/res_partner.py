@@ -79,6 +79,11 @@ class ResPartner(models.Model):
     # is_mail_relance_facture     = fields.Char('Mail relance facture')
     is_contact_relance_facture_id = fields.Many2one('res.partner', 'Contact relance facture')
 
+    default_supplierinfo_discount = fields.Float(
+        string="Remise par défaut pour les articles (%)",
+        digits="Discount",
+    )
+
 
     def creer_modele_commande(self):
         for obj in self:

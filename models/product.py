@@ -303,7 +303,20 @@ class ProductTemplate(models.Model):
     is_prix_vente_futur_marge_lf_coll    = fields.Float(string='TM futur forcé LF coll.'  , digits='Product Price')
     is_prix_vente_futur_marge_ft         = fields.Float(string='TM futur forcé FT'        , digits='Product Price')
 
-    is_nb_promos = fields.Integer(string='Nb promos', help="Nombre de promos en cours (actualisé la nuit par la gestion des promos)", readonly=True)
+    is_discount = fields.Float(string="Remise (%)", compute='_compute_is_discount', readonly=True, store=True, digits="Discount", help="Remise du fournisseur par défaut (actualisé la nuit par la gestion des promos)")
+
+
+    @api.depends('seller_ids','seller_ids.discount')
+    def _compute_is_discount(self):
+        for obj in self:
+            discount=0
+            if obj.product_variant_id:
+                seller = obj.product_variant_id._select_seller(
+                    partner_id=obj.is_fournisseur_id,
+                )
+                if seller:
+                    discount = seller.discount
+            obj.is_discount = discount
 
 
     @api.depends('milk_type_ids','milk_type_ids.name')
@@ -335,16 +348,6 @@ class ProductTemplate(models.Model):
                 nb = obj.is_nb_pieces_par_colis or 1
                 res= port*obj.is_poids_net_colis/nb
             return res
-
-
-    def compute_nb_promos(self,supplierinfo):
-        for obj in self:
-            nb=0
-            for line in supplierinfo.discount_ids:
-                if line.promo_id:
-                    nb+=1
-            obj.is_nb_promos = nb
-
 
     @api.depends('seller_ids','seller_ids.price',
                  'seller_ids.date_start',
@@ -388,7 +391,7 @@ class ProductTemplate(models.Model):
             for line in obj.seller_ids:
                 if now>=line.date_start and now<=line.date_end:
                     prix_actuel = line.price
-                    obj.compute_nb_promos(line)
+                    obj._compute_is_discount()
             obj.is_prix_achat_actuel  = prix_actuel
             #******************************************************************
 
@@ -626,16 +629,12 @@ class ProductProduct(models.Model):
 
 
     def get_product_pricelist(self,pricelist):
-        print(self, pricelist)
         items = self.env['product.pricelist.item'].search([
                 ('pricelist_id','=',pricelist.id),('product_tmpl_id','=',self.product_tmpl_id.id)
             ], order="date_start desc", limit=1)
         price=0
         for item in items:
             price=item.fixed_price
-
-        print(price, type(price))
-
         return price
 
 

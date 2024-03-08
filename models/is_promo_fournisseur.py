@@ -78,6 +78,22 @@ class IsPromoFournisseur(models.Model):
             obj.product_ids=False
 
 
+
+    def appliquer_promo_action(self):
+        now = datetime.now().date()
+        for obj in self:
+            obj.desactiver_promo_action()
+            #** Appliquer les promos ******************************************
+            if now>=obj.date_debut_promo and now<=obj.date_fin_promo:
+                for l in obj.ligne_ids:
+                    seller = l.product_id._select_seller(
+                        partner_id=obj.partner_id,
+                    )
+                    if seller:
+                        seller.discount = l.taux_remise
+            #******************************************************************
+
+
     # def appliquer_promo_action(self):
     #     for obj in self:
     #         now = datetime.now().date()
@@ -110,16 +126,26 @@ class IsPromoFournisseur(models.Model):
 
     def desactiver_promo_action(self):
         for obj in self:
+           #** Suppressions des promos ***************************************
+            filtre=[
+                ('name'    , '=', obj.partner_id.id),
+                ('discount', '>', 0),
+            ]
+            self.env['product.supplierinfo'].search(filtre).discount=0
+            #******************************************************************
+
+            #** Ancien système de promo => N'est plus utilisé *****************
             for l in obj.ligne_ids:
                 filtre=[
                     ('promo_id', '=', l.id),
                 ]
                 lines = self.env['product.supplierdiscount'].search(filtre)
                 lines.unlink()
-    
+            #******************************************************************
 
-    # def update_promo_fournisseur_ir_cron(self):
-    #     self.env['is.promo.fournisseur'].search([]).appliquer_promo_action()
+
+    def update_promo_fournisseur_ir_cron(self):
+        self.env['is.promo.fournisseur'].search([]).appliquer_promo_action()
 
 
 class IsPromoFournisseurLigne(models.Model):
@@ -128,9 +154,10 @@ class IsPromoFournisseurLigne(models.Model):
     _rec_name = 'promo_id'
 
 
-    promo_id    = fields.Many2one('is.promo.fournisseur', 'Promo fournisseur', required=True, ondelete='cascade')
-    product_id  = fields.Many2one('product.product', 'Article', required=True)
-    taux_remise = fields.Float("Taux de remise (%)"           , required=True, digits=(14,2))
+    promo_id           = fields.Many2one('is.promo.fournisseur', 'Promo fournisseur', required=True, ondelete='cascade')
+    product_id         = fields.Many2one('product.product', 'Article', required=True)
+    taux_remise        = fields.Float("Taux de remise (%)"           , required=True, digits=(14,2))
+    taux_remise_actuel = fields.Float(string="Taux de remise actuel (%)", related="product_id.is_discount")
 
 
     @api.onchange('product_id')

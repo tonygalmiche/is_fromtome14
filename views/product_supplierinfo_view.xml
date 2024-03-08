@@ -25,6 +25,12 @@
             <xpath expr="//field[@name='company_id']" position="attributes">
                  <attribute name="invisible">1</attribute>
             </xpath>
+
+            <xpath expr="//div[field[@name='price']]" position="after">
+                <field name="discount" />
+            </xpath>
+
+
         </field>
     </record>
 
@@ -40,6 +46,9 @@
         <field name="arch" type="xml">
             <field name="name" position="before">
                 <button title="Dupliquer" name= "dupliquer_action" type="object" icon="fa-copy"/>
+            </field>
+            <field name="price" position="after">
+                <field name="discount" />
             </field>
         </field>
     </record>

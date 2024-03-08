@@ -143,6 +143,21 @@
                 <attribute name="readonly">1</attribute>
             </xpath>
 
+            <xpath
+                expr="//field[@name='order_line']/tree/field[@name='price_unit']"
+                position="after"
+            >
+                <field name="discount" />
+            </xpath>
+            <xpath
+                expr="//field[@name='order_line']/form//field[@name='price_unit']"
+                position="after"
+            >
+                <field name="discount" />
+            </xpath>
+
+
+
         </field>
     </record>
     <record id="is_purchase_order_view_tree" model="ir.ui.view">
@@ -234,6 +249,7 @@
                 <field name="is_nb_colis"            readonly="1" optional="hide" sum="Total"/>
                 <field name="is_poids_net"           readonly="1" optional="hide" sum="Total"/>
                 <field name="price_unit"/>
+                <field name="discount"/>
                 <field name="price_subtotal"        readonly="1" optional="show" sum="Total"/>
                 <field name="state"                 readonly="1" optional="hide"/>
                 <field name="is_sale_order_line_id" readonly="1" optional="hide"/>
