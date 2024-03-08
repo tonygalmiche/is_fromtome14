@@ -19,6 +19,7 @@
                                         <th class="text-center">PCB<br /></th>
                                         <th class="text-center">Traitement<br />Thermique</th>
                                         <th t-if="o.afficher_prix" class="text-center">Tarif HT<br />(en €)</th>
+                                        <th class="text-center">U.V.<br /></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -26,7 +27,7 @@
                                         <td class="text-center"><span t-field="product.default_code"/></td>
                                         <td class="text-left"><span t-field="product.name"/></td>
                                         <td class="text-left"><span t-field="product.is_fournisseur_id.name"/></td>
-                                        <td class="text-right text-nowrap"><span t-esc="round(product.is_poids_net_colis/(product.is_nb_pieces_par_colis or 1),2)"/> Kg</td>
+                                        <td class="text-right text-nowrap"><span t-esc='str(round(product.is_poids_net_colis/(product.is_nb_pieces_par_colis or 1),3)).replace(".",",")'/> Kg</td>
                                         <td class="text-center"><span t-field="product.is_nb_pieces_par_colis"/></td>
                                         <td class="text-center text-nowrap"><span t-field="product.traitement_thermique"/></td>                               
                                         <td t-if="o.afficher_prix" class="text-right">
@@ -35,6 +36,7 @@
                                                 t-options='{"widget": "monetary", "display_currency": o.enseigne_id.name.currency_id}'
                                             />
                                         </td>
+                                        <td class="text-center"><span t-field="product.uom_id.name"/></td>
                                     </tr>
                                 </tbody>
                             </table>

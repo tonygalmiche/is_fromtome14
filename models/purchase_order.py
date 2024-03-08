@@ -225,21 +225,12 @@ class PurchaseOrder(models.Model):
 class PurchaseOrderLine(models.Model):
     _inherit = "purchase.order.line"
 
-    @api.depends('product_id','product_qty')
+    @api.depends('product_id','product_qty','is_nb_colis')
     def _compute_is_nb_pieces_par_colis(self):
         for obj in self:
             nb        = obj.product_id.is_nb_pieces_par_colis
             poids_net = obj.product_id.is_poids_net_colis
             obj.is_nb_pieces_par_colis = nb
-            #unite     = obj.product_uom.category_id.name
-            #nb_colis  = 0
-            #if unite=="Poids":
-            #    if poids_net>0:
-            #        nb_colis = obj.product_qty/poids_net
-            #else:
-            #    if nb>0:
-            #        nb_colis = obj.product_qty / nb
-            #obj.is_nb_colis = nb_colis
             obj.is_poids_net = obj.is_nb_colis * poids_net
 
 
