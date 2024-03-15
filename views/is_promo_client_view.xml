@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- is.promo.client -->
+    <record id="is_promo_client_seq" model="ir.sequence">
+        <field name="name">Promo client</field>
+        <field name="code">is.promo.client</field>
+        <field name="prefix"></field>
+        <field name="padding">5</field>
+        <field eval="False" name="company_id"/>
+    </record>
+    <record id="is_promo_client_tree_view" model="ir.ui.view">
+        <field name="name">is_promo_client_tree_view</field>
+        <field name="model">is.promo.client</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="partner_id" widget="many2one_clickable"/>
+                <field name="date_debut_promo"/>
+                <field name="date_fin_promo"/>
+                <field name="pourcent_promo_a_repercuter"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_promo_client_form_view" model="ir.ui.view">
+        <field name="name">is_promo_client_form_view</field>
+        <field name="model">is.promo.client</field>
+        <field name="arch" type="xml">
+            <form>
+                <style>
+                    .o_form_view .o_form_sheet_bg > .o_form_sheet{
+                        max-width: 1800px;
+                    }
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
+                <header>
+                    <button
+                        name="actualiser_promo_action"
+                        type="object"
+                        string="Actualiser la liste des promos"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="partner_id"/>
+                        <field name="date_debut_promo"/>
+                        <field name="date_fin_promo"/>
+                        <field name="pourcent_promo_a_repercuter"/>
+                    </group>
+                    <field  name="ligne_ids" nolabel="1">
+                        <tree limit="1000">
+                            <field name="promo_fournisseur_id" widget="many2one_clickable"/>
+                            <field name="partner_id"           widget="many2one_clickable"/>
+                            <field name="date_debut_promo"/>
+                            <field name="date_fin_promo"/>
+                            <field name="product_id"           widget="many2one_clickable"/>
+                            <field name="remise_fournisseur"/>
+                            <field name="remise_client"/>
+                        </tree>
+                    </field>
+                 </sheet>
+                 <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="is_promo_client_search_view" model="ir.ui.view">
+        <field name="name">is_promo_client_search_view</field>
+        <field name="model">is.promo.client</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+            </search>
+        </field>
+    </record>
+    <record id="is_promo_client_action" model="ir.actions.act_window">
+        <field name="name">Promos</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">is.promo.client</field>
+        <field name="view_mode">tree,form</field>
+    </record>     
+    <menuitem 
+        id="is_promo_client_main_menu" 
+        name="Promos" 
+        parent="sale.sale_menu_root" 
+        sequence="4"
+    />
+    <menuitem 
+        id="is_promo_client_menu" 
+        name="Promos" 
+        parent="is_promo_client_main_menu" 
+        sequence="10"
+        action="is_promo_client_action"
+    />
+
+</odoo>

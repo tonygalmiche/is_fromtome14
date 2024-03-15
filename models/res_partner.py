@@ -84,6 +84,10 @@ class ResPartner(models.Model):
         digits="Discount",
     )
 
+    is_pourcent_promo_a_repercuter = fields.Float(
+        string="Pourcentage promo fournisseur à répercuter (%)",
+        digits="Discount",
+    )
 
     def creer_modele_commande(self):
         for obj in self:

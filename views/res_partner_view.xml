@@ -207,6 +207,7 @@
                 <field name="property_supplier_payment_term_id" optional="hide"/>
                 <field name="property_product_pricelist"        optional="hide"/>
                 <field name="is_modele_commande_id"             optional="hide"/>
+                <field name="is_pourcent_promo_a_repercuter"    optional="hide"/>
                 <field name="is_presentation_bl"                optional="hide"/>
                 <field name="is_transporteur_id"                optional="hide"/>
                 <field name="is_warehouse_id"                   optional="hide"/>
@@ -315,6 +316,7 @@
             </field>
             <field name="property_product_pricelist" position="after">
                 <field name="is_presentation_bl"/>
+                <field name="is_pourcent_promo_a_repercuter"/>
                 <field name="is_modele_commande_id"/>
                 <button
                     name="creer_modele_commande"
