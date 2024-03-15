@@ -13,6 +13,14 @@
         <field name="model">is.listing.prix.client</field>
         <field name="arch" type="xml">
             <form>
+                <style>
+                    .o_form_view .o_form_sheet_bg > .o_form_sheet{
+                        max-width: 1800px;
+                    }
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
                 <header>
                     <button
                         name="ajouter_articles_action"
@@ -31,10 +39,12 @@
                          <group>
                             <field name="name"/>
                             <field name="afficher_prix"/>
+                            <field name="prix_futur"/>
                          </group>
                     </group>
                     <field name="product_ids" nolabel="1" >
                         <tree editable="bottom">
+                            <button name="voir_product_template_action" title="Voir article" type="object" icon="fa-search-plus"/>
                             <field name="default_code"/>
                             <field name="name"/>
                             <field name="uom_id"/>
@@ -59,6 +69,7 @@
                 <field name="enseigne_id"/>
                 <field name="pricelist_id"/>
                 <field name="afficher_prix"/>
+                <field name="prix_futur"/>
                 <field name="name"/>
             </tree>
         </field>

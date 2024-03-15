@@ -5,6 +5,7 @@ import unicodedata
 import base64
 import sys
 
+
 class IsListingPrixClient(models.Model):
     _name = 'is.listing.prix.client'
     _description = "Listing prix client"
@@ -16,12 +17,18 @@ class IsListingPrixClient(models.Model):
     partner_id    = fields.Many2one('res.partner', 'Client')
     nom_listing   = fields.Char("Nom du listing")
     product_ids   = fields.Many2many('product.product', 'is_listing_prix_client_product_rel', 'doc_id', 'product_id', 'Articles')
-    afficher_prix = fields.Boolean("Afficher les prix", default=True)
+    afficher_prix = fields.Boolean("Afficher prix actuel", default=True)
+    prix_futur = fields.Selection([
+            ('cdf_quai'  , 'Cdf quai'),
+            ('cdf_franco', 'Cdf franco'),
+            ('lf'        , 'LF'),
+            ('lf_coll'   , 'LF coll.'),
+            ('ft'        , 'FT'),
+        ], 'Prix futur à afficher', copy=False)
 
-
+ 
     @api.onchange('partner_id')
     def onchange_partner_id(self):
-        print(self)
         if self.partner_id:
             self.nom_listing  = self.partner_id.name
             self.enseigne_id  = self.partner_id.is_enseigne_id.id
@@ -194,7 +201,6 @@ class IsListingPrixClient(models.Model):
         products = self.env['product.product'].search([('id','in',ids)],order='is_type_article,name')
         res={}
         for product in products:
-            print(product.default_code)
             type = product.is_type_article 
             if type not in res:
                 res[type]=[]

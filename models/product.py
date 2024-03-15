@@ -629,12 +629,31 @@ class ProductProduct(models.Model):
 
 
     def get_product_pricelist(self,pricelist):
+        price=0
         items = self.env['product.pricelist.item'].search([
                 ('pricelist_id','=',pricelist.id),('product_tmpl_id','=',self.product_tmpl_id.id)
             ], order="date_start desc", limit=1)
-        price=0
         for item in items:
             price=item.fixed_price
         return price
 
 
+
+    def get_prix_futur(self,prix_futur=False):
+        price=0
+        if prix_futur:
+            name = "is_prix_vente_futur_%s"%prix_futur
+            price = getattr(self, name)
+        else:
+            items = self.env['product.pricelist.item'].search([
+                    ('pricelist_id','=',pricelist.id),('product_tmpl_id','=',self.product_tmpl_id.id)
+                ], order="date_start desc", limit=1)
+            for item in items:
+                price=item.fixed_price
+        return price
+
+
+
+    def voir_product_template_action(self):
+        for obj in self:
+            return obj.product_tmpl_id.voir_article_action()
