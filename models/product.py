@@ -391,7 +391,7 @@ class ProductTemplate(models.Model):
             for line in obj.seller_ids:
                 if now>=line.date_start and now<=line.date_end:
                     prix_actuel = line.price
-                    obj._compute_is_discount()
+                    #obj._compute_is_discount()
             obj.is_prix_achat_actuel  = prix_actuel
             #******************************************************************
 
