@@ -414,10 +414,11 @@ class ProductTemplate(models.Model):
                     taux_marge = coefs[price]
                     name = "is_prix_vente_actuel_marge_%s"%price
                     force = getattr(obj, name)
-                    if force>0:
+                    if force!=0:
                         taux_marge = force
                     val=0
-                    if taux_marge<100 and taux_marge>0:
+                    #if taux_marge<100 and taux_marge>0:
+                    if taux_marge<100:
                         val = round(100 * prix_actuel / (100 - taux_marge),4) # PrixVente = 100 x PrixAchat / (100 - TauxMarge)
                     val+=obj.get_frais_port(ports[price])
                     name = "is_prix_vente_actuel_%s"%price
@@ -436,10 +437,11 @@ class ProductTemplate(models.Model):
                 taux_marge = coefs[price]
                 name = "is_prix_vente_futur_marge_%s"%price
                 force = getattr(obj, name)
-                if force>0:
+                if force!=0:
                     taux_marge = force
                 val=0
-                if taux_marge<100 and taux_marge>0:
+                #if taux_marge<100 and taux_marge>0:
+                if taux_marge<100:
                     val = round(100 * prix_futur / (100 - taux_marge),4) # PrixVente = 100 x PrixAchat / (100 - TauxMarge)
                 val+=obj.get_frais_port(ports[price])
                 name = "is_prix_vente_futur_%s"%price
