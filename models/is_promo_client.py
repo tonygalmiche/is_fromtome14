@@ -14,6 +14,7 @@ class IsPromoClient(models.Model):
 
     name              = fields.Char("N°Promo", readonly=True)
     partner_id        = fields.Many2one('res.partner', 'Client', required=True)
+    enseigne_id       = fields.Many2one(related='partner_id.is_enseigne_id')
     date_debut_promo  = fields.Date("Date début promo"         , required=True)
     date_fin_promo    = fields.Date("Date fin promo"           , required=True)
     pourcent_promo_a_repercuter = fields.Float("Pourcentage promo fournisseur à répercuter (%)", digits=(14,2), compute='_compute_taux_remise', readonly=True, store=True)
@@ -53,6 +54,26 @@ class IsPromoClient(models.Model):
                             'remise_client'       : remise_client,
                         }
                         self.env['is.promo.client.ligne'].create(vals)
+
+
+    def get_products(self):
+        promos=[]
+        for product in self.ligne_ids:
+            promo = product.promo_fournisseur_id
+            if promo not in promos:
+                promos.append(promo)
+        res={}
+        for promo in promos:
+            filtre=[
+                ('promo_id','=',self.id),
+                ('promo_fournisseur_id','=',promo.id),
+            ]
+            lignes = self.env['is.promo.client.ligne'].search(filtre)
+            for ligne in lignes:
+                if promo not in res:
+                    res[promo]=[]
+                res[promo].append(ligne)
+        return res
 
 
 class IsPromoClientLigne(models.Model):

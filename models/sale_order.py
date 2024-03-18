@@ -268,12 +268,34 @@ class SaleOrderLine(models.Model):
         return round(nb_colis)
 
 
+    def get_discount(self):
+        now = datetime.date.today()
+        for obj in self:
+            discount = 0
+            filtre=[
+                    ('date_debut_promo', '<=', now),
+                    ('date_fin_promo', '>=', now),
+                    ('partner_id', '=', obj.order_id.partner_id.id),
+                ]
+            promos=self.env['is.promo.client'].search(filtre, limit=1)
+            for promo in promos:
+                filtre=[
+                        ('promo_id'        , '=', promo.id),
+                        ('product_id'      , '=', obj.product_id.id),
+                        ('date_debut_promo', '<=', now),
+                        ('date_fin_promo'  , '>=', now),
+                    ]
+                lignes=self.env['is.promo.client.ligne'].search(filtre, limit=1)
+                for ligne in lignes:
+                    discount = ligne.remise_client
+            obj.discount = discount
+
+
     @api.depends('product_id','product_uom_qty')
     def _compute_is_nb_pieces_par_colis(self):
         for obj in self:
             nb_colis = obj.get_nb_colis()
             obj.is_nb_colis = nb_colis
-
             unite = obj.product_uom.category_id.name
             if unite=="Poids":
                 poids = obj.product_uom_qty
@@ -281,6 +303,8 @@ class SaleOrderLine(models.Model):
                 poids = nb_colis*obj.product_id.is_poids_net_colis
             obj.is_poids_net = poids
             obj.is_nb_pieces_par_colis=obj.product_id.is_nb_pieces_par_colis
+            if obj.discount==0:
+                obj.get_discount()
 
 
     @api.depends('product_id','name','product_uom_qty')

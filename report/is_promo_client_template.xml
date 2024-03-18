@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="is_promo_client_external_layout_standard">
+        <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+           <div class="o_boxed_header">
+                <div class="row mb8">
+                    <div class="col-3">
+                        <img t-if="o.enseigne_id.name.image_1920" t-att-src="image_data_uri(o.enseigne_id.name.image_1920)" alt="Logo"/>
+                    </div>
+                    <div class="col-9 text-right mb4">
+                        <div name="res_company" class="mb4">
+                            <div style="font-size:13pt;font-weight:700 !important;">
+                                Promos pour '<span t-field="o.partner_id.name"/>'
+                                <!-- <br />
+                                du <t t-esc="o.date_debut_promo" t-options="{'widget': 'date'}"/>
+                                au <t t-esc="o.date_fin_promo"   t-options="{'widget': 'date'}"/> -->
+                            </div>
+                            <div style="font-size:11pt;font-weight:700 !important;" t-field="o.enseigne_id.name.name"/>
+                            <span t-field="res_company.street"/> - 
+                            <span t-field="res_company.zip"/>
+                            <![CDATA[
+                            &nbsp;
+                            ]]>
+                            <span t-field="res_company.city"/> - <span t-field="res_company.country_id"/>
+                           <div t-if="o.enseigne_id">
+                                Tél: <span t-esc="o.enseigne_id.name.mobile or o.enseigne_id.name.phone"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div t-attf-class="article o_report_layout_standard o_company_#{company.id}_layout"  t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <t t-raw="0"/>
+        </div>
+        <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
+            <div class="text-center" style="border-top: 1px solid black;">
+                <div t-if="report_type == 'pdf'" class="text-muted">
+                    Page: <span class="page"/> / <span class="topage"/>
+                </div>
+            </div>
+        </div>
+    </template>
+    <template id="is_promo_client_external_layout">
+        <t t-if="not o" t-set="o" t-value="doc"/>
+        <t t-if="not company">
+            <t t-if="company_id">
+                <t t-set="company" t-value="company_id"/>
+            </t>
+            <t t-elif="o and 'company_id' in o">
+                <t t-set="company" t-value="o.company_id.sudo()"/>
+            </t>
+            <t t-else="else">
+                <t t-set="company" t-value="res_company"/>
+            </t>
+        </t>
+        <t t-call="is_fromtome14.is_promo_client_external_layout_standard">
+            <t t-raw="0"/>
+        </t>
+    </template>
+    <template id="is_promo_client_report_layout" name="Report layout">&lt;!DOCTYPE html&gt;
+        <html t-att-lang="lang and lang.replace('_', '-')"
+              t-att-data-report-margin-top="data_report_margin_top"
+              t-att-data-report-header-spacing="data_report_header_spacing"
+              t-att-data-report-dpi="data_report_dpi"
+              t-att-data-report-landscape="data_report_landscape"
+              t-att-web-base-url="web_base_url">
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="initial-scale=1"/>
+                <title><t t-esc="title or 'Odoo Report'"/></title>
+                <t t-call-assets="web.report_assets_common" t-js="false"/>
+                <t t-call-assets="web.assets_common" t-css="false"/>
+                <t t-call-assets="web.report_assets_common" t-css="false"/>
+            </head>
+            <body t-att-class="'container' if not full_width else 'container-fluid'">
+                <div id="wrapwrap">
+                    <main>
+                        <t t-raw="0"/>
+                    </main>
+                </div>
+            </body>
+        </html>
+    </template>
+    <template id="is_promo_client_html_container">
+        <t t-set="body_classname" t-value="'container'"/>
+        <t t-call="is_fromtome14.is_promo_client_report_layout">
+            <t t-raw="0"/>
+        </t>
+    </template>
+
+
+    <template id="is_promo_client_report">
+        <t t-call="is_fromtome14.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="is_fromtome14.is_promo_client_external_layout">
+                    <div class="page listing_prix_client">
+                        <div class="oe_structure"/>
+                        <t t-set="res" t-value="o.get_products()"/>
+                        <t t-foreach="res" t-as="promo">
+                            <table class="table table-sm o_main_table">
+                                <thead>
+                                    <tr>
+                                        <th colspan="100" style="color:black;background-color:Gainsboro;font-size:12pt">
+                                            Promo fournisseur '<t t-esc="promo.partner_id.name"/>' 
+                                            du <t t-esc="promo.date_debut_promo" t-options="{'widget': 'date'}"/>
+                                            au <t t-esc="promo.date_fin_promo"   t-options="{'widget': 'date'}"/>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th style="width:15%" class="text-center">Référence Interne</th>
+                                        <th style="width:70%" class="text-left">Nom Article</th>
+                                        <th style="width:15%" class="text-center">Remise (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="res[promo]" t-as="line">
+                                        <td class="text-center"><span t-field="line.product_id.default_code"/></td>
+                                        <td class="text-left"><span t-field="line.product_id.name"/></td>
+                                        <td class="text-center"><span t-field="line.remise_client"/></td>
+                                     </tr>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+    <record id="is_promo_client_paperformat" model="report.paperformat">
+        <field name="name">Listing prix client</field>
+        <field name="default" eval="True"/>
+        <field name="format">custom</field>
+        <field name="page_height">297</field>
+        <field name="page_width">210</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">30</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">25</field>
+        <field name="dpi">90</field>
+    </record>
+    <record id="is_promo_client_report_action" model="ir.actions.report">
+        <field name="name">Listing promos client</field>
+        <field name="model">is.promo.client</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">is_fromtome14.is_promo_client_report</field>
+        <field name="report_file">is_fromtome14.is_promo_client_report</field>
+        <field name="paperformat_id" ref="is_fromtome14.is_promo_client_paperformat"/>
+        <field name="binding_model_id" ref="model_is_promo_client"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>
