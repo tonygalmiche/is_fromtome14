@@ -51,7 +51,7 @@
                         <field name="date_fin_promo"/>
                         <field name="pourcent_promo_a_repercuter"/>
                     </group>
-                    <field  name="ligne_ids" nolabel="1">
+                    <field  name="ligne_ids" nolabel="1" readonly="1">
                         <tree limit="1000">
                             <field name="promo_fournisseur_id" widget="many2one_clickable"/>
                             <field name="partner_id"           widget="many2one_clickable"/>
