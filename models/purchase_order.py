@@ -96,6 +96,13 @@ class PurchaseOrder(models.Model):
 
     def initialisation_etat_facturee_fournisseur_action_server(self):
         for obj in self:
+
+            for line in obj.order_line:
+                line._compute_qty_invoiced()
+                print("TEST",line, line.qty_to_invoice)
+
+
+
             obj._get_invoiced()
  
 
