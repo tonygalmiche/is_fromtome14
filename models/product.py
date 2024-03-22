@@ -429,7 +429,7 @@ class ProductTemplate(models.Model):
             if update_prix_actuel:
                 for product in obj.product_variant_ids:
                     if type(product.id)==int:
-                        product.update_pricelist_ir_cron(product_tmpl_id=obj.id)
+                        product.update_pricelist(product_tmpl_id=obj.id)
             #******************************************************************
 
             #** Prix de vente futur *******************************************
@@ -485,7 +485,7 @@ class ProductTemplate(models.Model):
                 })
             product.write(vals)
             for variante in product.product_variant_ids:
-                variante.update_pricelist_ir_cron(product_tmpl_id=product.id)
+                variante.update_pricelist(product_tmpl_id=product.id)
             ct+=1
 
 
@@ -581,7 +581,49 @@ class ProductProduct(models.Model):
             for template in self]
 
 
-    def update_pricelist_ir_cron(self, product_tmpl_id=False):
+    def update_pricelist_ir_cron(self):
+        cr, user, context, su = self.env.args
+        products = self.env['product.template'].search([])
+        ids=[]
+        for product in products:
+            ids.append(str(product.id))
+        nb_products = len(products)
+
+        for key in _PRICELISTS:
+            name = _PRICELISTS[key]
+            pricelists = self.env['product.pricelist'].search([('name', '=', name)], limit=1)
+            for pricelist in pricelists:
+                #** Supprimer les lignes sans article correspondand ***********
+                items = self.env['product.pricelist.item'].search([('pricelist_id'   ,'=',pricelist.id)])
+                nb1=len(items)
+                SQL="delete from product_pricelist_item where pricelist_id=%s and product_tmpl_id not in(%s)"%(pricelist.id,",".join(ids))
+                cr.execute(SQL)
+                items = self.env['product.pricelist.item'].search([('pricelist_id'   ,'=',pricelist.id)])
+                nb2=len(items)
+                #**************************************************************
+
+                #** Mettre à jour les articles manquant ***********************
+                item_ids=[]
+                for item in items:
+                    item_ids.append(str(item.product_tmpl_id.id))
+                for id in ids:
+                    if id not in item_ids:
+                        product = self.env['product.template'].browse(int(id))
+                        if product:
+                            field_name = "is_prix_vente_actuel_%s"%key
+                            price = round(getattr(product, field_name),6)
+                            if price>0:
+                                print("Ajouter article %s"%product.name,product.product_variant_ids)
+                                product.product_variant_ids.update_pricelist(product_tmpl_id=product.id)
+                #**************************************************************
+
+                items = self.env['product.pricelist.item'].search([('pricelist_id'   ,'=',pricelist.id)])
+                nb3=len(items)
+                print(pricelist, pricelist.name, nb_products, nb1,nb2,nb3)
+                #**************************************************************
+
+
+    def update_pricelist(self, product_tmpl_id=False):
         for key in _PRICELISTS:
             name = _PRICELISTS[key]
             pricelists = self.env['product.pricelist'].search([('name', '=', name)])
@@ -625,7 +667,7 @@ class ProductProduct(models.Model):
                         item = self.env['product.pricelist.item'].create(vals)
                     if item:
                         item.fixed_price = price
-                        _logger.info("update_pricelist_ir_cron : %s : %s/%s : %s : %s"%(key,ct,nb,product.default_code,price))
+                        _logger.info("update_pricelist : %s : %s/%s : %s : %s"%(key,ct,nb,product.default_code,price))
                     ct+=1
 
 
@@ -640,18 +682,11 @@ class ProductProduct(models.Model):
         return price
 
 
-
     def get_prix_futur(self,prix_futur=False):
         price=0
         if prix_futur:
             name = "is_prix_vente_futur_%s"%prix_futur
             price = getattr(self, name)
-        else:
-            items = self.env['product.pricelist.item'].search([
-                    ('pricelist_id','=',pricelist.id),('product_tmpl_id','=',self.product_tmpl_id.id)
-                ], order="date_start desc", limit=1)
-            for item in items:
-                price=item.fixed_price
         return price
 
 

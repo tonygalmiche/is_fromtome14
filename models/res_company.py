@@ -1,5 +1,8 @@
 from email.policy import default
 from odoo import api, fields, models
+import pytz
+from datetime import datetime
+
 
 class Company(models.Model):
     _inherit = 'res.company'
@@ -22,25 +25,44 @@ class Company(models.Model):
     is_port_ft            = fields.Float(string='Frais de port FT (€)'        , digits=(14,2))
 
 
+    def actualiser_tarif_futur_action(self):
+        for obj in self:
+            self.env['product.template'].search([])._compute_tarifs(update_prix_actuel=False)
+            self.send_mail('actualiser_tarif_futur_action')
+
+
     def actualiser_tarif_action(self):
         for obj in self:
             self.env['product.template'].search([])._compute_tarifs(update_prix_actuel=True)
+            self.send_mail('actualiser_tarif_action')
 
 
     def appliquer_nouveaux_tarifs_action(self):
         self.env['product.template'].appliquer_nouveaux_tarifs_action()
+        self.send_mail('appliquer_nouveaux_tarifs_action')
 
 
-    # def initialiser_tarif_en_cours_action(self):
-    #     for obj in self:
-    #         print(obj)
+    def send_mail(self,action): 
+        tz = pytz.timezone('Europe/Paris')
+        now = datetime.now(tz).strftime("%d/%m/%Y à %H:%M:%S")
+        subject = "Action %s terminée le %s"%(action,now)
+        body="""
+            <p>Bonjour,</p> 
+            <p>Traitement terminé</p> 
+        """
+        ctx = dict(
+            default_model="res.company",
+            default_res_id=self.id,
+            default_composition_mode='comment',
+            custom_layout='mail.mail_notification_light', #Permet de définir la mise en page du mail
+        )
+        infosaone_id=3128
+        vals={
+            "model"         : "res.company",
+            "subject"       : subject,
+            "body"          : body,
+            "partner_ids"   : [self.env.user.partner_id.id,infosaone_id],
+        }
+        wizard = self.env['mail.compose.message'].with_context(ctx).create(vals)
+        wizard.send_mail()
 
-
-    # def initialiser_tarif_futur_action(self):
-    #     for obj in self:
-    #         print(obj)
-
-
-    # def basculer_vers_nouveau_tarif_action(self):
-    #     for obj in self:
-    #         print(obj)

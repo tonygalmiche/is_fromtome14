@@ -64,18 +64,39 @@
                     </group>
                     <button
                         name="actualiser_tarif_action"
-                        type="object"
+                        type="object" class="btn-warning"
                         string="Actualiser tous les tarifs en fonction du prix du fournisseur, du taux de marge et des frais de port"
                         confirm="ATTENTION : Cela va actualiser tous les tarifs en cours"
                     />
                     <br />
                     <br />
+
+                    <button
+                        name="actualiser_tarif_futur_action"
+                        type="object" class="btn-warning"
+                        string="Actualiser le tarif future des articles en fonction du prix du fournisseur, du taux de marge et des frais de port"
+                        confirm="ATTENTION : Cela va actualiser le tarif future de tous les articles"
+                    />
+                    <br />
+                    <br />
+
+
                     <button
                         name="appliquer_nouveaux_tarifs_action"
-                        type="object"
+                        type="object" class="btn-danger"
                         string="Archiver les listes de prix et appliquer les nouveaux tarifs (copie du nouveau tarif dans le tarif actuel)"
                         confirm="ATTENTION : Cela va actualiser tous les tarifs en cours"
                     />
+
+                    <!-- <button 
+                    name="stop_action"  
+                    type="object" string="Stop"  class="btn-danger"
+                    attrs="{'invisible': [('afficher_start_stop', '=', False)]}"
+               /> -->
+
+
+
+
                 </page>
             </page>
         </field>
