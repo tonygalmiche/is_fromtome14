@@ -12,13 +12,16 @@
         <field name="model">mail.activity</field>
         <field name="inherit_id" ref="mail.mail_activity_view_form_popup"/>
         <field name="arch" type="xml">
+            <xpath expr="//sheet/group/field[@name='activity_category']/.." position="before">
+                <field name="active" invisible="1"/>
+                <widget name="web_ribbon" title="Terminée" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+            </xpath>
             <field name="activity_type_id" position="after">
                 <field name="partner_id"/>
                 <field name="is_attachment_ids" widget="many2many_binary"/>
             </field>
         </field>
     </record>
-
     <record id="is_mail_activity_tree" model="ir.ui.view">
         <field name="name">is_mail_activity_tree</field>
         <field name="model">mail.activity</field>
