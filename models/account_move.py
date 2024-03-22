@@ -81,12 +81,24 @@ class AccountMove(models.Model):
     @api.depends('invoice_line_ids')
     def _compute_is_alerte(self):
         for obj in self:
-            alerte=''
+            alertes=[]
+            nb_frais_de_port=0
             for line in obj.invoice_line_ids:
+                if line.product_id.categ_id.name=='TRANSPORT':
+                    nb_frais_de_port+=1
                 if line.price_unit==0:
-                    alerte = "Prix facturé à 0"
+                    alertes.append("Prix facturé à 0")
                 if line.price_unit>=9999:
-                    alerte = "Prix facturé > 9999"
+                    alertes.append("Prix facturé > 9999")
+
+            if nb_frais_de_port>1:
+                alertes.append("Il y a %s lignes de frais de port"%nb_frais_de_port)
+
+
+
+            alerte=False
+            if len(alertes)>0:
+                alerte = '\n'.join(alertes)
             obj.is_alerte=alerte
 
 
