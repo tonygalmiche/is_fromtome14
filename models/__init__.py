@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from . import account_move
-from . import account_payment_order
+from . import account_payment
 from . import mail_activity
 from . import product
 from . import product_pricelist
