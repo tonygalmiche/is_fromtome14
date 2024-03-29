@@ -209,6 +209,20 @@ class ProductTemplate(models.Model):
             obj.is_fournisseur_id  = fournisseur_id
 
 
+    # def _compute_is_pricelist_item_compute_ids(self):
+    #     for obj in self:
+    #         ids=[]
+    #         filtre=[
+    #             ('pricelist_id.active','in',[0,1]),
+    #             ('active','in',[0,1]),
+    #             ('product_tmpl_id','=',obj.id),
+    #         ]
+    #         items = self.env['product.pricelist.item'].search(filtre,limit=15,order="pricelist_id")
+    #         for item in items:
+    #             ids.append(item.id)
+    #         obj.is_pricelist_item_compute_ids=ids
+
+
     is_ref_fournisseur = fields.Char(string='Réf fournisseur'        , compute='_compute_is_ref_fournisseur', readonly=True, store=True)
     is_fournisseur_id  = fields.Many2one('res.partner', 'Fournisseur', compute='_compute_is_ref_fournisseur', readonly=True, store=True)
 
@@ -267,7 +281,13 @@ class ProductTemplate(models.Model):
 
     is_stock_mini         = fields.Float("Stock mini FT", digits=(14,4))
     is_stock_mini_lc      = fields.Float("Stock mini LC", digits=(14,4))
-    is_pricelist_item_ids = fields.One2many('product.pricelist.item', 'product_tmpl_id', 'Liste de prix')
+    is_pricelist_item_ids = fields.One2many('product.pricelist.item', 'product_tmpl_id', 'Liste de prix') #, domain=[('pricelist_id.active','in',[0,1]),('active','in',[0,1])])
+
+
+    # is_pricelist_item_compute_ids = fields.Many2many('product.pricelist.item',
+    #     compute="_compute_is_pricelist_item_compute_ids",
+    #     domain="[('active','in',[0,1]),('pricelist_id.active','in',[0,1])]"
+    # )
 
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis')
     is_poids_net_colis     = fields.Float(string='Poids net colis (Kg)', digits='Stock Weight')
@@ -557,6 +577,37 @@ class ProductTemplate(models.Model):
         return nb_colis
 
 
+
+    def voir_prix_archives(self):
+        for obj in self:
+            ids=[]
+            filtre=[
+                ('pricelist_id.active','in',[0,1]),
+                ('active','in',[0,1]),
+                ('product_tmpl_id','=',obj.id),
+            ]
+            items = self.env['product.pricelist.item'].search(filtre,order="pricelist_id")
+            for item in items:
+                ids.append(item.pricelist_id.id)
+            dummy, view_id = self.env['ir.model.data'].get_object_reference('is_fromtome14', 'is_product_pricelist_item_tree')
+            res= {
+                'name': 'Lignes',
+                'view_mode': 'tree',
+                'view_type': 'form',
+                'views': [[view_id, "tree"], [False, "form"]],
+                'res_model': 'product.pricelist.item',
+                'type': 'ir.actions.act_window',
+                'domain': [
+                    ('active','in',[0,1]),
+                    ('pricelist_id','in',ids),
+                    ('product_tmpl_id','=',obj.id),
+                ],
+                'limit': 1000,
+            }
+            return res
+
+
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
@@ -613,13 +664,11 @@ class ProductProduct(models.Model):
                             field_name = "is_prix_vente_actuel_%s"%key
                             price = round(getattr(product, field_name),6)
                             if price>0:
-                                print("Ajouter article %s"%product.name,product.product_variant_ids)
                                 product.product_variant_ids.update_pricelist(product_tmpl_id=product.id)
                 #**************************************************************
 
                 items = self.env['product.pricelist.item'].search([('pricelist_id'   ,'=',pricelist.id)])
                 nb3=len(items)
-                print(pricelist, pricelist.name, nb_products, nb1,nb2,nb3)
                 #**************************************************************
 
 

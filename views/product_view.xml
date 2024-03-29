@@ -283,8 +283,8 @@
                     </group>
 
 
-                    <group string="Listes de prix">
-                        <field name="is_pricelist_item_ids" nolabel="1">
+                    <!-- <group string="Listes de prix compute">
+                        <field name="is_pricelist_item_compute_ids" nolabel="1" domain="[('active','in',[0,1]),('pricelist_id.active','in',[0,1])]">
                             <tree>
                                 <field name="pricelist_id" string="Liste de prix"/>
                                 <field name="fixed_price"  string="Prix de vente"/>
@@ -292,8 +292,26 @@
                                 <field name="date_end"/>
                             </tree>
                         </field>
+                    </group> -->
+    
+
+                    <group string="Listes de prix">
+                        <field name="is_pricelist_item_ids" nolabel="1" domain="[('active','in',[0,1]),('pricelist_id.active','in',[0,1])]">
+                            <tree>
+                                <field name="pricelist_id" string="Liste de prix" widget="many2one_clickable" />
+                                <field name="fixed_price"  string="Prix de vente"/>
+                                <field name="date_start"/>
+                                <field name="date_end"/>
+                            </tree>
+                        </field>
                     </group>
     
+                    <button
+                        name="voir_prix_archives"
+                        type="object" class="btn btn-secondary"
+                        string="Voir également les prix archivés"
+                    />
+
 
                 </page>
             </xpath>
