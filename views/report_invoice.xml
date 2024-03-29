@@ -28,7 +28,7 @@
             <div class="page">
                 <table style="border:none;width:100%">
                     <tr>
-                        <th style="border:none;width:95mm">
+                        <th style="border:none;width:115mm">
                             <div style="text-decoration: underline">Adresse de livraison:</div>
                             <div><b><span t-field="o.partner_shipping_id.name"/></b></div>
                             <div t-field="o.partner_shipping_id.street"/>
