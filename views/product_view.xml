@@ -281,27 +281,27 @@
                             <field name="is_prix_vente_futur_marge_ft"/>
                         </group>
                     </group>
-
-
-                    <!-- <group string="Listes de prix compute">
-                        <field name="is_pricelist_item_compute_ids" nolabel="1" domain="[('active','in',[0,1]),('pricelist_id.active','in',[0,1])]">
-                            <tree>
-                                <field name="pricelist_id" string="Liste de prix"/>
-                                <field name="fixed_price"  string="Prix de vente"/>
-                                <field name="date_start"/>
-                                <field name="date_end"/>
-                            </tree>
-                        </field>
-                    </group> -->
-    
-
                     <group string="Listes de prix">
                         <field name="is_pricelist_item_ids" nolabel="1" domain="[('active','in',[0,1]),('pricelist_id.active','in',[0,1])]">
                             <tree>
                                 <field name="pricelist_id" string="Liste de prix" widget="many2one_clickable" />
                                 <field name="fixed_price"  string="Prix de vente"/>
-                                <field name="date_start"/>
-                                <field name="date_end"/>
+                                <field name="date_start" optional="hide" />
+                                <field name="date_end"   optional="hide" />
+
+                                <field name="is_prix_achat" optional="show"/>
+                                <field name="is_taux_marge" optional="show"/>
+                                <button 
+                                    name="is_alerte_action" type="object" class="oe_stat_button" 
+                                    icon="fa-exclamation-triangle"
+                                    attrs="{'invisible': [('is_alerte', '=', False)]}"
+                                    title="Alertes"
+                                />
+                                <field name="is_alerte"   optional="show"/>
+                                <field name="create_date" optional="hide" string="Créé le"/>
+                                <field name="create_uid"  optional="hide" string="Créé par"/>
+                                <field name="write_date"  optional="show" string="Modifié le"/>
+                                <field name="write_uid"   optional="show" string="Modifié par"/>
                             </tree>
                         </field>
                     </group>
