@@ -64,6 +64,12 @@
             <field name="qty_done" position="before">
                 <field name="product_uom_qty"/>
             </field>
+            <field name="state" position="before">
+                <field name="create_date" optional="hide" string="Créé le"/>
+                <field name="create_uid"  optional="hide" string="Créé par"/>
+                <field name="write_date"  optional="hide" string="Modifié Le"/>
+                <field name="write_uid"   optional="hide" string="Modifié par"/>
+            </field>
         </field>
     </record>
 </odoo>
