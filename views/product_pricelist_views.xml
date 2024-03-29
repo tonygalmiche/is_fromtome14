@@ -26,8 +26,12 @@
                         attrs="{'invisible': [('is_alerte', '=', False)]}"
                         title="Alertes"
                     />
-                    <field name="is_alerte"     optional="show"/>
-                    <field name="active"        optional="show"/>
+                    <field name="is_alerte"   optional="show"/>
+                    <field name="create_date" optional="hide" string="Créé le"/>
+                    <field name="create_uid"  optional="hide" string="Créé par"/>
+                    <field name="write_date"  optional="hide" string="Modifié le"/>
+                    <field name="write_uid"   optional="hide" string="Modifié par"/>
+                    <field name="active"      optional="hide"/>
                 </tree>
             </field>
         </record>
