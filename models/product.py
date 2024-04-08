@@ -20,6 +20,12 @@ _PRICELISTS = {
     'lf_coll'   : 'LF coll.',
     'ft'        : 'FT',
 }
+_COLISAGE = [
+    ('1', 'Colis'),
+    ('2', '1/2 colis'),
+    ('4', '1/4 colis'),
+]
+
 
 class MilkType(models.Model):
     _name="milk.type"
@@ -301,8 +307,8 @@ class ProductTemplate(models.Model):
     is_prix_vente_futur_marge_lf         = fields.Float(string='TM futur forcé LF'        , digits='Product Price')
     is_prix_vente_futur_marge_lf_coll    = fields.Float(string='TM futur forcé LF coll.'  , digits='Product Price')
     is_prix_vente_futur_marge_ft         = fields.Float(string='TM futur forcé FT'        , digits='Product Price')
-
-    is_discount = fields.Float(string="Remise (%)", compute='_compute_is_discount', readonly=True, store=True, digits="Discount", help="Remise du fournisseur par défaut (actualisé la nuit par la gestion des promos)")
+    is_discount  = fields.Float(string="Remise (%)", compute='_compute_is_discount', readonly=True, store=True, digits="Discount", help="Remise du fournisseur par défaut (actualisé la nuit par la gestion des promos)")
+    is_colisage  = fields.Selection(string='Colisage', selection=_COLISAGE, required=True, default='1', help="Utilisé dans 'Préparation transfert entrepôt'")
 
 
     @api.depends('seller_ids','seller_ids.discount')
@@ -540,21 +546,27 @@ class ProductTemplate(models.Model):
 
 
     def uom2colis(self,qty,arrondir="round"):
+        colisage  = int(self.is_colisage or 1)
         nb        = self.is_nb_pieces_par_colis
         poids_net = self.is_poids_net_colis
         unite     = self.uom_id.category_id.name
         nb_colis  = 0
+
+        print(self.default_code, colisage)
+
+
         if unite=="Poids":
             if poids_net>0:
                 nb_colis = qty / poids_net
         else:
             if nb>0:
                 nb_colis = qty / nb
-        nb_colis = round(nb_colis,2)       # Arrondir à 2 decimales pour éviter les problèmes de virgules flotante
-        if arrondir=="round":             
-            nb_colis = round(nb_colis)     # Arrondir à l'entier le plus proche
+        nb_colis = round(nb_colis,2)                     # Arrondir à 2 decimales pour éviter les problèmes de virgules flotante
+        if arrondir=="round":   
+            nb_colis = round(colisage*nb_colis)/colisage # Arrondir à l'entier le plus proche en tenant compte du colisage
         if arrondir=="ceil":
-            nb_colis = math.ceil(nb_colis) # Arrondir à l'entier supérieur
+            nb_colis = math.ceil(nb_colis)               # Arrondir à l'entier supérieur
+        nb_colis = round(nb_colis,2)                     # Arrondir à 2 decimales pour éviter les problèmes de virgules flotante
         return nb_colis
 
 

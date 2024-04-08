@@ -24,6 +24,8 @@
                 <field name="nb_pieces_par_colis" optional="hide"/>
                 <field name="uom_id"              optional="hide"/>
                 <field name="unite"/>
+                <field name="is_colisage"         optional="show"/>
+
 
                 <field name="stock_mini"    optional="show" sum="Total"/>
                 <field name="stock_ft"      optional="show" sum="Total"/>

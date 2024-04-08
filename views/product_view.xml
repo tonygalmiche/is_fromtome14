@@ -45,6 +45,7 @@
             </field>
              <field name="uom_id" position="after">
                 <field name="is_stock_mini" optional="hide"/>
+                <field name="is_colisage" optional="hide"/>
                 <field name="is_nb_pieces_par_colis" optional="hide"/>
                 <field name="is_poids_net_colis" optional="hide"/>
                 <field name="is_enseigne_id" optional="hide"/>
@@ -143,6 +144,7 @@
             </field>
             <field name="uom_po_id" position="after">
                 <hr/><hr/>
+                <field name="is_colisage"/>
                 <field name="is_nb_pieces_par_colis"/>
                 <field name="is_poids_net_colis"/>
                 <field name="is_forcer_poids_colis"/>

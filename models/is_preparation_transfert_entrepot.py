@@ -11,6 +11,7 @@ class is_preparation_transfert_entrepot_ligne(models.Model):
     preparation_id = fields.Many2one('is.preparation.transfert.entrepot', 'Préparation', required=True, ondelete='cascade')
     product_id     = fields.Many2one('product.product', 'Article')
     designation    = fields.Char("Désignation" )
+    is_colisage    = fields.Selection(related="product_id.is_colisage")
     default_code   = fields.Char("Référence interne")
     stock_mini     = fields.Float("Stock mini FT", digits='Product Unit of Measure')
     stock_mini_lc  = fields.Float("Stock mini LC", digits='Product Unit of Measure')
@@ -129,7 +130,6 @@ class is_preparation_transfert_entrepot(models.Model):
                         ('is_date_reception', '<='   , obj.date_fin),
                     ]
                     pickings=self.env['stock.picking'].search(filtre)
-                    print(pickings,filtre)
                     for picking in pickings:
                         for move in picking.move_ids_without_package:
                             if move.state not in ['done','cancel'] and move.product_id==product:
