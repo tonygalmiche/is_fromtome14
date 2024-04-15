@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
+from datetime import datetime, date, timedelta
 
 
 class AccountMoveLine(models.Model):
@@ -151,6 +152,24 @@ class AccountMove(models.Model):
             obj.is_enseigne_id = obj.partner_id.is_enseigne_id.id
         
 
+    @api.depends('state','amount_total','amount_residual')
+    def _compute_is_date_delai_paiement(self):
+        for obj in self:
+            date_paiement = False
+            delai_paiement = False
+            if obj.state == 'posted' and obj.is_invoice(include_receipts=True):
+                payments = obj._get_reconciled_info_JSON_values()
+                for payment in payments:
+                    if date_paiement==False:
+                        date_paiement = payment['date']
+                    if payment['date']>date_paiement:
+                        date_paiement = payment['date']
+            if date_paiement:
+                delai_paiement=(date_paiement-obj.invoice_date).days
+            obj.is_date_paiement  = date_paiement
+            obj.is_delai_paiement = delai_paiement
+
+
     is_enseigne_id      = fields.Many2one('is.enseigne.commerciale', 'Enseigne', compute='_compute_is_enseigne_id', store=True, readonly=False) #, related='partner_id.is_enseigne_id')
     is_export_compta_id = fields.Many2one('is.export.compta', 'Folio', copy=False)
     is_alerte           = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
@@ -162,6 +181,9 @@ class AccountMove(models.Model):
     is_date_relance     = fields.Date(string='Date dernière relance', readonly=1)
     is_date_releve      = fields.Date(string='Date dernier relevé'  , readonly=1)
     is_motif_avoir_id   = fields.Many2one('is.motif.avoir', "Motif de l'avoir")
+    is_date_paiement    = fields.Date(string='Date paiement'       , compute='_compute_is_date_delai_paiement', store=True, readonly=True)
+    is_delai_paiement   = fields.Integer(string='Délai de paiement', compute='_compute_is_date_delai_paiement', store=True, readonly=True)
+
 
 
     def write(self, vals):

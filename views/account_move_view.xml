@@ -37,6 +37,8 @@
                 <field name="is_export_compta_id" readonly="1"/>
                 <field name="is_date_relance" attrs="{'invisible':[('is_date_relance','=',False)]}"/>
                 <field name="is_date_releve"  attrs="{'invisible':[('is_date_releve','=',False)]}"/>
+                <field name="is_date_paiement"   attrs="{'invisible':[('is_date_paiement','=',False)]}"/>
+                <field name="is_delai_paiement"  attrs="{'invisible':[('is_delai_paiement','=',0)]}"/>
             </div>
             <label for="invoice_payment_term_id" position="replace"/>
             <xpath expr="//field[@name='invoice_date_due']/.." position="replace">
@@ -102,6 +104,8 @@
                 <field name="is_enseigne_id" optional="show"/>
             </field>
             <field name="state" position="before">
+                <field name="is_date_paiement"    optional="show"/>
+                <field name="is_delai_paiement"   optional="show"/>
                 <field name="is_export_compta_id" optional="show"/>
             </field>
             <!-- <field name="invoice_date_due" position="before">
