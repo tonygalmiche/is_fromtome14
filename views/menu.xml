@@ -110,6 +110,31 @@
 
     
 
+    <!-- Employés / Suivi du temps -->
+    <menuitem
+        id="is_suivi_temps_main_menu"
+        name="Suivi du temps"
+        parent="hr.menu_hr_root"
+        sequence="2"
+    />
+    <menuitem
+        id="is_suivi_temps_menu"
+        name="Suivi du temps"
+        parent="is_suivi_temps_main_menu"
+        sequence="10"
+        action="is_suivi_temps_action"
+    />
+    <menuitem
+        id="is_motif_absence_menu"
+        name="Motif d'absence"
+        parent="is_suivi_temps_main_menu"
+        sequence="20"
+        action="is_motif_absence_action"
+    />
+
+
+
+
 
     <!-- Déplacement des menus inutiles -->
     <menuitem id="mail.menu_root_discuss"     parent="base.menu_custom" sequence="900"/>

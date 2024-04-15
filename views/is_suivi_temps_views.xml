@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- is.suivi.temps -->
+    <record id="is_suivi_temps_form" model="ir.ui.view">
+        <field name="name">is.suivi.temps.form</field>
+        <field name="model">is.suivi.temps</field>
+        <field name="arch" type="xml">
+            <form>
+                 <sheet>
+                    <group>
+                        <field name="date"/>
+                        <field name="employe_id"/>
+                        <field name="nb_heures" widget="float_time"/>
+                        <field name="motif_absence_id"/>
+                        <field name="commentaire"/>
+                    </group>
+                </sheet>
+             </form>
+        </field>
+    </record>
+    <record id="is_suivi_temps_tree" model="ir.ui.view">
+        <field name="name">is.suivi.temps.tree</field>
+        <field name="model">is.suivi.temps</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date"/>
+                <field name="employe_id"/>
+                <field name="nb_heures" widget="float_time"/>
+                <field name="motif_absence_id"/>
+                <field name="commentaire" optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_suivi_temps_search" model="ir.ui.view">
+        <field name="name">is.suivi.temps.search</field>
+        <field name="model">is.suivi.temps</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employe_id"/>
+                <field name="motif_absence_id"/>
+                <field name="commentaire"/>
+           </search>
+        </field>
+    </record>
+    <record id="is_suivi_temps_pivot" model="ir.ui.view">
+        <field name="name">is_suivi_temps_pivot</field>
+        <field name="model">is.suivi.temps</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="employe_id" type="col"/>
+                <field name="date"       type="row"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="is_suivi_temps_graph" model="ir.ui.view">
+        <field name="name">is_suivi_temps_graph</field>
+        <field name="model">is.suivi.temps</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="False">
+                <field name="date"   type="row"/>
+            </graph>
+        </field>
+    </record>
+    <record  id="is_suivi_temps_action" model="ir.actions.act_window">
+        <field name="name">Suivi du temps</field>
+        <field name="res_model">is.suivi.temps</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">[]</field>
+    </record>
+
+
+
+    <!-- is.motif.absence -->
+    <record id="is_motif_absence_form" model="ir.ui.view">
+        <field name="name">is.motif.absence.form</field>
+        <field name="model">is.motif.absence</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                     </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_motif_absence_tree" model="ir.ui.view">
+        <field name="name">is.motif.absence.tree</field>
+        <field name="model">is.motif.absence</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_motif_absence_search" model="ir.ui.view">
+        <field name="name">is.motif.absence.search</field>
+        <field name="model">is.motif.absence</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+    <record  id="is_motif_absence_action" model="ir.actions.act_window">
+        <field name="name">Motif d'absence</field>
+        <field name="res_model">is.motif.absence</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</odoo>
