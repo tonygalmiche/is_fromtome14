@@ -8,6 +8,9 @@ from odoo.exceptions import UserError, ValidationError
 from datetime import datetime
 import pytz
 import math
+import base64
+from subprocess import PIPE, Popen
+import re
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -248,9 +251,11 @@ class ProductTemplate(models.Model):
     is_type_tracabilite       = fields.Selection(string='Traçabilité', selection=[('ddm', 'DDM'), ('dlc', 'DLC')], default='dlc')
     is_dluo                   = fields.Char(string='DDM/DLC')
     is_type_conditionnement   = fields.Char(string='Type de conditionnement')
+    is_poids_brut             = fields.Char(string='Poids brut')
     is_atelier_transformation = fields.Char(string='Atelier de transformation')
     no_agrement_sanitaire     = fields.Char(string="N° d'agrément fabriquant")
     temperature_stock         = fields.Char(string='T° de conservation')
+    is_ogm_ionisation         = fields.Char(string='OGM / Ionisation')
 
 
     # CARACTÉRISTIQUES ORGANOLEPTIQUES:
@@ -261,8 +266,10 @@ class ProductTemplate(models.Model):
     degustation = fields.Char(string='Goût / Dégustation')
     odeur       = fields.Char(string='Odeur')
 
-    is_ingredient_ids = fields.One2many('is.ingredient.line', 'product_id', "Lignes", copy=True)
-    is_ingredient     = fields.Char(string='Ingrédients', compute='_compute_is_ingredient')
+    is_ingredient_ids    = fields.One2many('is.ingredient.line', 'product_id', "Lignes", copy=True)
+    is_ingredient        = fields.Html(string='Ingrédients (dont allergènes en gras)', compute='_compute_is_ingredient')
+    is_ingredient_import = fields.Text(string='Ingrédients importés')
+    is_allergene_import  = fields.Text(string='Allergènes importés')
 
     is_germe_ids                 = fields.One2many('is.germe.line'                , 'product_id', "Germes" , copy=True)
     is_valeur_nutritionnelle_ids = fields.One2many('is.valeur.nutritionnelle.line', 'product_id', "Valeurs", copy=True)
@@ -310,6 +317,8 @@ class ProductTemplate(models.Model):
     is_discount  = fields.Float(string="Remise (%)", compute='_compute_is_discount', readonly=True, store=True, digits="Discount", help="Remise du fournisseur par défaut (actualisé la nuit par la gestion des promos)")
     is_colisage  = fields.Selection(string='Colisage', selection=_COLISAGE, required=True, default='1', help="Utilisé dans 'Préparation transfert entrepôt'")
 
+    is_fiche_technique_ids    = fields.Many2many('ir.attachment', 'product_is_fiche_technique_rel', 'product_id', 'file_id', 'Fiche techinque')
+    is_fiche_technique_import =  fields.Text('Résultat importation fiche techinque')
 
     @api.depends('seller_ids','seller_ids.discount')
     def _compute_is_discount(self):
@@ -598,6 +607,203 @@ class ProductTemplate(models.Model):
                 'limit': 1000,
             }
             return res
+
+
+    def importer_fiche_technique_action(self):
+        for obj in self:
+            for attachment in obj.is_fiche_technique_ids:
+                pdf=base64.b64decode(attachment.datas)
+                name = 'fiche-technique-%s'%obj.id
+                path = "/tmp/%s.pdf"%name
+                f = open(path,'wb')
+                f.write(pdf)
+                f.close()
+                cde = "cd /tmp && pdftotext -layout %s.pdf"%name
+                p = Popen(cde, shell=True, stdout=PIPE, stderr=PIPE)
+                stdout, stderr = p.communicate()
+                path = "/tmp/%s.txt"%name
+                r = open(path,'rb').read().decode('utf-8')
+                lines = r.split('\n')
+                ledict={}
+                for line in lines:
+                    ledict = obj.regex_extract(ledict,'01-Conditionnement'          , line, 'Conditionnement :'                 , False)
+                    ledict = obj.regex_extract(ledict,'01-Poids brut'               , line, 'Poids brut :'                      , False)
+                    ledict = obj.regex_extract(ledict,"02-N° d'agrément"            , line, "N° d'agrément sanitaire européen :", False)
+                    ledict = obj.regex_extract(ledict,'03-Energie'                  , line, 'Energie :'                   , '    ')
+                    ledict = obj.regex_extract(ledict,'04-Matières Grasses'         , line, 'Matières Grasses :'          , '    ')
+                    ledict = obj.regex_extract(ledict,'05-Dont Acides gras saturés' , line, '► dont acides gras saturés :', '    ')
+                    ledict = obj.regex_extract(ledict,'06-Glucides'                 , line, 'Glucides :'                  , '    ')
+                    ledict = obj.regex_extract(ledict,'07-Dont Sucres'              , line, '► dont sucres :'             , False)
+                    ledict = obj.regex_extract(ledict,'08-Protéines'                , line, 'Protéines :'                 , False)
+                    ledict = obj.regex_extract(ledict,'09-Sel'                      , line, 'Sel :'                       , False)
+                    ledict = obj.regex_extract(ledict,'10-Listeria'                 , line, 'Listeria :'                  , False)
+                    ledict = obj.regex_extract(ledict,'11-Salmonelle'               , line, 'Salmonelle :'                , False)
+                    ledict = obj.regex_extract(ledict,'12-Escherichia coli'         , line, 'Escherichia coli :'          , False)
+                    ledict = obj.regex_extract(ledict,'13-Staphylocoques'           , line, 'Staphylocoques :'            , False)
+
+                #** Recherche des ingredients sur plusieurs lignes ************
+                search_start = search_end = False
+                ingredients=[]
+                for line in lines:
+                    if search_start:
+                        x = re.findall("Matière grasse :", line)
+                        if x:
+                            search_end=True
+                    if search_start and not search_end:
+                        ingredient = line.replace('Ingrédients :','').strip()
+                        if ingredient!='':
+                            ingredients.append(ingredient)
+                    if not search_end:
+                        x = re.findall("       PRODUIT", line)
+                        if x:
+                            search_start=True
+                ledict['14-Ingrédients']='\n'.join(ingredients)
+                #**************************************************************
+
+                #** Recherche Allergènes **************************************
+                search_start = False
+                for line in lines:
+                    if search_start:
+                        x = re.findall("(.*)Froid positif :", line)
+                        if x:
+                            ledict['15-Allergènes']=x[0].strip()
+                        break
+                    x = re.findall("Conditions de conservation", line)
+                    if x:
+                        search_start=True
+                #**************************************************************
+
+                #** Conditions de conservation ********************************
+                search_start = False
+                for line in lines:
+                    if search_start:
+                        x = re.findall(".*    (.*)", line)
+                        if x:
+                            ledict['16-Conditions de conservation']=x[0].strip()
+                        break
+                    x = re.findall("Conditions de conservation", line)
+                    if x:
+                        search_start=True
+                #**************************************************************
+
+                #** OGM / Ionisation ********************************
+                search_start = False
+                for line in lines:
+                    print(line)
+                    if search_start:
+                        ledict['17-OGM / Ionisation']=line.strip()
+                        break
+                    x = re.findall("OGM / Ionisation", line)
+                    if x:
+                        search_start=True
+                #**************************************************************
+                
+                #** Recherche Description  ************************************
+                search_start = search_end = False
+                descriptions=[]
+                for line in lines:
+                    print(line)
+                    if search_start:
+                        x = re.findall("Caractéristiques nutritionnelles", line)
+                        if x:
+                            search_end=True
+                    if search_start and not search_end:
+                        description = line.strip()
+                        if description!='':
+                            descriptions.append(description)
+                    if not search_end:
+                        x = re.findall("Description & caractéristiques organoleptiques", line)
+                        if x:
+                            search_start=True
+                ledict['18-Description']='\n'.join(descriptions)
+                #**************************************************************
+
+                #** Résultat final ********************************************
+                resultat=[]
+                sorted_dict = dict(sorted(ledict.items())) 
+                if sorted_dict:
+                    for key in sorted_dict:
+                        x = "%s : %s"%(key.ljust(30), sorted_dict[key])
+                        resultat.append(x)
+                        print(x)
+                obj.is_fiche_technique_import = '\n'.join(resultat)
+                #**************************************************************
+
+                #** Enregistrement des données ********************************
+                obj.is_mis_a_jour_le = datetime.today()
+                obj.is_type_conditionnement = sorted_dict.get("01-Conditionnement")
+                obj.is_poids_brut           = sorted_dict.get("01-Poids brut")
+                obj.no_agrement_sanitaire   = sorted_dict.get("02-N° d'agrément")
+                obj.is_ingredient_import    = sorted_dict.get("14-Ingrédients")
+                obj.is_allergene_import     = sorted_dict.get("15-Allergènes")
+                obj.temperature_stock       = sorted_dict.get("16-Conditions de conservation")
+                obj.is_ogm_ionisation       = sorted_dict.get("17-OGM / Ionisation")
+                obj.degustation             = sorted_dict.get("18-Description")
+                #**************************************************************
+
+                #** Caractéristiques nutritionnelles **************************
+                obj.is_valeur_nutritionnelle_ids.unlink()
+                obj.add_valeur_nutritionnelle('Valeur Énergétique'      , sorted_dict.get("03-Energie"))
+                obj.add_valeur_nutritionnelle('Matières Grasses'        , sorted_dict.get("04-Matières Grasses"))
+                obj.add_valeur_nutritionnelle('Dont Acides gras saturés', sorted_dict.get("05-Dont Acides gras saturés"))
+                obj.add_valeur_nutritionnelle('Glucides'                , sorted_dict.get("06-Glucides"))
+                obj.add_valeur_nutritionnelle('Dont Sucres'             , sorted_dict.get("07-Dont Sucres"))
+                obj.add_valeur_nutritionnelle('Protéines'               , sorted_dict.get("08-Protéines"))
+                obj.add_valeur_nutritionnelle('Sel'                     , sorted_dict.get("09-Sel"))
+                #**************************************************************
+
+                #** Germes ****************************************************
+                obj.is_germe_ids.unlink()
+                obj.add_germe('Listeria monocytogenes', sorted_dict.get("10-Listeria"))
+                obj.add_germe('Salmonella'            , sorted_dict.get("11-Salmonelle"))
+                obj.add_germe('Escherichia coli'      , sorted_dict.get("12-Escherichia coli"))
+                obj.add_germe('Staphylocoques'        , sorted_dict.get("13-Staphylocoques"))
+                #**************************************************************
+
+
+
+    def add_valeur_nutritionnelle(self,name,valeur):
+        for obj in self:
+            lines = self.env['is.valeur.nutritionnelle'].search([('name', '=' , name)], limit=1)
+            for line in lines:
+                vals={
+                    'product_id': obj.id,
+                    'valeur_id' : line.id,
+                    'valeur'    : valeur
+                }
+                self.env['is.valeur.nutritionnelle.line'].create(vals)
+
+
+    def add_germe(self,name,critere):
+        for obj in self:
+            lines = self.env['is.germe'].search([('name', '=' , name)], limit=1)
+            for line in lines:
+                vals={
+                    'product_id': obj.id,
+                    'germe_id'  : line.id,
+                    'critere'   : critere
+                }
+                self.env['is.germe.line'].create(vals)
+
+
+    def regex_extract(self,ledict,key,txt,regex_start,regex_end):
+        "retourne dans dict la chaine trouvée entre 2 expressions régulières"
+        v = re.search(regex_start, txt)  # Recherche la première occurence de regex_start
+        res=False
+        if v:
+            txt2 = txt[v.end():].strip()
+            if regex_end:
+                v = re.search(regex_end, txt2)      # Recherche la première occurence de '    '
+                if v:
+                    res= txt2[0:v.start()].strip()
+            else:
+                res = txt2
+        if res:
+            ledict[key]=res
+        return ledict
+
+
+
 
 
 

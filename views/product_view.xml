@@ -161,6 +161,21 @@
             </xpath>
             <xpath expr="//form//sheet//notebook//page[1]" position="after">
                 <page string="Fiche technique">
+
+                    <group col="3">
+                        <field name="is_fiche_technique_ids" widget="many2many_binary"/>
+                        <button
+                            string="Importer cette fiche techinque" 
+                            name="importer_fiche_technique_action" 
+                            type="object" 
+                            attrs="{'invisible': [('is_fiche_technique_ids', '=', [])]}"
+                        />
+                    </group>
+                    <group attrs="{'invisible': [('is_fiche_technique_import', '=', False)]}">
+                        <div style="background:gainsboro;font-weight:normal;padding-left:5pt;font-family:courier, courier new, serif;">
+                            <field name="is_fiche_technique_import"  nolabel="1"/>
+                        </div>
+                    </group>
                     <group>
                         <group>
                             <field name="is_creation_le"/>
@@ -193,9 +208,11 @@
                             <field name="is_type_tracabilite"/>
                             <field name="is_dluo"/>
                             <field name="is_type_conditionnement"/>
+                            <field name="is_poids_brut"/>
                             <field name="is_atelier_transformation"/>
                             <field name="no_agrement_sanitaire"/>
                             <field name="temperature_stock"/>
+                            <field name="is_ogm_ionisation"/>
                         </group>
                     </group>
                     <group string="Caractéristiques Organoleptiques">
@@ -209,7 +226,12 @@
                             <field name="odeur"/>
                         </group>
                     </group>
-                    <group string="Ingrédients">
+                    <group string="Ingrédients"/>
+                    <group>
+                        <field name="is_ingredient_import"/>
+                        <field name="is_allergene_import"/>
+                    </group>
+                    <group>
                         <field name="is_ingredient_ids" nolabel="1" >
                             <tree editable="bottom">
                                 <field name="ordre" widget="handle"/>
@@ -217,6 +239,9 @@
                                 <field name="allergene"/>
                             </tree>
                         </field>
+                    </group>
+                    <group>
+                        <field name="is_ingredient"/>
                     </group>
                     <group string="Germes"/>
                     <field name="is_germe_ids" nolabel="1" >
