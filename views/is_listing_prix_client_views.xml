@@ -40,6 +40,7 @@
                             <field name="name"/>
                             <field name="afficher_prix"/>
                             <field name="prix_futur"/>
+                            <field name="lang"/>
                          </group>
                     </group>
                     <field name="product_ids" nolabel="1" >
@@ -71,6 +72,7 @@
                 <field name="afficher_prix"/>
                 <field name="prix_futur"/>
                 <field name="name"/>
+                <field name="lang"/>
             </tree>
         </field>
     </record>

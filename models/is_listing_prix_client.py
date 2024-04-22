@@ -6,6 +6,11 @@ import base64
 import sys
 
 
+@api.model
+def _lang_get(self):
+    return self.env['res.lang'].get_installed()
+
+
 class IsListingPrixClient(models.Model):
     _name = 'is.listing.prix.client'
     _description = "Listing prix client"
@@ -25,8 +30,9 @@ class IsListingPrixClient(models.Model):
             ('lf_coll'   , 'LF coll.'),
             ('ft'        , 'FT'),
         ], 'Prix futur à afficher', copy=False)
+    lang = fields.Selection(_lang_get, string='Langue', default='fr_FR')
 
- 
+
     @api.onchange('partner_id')
     def onchange_partner_id(self):
         if self.partner_id:
@@ -154,6 +160,11 @@ class IsListingPrixClient(models.Model):
                             html+='<td class="vignette" colspan="%s" style="border-width:%s">'%(colspan,border_width)
                         else:
                             html+='<td class="vignette">'
+
+                        if obj.lang=="de_DE":
+                            html+='<div style="text-align:center;font-size:8pt">Art. Nr./Bezeichnung<br>Gewicht/Verpackungseinheit</div>'
+
+
                         html+='<div style="font-weight:bold;text-align:center;height:16mm">['+p.default_code+'] '+p.name+'</div>'
                         if img:
                             html+='<div style="text-align:center;height:30mm"><img src="'+img+'" alt="Logo" style="max-height:30mm;max-width:35mm"/></div>'
