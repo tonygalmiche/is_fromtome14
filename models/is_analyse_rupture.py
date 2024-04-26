@@ -36,7 +36,6 @@ class IsAnalyseRupture(models.Model):
 
     def generer_lignes_action(self):
         for obj in self:
-            print(obj)
             filtre=[
                 ('is_commande_soldee', '=', False),
                 ('state'             , '=', 'sale'),

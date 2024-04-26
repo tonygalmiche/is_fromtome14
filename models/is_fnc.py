@@ -88,9 +88,9 @@ class IsFNC(models.Model):
                 ('date','<=',obj.move_line_id.date),
                 ('lot_id','=',obj.lot_id.id),
             ]
-            lines = self.env['stock.move.line'].search(filtre, order="date desc")
+            lines = self.env['stock.move.line'].search(filtre, order="date desc",limit=10)
             for line in lines:
-                if line.move_id.picking_type_id.id==1:
+                if line.move_id.picking_type_id.code=='incoming':
                     copy.move_line_id = line.id
                     copy.picking_id = line.move_id.picking_id.id
                     copy.partner_id = line.move_id.picking_id.partner_id.id

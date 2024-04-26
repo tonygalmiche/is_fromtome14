@@ -78,7 +78,6 @@ class IntrastatProductDeclaration(models.Model):
                     "with Intrastat Code '%s' manually"
                 ) % hs_code.display_name
                 self._note += note
-                #print('1weight--',weight)
                 return weight, suppl_unit_qty
             if target_uom.category_id == source_uom.category_id:
                 suppl_unit_qty = source_uom._compute_quantity(
@@ -103,7 +102,6 @@ class IntrastatProductDeclaration(models.Model):
                         "Please correct the product record and regenerate "
                         "the lines or adjust the impacted lines manually")
                     self._note += note
-                    #print('2weight--', weight)
                     return weight, suppl_unit_qty
                 suppl_unit_qty = m3_uom._compute_quantity(
                     line_qty * product.volume, target_uom)
@@ -117,15 +115,12 @@ class IntrastatProductDeclaration(models.Model):
                     "regenerate the lines or adjust the impacted "
                     "lines manually")
                 self._note += note
-                #print('3weight--', weight)
                 return weight, suppl_unit_qty
 
         if source_uom == kg_uom:
-            #print('4weight--', weight)
             weight = line_qty
             weight_net = line_qty
         elif source_uom.category_id == weight_uom_categ:
-            #print('5weight--', weight)
             weight = source_uom._compute_quantity(line_qty, kg_uom)
         elif source_uom.category_id == pce_uom_categ:
             if not product.weight:  # re-create weight_net ?
@@ -136,7 +131,6 @@ class IntrastatProductDeclaration(models.Model):
                     "Please correct the product record and regenerate "
                     "the lines or adjust the impacted lines manually")
                 self._note += note
-                #print('6weight--', weight)
                 return weight, suppl_unit_qty
             if source_uom == pce_uom:
                 weight = product.weight * line_qty  # product.weight_net
@@ -157,7 +151,6 @@ class IntrastatProductDeclaration(models.Model):
                     "Please correct the product record and regenerate "
                     "the lines or adjust the impacted lines manually")
                 self._note += note
-                #print('7weight--', weight)
                 return weight, suppl_unit_qty
             qty = source_uom._compute_quantity(
                 line_qty, product.uom_id, raise_if_failure=False)
@@ -165,9 +158,6 @@ class IntrastatProductDeclaration(models.Model):
 
         if weight_net == 0 and source_uom != kg_uom :
             weight_net = (product.product_weight / product.weight)*line_qty
-        #print('8weight--', weight)
-        #print('weight_net----',weight_net)
-        #print('line_qty--',line_qty)
         return weight, suppl_unit_qty,weight_net
 
 
@@ -324,19 +314,10 @@ class IntrastatProductDeclaration(models.Model):
 
 class L10nFrIntrastatProductDeclaration(models.Model):
     _inherit = "l10n.fr.intrastat.product.declaration"
-    #
-    # @api.model
-    # def _prepare_grouped_fields(self, computation_line, fields_to_sum):
-    #     vals = super(L10nFrIntrastatProductDeclaration, self). \
-    #         _prepare_grouped_fields(computation_line, fields_to_sum)
-    #     vals['weight_net'] = computation_line.weight_net
-    #     return vals
 
     @api.model
     def _xls_template(self):
         res = super(L10nFrIntrastatProductDeclaration, self)._xls_template()
-        print('weighhghgt---', self._render(
-                        'line.weight_net'))
         res.update({
             'weight_net': {
                 'header': {

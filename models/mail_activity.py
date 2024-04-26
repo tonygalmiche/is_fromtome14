@@ -28,17 +28,7 @@ class MailActivity(models.Model):
     @api.depends('res_model','res_id')
     def _compute_partner_id(self):
         for obj in self:
-
             partner_id= False
-
-            # try:
-            #     print(obj) #,obj.res_model,obj.res_id)
-            #     partner_id=False
-            # except ValueError:
-            #     partner_id=False
-
-
-
             p=False
             if obj.res_model=='res.partner':
                 partners=self.env['res.partner'].search([('id','=',obj.res_id)])
@@ -58,20 +48,8 @@ class MailActivity(models.Model):
                     p = order.partner_id
             if p:
                 partner_id=p.id
-
-            print(obj,obj.res_model,obj.res_id,partner_id)
-
-
-
             obj.partner_id = partner_id
             
-
-
-    # def write(self, vals):
-    #     print(self,vals)
-    #     return super(MailActivity, self).write(vals)
-
-
 
     def unlink(self):
         self.active=False

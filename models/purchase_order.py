@@ -386,11 +386,6 @@ class PurchaseOrderLine(models.Model):
                 date=date,
                 uom_id=self.product_uom,
             )
-
-
-            print("## TEST _onchange_quantity",date, seller)
-
-
             self._apply_value_from_seller(seller)
         return res
 

@@ -29,18 +29,7 @@ class PricelistItem(models.Model):
         for obj in self:
             print(obj)
 
-    # def is_product_action(self):
-    #     for obj in self:
-    #         print(obj)
-
-    # def is_archive(self):
-    #     for obj in self:
-    #         test=False
-    #         if not obj.product_tmpl_id.active:
-    #             test=True
-    #         obj.is_archive=test
-
-
+ 
     @api.depends('product_id')
     def _compute_is_alerte(self):
         today = date.today()

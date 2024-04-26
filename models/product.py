@@ -560,10 +560,6 @@ class ProductTemplate(models.Model):
         poids_net = self.is_poids_net_colis
         unite     = self.uom_id.category_id.name
         nb_colis  = 0
-
-        print(self.default_code, colisage)
-
-
         if unite=="Poids":
             if poids_net>0:
                 nb_colis = qty / poids_net
@@ -689,7 +685,6 @@ class ProductTemplate(models.Model):
                 #** OGM / Ionisation ********************************
                 search_start = False
                 for line in lines:
-                    print(line)
                     if search_start:
                         ledict['17-OGM / Ionisation']=line.strip()
                         break
@@ -702,7 +697,6 @@ class ProductTemplate(models.Model):
                 search_start = search_end = False
                 descriptions=[]
                 for line in lines:
-                    print(line)
                     if search_start:
                         x = re.findall("Caractéristiques nutritionnelles", line)
                         if x:
@@ -725,7 +719,6 @@ class ProductTemplate(models.Model):
                     for key in sorted_dict:
                         x = "%s : %s"%(key.ljust(30), sorted_dict[key])
                         resultat.append(x)
-                        print(x)
                 obj.is_fiche_technique_import = '\n'.join(resultat)
                 #**************************************************************
 

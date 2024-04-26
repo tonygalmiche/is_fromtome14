@@ -562,22 +562,7 @@ class Picking(models.Model):
             if poids_scan and poids_picking:
                 if round(poids_scan,4)!=round(poids_picking,4):
                     alertes.append("Le poids du scan (%.2f) est différent du poids du picking (%.2f)"%(poids_scan,poids_picking))
-
-            # #** Recherche des lots créées après la création du scan de livraison
-            # print(obj,date_picking,date_scan)
-            # if date_scan:
-            #     for line in obj.move_line_ids_without_package:
-            #         print(line, date_scan, line.lot_id.create_date,line.lot_id.name)
-            #         if line.lot_id.create_date:
-            #             if line.lot_id.create_date>date_scan:
-            #                 alertes.append("Le lot %s a été créé après la création du scan ce qui n'est pas normal"%(line.lot_id.name))
-
             obj.is_alerte = '\n'.join(alertes) or False
-
-
-
-
-
 
 
     @api.depends('move_line_ids_without_package','state')

@@ -41,37 +41,9 @@ class IsImportLeCellier(models.Model):
                 #** Test si fichier est bien du xlsx **************************
                 try:
                     wb    = openpyxl.load_workbook(filename = path, data_only=True)
-                    print(wb, wb.sheetnames) #['base 2022', 'HT 2022', 'FRANCO 2022']
                 except:
                     raise Warning("Le fichier "+attachment.name+u" n'est pas un fichier xlsx")
                 #**************************************************************
-
-
-            # #** Création des listes de prix ***********************************
-            # name = "Liste Prix CDF QUAI"
-            # pricelist_quai = False
-            # pricelists = self.env['product.pricelist'].search([("name","=",name)])
-            # if len(pricelists):
-            #     pricelist_quai = pricelists[0]
-            #     pricelist_quai.item_ids.unlink()
-            # else:
-            #     vals={
-            #         "name": name,
-            #     }
-            #     pricelist_quai=self.env['product.pricelist'].create(vals)
-            # name = "Liste Prix CDF FRANCO"
-            # pricelist_franco = False
-            # pricelists = self.env['product.pricelist'].search([("name","=",name)])
-            # if len(pricelists):
-            #     pricelist_franco = pricelists[0]
-            #     pricelist_franco.item_ids.unlink()
-            # else:
-            #     vals={
-            #         "name": name,
-            #     }
-            #     pricelist_franco=self.env['product.pricelist'].create(vals)
-            # #******************************************************************
-
 
             ws = wb['Sheet1']
             cells = list(ws)
@@ -117,17 +89,6 @@ class IsImportLeCellier(models.Model):
                             partners = self.env['res.partner'].search([("name","=",fournisseur)])
                             if len(partners)>0:
                                 partner = partners[0]
-                    # if not partner and fournisseur:
-                    #     vals={
-                    #         "name": fournisseur,
-                    #     }
-                    #     partner = self.env['res.partner'].create(vals)
-                    #     print("Création", fournisseur, code_comptable_fournisseur)
-                # if partner and code_fournisseur and not partner.is_code_interne:
-                #         vals={
-                #             "is_code_interne" : code_fournisseur,
-                #         }
-                #         partner.write(vals)
                 #**************************************************************
 
                 #** Recherche article *****************************************
@@ -141,13 +102,6 @@ class IsImportLeCellier(models.Model):
                             products = self.env['product.template'].search([("barcode","=",code_ean)])
                     if len(products):
                         product = products[0]
-                    # else:
-                    #     vals={
-                    #         "name"        : designation_interne,
-                    #         "default_code": nouvelle_reference,
-                    #     }
-                    #     product = self.env['product.template'].create(vals)
-                    #     print("Création", designation_interne)
                 #**************************************************************
 
 
@@ -161,7 +115,6 @@ class IsImportLeCellier(models.Model):
 
                 #** Création / Modification article ***************************
                 if product:
-                    print(lig,ct,products,nouvelle_reference,designation_interne)
                     tz = pytz.timezone('Europe/Paris')
                     now = datetime.now(tz).strftime("%d/%m/%Y à %H:%M:%S")
                     note = "Importé le %s"%(now)

@@ -212,9 +212,6 @@ class AccountMove(models.Model):
         for invoice in self:        
             invoice.sudo().message_follower_ids.unlink()
         res = super(AccountMove, self).action_invoice_sent()
-
-        print("TEST",invoice,invoice.message_follower_ids)
-
         return res
 
 
