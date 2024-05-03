@@ -36,6 +36,7 @@ InfoSaône - Module Odoo 14 pour Fromtome
         'list_export_excel_app',
     ],
     'data' : [
+        'security/res.groups.xml',
         'security/ir.model.access.csv',
         'views/assets.xml',
         'views/account_move_view.xml',

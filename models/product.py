@@ -363,6 +363,7 @@ class ProductTemplate(models.Model):
                 res= port*obj.is_poids_net_colis/nb
             return res
 
+
     @api.depends('seller_ids','seller_ids.price',
                  'seller_ids.date_start',
                  'is_prix_vente_actuel_marge_cdf_quai',
@@ -377,12 +378,15 @@ class ProductTemplate(models.Model):
                  'is_prix_vente_futur_marge_ft',
                  'active'
     )
-    def _compute_tarifs(self, update_prix_actuel=False):
+    def _compute_tarifs(self, update_prix_actuel=False,pricelist=False):
         company = self.env.user.company_id
+        prices = _PRICELISTS
+        if pricelist:
+            prices={pricelist: _PRICELISTS[pricelist]}
 
         #** Coefficients à appliquer ******************************************
         coefs={}
-        for price in _PRICELISTS:
+        for price in prices:
             name = "is_coef_%s"%price
             coef = getattr(company, name)
             coefs[price] = coef
@@ -390,7 +394,7 @@ class ProductTemplate(models.Model):
 
         #** Frais de port à appliquer *****************************************
         ports={}
-        for price in _PRICELISTS:
+        for price in prices:
             name = "is_port_%s"%price
             port = getattr(company, name)
             ports[price] = port
@@ -424,7 +428,7 @@ class ProductTemplate(models.Model):
 
             #** Prix de vente actuel ******************************************
             if update_prix_actuel:
-                for price in _PRICELISTS:
+                for price in prices:
                     taux_marge = coefs[price]
                     name = "is_prix_vente_actuel_marge_%s"%price
                     force = getattr(obj, name)
@@ -444,11 +448,11 @@ class ProductTemplate(models.Model):
             if update_prix_actuel:
                 for product in obj.product_variant_ids:
                     if type(product.id)==int:
-                        product.update_pricelist(product_tmpl_id=obj.id)
+                        product.update_pricelist(product_tmpl_id=obj.id,pricelist=pricelist)
             #******************************************************************
 
             #** Prix de vente futur *******************************************
-            for price in _PRICELISTS:
+            for price in prices:
                 taux_marge = coefs[price]
                 name = "is_prix_vente_futur_marge_%s"%price
                 force = getattr(obj, name)
@@ -864,9 +868,13 @@ class ProductProduct(models.Model):
                 #**************************************************************
 
 
-    def update_pricelist(self, product_tmpl_id=False):
-        for key in _PRICELISTS:
-            name = _PRICELISTS[key]
+    def update_pricelist(self, product_tmpl_id=False, pricelist=False):
+        prices = _PRICELISTS
+        if pricelist:
+            prices={pricelist: _PRICELISTS[pricelist]}
+
+        for key in prices:
+            name = prices[key]
             pricelists = self.env['product.pricelist'].search([('name', '=', name)])
             if pricelists:
                 pricelist = pricelists[0]

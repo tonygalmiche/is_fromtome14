@@ -61,4 +61,4 @@ access_is_promo_client_ligne,access_is_promo_client_ligne,model_is_promo_client_
 access_is_promo_client_ligne_manager,access_is_promo_client_ligne_manager,model_is_promo_client_ligne,sales_team.group_sale_manager,1,1,1,1
 
 access_is_motif_absence,access_is_motif_absence,model_is_motif_absence,hr.group_hr_manager,1,1,1,0
-access_is_suivi_temps,access_is_suivi_temps,model_is_suivi_temps,hr.group_hr_manager,1,1,1,1
+access_is_suivi_temps,access_is_suivi_temps,model_is_suivi_temps,is_fromtome14.gestionnaire_suivi_temps_group,1,1,1,1

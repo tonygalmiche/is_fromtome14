@@ -31,10 +31,20 @@ class Company(models.Model):
             self.send_mail('actualiser_tarif_futur_action')
 
 
-    def actualiser_tarif_action(self):
+    # def actualiser_tarif_action(self):
+    #     for obj in self:
+    #         self.env['product.template'].search([])._compute_tarifs(update_prix_actuel=True)
+    #         self.send_mail('actualiser_tarif_action')
+
+
+
+    def actualiser_tarif_ft_action(self):
         for obj in self:
-            self.env['product.template'].search([])._compute_tarifs(update_prix_actuel=True)
+            self.env['product.template'].search([])._compute_tarifs(update_prix_actuel=True, pricelist='ft')
             self.send_mail('actualiser_tarif_action')
+
+
+
 
 
     def appliquer_nouveaux_tarifs_action(self):
