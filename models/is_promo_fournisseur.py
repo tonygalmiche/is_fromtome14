@@ -83,7 +83,7 @@ class IsPromoFournisseur(models.Model):
         now = datetime.now().date()
         for obj in self:
             if now>=obj.date_debut_promo and now<=obj.date_fin_promo:
-                obj.desactiver_promo_action()
+                #obj.desactiver_promo_action()
                 for l in obj.ligne_ids:
                     seller = l.product_id._select_seller(
                         partner_id=obj.partner_id,
@@ -132,17 +132,18 @@ class IsPromoFournisseur(models.Model):
             self.env['product.supplierinfo'].search(filtre).discount=0
             #******************************************************************
 
-            #** Ancien système de promo => N'est plus utilisé *****************
-            for l in obj.ligne_ids:
-                filtre=[
-                    ('promo_id', '=', l.id),
-                ]
-                lines = self.env['product.supplierdiscount'].search(filtre)
-                lines.unlink()
-            #******************************************************************
+            # #** Ancien système de promo => N'est plus utilisé *****************
+            # for l in obj.ligne_ids:
+            #     filtre=[
+            #         ('promo_id', '=', l.id),
+            #     ]
+            #     lines = self.env['product.supplierdiscount'].search(filtre)
+            #     lines.unlink()
+            # #******************************************************************
 
 
     def update_promo_fournisseur_ir_cron(self):
+        self.env['is.promo.fournisseur'].search([]).desactiver_promo_action()
         self.env['is.promo.fournisseur'].search([]).appliquer_promo_action()
 
 
