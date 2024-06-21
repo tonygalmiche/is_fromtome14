@@ -34,6 +34,7 @@
             </field>
             <div name="journal_div" position="after">
                 <field name="is_motif_avoir_id" attrs="{'invisible':[('move_type','not in',['in_refund','out_refund'])]}"/>
+                <field name="is_type_avoir"     attrs="{'invisible':[('move_type','not in',['in_refund','out_refund'])]}"/>
                 <field name="is_export_compta_id" readonly="1"/>
                 <field name="is_date_relance" attrs="{'invisible':[('is_date_relance','=',False)]}"/>
                 <field name="is_date_releve"  attrs="{'invisible':[('is_date_releve','=',False)]}"/>
@@ -101,6 +102,7 @@
         <field name="inherit_id" ref="account.view_invoice_tree" />
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
+                <field name="is_type_avoir"  optional="show" invisible="context.get('default_move_type') not in ('out_refund', 'in_refund')"/>
                 <field name="is_enseigne_id" optional="show"/>
             </field>
             <field name="state" position="before">
@@ -154,6 +156,7 @@
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id"/>
                 <field name="is_motif_avoir_id"/>
+                <field name="is_type_avoir"/>
             </field>
         </field>
     </record>
