@@ -2,6 +2,10 @@
 from odoo import api, fields, models, _
 from datetime import datetime, date, timedelta
 
+_TYPE_AVOIR = [
+    ('avoir_prix'    , 'Avoir sur prix'),
+    ('avoir_quantite', 'Avoir sur quantité'),
+]
 
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
@@ -183,10 +187,7 @@ class AccountMove(models.Model):
     is_motif_avoir_id   = fields.Many2one('is.motif.avoir', "Motif de l'avoir")
     is_date_paiement    = fields.Date(string='Date paiement'       , compute='_compute_is_date_delai_paiement', store=True, readonly=True)
     is_delai_paiement   = fields.Integer(string='Délai de paiement', compute='_compute_is_date_delai_paiement', store=True, readonly=True)
-    is_type_avoir       = fields.Selection([
-        ('avoir_prix'    , 'Avoir sur prix'),
-        ('avoir_quantite', 'Avoir sur quantité'),
-    ], 'Type avoir', default="avoir_quantite", copy=False)
+    is_type_avoir       = fields.Selection(_TYPE_AVOIR, 'Type avoir', default="avoir_quantite", copy=False)
 
 
     def write(self, vals):

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
 from datetime import datetime, timedelta, date
+from odoo.addons.is_fromtome14.models.account_move import _TYPE_AVOIR
+
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -64,37 +66,41 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                         if invoice.move_type in ["out_refund","in_invoice"]:
                             sens=-1
 
+                        is_type_avoir = False
+                        if invoice.move_type in('out_refund','in_refund'):
+                            is_type_avoir = invoice.is_type_avoir
+
+
                         #** Recherche du dernier prix d'achat pour cet article ****
                         prix_achat=montant_achat=marge_brute=0
                         ligne_facture_fournisseur_id = date_facture_fournisseur = False
                         fournisseur_id = False
-                        if invoice.move_type=='out_invoice':
-                            sql="""
-                                SELECT  
-                                    aml.price_unit,
-                                    am.invoice_date,
-                                    aml.id,
-                                    am.partner_id
-                                FROM account_move_line aml inner join account_move am on aml.move_id=am.id
-                                WHERE 
-                                    am.invoice_date<=%s and
-                                    aml.product_id=%s and
-                                    am.move_type='in_invoice'
-                                ORDER BY am.invoice_date desc
-                                limit 1
-                            """
-                            cr.execute(sql,[invoice.invoice_date, line.product_id.id])
-                            for row in cr.fetchall():
-                                prix_achat                   = row[0]
-                                date_facture_fournisseur     = row[1]
-                                ligne_facture_fournisseur_id = row[2]
-                                fournisseur_id               = row[3]
-                                montant_achat = prix_achat*line.quantity*sens
-                                marge_brute = line.price_subtotal*sens-montant_achat
-
-                        if invoice.move_type=='out_refund':
-                            marge_brute = line.price_subtotal*sens
+                        if invoice.move_type in ('out_invoice', 'out_refund'):
+                            if is_type_avoir!='avoir_prix':
+                                sql="""
+                                    SELECT  
+                                        aml.price_unit,
+                                        am.invoice_date,
+                                        aml.id,
+                                        am.partner_id
+                                    FROM account_move_line aml inner join account_move am on aml.move_id=am.id
+                                    WHERE 
+                                        am.invoice_date<=%s and
+                                        aml.product_id=%s and
+                                        am.move_type='in_invoice'
+                                    ORDER BY am.invoice_date desc
+                                    limit 1
+                                """
+                                cr.execute(sql,[invoice.invoice_date, line.product_id.id])
+                                for row in cr.fetchall():
+                                    prix_achat                   = row[0]
+                                    date_facture_fournisseur     = row[1]
+                                    ligne_facture_fournisseur_id = row[2]
+                                    fournisseur_id               = row[3]
+                                    montant_achat = prix_achat*line.quantity*sens
+                            marge_brute = line.price_subtotal*sens-montant_achat
                         #**********************************************************
+
 
                         vals={
                             "invoice_id"     : invoice.id,
@@ -112,6 +118,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                             "price_unit"    : line.price_unit,
                             "price_subtotal": line.price_subtotal*sens,
                             "move_type"     : _MOVE_TYPE[invoice.move_type],
+                            "is_type_avoir" : is_type_avoir,
                             "prix_achat"    : prix_achat,
                             "montant_achat" : montant_achat,
                             "marge_brute"   : marge_brute,
@@ -209,13 +216,14 @@ class IsAnalyseFacturation(models.Model):
     ligne_facture_fournisseur_id = fields.Many2one('account.move.line', 'Ligne facture fournisseur')
     date_facture_fournisseur     = fields.Date("Date facture fournisseur")
     fournisseur_id               = fields.Many2one('res.partner', 'Fournisseur')
-    move_type         = fields.Selection([
+    move_type = fields.Selection([
             ('Facture client'     , 'Facture client'),
             ('Avoir client'       , 'Avoir client'),
             ('Facture fournisseur', 'Facture fournisseur'),
             ('Avoir fournisseur'  , 'Avoir fournisseur'),
             ('Rebut'              , 'Rebut'),
         ], 'Type')
+    is_type_avoir = fields.Selection(_TYPE_AVOIR, 'Type avoir')
     bloquer = fields.Boolean("Bloquer la mise à jour de cette fiche", help="A utiliser pour corriger une errreur dans Odoo", default=False, index=True)
 
 
