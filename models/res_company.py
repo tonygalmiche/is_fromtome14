@@ -16,12 +16,14 @@ class Company(models.Model):
     is_coef_cdf_franco    = fields.Float(string='Taux de marge Cdf franco (%)', digits=(14,2))
     is_coef_lf            = fields.Float(string='Taux de marge LF (%)'        , digits=(14,2))
     is_coef_lf_coll       = fields.Float(string='Taux de marge LF coll. (%)'  , digits=(14,2))
+    is_coef_lf_franco     = fields.Float(string='Taux de marge LF franco (%)' , digits=(14,2))
     is_coef_ft            = fields.Float(string='Taux de marge FT (%)'        , digits=(14,2))
 
     is_port_cdf_quai      = fields.Float(string='Frais de port Cdf quai (€)'  , digits=(14,2))
     is_port_cdf_franco    = fields.Float(string='Frais de port Cdf franco (€)', digits=(14,2))
     is_port_lf            = fields.Float(string='Frais de port LF (€)'        , digits=(14,2))
     is_port_lf_coll       = fields.Float(string='Frais de port LF coll. (€)'  , digits=(14,2))
+    is_port_lf_franco     = fields.Float(string='Frais de port LF franco (€)' , digits=(14,2))
     is_port_ft            = fields.Float(string='Frais de port FT (€)'        , digits=(14,2))
 
 
@@ -44,7 +46,10 @@ class Company(models.Model):
             self.send_mail('actualiser_tarif_action')
 
 
-
+    def actualiser_tarif_lf_franco_action(self):
+        for obj in self:
+            self.env['product.template'].search([])._compute_tarifs(update_prix_actuel=True, pricelist='lf_franco')
+            self.send_mail('actualiser_tarif_action')
 
 
     def appliquer_nouveaux_tarifs_action(self):

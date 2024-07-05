@@ -24,6 +24,7 @@
                             <field name="is_coef_cdf_franco"/>
                             <field name="is_coef_lf"/>
                             <field name="is_coef_lf_coll"/>
+                            <field name="is_coef_lf_franco"/>
                             <field name="is_coef_ft"/>
                         </group>
                         <group string="Frais de port">
@@ -31,6 +32,7 @@
                             <field name="is_port_cdf_franco"/>
                             <field name="is_port_lf"/>
                             <field name="is_port_lf_coll"/>
+                            <field name="is_port_lf_franco"/>
                             <field name="is_port_ft"/>
                         </group>
                     </group>
@@ -47,12 +49,16 @@
                         string="Actualiser Liste de prix Fromtome (FT) uniquement"
                         confirm="ATTENTION : Cela va actualiser tous les tarifs en cours de la liste de prix Fromtome (FT)"
                     />
-
-
-
                     <br />
                     <br />
-
+                    <button
+                        name="actualiser_tarif_lf_franco_action"
+                        type="object" class="btn-warning"
+                        string="Actualiser Liste de prix 'LF Franco' uniquement"
+                        confirm="ATTENTION : Cela va actualiser tous les tarifs en cours de la liste de prix 'LF Franco'"
+                    />
+                    <br />
+                    <br />
                     <button
                         name="actualiser_tarif_futur_action"
                         type="object" class="btn-warning"
@@ -61,8 +67,6 @@
                     />
                     <br />
                     <br />
-
-
                     <button
                         name="appliquer_nouveaux_tarifs_action"
                         type="object" class="btn-danger"

@@ -21,6 +21,7 @@ _PRICELISTS = {
     'cdf_franco': 'Cdf franco',
     'lf'        : 'LF',
     'lf_coll'   : 'LF coll.',
+    'lf_franco' : 'LF franco',
     'ft'        : 'FT',
 }
 _COLISAGE = [
@@ -295,24 +296,28 @@ class ProductTemplate(models.Model):
     is_prix_vente_actuel_cdf_franco = fields.Float(string='PV actuel Cdf franco', digits='Product Price', readonly=True, store=True)
     is_prix_vente_actuel_lf         = fields.Float(string='PV actuel LF'        , digits='Product Price', readonly=True, store=True)
     is_prix_vente_actuel_lf_coll    = fields.Float(string='PV actuel LF coll.'  , digits='Product Price', readonly=True, store=True)
+    is_prix_vente_actuel_lf_franco  = fields.Float(string='PV actuel LF franco' , digits='Product Price', readonly=True, store=True)
     is_prix_vente_actuel_ft         = fields.Float(string='PV actuel FT'        , digits='Product Price', readonly=True, store=True)
 
     is_prix_vente_actuel_marge_cdf_quai   = fields.Float(string='TM actuel forcé Cdf quai'  , digits='Product Price')
     is_prix_vente_actuel_marge_cdf_franco = fields.Float(string='TM actuel forcé Cdf franco', digits='Product Price')
     is_prix_vente_actuel_marge_lf         = fields.Float(string='TM actuel forcé LF'        , digits='Product Price')
     is_prix_vente_actuel_marge_lf_coll    = fields.Float(string='TM actuel forcé LF coll.'  , digits='Product Price')
+    is_prix_vente_actuel_marge_lf_franco  = fields.Float(string='TM actuel forcé LF franco' , digits='Product Price')
     is_prix_vente_actuel_marge_ft         = fields.Float(string='TM actuel forcé FT'        , digits='Product Price')
 
     is_prix_vente_futur_cdf_quai   = fields.Float(string='PV futur Cdf quai'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
     is_prix_vente_futur_cdf_franco = fields.Float(string='PV futur Cdf franco', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
     is_prix_vente_futur_lf         = fields.Float(string='PV futur LF'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
     is_prix_vente_futur_lf_coll    = fields.Float(string='PV futur LF coll.'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
+    is_prix_vente_futur_lf_franco  = fields.Float(string='PV futur LF franco' , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
     is_prix_vente_futur_ft         = fields.Float(string='PV futur FT'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True)
 
     is_prix_vente_futur_marge_cdf_quai   = fields.Float(string='TM futur forcé Cdf quai'  , digits='Product Price')
     is_prix_vente_futur_marge_cdf_franco = fields.Float(string='TM futur forcé Cdf franco', digits='Product Price')
     is_prix_vente_futur_marge_lf         = fields.Float(string='TM futur forcé LF'        , digits='Product Price')
     is_prix_vente_futur_marge_lf_coll    = fields.Float(string='TM futur forcé LF coll.'  , digits='Product Price')
+    is_prix_vente_futur_marge_lf_franco  = fields.Float(string='TM futur forcé LF franco' , digits='Product Price')
     is_prix_vente_futur_marge_ft         = fields.Float(string='TM futur forcé FT'        , digits='Product Price')
     is_discount  = fields.Float(string="Remise (%)", compute='_compute_is_discount', readonly=True, store=True, digits="Discount", help="Remise du fournisseur par défaut (actualisé la nuit par la gestion des promos)")
     is_colisage  = fields.Selection(string='Colisage', selection=_COLISAGE, required=True, default='1', help="Utilisé dans 'Préparation transfert entrepôt'")
@@ -370,11 +375,13 @@ class ProductTemplate(models.Model):
                  'is_prix_vente_actuel_marge_cdf_franco',
                  'is_prix_vente_actuel_marge_lf',
                  'is_prix_vente_actuel_marge_lf_coll',
+                 'is_prix_vente_actuel_marge_lf_franco',
                  'is_prix_vente_actuel_marge_ft',
                  'is_prix_vente_futur_marge_cdf_quai',
                  'is_prix_vente_futur_marge_cdf_franco',
                  'is_prix_vente_futur_marge_lf',
                  'is_prix_vente_futur_marge_lf_coll',
+                 'is_prix_vente_futur_marge_lf_franco',
                  'is_prix_vente_futur_marge_ft',
                  'active'
     )
