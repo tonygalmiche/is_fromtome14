@@ -57,6 +57,7 @@
                                 <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/></div>
                             <div t-if="o.partner_id.is_gln">GLN:<span t-field="o.partner_id.is_gln"/></div>
                             <div t-if="o.partner_id.is_code_fromtome">Code Fournisseur:<span t-field="o.partner_id.is_code_fromtome"/></div>
+                            <div t-if="o.partner_id.siret">SIRET:<span t-field="o.partner_id.siret"/></div>
                          </th>
                     </tr>
                 </table>
