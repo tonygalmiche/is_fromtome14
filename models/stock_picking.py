@@ -523,6 +523,7 @@ class Picking(models.Model):
     is_enseigne_id    = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
     is_transporteur_id = fields.Many2one(related='partner_id.is_transporteur_id')
     is_alerte          = fields.Text('Alerte', compute="_compute_is_alerte", readonly=True, store=False)
+    is_preparation_transfert_id = fields.Many2one('is.preparation.transfert.entrepot', 'Préparation transfert')
 
 
     @api.depends('move_line_ids_without_package')
@@ -718,6 +719,19 @@ class Picking(models.Model):
     def _message_auto_subscribe_notify(self, partner_ids, template):
         "Désactiver les notifications d'envoi des mails"
         return True
+
+
+    def voir_picking_action(self):
+        for obj in self:
+            res= {
+                'name': 'Picking',
+                'view_mode': 'form,tree',
+                'view_type': 'form',
+                'res_model': 'stock.picking',
+                'type': 'ir.actions.act_window',
+                'res_id':obj.id,
+            }
+            return res
 
 
 class PickingType(models.Model):

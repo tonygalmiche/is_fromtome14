@@ -423,6 +423,7 @@
                 <field name="sale_id"           readonly="1" attrs="{'invisible': [('sale_id', '=', False)]}"/>
                 <field name="purchase_id"       readonly="1" attrs="{'invisible': [('purchase_id', '=', False)]}"/>
                 <field name="is_poids_net" sum="Total"/>
+                <field name="is_preparation_transfert_id" attrs="{'invisible': [('is_preparation_transfert_id', '=', False)]}"/>
             </field>
            <field name="backorder_id" position="after">
             <field name="is_enseigne_id"/>
@@ -527,6 +528,9 @@
                 <attribute name="invisible">1</attribute>
             </field>
 
+            <field name="origin" position="after">
+                <field name="is_preparation_transfert_id" optional="hide"/>
+            </field>
 
         </field>
     </record>

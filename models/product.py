@@ -587,6 +587,17 @@ class ProductTemplate(models.Model):
 
 
 
+    def colis2uom(self,colis):
+        nb        = self.is_nb_pieces_par_colis
+        poids_net = self.is_poids_net_colis
+        unite     = self.uom_id.category_id.name
+        if unite=="Poids":
+            uom = colis * poids_net
+        else:
+            uom = colis * nb
+        return round(uom,4)
+
+
     def voir_prix_archives(self):
         for obj in self:
             ids=[]

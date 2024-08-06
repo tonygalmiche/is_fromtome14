@@ -73,6 +73,7 @@ class is_preparation_transfert_entrepot(models.Model):
     calcul_en_colis = fields.Boolean("Calcul en colis", default=False, help="Le résultat affiché sera en colis")
     commentaire     = fields.Text("Commentaire")
     ligne_ids       = fields.One2many('is.preparation.transfert.entrepot.ligne', 'preparation_id', 'Lignes')
+    picking_ids     = fields.One2many('stock.picking', 'is_preparation_transfert_id', 'Pickings', readonly=True)
 
 
     def voir_lignes_action(self):
@@ -215,3 +216,119 @@ class is_preparation_transfert_entrepot(models.Model):
                     }
                     self.env['is.preparation.transfert.entrepot.ligne'].create(vals)
         return self.voir_lignes_action()
+    
+
+    def creation_picking(self,domain,partner_id,picking_type_id,location_id,location_dest_id,name_field_qty):
+        for obj in self:
+            lines=self.env['is.preparation.transfert.entrepot.ligne'].search(domain)
+            move_ids=[]
+            sequence=1
+            for line in lines:
+                colis = -getattr(line, name_field_qty)
+                product_uom_qty  = line.product_id.product_tmpl_id.colis2uom(colis)
+                vals={
+                    'sequence'         : sequence,
+                    'product_id'       : line.product_id.id,
+                    'name'             : line.product_id.name,
+                    'product_uom_qty'  : product_uom_qty,
+                    'product_uom'      : line.product_id.uom_po_id.id,
+                }
+                move_ids.append([0,0,vals])
+                sequence+=1
+            vals={
+                'is_preparation_transfert_id': obj.id,
+                'partner_id'              : partner_id,
+                'picking_type_id'         : picking_type_id,
+                'location_id'             : location_id,
+                'location_dest_id'        : location_dest_id,
+                'move_ids_without_package': move_ids,
+            }
+            picking=self.env['stock.picking'].create(vals)
+            #picking.action_confirm()
+
+
+    def creer_commandes(self):
+        depots=['ft','lc']
+        now = date.today()
+        for obj in self:
+            domain=[
+                ('preparation_id','=',obj.id),
+                ('solde_lc','<',0),
+                ('solde_ft','>',0),
+            ]
+            partner_id       = 1  # Fromtome
+            picking_type_id  = 5  # Transferts internes de Fromtome vers le Cellier
+            location_id      = 8  # FT/Stock
+            location_dest_id = 20 # LC/Stock
+            obj.creation_picking(domain,partner_id,picking_type_id,location_id,location_dest_id,'solde_lc')
+
+            domain=[
+                ('preparation_id','=',obj.id),
+                ('solde_ft','<',0),
+                ('solde_lc','>',0),
+            ]
+            partner_id       = 3396 # Le Cellier
+            picking_type_id  = 13    # Transferts internes du Cellier vers Fromtome
+            location_id      = 20   # LC/Stock
+            location_dest_id = 8    # FT/Stock
+            obj.creation_picking(domain,partner_id,picking_type_id,location_id,location_dest_id,'solde_ft')
+
+
+
+
+
+
+
+
+
+
+            # order_line=[]
+            # sequence=1
+            # for line in lines:
+            #     vals={
+            #         'sequence'         : sequence,
+            #         'product_id'       : line.product_id.id,
+            #         #'name'             : line.product_id.name,
+            #         'is_colis_cde'     : line.solde_ft,
+            #         #'product_uom_qty'  : line.solde_ft,
+            #         'product_uom'      : line.product_id.uom_po_id.id,
+            #         'is_date_reception': now,
+            #         'price_unit'       : 0,
+            #     }
+            #     order_line.append([0,0,vals])
+            #     sequence+=1
+            # #partner_id = 1    # Fromtome
+            # partner_id = 3396 # Le Cellier
+            # vals={
+            #     'partner_id'       : partner_id,
+            #     'is_date_livraison': now,
+            #     'order_line'       : order_line,
+            # }
+            # order=self.env['sale.order'].create(vals)
+            # for line in order.order_line:
+            #     line.onchange_is_colis_cde()
+
+
+            # order_line=[]
+            # sequence=1
+            # for line in lines:
+            #     vals={
+            #         'sequence'    : sequence,
+            #         'product_id'  : line.product_id.id,
+            #         'name'        : line.product_id.name,
+            #         'product_qty' : line.solde_ft,
+            #         'product_uom' : line.product_id.uom_po_id.id,
+            #         'date_planned': str(now)+' 08:00:00',
+            #         'price_unit'  : 0,
+            #     }
+            #     order_line.append([0,0,vals])
+            #     sequence+=1
+            # partner_id = 1    # Fromtome
+            # #partner_id = 3396 # Le Cellier
+            # vals={
+            #     'partner_id'  : partner_id,
+            #     'order_line'  : order_line,
+            # }
+            # order=self.env['purchase.order'].create(vals)
+
+
