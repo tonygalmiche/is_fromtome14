@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
+from odoo.addons.is_fromtome14.models.res_partner import HABITUDE_COMMANDE
 from datetime import datetime, timedelta, date
 
 
@@ -12,10 +13,7 @@ class IsSuiviCommandeHebdoLigne(models.Model):
     partner_id  = fields.Many2one('res.partner', 'Client', required=True)
     heure_appel = fields.Char(string="Heure d'appel")
     phone       = fields.Char(string="Numéro")
-    habitude_commande = fields.Selection([
-        ('telephone', 'Téléphone'),
-        ('mail'     , 'Mail'),
-    ], 'Habitude commande')
+    habitude_commande = fields.Selection(HABITUDE_COMMANDE, 'Habitude commande')
     transporteur_id = fields.Many2one('is.transporteur', 'Transporteur')
     order_id  = fields.Many2one('sale.order', 'Commande')
     nb_colis  = fields.Float(string="Nb colis commande")
@@ -46,7 +44,7 @@ class IsSuiviCommandeHebdo(models.Model):
     _rec_name = 'date'
 
 
-    date        = fields.Date("Date", default=lambda *a: fields.Date.today(), required=True)
+    date        = fields.Date("Date livraison client", default=lambda *a: fields.Date.today(), required=True)
     enseigne_id = fields.Many2one('is.enseigne.commerciale', 'Enseigne', required=True)
     commentaire = fields.Text("Commentaire")
     ligne_ids   = fields.One2many('is.suivi.commande.hebdo.ligne', 'suivi_id', 'Lignes')
@@ -67,8 +65,8 @@ class IsSuiviCommandeHebdo(models.Model):
                 filtre=[
                     ('partner_id', '=', partner.id),
                     ('state'     , '=', 'sale'),
-                    ('date_order', '>=', date_debut),
-                    ('date_order', '<=', date_fin),
+                    ('is_date_livraison', '>=', date_debut),
+                    ('is_date_livraison', '<=', date_fin),
                 ]
                 orders=self.env['sale.order'].search(filtre, order="id desc", limit=1)
                 order_id=False

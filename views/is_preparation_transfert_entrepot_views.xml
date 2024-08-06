@@ -81,7 +81,7 @@
                     <button
                         name="creer_commandes"
                         type="object"
-                        string="Créer les commandes inter-sites"
+                        string="Créer les pickings inter-sites"
                         attrs="{'invisible': ['|',('ligne_ids', '=', []),('picking_ids', '!=', [])]}"
                     />
                 </header>

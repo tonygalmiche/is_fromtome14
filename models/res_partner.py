@@ -2,6 +2,13 @@
 from odoo import api, fields, models, _
 
 
+HABITUDE_COMMANDE = [
+    ('telephone', 'Téléphone'),
+    ('mail'     , 'Mail'),
+    ('sms'      , 'SMS'),
+]
+
+
 class Pricelist(models.Model):
     _inherit = "product.pricelist"
 
@@ -69,10 +76,7 @@ class ResPartner(models.Model):
     is_heure_envoi_id           = fields.Many2one('is.heure.maxi', 'Heure', help="Heure maxi d'envoi de la commande au fournisseur")
     is_encours_client           = fields.Float(string='En-cours client', digits=(14,2), compute='_compute_is_encours_client')
     is_heure_appel              = fields.Char(string="Heure d'appel", help="Heure d'appel des clients")
-    is_habitude_commande        = fields.Selection([
-        ('telephone', 'Téléphone'),
-        ('mail'     , 'Mail'),
-    ], 'Habitude commande')
+    is_habitude_commande        = fields.Selection(HABITUDE_COMMANDE, 'Habitude commande')
     is_date_debut_nouveau_tarif = fields.Date(string="Date début nouveau tarif", help="Date utilisée lors de la copie d'un tarif dans un article")
     is_date_fin_nouveau_tarif   = fields.Date(string="Date fin nouveau tarif"  , help="Date utilisée lors de la copie d'un tarif dans un article")
     is_mini_cde                 = fields.Float(string="Mini de commande", help='Minimum de commande fournisseur', digits=(14,4))
