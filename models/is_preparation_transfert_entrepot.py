@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
 from datetime import datetime, timedelta, date
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class is_preparation_transfert_entrepot_ligne(models.Model):
@@ -92,16 +94,31 @@ class is_preparation_transfert_entrepot(models.Model):
             return res
 
 
+
+        # debut2=datetime.now()
+        # select_fournisseur = self._get_select_fournisseur(filtre,gest)   # Liste des fournisseurs
+        # _logger.info("select_fournisseur (durée=%.2fs)"%(datetime.now()-debut2).total_seconds())
+
+
     def actualiser_lignes_action(self):
+        debut=datetime.now()
+        _logger.info("** DEBUT ************************************************")
+
         warehouses = self.env['stock.warehouse'].search([])
         for obj in self:
             obj.ligne_ids.unlink()
             filtre=[
+                #('default_code','in',['1101023','2201027'])
                 #('id','=', 1469),
                 #('default_code','in',['0107001','1212017','1212022','1212035','0901019','1501008','1907005','1901010','1217002','1217001','0107002'])
             ]
             products=self.env['product.product'].search(filtre, order="name")
+            nb=len(products)
+            ct=1
             for product in products:
+                _logger.info("- %s/%s : %s"%(ct,nb,product.default_code))
+
+
 
                 solde_ft = solde_lc = solde = 0
                 #** Recherche du stock par entrepôt ***************************
@@ -215,6 +232,10 @@ class is_preparation_transfert_entrepot(models.Model):
                         "solde"         : solde,
                     }
                     self.env['is.preparation.transfert.entrepot.ligne'].create(vals)
+                ct+=1
+
+        _logger.info("** FIN (durée=%.2fs)"%(datetime.now()-debut).total_seconds())
+
         return self.voir_lignes_action()
     
 
@@ -224,8 +245,9 @@ class is_preparation_transfert_entrepot(models.Model):
             move_ids=[]
             sequence=1
             for line in lines:
-                colis = -getattr(line, name_field_qty)
-                product_uom_qty  = line.product_id.product_tmpl_id.colis2uom(colis)
+                product_uom_qty = -getattr(line, name_field_qty)
+                if obj.calcul_en_colis:
+                    product_uom_qty  = line.product_id.product_tmpl_id.colis2uom(product_uom_qty)
                 vals={
                     'sequence'         : sequence,
                     'product_id'       : line.product_id.id,
