@@ -34,9 +34,6 @@ class Company(models.Model):
         for obj in self:
             _logger.info("actualiser_tarif_futur_action : Début")
             self.env['product.template'].search([])._compute_tarifs(update_prix_actuel=False)
-            #for product in products:
-            #    #print(product)
-            #    product._compute_tarifs(update_prix_actuel=False)
             #self.send_mail('actualiser_tarif_futur_action')
             _logger.info("actualiser_tarif_futur_action : Fin")
 
@@ -51,18 +48,18 @@ class Company(models.Model):
     def actualiser_tarif_ft_action(self):
         for obj in self:
             self.env['product.template'].search([])._compute_tarifs(update_prix_actuel=True, pricelist='ft')
-            self.send_mail('actualiser_tarif_action')
+            #self.send_mail('actualiser_tarif_action')
 
 
     def actualiser_tarif_lf_franco_action(self):
         for obj in self:
             self.env['product.template'].search([])._compute_tarifs(update_prix_actuel=True, pricelist='lf_franco')
-            self.send_mail('actualiser_tarif_action')
+            #self.send_mail('actualiser_tarif_action')
 
 
     def appliquer_nouveaux_tarifs_action(self):
         self.env['product.template'].appliquer_nouveaux_tarifs_action()
-        self.send_mail('appliquer_nouveaux_tarifs_action')
+        #self.send_mail('appliquer_nouveaux_tarifs_action')
 
 
     def send_mail(self,action): 
@@ -88,4 +85,5 @@ class Company(models.Model):
         }
         wizard = self.env['mail.compose.message'].with_context(ctx).create(vals)
         wizard.send_mail()
+        return True
 
