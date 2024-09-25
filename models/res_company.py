@@ -2,6 +2,9 @@ from email.policy import default
 from odoo import api, fields, models
 import pytz
 from datetime import datetime
+import logging
+_logger = logging.getLogger(__name__)
+
 
 
 class Company(models.Model):
@@ -29,8 +32,13 @@ class Company(models.Model):
 
     def actualiser_tarif_futur_action(self):
         for obj in self:
+            _logger.info("actualiser_tarif_futur_action : Début")
             self.env['product.template'].search([])._compute_tarifs(update_prix_actuel=False)
-            self.send_mail('actualiser_tarif_futur_action')
+            #for product in products:
+            #    #print(product)
+            #    product._compute_tarifs(update_prix_actuel=False)
+            #self.send_mail('actualiser_tarif_futur_action')
+            _logger.info("actualiser_tarif_futur_action : Fin")
 
 
     # def actualiser_tarif_action(self):
