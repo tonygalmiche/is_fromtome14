@@ -101,6 +101,11 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                             marge_brute = line.price_subtotal*sens-montant_achat
                         #**********************************************************
 
+                        #** Poids en fonction du type d'avoir et du sens **********
+                        poids_net = sens*line.is_poids_net or 0
+                        if is_type_avoir=='avoir_prix':
+                            poids_net=0
+                        #**********************************************************
 
                         vals={
                             "invoice_id"     : invoice.id,
@@ -114,7 +119,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                             "libelle"       : line.name,
                             "quantity"      : line.quantity,
                             "nb_colis"      : line.is_nb_colis or 0,
-                            "poids_net"     : line.is_poids_net or 0,
+                            "poids_net"     : poids_net,
                             "price_unit"    : line.price_unit,
                             "price_subtotal": line.price_subtotal*sens,
                             "move_type"     : _MOVE_TYPE[invoice.move_type],
@@ -170,7 +175,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                     "libelle"       : scrap.name+" / "+(scrap.origin or ''),
                     "quantity"      : scrap.scrap_qty,
                     "nb_colis"      : nb_colis,
-                    "poids_net"     : poids_net,
+                    "poids_net"     : -poids_net,
                     "price_unit"    : price_unit,
                     "price_subtotal": price_subtotal,
                     "marge_brute"   : price_subtotal,

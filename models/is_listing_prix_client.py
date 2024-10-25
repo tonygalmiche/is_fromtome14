@@ -164,8 +164,11 @@ class IsListingPrixClient(models.Model):
                         if obj.lang=="de_DE":
                             html+='<div style="text-align:center;font-size:8pt">Art. Nr./Bezeichnung<br>Gewicht/Verpackungseinheit</div>'
 
+                        #** Recherche product dans la langue indiquée *********
+                        translate_product = p.with_context(lang=obj.lang)
+                        #******************************************************
 
-                        html+='<div style="font-weight:bold;text-align:center;height:16mm">['+p.default_code+'] '+p.name+'</div>'
+                        html+='<div style="font-weight:bold;text-align:center;height:16mm">['+p.default_code+'] '+translate_product.name+'</div>'
                         if img:
                             html+='<div style="text-align:center;height:30mm"><img src="'+img+'" alt="Logo" style="max-height:30mm;max-width:35mm"/></div>'
                         else:
