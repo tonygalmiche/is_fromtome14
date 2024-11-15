@@ -110,7 +110,7 @@ class IsImprimerEtiquetteGS1(models.Model):
                     dlc_ddm="DDM : %s"%ddm
 
                 pcb="PCB : %s"%obj.product_id.is_nb_pieces_par_colis
-                poids="POIDS NET : %.3fkg"%obj.product_id.is_poids_net_colis
+                poids="POIDS NET : %.3fkg"%obj.poids
                 ZPL="""
 ^XA
 ^CI28
