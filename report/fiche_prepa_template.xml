@@ -53,8 +53,13 @@
                     <tbody>
                         <tr t-foreach="o.move_ids_without_package" t-as="line">
                             <td style="width: 150mm" class="text-left">
-                                <div t-field="line.product_id.display_name"/>
-                                <div t-if="line.product_id.description_picking" t-field="line.product_id.description_picking"/>
+                                <!-- <div t-field="line.product_id.display_name"/> -->
+                                <!-- <div t-if="line.product_id.description_picking" t-field="line.product_id.description_picking"/> -->
+
+
+                                <div><strong><span t-field="line.is_description_cde"/></strong></div>
+
+
                             </td>
                             <td style="width: 10mm" class="text-left"><span t-field="line.is_ref_fournisseur"/></td>
                             <td style="width: 10mm" class="text-right"><b><span t-field="line.is_nb_colis_cde"/></b></td>

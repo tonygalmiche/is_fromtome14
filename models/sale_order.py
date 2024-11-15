@@ -482,17 +482,17 @@ class SaleOrder(models.Model):
 
 
     is_enseigne_id           = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
-    is_date_livraison        = fields.Date('Date livraison client', help="Date d'arrivée chez le client")
-    is_commande_soldee       = fields.Boolean(string='Commande soldée', default=False, copy=False, help="Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
+    is_date_livraison        = fields.Date('Date livraison client', help="Date d'arrivée chez le client", tracking=True)
+    is_commande_soldee       = fields.Boolean(string='Commande soldée', default=False, copy=False, tracking=True, help="Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
     is_frequence_facturation = fields.Selection(string='Fréquence facturation', related="partner_id.is_frequence_facturation") #, selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')])
-    is_type_doc              = fields.Selection([('cc', 'CC'), ('offre', 'Offre')], string='Type document', default="cc")
-    is_modele_commande_id    = fields.Many2one('is.modele.commande', 'Modèle de commande', related='partner_id.is_modele_commande_id')
+    is_type_doc              = fields.Selection([('cc', 'CC'), ('offre', 'Offre')], string='Type document', default="cc", tracking=True)
+    is_modele_commande_id    = fields.Many2one('is.modele.commande', 'Modèle de commande', related='partner_id.is_modele_commande_id', tracking=True)
     is_transporteur_id       = fields.Many2one(related='partner_id.is_transporteur_id')
     is_encours_client        = fields.Float(related='partner_id.is_encours_client')
     is_import_excel_ids      = fields.Many2many('ir.attachment' , 'sale_order_is_import_excel_ids_rel', 'order_id'     , 'attachment_id'    , 'Commande .xlsx à importer')
     is_import_alerte         = fields.Text('Alertes importation')
     is_nb_lignes             = fields.Integer('Nb lignes (hors transport)', compute='_compute_is_nb_lignes')
-    is_heure_envoi_id        = fields.Many2one('is.heure.maxi', 'Heure', help="Heure maxi d'envoi de la commande au fournisseur")
+    is_heure_envoi_id        = fields.Many2one('is.heure.maxi', 'Jour / Heure limite', tracking=True, help="Heure maxi d'envoi de la commande au fournisseur")
     is_fusion_order_id       = fields.Many2one('sale.order', 'Fusionnée dans', copy=False,readonly=True)
 
 
