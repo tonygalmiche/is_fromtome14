@@ -95,8 +95,8 @@ class IsImprimerEtiquetteGS1(models.Model):
             if obj.imprimante_id.dimension=='102x38':
 
                 code_designation="%s - %s"%(obj.product_id.default_code,obj.product_id.name) #[0:50]
-                ligne1 = code_designation[0:50]
-                ligne2 = code_designation[50:99]
+                ligne1 = code_designation[0:55]
+                ligne2 = code_designation[55:110]
                 lot="LOT : %s"%lot
                 if obj.type_tracabilite=='dlc':
                     dlc=''
