@@ -28,39 +28,16 @@
                         />
                     </div>
                     <group>
-                        <!-- <field name="code_gs1"/> -->
                         <field name="product_id"/>
                         <field name="code_ean"/>
                         <field name="type_tracabilite"/>
-
                         <field name="lot"/>
-
-                        <!-- <label for="lot"/>
-                        <div class="o_row no-gutters d-flex">
-                            <field name="lot" class="oe_inline" nolabel="1"/>
-                            <button 
-                                string="Générer Lot" 
-                                name="generer_lot_action" 
-                                type="object"
-                                class="oe_inline btn btn-sm btn-secondary"
-                                style="margin-right:10px"
-                            />
-                        </div> -->
-
                         <field name="dluo" attrs="{'invisible': [('type_tracabilite', '!=', 'ddm')]}"/>
                         <field name="dlc"  attrs="{'invisible': [('type_tracabilite', '!=', 'dlc')]}"/>
                         <field name="poids"/>
-                        <!-- <field name="nb_pieces"/> -->
                         <field name="qt_imprime"/>
                         <field name="imprimante_id" required="1"/>
                     </group>
-                    <!-- <footer>
-                        <button
-                            name="imprimer_etiquette_action"
-                            type="object"
-                            string="Imprimer les étiquettes"
-                        />
-                    </footer> -->
                 </sheet>
             </form>
         </field>
@@ -141,10 +118,16 @@
         <field name="model">is.imprimante.etiquette</field>
         <field name="arch" type="xml">
             <form>
+                <style>
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
                 <sheet>
                     <group>
                         <field name="name"/>
                         <field name="name_cups"/>
+                        <field name="dimension"/>
                         <field name="default"/>
                     </group>
                 </sheet>
@@ -158,6 +141,7 @@
             <tree>
                 <field name="name"/>
                 <field name="name_cups"/>
+                <field name="dimension"/>
                 <field name="default"/>
             </tree>
         </field>
