@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="is_report_invoice_document" inherit_id="account.report_invoice_document">
-
         <t t-set="address" position="replace">
             <!-- <t t-set="address">
                 <address t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}' />
@@ -11,15 +10,7 @@
                 <div t-if="o.partner_id.is_gln">GLN:<span t-field="o.partner_id.is_gln"/></div>
             </t> -->
         </t>
-
-
-
-
-
-
         <div class="page" position="replace">
-
-
             <style>
                 .page{
                     font-size:10pt;
@@ -35,8 +26,11 @@
                             <div t-if="o.partner_shipping_id.street2"><span t-field="o.partner_shipping_id.street2"/></div>
                             <div><span t-field="o.partner_shipping_id.zip"/> <span t-field="o.partner_shipping_id.city"/></div>
                             <div t-if="o.partner_shipping_id.country_id"><span t-field="o.partner_shipping_id.country_id.name"/></div>
-                            <!-- <div t-if="o.partner_shipping_id.phone">N°tel:<span t-field="o.partner_shipping_id.phone"/></div> -->
                             <div t-if="o.partner_shipping_id.is_gln">GLN:<span t-field="o.partner_shipping_id.is_gln"/></div>
+                            <div t-if="o.partner_id.vat">
+                                <t t-if="o.company_id.country_id.vat_label" t-esc="o.company_id.country_id.vat_label" id="inv_tax_id_label"/>
+                                <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/></div>
+                             <div t-if="o.partner_id.siret">SIRET:<span t-field="o.partner_id.siret"/></div>
                         </th>
                         <th style="border:none">
                             <div style="text-decoration: underline">Adresse de facturation:</div>
@@ -51,28 +45,13 @@
                             <div t-if="o.partner_id.street2"><span t-field="o.partner_id.street2"/></div>
                             <div><span t-field="o.partner_id.zip"/> <span t-field="o.partner_id.city"/></div>
                             <div t-if="o.partner_id.country_id"><span t-field="o.partner_id.country_id.name"/></div>
-                            <!-- <div t-if="o.partner_id.phone">N°tel:<span t-field="o.partner_id.phone"/></div> -->
-                            <div t-if="o.partner_id.vat">
-                                <t t-if="o.company_id.country_id.vat_label" t-esc="o.company_id.country_id.vat_label" id="inv_tax_id_label"/>
-                                <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/></div>
+ 
                             <div t-if="o.partner_id.is_gln">GLN:<span t-field="o.partner_id.is_gln"/></div>
                             <div t-if="o.partner_id.is_code_fromtome">Code Fournisseur:<span t-field="o.partner_id.is_code_fromtome"/></div>
-                            <div t-if="o.partner_id.siret">SIRET:<span t-field="o.partner_id.siret"/></div>
                          </th>
                     </tr>
                 </table>
                 <br />
-                <!-- <h2>
-                    <span t-if="o.move_type == 'out_invoice' and o.state == 'posted'">Facture</span>
-                    <span t-if="o.move_type == 'out_invoice' and o.state == 'draft'">Facture brouillon</span>
-                    <span t-if="o.move_type == 'out_invoice' and o.state == 'cancel'">Facture annulée</span>
-                    <span t-if="o.move_type == 'out_refund'">Avoir</span>
-                    <span t-if="o.move_type == 'in_refund'">Avoir Fournisseur</span>
-                    <span t-if="o.move_type == 'in_invoice'">Facture Fournisseur</span>
-                    <span t-if="o.name != '/'" t-field="o.name"/>
-                </h2>
- -->
-
                 <table class="table table-sm o_main_table" name="invoice_line_table">
                     <thead>
                         <tr>
@@ -103,7 +82,6 @@
                         <tr>
                             <th class="text-left"><span>Code produit</span></th>
                             <th class="text-left"><span>Désignation</span></th>
-                            <!-- <th class="text-left"><span>Gencode</span></th> -->
                             <th t-if="o.move_type not in ['in_refund','out_refund']" class="text-right"><span>Colis</span></th>
                             <th class="text-center"><span>PCB</span></th>
                             <th class="text-center" colspan="2"><span>Qt</span></th>
@@ -123,7 +101,6 @@
                                 <div t-if="line.product_id.is_bio_id"><i><span t-field="line.product_id.is_bio_id.name"/></i></div>
                                 <div t-if="line.discount">Remise effectuée de <span t-field="line.discount"/>%</div>
                             </td>
-                            <!-- <td class="text-left"><span style="font-size:6pt" t-field="line.product_id.barcode"/></td> -->
                             <td t-if="o.move_type not in ['in_refund','out_refund']" class="text-right"><b><span t-field="line.is_nb_colis"/></b></td>
                             <td class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
                             <td class="text-right" style="border-right:none"><span t-if="o.move_type in ['in_refund','out_refund']">-</span><span t-field="line.quantity"/></td>
@@ -213,9 +190,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- <p t-if="o.move_type in ('out_invoice', 'in_refund') and o.payment_reference" name="payment_communication">
-                    Please use the following communication for your payment : <b><span t-field="o.payment_reference"/></b>
-                </p> -->
                 <p t-if="o.invoice_payment_term_id" name="payment_term">
                     <span t-field="o.invoice_payment_term_id.note"/> - <span t-field="o.payment_mode_id.name"/>
                 </p>
@@ -232,13 +206,6 @@
                     Sans escompte. Pénalités en cas de retard de paiement : 3 fois le taux d’intérêt légal.<br />
                     Indemnité forfaitaire pour frais de recouvrement : 40€ en cas de retard de paiement (Art L441-3 et L441-6 du Code de Commerce).
                 </p>
-
-                <!-- <div id="qrcode" t-if="o.display_qr_code">
-                    <p t-if="qr_code_urls.get(o.id)">
-                        <strong class="text-center">Scan me with your banking app.</strong><br/><br/>
-                        <img class="border border-dark rounded" t-att-src="qr_code_urls[o.id]"/>
-                    </p>
-                </div> -->
             </div>
         </div>
     </template>
