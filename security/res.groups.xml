@@ -13,9 +13,14 @@
         <field name="comment"></field>
         <field name="category_id" ref="is_groupe_fromtome_module_category"/>
     </record>
-    <record model="res.groups" id="gestionnaire_contacts_group" >
+    <record model="res.groups" id="is_gestionnaire_contacts_group" >
         <field name="name">Gestionnaire des contacts</field>
-        <field name="comment"></field>
+        <field name="comment">Ce groupe est le seul pouvant créer, modifier ou supprimer des contacts, clients ou fournisseurs</field>
+        <field name="category_id" ref="is_groupe_fromtome_module_category"/>
+    </record>
+    <record model="res.groups" id="is_gestionnaire_articles_group" >
+        <field name="name">Gestionnaire des articles</field>
+        <field name="comment">Ce groupe est le seul pouvant créer, modifier ou supprimer des articles</field>
         <field name="category_id" ref="is_groupe_fromtome_module_category"/>
     </record>
 

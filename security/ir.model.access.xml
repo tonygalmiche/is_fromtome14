@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Supprimer le droit de créer, modifier ou supprimer aux groupes par défaut -->
+    <!-- Supprimer le droit de créer, modifier ou supprimer des contacts aux groupes par défaut -->
     <record id="mrp.access_product_group_res_partner_mrp_manager"  model="ir.model.access" >
         <field name="perm_read"   eval="True"/>
         <field name="perm_write"  eval="False"/>
@@ -38,12 +38,11 @@
         <field name="perm_create" eval="False"/>
     </record>
 
-
-    <!-- Ajouter le droit de créer, modifier ou supprimer au groupe 'Gestionnaire des contacts' -->
+    <!-- Ajouter le droit de créer, modifier ou supprimer des contacts au groupe 'Gestionnaire des contacts' -->
     <record id="is_res_partner_gestionnaire_contacts_access"  model="ir.model.access" >
         <field name="name">is_res_partner_gestionnaire_contacts_access</field>
         <field name="model_id"    eval="ref('model_res_partner')"/>
-        <field name="group_id"    eval="ref('gestionnaire_contacts_group')"/>
+        <field name="group_id"    eval="ref('is_gestionnaire_contacts_group')"/>
         <field name="perm_read"   eval="True"/>
         <field name="perm_write"  eval="True"/>
         <field name="perm_unlink" eval="True"/>
@@ -53,51 +52,102 @@
 
 
 
-
-
-
-
-<!-- 
-    <record id="is_export_compta_rule" model="ir.rule">
-        <field name="name">Export compta</field>
-        <field name="model_id" ref="model_is_export_compta"/>
-        <field name="domain_force">[('company_id', 'child_of', [user.company_id.id])]</field>
-        <field name="groups" eval="[(6,0,[
-            ref('base.group_user'),
-        ])]"/>
-        <field name="perm_create" eval="1" />
-        <field name="perm_read"   eval="1" />
-        <field name="perm_write"  eval="1" />
-        <field name="perm_unlink" eval="1" />
+    <!-- Supprimer le droit de créer, modifier ou supprimer des articles aux groupes par défaut -->
+    <record id="mrp.access_product_product_mrp_manager"  model="ir.model.access" >
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="perm_create" eval="False"/>
+    </record>
+    <record id="purchase.access_product_product_purchase_manager"  model="ir.model.access" >
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="perm_create" eval="False"/>
+    </record>
+    <record id="sale.access_product_product_sale_manager"  model="ir.model.access" >
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="perm_create" eval="False"/>
+    </record>
+    <record id="stock.access_product_product_stock_manager"  model="ir.model.access" >
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="perm_create" eval="False"/>
+    </record>
+    <record id="product.access_product_product_manager"  model="ir.model.access" >
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="perm_create" eval="False"/>
+    </record>
+    <record id="account.access_product_product_account_manager"  model="ir.model.access" >
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="perm_create" eval="False"/>
+    </record>
+ 
+    <record id="mrp.access_product_template_mrp_manager"  model="ir.model.access" >
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="perm_create" eval="False"/>
+    </record>
+    <record id="purchase.access_product_template_purchase_manager"  model="ir.model.access" >
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="perm_create" eval="False"/>
+    </record>
+    <record id="sale.access_product_template_sale_manager"  model="ir.model.access" >
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="perm_create" eval="False"/>
+    </record>
+    <record id="stock.access_product_template_stock_manager"  model="ir.model.access" >
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="perm_create" eval="False"/>
+    </record>
+    <record id="product.access_product_template_manager"  model="ir.model.access" >
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="perm_create" eval="False"/>
+    </record>
+    <record id="account.access_product_template_account_manager"  model="ir.model.access" >
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+        <field name="perm_create" eval="False"/>
     </record>
 
 
-    <record id="is_stock_production_lot_rule" model="ir.rule">
-        <field name="name">Accès aux lots de la société uniquement</field>
-        <field name="model_id" ref="model_stock_production_lot"/>
-        <field name="domain_force">['|', ('is_company_id', '=', False), ('is_company_id', 'child_of', [user.company_id.id])]</field>
-        <field name="groups" eval="[(6,0,[
-            ref('base.group_user'),
-        ])]"/>
-        <field name="perm_create" eval="1" />
-        <field name="perm_read"   eval="1" />
-        <field name="perm_write"  eval="1" />
-        <field name="perm_unlink" eval="1" />
+     <!-- Ajouter le droit de créer, modifier ou supprimer des articles au groupe 'Gestionnaire des article' -->
+    <record id="is_product_template_gestionnaire_articles_access"  model="ir.model.access" >
+        <field name="name">is_product_template_gestionnaire_articles_access</field>
+        <field name="model_id"    eval="ref('model_product_template')"/>
+        <field name="group_id"    eval="ref('is_gestionnaire_articles_group')"/>
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+        <field name="perm_create" eval="True"/>
+    </record>
+    <record id="is_product_product_gestionnaire_articles_access"  model="ir.model.access" >
+        <field name="name">is_product_product_gestionnaire_articles_access</field>
+        <field name="model_id"    eval="ref('model_product_product')"/>
+        <field name="group_id"    eval="ref('is_gestionnaire_articles_group')"/>
+        <field name="perm_read"   eval="True"/>
+        <field name="perm_write"  eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+        <field name="perm_create" eval="True"/>
     </record>
 
-    <record id="is_fnc_rule" model="ir.rule">
-        <field name="name">FNC</field>
-        <field name="model_id" ref="model_is_fnc"/>
-        <field name="domain_force">[('company_id', 'child_of', [user.company_id.id])]</field>
-        <field name="groups" eval="[(6,0,[
-            ref('base.group_user'),
-        ])]"/>
-        <field name="perm_create" eval="1" />
-        <field name="perm_read"   eval="1" />
-        <field name="perm_write"  eval="1" />
-        <field name="perm_unlink" eval="1" />
-    </record>
- -->
 
 
 
