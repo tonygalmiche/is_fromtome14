@@ -327,6 +327,14 @@ class SaleOrderLine(models.Model):
                 colis_liv+= move.is_nb_colis
             obj.is_colis_liv = colis_liv
 
+
+    @api.depends('product_id','product_uom_qty','is_qt_cde')
+    def _compute_is_ecart_qt_cde_prepa(self):
+        for obj in self:
+            ecart=obj.product_uom_qty - obj.is_qt_cde
+            obj.is_ecart_qt_cde_prepa = ecart
+
+
     is_purchase_line_id       = fields.Many2one('purchase.order.line', string=u'Ligne commande fournisseur', index=True, copy=False)
     is_date_reception         = fields.Date(string=u'Date réception')
     is_livraison_directe      = fields.Boolean(string=u'Livraison directe', help=u"Si cette case est cochée, une commande fournisseur spécifique pour ce client sera créée",default=False)
@@ -340,6 +348,7 @@ class SaleOrderLine(models.Model):
     is_ref_fournisseur        = fields.Char(string='Réf Fournisseur', compute='_compute_ref', readonly=True, store=True)
     is_colis_liv              = fields.Float(string='Colis Liv', digits=(14,2), compute='_compute_is_colis_liv', readonly=True, store=False)
     is_qt_cde                 = fields.Float(string='Qt Cde', digits='Product Unit of Measure',readonly=True,help="Ce champ permet de mémoriser la valeur du champ product_uom_qty au moment de la validation de la commande")
+    is_ecart_qt_cde_prepa     = fields.Float(string='Qt Prépa - Qt Cde', digits='Product Unit of Measure', compute='_compute_is_ecart_qt_cde_prepa', readonly=True, store=True)
 
 
     def write(self, vals):

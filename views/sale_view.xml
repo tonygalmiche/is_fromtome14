@@ -268,9 +268,12 @@
             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom_qty']" position="before">
                 <field name="is_qt_cde"            optional="show"    sum="Total"/>
             </xpath>
+            <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom_qty']" position="after">
+                <field name="is_ecart_qt_cde_prepa" optional="hide"/>
+            </xpath>
             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom']" position="after">
-                <field name="is_colis_cde_origine" optional="show" sum="Total"/>
-                <field name="is_colis_cde"         optional="show" sum="Total"/>
+                <field name="is_colis_cde_origine"  optional="show" sum="Total"/>
+                <field name="is_colis_cde"          optional="show" sum="Total"/>
             </xpath>
             <xpath expr="//form/sheet/notebook/page/field/tree/field[@name='product_uom_qty']" position="attributes">
                 <attribute name="string">Qt Prépa</attribute>
