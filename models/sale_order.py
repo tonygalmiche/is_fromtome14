@@ -332,14 +332,14 @@ class SaleOrderLine(models.Model):
     is_livraison_directe      = fields.Boolean(string=u'Livraison directe', help=u"Si cette case est cochée, une commande fournisseur spécifique pour ce client sera créée",default=False)
     is_nb_pieces_par_colis    = fields.Integer(string="PCB", help='Nb Pièces / colis', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_nb_colis               = fields.Float(string='Nb Colis', digits=(14,2), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
-    is_colis_cde              = fields.Float(string='Colis Cde', digits=(14,2))
+    is_colis_cde              = fields.Float(string='Colis Prépa', digits=(14,2))
+    is_colis_cde_origine      = fields.Float(string='Colis Cde'  , digits=(14,2), readonly=True, help="Ce champ permet de mémoriser la valeur du champ 'Colis Prépa' au moment de la validation de la commande")
     is_poids_net              = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
     is_correction_prix_achat  = fields.Float(string="Correction Prix d'achat", digits='Product Price', help="Utilsé dans 'Lignes des mouvements valorisés'")
     is_default_code           = fields.Char(string='Réf Fromtome'   , compute='_compute_ref', readonly=True, store=True)
     is_ref_fournisseur        = fields.Char(string='Réf Fournisseur', compute='_compute_ref', readonly=True, store=True)
-
     is_colis_liv              = fields.Float(string='Colis Liv', digits=(14,2), compute='_compute_is_colis_liv', readonly=True, store=False)
-
+    is_qt_cde                 = fields.Float(string='Qt Cde', digits='Product Unit of Measure',readonly=True,help="Ce champ permet de mémoriser la valeur du champ product_uom_qty au moment de la validation de la commande")
 
 
     def write(self, vals):
@@ -551,6 +551,7 @@ class SaleOrder(models.Model):
             for line in obj.order_line:
                 if line.product_uom_qty==0:
                     line.unlink()
+            obj.recopie_qt_prepa_dans_qt_cde_action(force=True)
         return super(SaleOrder, self).action_confirm()
 
 
@@ -625,6 +626,25 @@ class SaleOrder(models.Model):
             for line in obj.order_line:
                 line._compute_invoice_status()
  
+
+    def recopie_qt_prepa_dans_qt_cde_action(self,force=False):
+        for obj in self:
+            for line in obj.order_line:
+                if force:
+                    line.is_qt_cde = line.product_uom_qty
+                    line.is_colis_cde_origine = line.is_colis_cde
+                else:
+                    if line.is_qt_cde==0:
+                        line.is_qt_cde = line.product_uom_qty
+                    if line.is_colis_cde_origine==0:
+                        line.is_colis_cde_origine = line.is_colis_cde
+
+            print(obj)
+          
+
+    # is_colis_cde              = fields.Float(string='Colis Prépa', digits=(14,2))
+    # is_colis_cde_origine      = fields.Float(string='Colis Cde'  , digits=(14,2), readonly=True, help="Ce champ permet de mémoriser la valeur du champ 'Colis Prépa' au moment de la validation de la commande")
+
 
     def creer_commande_fournisseur_action(self):
         company = self.env.user.company_id
