@@ -818,6 +818,62 @@ class ProductTemplate(models.Model):
         return ledict
 
 
+    def _get_rows_sql(self):
+        cr = self._cr
+        for obj in self:
+            sql="""
+                SELECT  
+                    sm.id,
+                    sm.sale_line_id,
+                    sm.purchase_line_id
+                FROM stock_move sm join product_product pp on sm.product_id=pp.id
+                WHERE sm.state not in ('done','cancel') 
+                    and pp.product_tmpl_id=%s
+            """
+            cr.execute(sql,[obj.id])
+            rows = cr.dictfetchall()
+            return rows
+
+
+    def lignes_commandes_action(self):
+        for obj in self:
+            ids=[]
+            rows = obj._get_rows_sql()
+            for row in rows:
+                ids.append(row['sale_line_id'])
+            res= {
+                'name': 'Lignes cde',
+                'view_mode': 'tree,form',
+                'view_type': 'form',
+                'res_model': 'is.sale.order.line',
+                'type': 'ir.actions.act_window',
+                'domain': [
+                    ('id','in',ids),
+                ],
+            }
+            return res
+           
+
+    def mouvements_stock_action(self):
+        cr = self._cr
+        for obj in self:
+            ids=[]
+            rows = obj._get_rows_sql()
+            for row in rows:
+                ids.append(row['id'])
+            dummy, view_id = self.env['ir.model.data'].get_object_reference('stock', 'view_move_tree')
+            res= {
+                'name': 'Mouvements',
+                'view_mode': 'tree,form',
+                'view_type': 'form',
+                'views': [[view_id, "tree"], [False, "form"]],
+                'res_model': 'stock.move',
+                'type': 'ir.actions.act_window',
+                'domain': [
+                    ('id','in',ids),
+                ],
+            }
+            return res
 
 
 

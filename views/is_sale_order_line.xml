@@ -39,26 +39,27 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="company_id" invisible="1"/>
-                <field name="order_id" optional="show"/>
-                <field name="date_order" optional="show"/>
-                <field name="partner_id" optional="show"/>
-                <field name="is_enseigne_id" optional="show"/>
-                <field name="user_id" optional="show"/>
-                <field name="description" optional="show"/>
-                <field name="barcode" optional="hide"/>
-                <field name="is_date_livraison" optional="hide"/>
-                <field name="product_uom_qty" sum="Total" optional="show"/>
-                <field name="qty_delivered"   sum="Total" optional="hide"/>
-                <field name="qty_invoiced"    sum="Total" optional="hide"/>
-                <field name="is_poids_net" sum="Total" optional="show"/>
-                <field name="price_unit" optional="hide"/>
-                <field name="discount" optional="hide"/>
-                <field name="price_subtotal"  sum="Total" optional="show"/>
-                <field name="product_uom" optional="hide"/>
+                <field name="order_id"           optional="show" widget="many2one_clickable"/>
+                <field name="date_order"         optional="show"/>
+                <field name="partner_id"         optional="show" widget="many2one_clickable"/>
+                <field name="is_enseigne_id"     optional="show"/>
+                <field name="user_id"            optional="show"/> 
+                <field name="product_id"         optional="show" widget="many2one_clickable"/>
+                <field name="description"        optional="hide"/>
+                <field name="barcode"            optional="hide"/>
+                <field name="is_date_livraison"  optional="hide"/>
+                <field name="product_uom_qty"    optional="show" sum="Total"/>
+                <field name="qty_delivered"      optional="hide" sum="Total"/>
+                <field name="qty_invoiced"       optional="hide" sum="Total"/>
+                <field name="is_poids_net"       optional="show" sum="Total"/>
+                <field name="price_unit"         optional="hide"/>
+                <field name="discount"           optional="hide"/>
+                <field name="price_subtotal"     optional="show" sum="Total"/>
+                <field name="product_uom"        optional="hide"/>
                 <field name="is_commande_soldee" optional="hide"/>
-                <field name="purchase_order_id" optional="hide"/>
-                <field name="write_date" optional="hide"/>
-                <field name="state" optional="hide"/>
+                <field name="purchase_order_id"  optional="hide" widget="many2one_clickable"/>
+                <field name="write_date"         optional="hide"/>
+                <field name="state"              optional="hide"/>
             </tree>
         </field>
     </record>

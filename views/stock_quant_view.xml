@@ -47,6 +47,13 @@
         <field name="domain">[('location_id.usage','=','internal')]</field>
     </record>
     <menuitem 
+        id="is_analyse_ruptures_menu" 
+        name="Analyse des ruptures" 
+        parent="stock.menu_stock_inventory_control" 
+        sequence="9"
+        action="is_analyse_ruptures_action"
+    />
+   <menuitem 
         id="stock_detaille_par_entrepot_menu" 
         name="Stock détaillé par entrepôt" 
         parent="stock.menu_stock_inventory_control" 
