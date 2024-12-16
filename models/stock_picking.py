@@ -521,9 +521,16 @@ class Picking(models.Model):
     is_date_livraison = fields.Date('Date livraison client', help="Date d'arrivée chez le client prévue sur la commande"    , related='sale_id.is_date_livraison')
     is_date_reception = fields.Datetime('Date réception'   , help="Date de réception chez Fromtome indiquée sur la commande", related='purchase_id.date_planned')
     is_enseigne_id    = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
-    is_transporteur_id = fields.Many2one(related='partner_id.is_transporteur_id')
+    # is_transporteur_id = fields.Many2one(related='partner_id.is_transporteur_id')
+    is_transporteur_id = fields.Many2one('is.transporteur', 'Transporteur', compute='_compute_is_transporteur_id', store=True, readonly=False)
     is_alerte          = fields.Text('Alerte', compute="_compute_is_alerte", readonly=True, store=False)
     is_preparation_transfert_id = fields.Many2one('is.preparation.transfert.entrepot', 'Préparation transfert')
+
+
+    @api.depends('partner_id','sale_id')
+    def _compute_is_transporteur_id(self):
+        for obj in self:
+            obj.is_transporteur_id = obj.sale_id.is_transporteur_id.id or obj.partner_id.is_transporteur_id.id
 
 
     @api.depends('move_line_ids_without_package')

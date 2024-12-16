@@ -70,7 +70,7 @@ class ResPartner(models.Model):
     is_frequence_facturation    = fields.Selection(string='Fréquence facturation', selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')])
     is_modele_commande_id       = fields.Many2one('is.modele.commande', 'Modèle de commande')
     is_presentation_bl          = fields.Selection(string='Présentation BL', selection=[('standard', 'Standard'),('detaillee', 'Détaillée')], default="standard")
-    is_transporteur_id          = fields.Many2one('is.transporteur', 'Transporteur', help="Enseigne commerciale")
+    is_transporteur_id          = fields.Many2one('is.transporteur', 'Transporteur')
     is_warehouse_id             = fields.Many2one('stock.warehouse', 'Entrepôt', help="Entrepôt à utiliser dans les réceptions ou les livraisons")
     is_frais_port_id            = fields.Many2one('product.product', 'Frais de port', domain=[('categ_id.name','=','TRANSPORT')], help="Utilisé pour ajouter automatiquement une ligne de frais de port sur les commandes")
     is_heure_envoi_id           = fields.Many2one('is.heure.maxi', 'Jour / Heure limite', help="Heure maxi d'envoi de la commande au fournisseur")
