@@ -55,19 +55,6 @@ class IsModeleCommandeLigne(models.Model):
                 prix, rule_id = pricelist.with_context(product_context).get_product_price_rule(product, 1.0, partner)
             obj.price_unit = prix
 
-            # prix = False
-            # pricelist = obj.modele_id.partner_id.property_product_pricelist
-            # if pricelist:
-            #     filtre=[
-            #         ('pricelist_id'   ,'=',pricelist.id),
-            #         ('product_tmpl_id','=',obj.product_id.product_tmpl_id.id),
-            #     ]
-            #     lines = self.env['product.pricelist.item'].search(filtre, limit=1)
-            #     for line in lines:
-            #         prix=line.fixed_price
-            # obj.price_unit = prix
-
-
 
     modele_id       = fields.Many2one('is.modele.commande', 'Modèle de commandes', required=True, ondelete='cascade')
     sequence        = fields.Integer('Séquence')
@@ -104,7 +91,6 @@ class IsModeleCommande(models.Model):
 
     name                = fields.Char('Nom du modèle', required=True)
     partner_id          = fields.Many2one('res.partner', 'Client')
-    #enseigne_id        = fields.Many2one('is.enseigne.commerciale', 'Enseigne')
     enseigne_id         = fields.Many2one(related='partner_id.is_enseigne_id')
     modele_commande_ids = fields.Many2many('ir.attachment', 'is_modele_commande_modele_commande_rel', 'enseigne_id', 'file_id', 'Modèle de commande client')
     ligne_ids           = fields.One2many('is.modele.commande.ligne', 'modele_id', 'Lignes')
@@ -185,7 +171,6 @@ class IsModeleCommande(models.Model):
                 wb.save(path)
                 #**************************************************************
 
-
                 # ** Creation ou modification de la pièce jointe **************
                 attachments = obj.modele_commande_ids
                 name="%s.xlsx"%(obj.name)
@@ -206,7 +191,6 @@ class IsModeleCommande(models.Model):
                     attachment = self.env['ir.attachment'].create(vals)
                 obj.modele_commande_ids=[attachment.id]
                 #**************************************************************
-
 
 
     def initialiser_action(self):
@@ -243,8 +227,6 @@ class IsModeleCommande(models.Model):
                 obj.trier_action()
 
 
-
-
     def trier_action(self):
         for obj in self:
             for line in obj.ligne_ids:
@@ -272,6 +254,8 @@ class SaleOrderLine(models.Model):
         now = datetime.date.today()
         for obj in self:
             discount = 0
+
+            #** Recherche promos **********************************************
             filtre=[
                     ('date_debut_promo', '<=', now),
                     ('date_fin_promo', '>=', now),
@@ -288,6 +272,18 @@ class SaleOrderLine(models.Model):
                 lignes=self.env['is.promo.client.ligne'].search(filtre, limit=1)
                 for ligne in lignes:
                     discount = ligne.remise_client
+            #******************************************************************
+
+            #** Recherche remises particulières *******************************
+            filtre=[
+                    ('partner_id', '=', obj.order_id.partner_id.id),
+                    ('product_id', '=', obj.product_id.id),
+                ]
+            remises=self.env['is.remise.particuliere'].search(filtre, limit=1)
+            for remise in remises:
+                if discount<remise.remise_client:
+                    discount = remise.remise_client
+            #******************************************************************
             obj.discount = discount
 
 

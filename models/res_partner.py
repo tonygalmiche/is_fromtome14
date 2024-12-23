@@ -42,9 +42,18 @@ class IsHeureMaxi(models.Model):
     name = fields.Char("Heure maxi d'envoi des commandes au fournisseur", required=True)
 
 
+class IsRemiseParticuliere(models.Model):
+    _name = 'is.remise.particuliere'
+    _description = "Remises particulières pour les clients"
+    _order='product_id'
+
+    partner_id    = fields.Many2one('res.partner', 'Client', required=True, ondelete='cascade')
+    product_id    = fields.Many2one('product.product', 'Article', required=True)
+    remise_client = fields.Float("Remise client (%)", digits=(14,2))
+
+
 class ResPartner(models.Model):
     _inherit = 'res.partner'
-
 
     def _compute_is_encours_client(self):
         for obj in self:
@@ -80,8 +89,9 @@ class ResPartner(models.Model):
     is_date_debut_nouveau_tarif = fields.Date(string="Date début nouveau tarif", help="Date utilisée lors de la copie d'un tarif dans un article")
     is_date_fin_nouveau_tarif   = fields.Date(string="Date fin nouveau tarif"  , help="Date utilisée lors de la copie d'un tarif dans un article")
     is_mini_cde                 = fields.Float(string="Mini de commande", help='Minimum de commande fournisseur', digits=(14,4))
-    # is_mail_relance_facture     = fields.Char('Mail relance facture')
     is_contact_relance_facture_id = fields.Many2one('res.partner', 'Contact relance facture')
+    is_remise_particuliere_ids    = fields.One2many('is.remise.particuliere', 'partner_id', 'Remises particulières')
+
 
     default_supplierinfo_discount = fields.Float(
         string="Remise par défaut pour les articles (%)",
