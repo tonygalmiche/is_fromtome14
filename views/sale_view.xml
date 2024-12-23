@@ -307,6 +307,7 @@
                         <button 
                             name="import_fichier_xlsx" 
                             string="Importer le fichier xlsx" type="object" 
+                            confirm="ATTENTION : Désormais l'importation d'un fichier ajoute de nouvelles lignes sans modifier les lignes précédentes"
                         />
                     </group>
                     <group string="Alertes importation" attrs="{'invisible':[('is_import_alerte','=',False)]}" >

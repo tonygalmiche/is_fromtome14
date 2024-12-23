@@ -662,13 +662,7 @@ class SaleOrder(models.Model):
                     if line.is_colis_cde_origine==0:
                         line.is_colis_cde_origine = line.is_colis_cde
 
-            print(obj)
           
-
-    # is_colis_cde              = fields.Float(string='Colis Prépa', digits=(14,2))
-    # is_colis_cde_origine      = fields.Float(string='Colis Cde'  , digits=(14,2), readonly=True, help="Ce champ permet de mémoriser la valeur du champ 'Colis Prépa' au moment de la validation de la commande")
-
-
     def creer_commande_fournisseur_action(self):
         company = self.env.user.company_id
         for obj in self:
@@ -777,7 +771,7 @@ class SaleOrder(models.Model):
 
     def import_fichier_xlsx(self):
         for obj in self:
-            obj.order_line.unlink()
+            #obj.order_line.unlink()
             alertes=[]
             for attachment in obj.is_import_excel_ids:
                 xlsxfile=base64.b64decode(attachment.datas)
