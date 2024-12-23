@@ -91,6 +91,7 @@ class ResPartner(models.Model):
     is_mini_cde                 = fields.Float(string="Mini de commande", help='Minimum de commande fournisseur', digits=(14,4))
     is_contact_relance_facture_id = fields.Many2one('res.partner', 'Contact relance facture')
     is_remise_particuliere_ids    = fields.One2many('is.remise.particuliere', 'partner_id', 'Remises particulières')
+    is_commentaire_commande       = fields.Char(string="Commentaire commande")
 
 
     default_supplierinfo_discount = fields.Float(

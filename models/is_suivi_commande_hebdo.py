@@ -13,15 +13,16 @@ class IsSuiviCommandeHebdoLigne(models.Model):
     partner_id  = fields.Many2one('res.partner', 'Client', required=True)
     heure_appel = fields.Char(string="Heure d'appel")
     phone       = fields.Char(string="Numéro")
-    habitude_commande = fields.Selection(HABITUDE_COMMANDE, 'Habitude commande')
-    transporteur_id = fields.Many2one('is.transporteur', 'Transporteur')
-    order_id  = fields.Many2one('sale.order', 'Commande')
-    nb_colis  = fields.Float(string="Nb colis commande")
-    nb_cde_transporteur = fields.Integer(string="Nb cde transporteur", compute="_compute_nb_cde_transporteur")
-    picking_id  = fields.Many2one('stock.picking', 'Livraison')
-    nb_colis_picking = fields.Float(string="Nb colis livraison")
-    ecart_colis      = fields.Float(string="Ecart colis")
-    poids_picking    = fields.Float(string="Poids", help="Poids réél de la livraison")
+    habitude_commande    = fields.Selection(HABITUDE_COMMANDE, 'Habitude commande')
+    transporteur_id      = fields.Many2one('is.transporteur', 'Transporteur')
+    order_id             = fields.Many2one('sale.order', 'Commande')
+    nb_colis             = fields.Float(string="Nb colis commande")
+    nb_cde_transporteur  = fields.Integer(string="Nb cde transporteur", compute="_compute_nb_cde_transporteur")
+    picking_id           = fields.Many2one('stock.picking', 'Livraison')
+    nb_colis_picking     = fields.Float(string="Nb colis livraison")
+    ecart_colis          = fields.Float(string="Ecart colis")
+    poids_picking        = fields.Float(string="Poids", help="Poids réél de la livraison")
+    commentaire_commande = fields.Char(string="Commentaire commande")
 
 
     @api.depends('transporteur_id','order_id')
@@ -98,14 +99,15 @@ class IsSuiviCommandeHebdo(models.Model):
                     "partner_id" : partner.id,
                     "heure_appel": partner.is_heure_appel,
                     "phone"      : partner.mobile or partner.phone,
-                    "habitude_commande": partner.is_habitude_commande,
-                    "transporteur_id"  : partner.is_transporteur_id.id,
-                    "order_id"         : order_id,
-                    "nb_colis"         : nb_colis,
-                    "picking_id"       : picking_id,
-                    "nb_colis_picking" : nb_colis_picking,
-                    "ecart_colis"      : nb_colis_picking-nb_colis,
-                    "poids_picking"    : poids,
+                    "habitude_commande"   : partner.is_habitude_commande,
+                    "transporteur_id"     : partner.is_transporteur_id.id,
+                    "order_id"            : order_id,
+                    "commentaire_commande": partner.is_commentaire_commande,
+                    "nb_colis"            : nb_colis,
+                    "picking_id"          : picking_id,
+                    "nb_colis_picking"    : nb_colis_picking,
+                    "ecart_colis"         : nb_colis_picking-nb_colis,
+                    "poids_picking"       : poids,
                 }
                 self.env['is.suivi.commande.hebdo.ligne'].create(vals)
             

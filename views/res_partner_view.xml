@@ -321,6 +321,9 @@
             <xpath expr="//field[@name='child_ids']/form/sheet/group/group/field[@name='name']" position="after">
                 <field name="is_enseigne_id"/>
             </xpath>
+            <field name="category_id" position="after">
+                <field name="is_commentaire_commande"/>
+            </field>
             <page name="sales_purchases" position="after" >
                 <page string="Remises particulières" attrs="{'invisible': ['|',('is_company', '=', False), ('is_customer', '=', False)]}">
                     <group>
