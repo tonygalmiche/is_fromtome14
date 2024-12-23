@@ -18,7 +18,7 @@ class is_sale_order_line(models.Model):
     barcode                 = fields.Char('Code barre')
     product_uom             = fields.Many2one('uom.uom', 'Unité')
     description             = fields.Char('Description')
-    product_uom_qty         = fields.Float('Qt cde'            , digits=(14,3))
+    product_uom_qty         = fields.Float('Qt prépa'            , digits=(14,3))
     qty_delivered           = fields.Float('Qt livrée'         , digits=(14,3))
     qty_invoiced            = fields.Float('Qt facturée'       , digits=(14,3))
     price_unit              = fields.Float('Prix unitaire'       , digits=(14,4))
@@ -40,6 +40,22 @@ class is_sale_order_line(models.Model):
     user_id        = fields.Many2one('res.users', 'Vendeur')
     is_enseigne_id = fields.Many2one('is.enseigne.commerciale', 'Enseigne', help="Enseigne commerciale")
     is_poids_net   = fields.Float(string='Poids net', digits='Stock Weight', help="Poids net total (Kg)")
+
+
+    is_date_reception         = fields.Date(string=u'Date réception')
+    is_nb_pieces_par_colis    = fields.Integer(string="PCB", help='Nb Pièces / colis', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
+    is_nb_colis               = fields.Float(string='Nb Colis', digits=(14,2), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
+    is_colis_cde              = fields.Float(string='Colis Prépa', digits=(14,2))
+    is_colis_cde_origine      = fields.Float(string='Colis Cde'  , digits=(14,2), readonly=True, help="Ce champ permet de mémoriser la valeur du champ 'Colis Prépa' au moment de la validation de la commande")
+    is_default_code           = fields.Char(string='Réf Fromtome'   , compute='_compute_ref', readonly=True, store=True)
+    is_ref_fournisseur        = fields.Char(string='Réf Fournisseur', compute='_compute_ref', readonly=True, store=True)
+    is_qt_cde                 = fields.Float(string='Qt Cde', digits='Product Unit of Measure',readonly=True,help="Ce champ permet de mémoriser la valeur du champ product_uom_qty au moment de la validation de la commande")
+    is_ecart_qt_cde_prepa     = fields.Float(string='Qt Prépa - Qt Cde', digits='Product Unit of Measure', compute='_compute_is_ecart_qt_cde_prepa', readonly=True, store=True)
+
+
+
+
+
 
     def init(self):
         drop_view_if_exists(self.env.cr, self._table)
@@ -70,7 +86,16 @@ class is_sale_order_line(models.Model):
                     so.user_id,
                     rp.is_enseigne_id,
                     sol.is_poids_net,
-                    sol.write_date
+                    sol.write_date,
+                    sol.is_date_reception,
+                    sol.is_nb_pieces_par_colis,
+                    sol.is_nb_colis,
+                    sol.is_colis_cde,
+                    sol.is_colis_cde_origine,
+                    sol.is_default_code,
+                    sol.is_ref_fournisseur,
+                    sol.is_qt_cde,
+                    sol.is_ecart_qt_cde_prepa
                 from sale_order so    inner join sale_order_line     sol on so.id=sol.order_id
                                       inner join product_product     pp on sol.product_id=pp.id
                                       inner join product_template    pt on pp.product_tmpl_id=pt.id

@@ -28,6 +28,16 @@
                         <field name="order_line_id"/>
                         <field name="purchase_order_id"/>
                         <field name="is_purchase_line_id"/>
+
+                        <field name="is_date_reception"/>
+                        <field name="is_nb_pieces_par_colis"/>
+                        <field name="is_nb_colis"/>
+                        <field name="is_colis_cde"/>
+                        <field name="is_colis_cde_origine"/>
+                        <field name="is_default_code"/>
+                        <field name="is_ref_fournisseur"/>
+                        <field name="is_qt_cde"/>
+                        <field name="is_ecart_qt_cde_prepa"/>
                     </group>
                 </sheet>
             </form>
@@ -47,19 +57,27 @@
                 <field name="product_id"         optional="show" widget="many2one_clickable"/>
                 <field name="description"        optional="hide"/>
                 <field name="barcode"            optional="hide"/>
+                <field name="is_default_code"    optional="show"/>
+                <field name="is_ref_fournisseur" optional="show"/>
+                <field name="is_date_reception"  optional="show"/>
                 <field name="is_date_livraison"  optional="hide"/>
+                <field name="is_qt_cde"          optional="show" sum="Total"/>
                 <field name="product_uom_qty"    optional="show" sum="Total"/>
-                <field name="qty_delivered"      optional="hide" sum="Total"/>
-                <field name="qty_invoiced"       optional="hide" sum="Total"/>
-                <field name="is_poids_net"       optional="show" sum="Total"/>
-                <field name="price_unit"         optional="hide"/>
-                <field name="discount"           optional="hide"/>
-                <field name="price_subtotal"     optional="show" sum="Total"/>
-                <field name="product_uom"        optional="hide"/>
-                <field name="is_commande_soldee" optional="hide"/>
-                <field name="purchase_order_id"  optional="hide" widget="many2one_clickable"/>
-                <field name="write_date"         optional="hide"/>
-                <field name="state"              optional="hide"/>
+                <field name="is_ecart_qt_cde_prepa"  optional="show"/>
+                <field name="qty_delivered"          optional="hide" sum="Total"/>
+                <field name="qty_invoiced"           optional="hide" sum="Total"/>
+                <field name="product_uom"            optional="hide"/>
+                <field name="is_colis_cde_origine"   optional="show" sum="Total"/>
+                <field name="is_colis_cde"           optional="show" sum="Total"/>
+                <field name="is_nb_pieces_par_colis" optional="show"/>
+                <field name="is_poids_net"           optional="show" sum="Total"/>
+                <field name="price_unit"             optional="hide"/>
+                <field name="discount"               optional="hide"/>
+                <field name="price_subtotal"         optional="show" sum="Total"/>
+                <field name="is_commande_soldee"     optional="hide"/>
+                <field name="purchase_order_id"      optional="hide" widget="many2one_clickable"/>
+                <field name="write_date"             optional="hide"/>
+                <field name="state"                  optional="hide"/>
             </tree>
         </field>
     </record>
@@ -74,6 +92,8 @@
                 <field name="user_id"/>
                 <field name="product_id"/>
                 <field name="barcode"/>
+                <field name="is_default_code"/>
+                <field name="is_ref_fournisseur"/>
                 <field name="is_commande_soldee"/>
                 <field name="state"/>
                 <field name="purchase_order_id"/>
