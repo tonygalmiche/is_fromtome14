@@ -29,6 +29,16 @@ class IsModeleCommandeLigne(models.Model):
             obj.product_name    = obj.product_id.name
             obj.default_code    = obj.product_id.default_code
             obj.ref_fournisseur = obj.product_id.is_ref_fournisseur
+            #** Limite fournisseur ********************************************
+            filtre=[
+                ('product_tmpl_id', '=', obj.product_id.product_tmpl_id.id),
+            ]
+            heure_envoi_id=False
+            suppliers=self.env['product.supplierinfo'].search(filtre,limit=1)
+            for s in suppliers:
+                heure_envoi_id = s.name.is_heure_envoi_id.id
+            obj.heure_envoi_id = heure_envoi_id
+            #******************************************************************
 
 
     @api.depends('product_id')
@@ -59,9 +69,10 @@ class IsModeleCommandeLigne(models.Model):
     modele_id       = fields.Many2one('is.modele.commande', 'Modèle de commandes', required=True, ondelete='cascade')
     sequence        = fields.Integer('Séquence')
     product_id      = fields.Many2one('product.product', 'Article', required=True)
-    product_name    = fields.Char('Désignation article'  , compute='_compute', readonly=True, store=True)
-    default_code    = fields.Char('Réf Fromtome'   , compute='_compute', readonly=True, store=True)
-    ref_fournisseur = fields.Char('Réf Fournisseur', compute='_compute', readonly=True, store=True)
+    product_name    = fields.Char('Désignation article'                    , compute='_compute', readonly=True, store=True)
+    default_code    = fields.Char('Réf Fromtome'                           , compute='_compute', readonly=True, store=True)
+    ref_fournisseur = fields.Char('Réf Fournisseur'                        , compute='_compute', readonly=True, store=True)
+    heure_envoi_id  = fields.Many2one('is.heure.maxi', 'Limite fournisseur', compute='_compute', readonly=True, store=True)
     weight          = fields.Float(string='Poids unitaire', digits='Stock Weight', compute='_compute', readonly=True, store=True)
     qt_livree       = fields.Float(string='Qt livrée', help="quantité livrée au moment de l'initialisation", readonly=True)
     price_unit      = fields.Float("Prix", digits='Product Price', compute='_compute_price_unit', readonly=True, store=False)
@@ -146,6 +157,7 @@ class IsModeleCommande(models.Model):
                         sheet.cell(row=row, column=4).value = line.product_id.is_ref_fournisseur or ''
                         sheet.cell(row=row, column=5).value = line.price_unit or ''
                         sheet.cell(row=row, column=6).value = line.product_id.uom_id.name
+                        sheet.cell(row=row, column=8).value = line.heure_envoi_id.name
                         if line.is_mise_en_avant or line.is_preco:
                             if line.is_mise_en_avant:
                                 txt = "Produit mis en avant"

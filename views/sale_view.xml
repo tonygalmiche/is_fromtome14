@@ -46,6 +46,7 @@
                             <field name="is_preco"         optional="hide"/>
                             <field name="default_code"    optional="show"/>
                             <field name="ref_fournisseur" optional="show"/>
+                            <field name="heure_envoi_id"  optional="show"/>
                             <field name="price_unit"      optional="show"/>
                             <field name="qt_livree"       optional="show"/>
                             <field name="weight"          optional="show"/>
