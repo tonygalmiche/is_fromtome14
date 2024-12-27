@@ -157,7 +157,7 @@ class IsModeleCommande(models.Model):
                         sheet.cell(row=row, column=4).value = line.product_id.is_ref_fournisseur or ''
                         sheet.cell(row=row, column=5).value = line.price_unit or ''
                         sheet.cell(row=row, column=6).value = line.product_id.uom_id.name
-                        sheet.cell(row=row, column=8).value = line.heure_envoi_id.name
+                        sheet.cell(row=row, column=8).value = line.heure_envoi_id.name or ''
                         if line.is_mise_en_avant or line.is_preco:
                             if line.is_mise_en_avant:
                                 txt = "Produit mis en avant"
