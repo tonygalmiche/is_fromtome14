@@ -3,6 +3,7 @@
 from . import account_move
 from . import account_payment
 from . import mail_activity
+from . import mail_template
 from . import product
 from . import product_pricelist
 from . import purchase_order
