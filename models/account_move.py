@@ -23,8 +23,11 @@ class AccountMoveLine(models.Model):
                     nb_colis+=line.is_nb_colis
             if obj.sale_line_ids.move_ids:
                 for line in obj.sale_line_ids.move_ids.move_line_ids:
-                    poids_net+=line.is_poids_net_reel
-                    nb_colis+=line.is_nb_colis
+                    sens=1
+                    if line.move_id.picking_type_id.code=='incoming':
+                        sens=-1
+                    poids_net+=sens*line.is_poids_net_reel
+                    nb_colis+=sens*line.is_nb_colis
 
             # Ajout du 06/07/22 pour Le Cellier
             if nb_colis==0:

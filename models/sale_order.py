@@ -332,7 +332,10 @@ class SaleOrderLine(models.Model):
             ]
             moves = self.env['stock.move'].search(filtre)
             for move in moves:
-                colis_liv+= move.is_nb_colis
+                sens=1
+                if move.picking_type_id.code=='incoming':
+                    sens=-1
+                colis_liv+= sens*move.is_nb_colis
             obj.is_colis_liv = colis_liv
 
 
