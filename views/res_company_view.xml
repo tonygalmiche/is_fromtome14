@@ -22,27 +22,24 @@
                         <group string="Taux de marge">
                             <field name="is_coef_cdf_quai"/>
                             <field name="is_coef_cdf_franco"/>
-                            <field name="is_coef_lf"/>
-                            <field name="is_coef_lf_coll"/>
-                            <field name="is_coef_lf_franco"/>
                             <field name="is_coef_ft"/>
                         </group>
                         <group string="Frais de port">
                             <field name="is_port_cdf_quai"/>
                             <field name="is_port_cdf_franco"/>
-                            <field name="is_port_lf"/>
-                            <field name="is_port_lf_coll"/>
-                            <field name="is_port_lf_franco"/>
                             <field name="is_port_ft"/>
                         </group>
                     </group>
-                    <!-- <button
+
+
+
+                    <!-- 
+                    <button
                         name="actualiser_tarif_action"
                         type="object" class="btn-warning"
                         string="Actualiser tous les tarifs en fonction du prix du fournisseur, du taux de marge et des frais de port"
                         confirm="ATTENTION : Cela va actualiser tous les tarifs en cours"
-                    /> -->
-
+                    />
                     <button
                         name="actualiser_tarif_ft_action"
                         type="object" class="btn-warning"
@@ -56,9 +53,8 @@
                         type="object" class="btn-warning"
                         string="Actualiser Liste de prix 'LF Franco' uniquement"
                         confirm="ATTENTION : Cela va actualiser tous les tarifs en cours de la liste de prix 'LF Franco'"
-                    />
-                    <br />
-                    <br />
+                    /> 
+                    -->
                     <button
                         name="actualiser_tarif_futur_action"
                         type="object" class="btn-warning"
@@ -74,6 +70,24 @@
                         confirm="ATTENTION : Cela va actualiser tous les tarifs en cours"
                     />
                 </page>
+                <page string="Import tarif xlsx">
+                    <group string="Fichier à importer">
+                        <field name="is_import_excel_ids" widget="many2many_binary" nolabel="1"/>
+                    </group>
+                    <group>
+                        <button 
+                            name="import_fichier_xlsx" 
+                            string="Importer le fichier xlsx" type="object" 
+                            confirm="ATTENTION : Cela va remplacer les taux de marge des tarifs future"
+                        />
+                    </group>
+                    <group string="Alertes importation" attrs="{'invisible':[('is_import_alerte','=',False)]}" >
+                        <div style="background:orange;font-weight:bold;padding-left:5pt">
+                            <field name="is_import_alerte" nolabel="1"/>
+                        </div>
+                    </group>
+                </page>
+
             </page>
         </field>
     </record>

@@ -1,10 +1,9 @@
-
 # -*- coding: utf-8 -*-
-from odoo import api, fields, tools, models,_
-from odoo.tools import float_is_zero, pycompat
-from odoo.tools.float_utils import float_round
-from odoo.addons import decimal_precision as dp
-from odoo.exceptions import UserError, ValidationError
+from odoo import api, fields, tools, models,_           # type: ignore
+from odoo.tools import float_is_zero, pycompat          # type: ignore
+from odoo.tools.float_utils import float_round          # type: ignore
+from odoo.addons import decimal_precision as dp         # type: ignore
+from odoo.exceptions import UserError, ValidationError  # type: ignore
 from datetime import datetime
 import pytz
 import math
@@ -19,9 +18,9 @@ _TRAITEMENT_THERMIQUE = [('laitcru', 'Lait Cru'), ('laitthermise', 'Lait Thermis
 _PRICELISTS = {
     'cdf_quai'  : 'Cdf quai',
     'cdf_franco': 'Cdf franco',
-    'lf'        : 'LF',
-    'lf_coll'   : 'LF coll.',
-    'lf_franco' : 'LF franco',
+    #'lf'        : 'LF',
+    #'lf_coll'   : 'LF coll.',
+    #'lf_franco' : 'LF franco',
     'ft'        : 'FT',
 }
 _COLISAGE = [
@@ -292,33 +291,34 @@ class ProductTemplate(models.Model):
     is_prix_achat_actuel  = fields.Float(string="PA actuel", digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
     is_prix_achat_futur   = fields.Float(string="PA futur" , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
 
-    is_prix_vente_actuel_cdf_quai   = fields.Float(string='PV actuel Cdf quai'  , digits='Product Price', readonly=True, store=True, tracking=True)
-    is_prix_vente_actuel_cdf_franco = fields.Float(string='PV actuel Cdf franco', digits='Product Price', readonly=True, store=True, tracking=True)
-    is_prix_vente_actuel_lf         = fields.Float(string='PV actuel LF'        , digits='Product Price', readonly=True, store=True, tracking=True)
-    is_prix_vente_actuel_lf_coll    = fields.Float(string='PV actuel LF coll.'  , digits='Product Price', readonly=True, store=True, tracking=True)
-    is_prix_vente_actuel_lf_franco  = fields.Float(string='PV actuel LF franco' , digits='Product Price', readonly=True, store=True, tracking=True)
-    is_prix_vente_actuel_ft         = fields.Float(string='PV actuel FT'        , digits='Product Price', readonly=True, store=True, tracking=True)
+    is_prix_vente_actuel_cdf_quai   = fields.Float(string='PV actuel A QUAI'  , digits='Product Price', readonly=True, store=True, tracking=True)
+    is_prix_vente_actuel_cdf_franco = fields.Float(string='PV actuel FRANCO'  , digits='Product Price', readonly=True, store=True, tracking=True)
+    is_prix_vente_actuel_ft         = fields.Float(string='PV actuel FROMTOME', digits='Product Price', readonly=True, store=True, tracking=True)
+    is_prix_vente_actuel_lf         = fields.Float(string='PV actuel LF        (Ne plus utiliser)', digits='Product Price', readonly=True, store=True, tracking=True)
+    is_prix_vente_actuel_lf_coll    = fields.Float(string='PV actuel LF coll.  (Ne plus utiliser)', digits='Product Price', readonly=True, store=True, tracking=True)
+    is_prix_vente_actuel_lf_franco  = fields.Float(string='PV actuel LF franco (Ne plus utiliser)', digits='Product Price', readonly=True, store=True, tracking=True)
 
-    is_prix_vente_actuel_marge_cdf_quai   = fields.Float(string='TM actuel forcé Cdf quai'  , digits='Product Price', tracking=True)
-    is_prix_vente_actuel_marge_cdf_franco = fields.Float(string='TM actuel forcé Cdf franco', digits='Product Price', tracking=True)
-    is_prix_vente_actuel_marge_lf         = fields.Float(string='TM actuel forcé LF'        , digits='Product Price', tracking=True)
-    is_prix_vente_actuel_marge_lf_coll    = fields.Float(string='TM actuel forcé LF coll.'  , digits='Product Price', tracking=True)
-    is_prix_vente_actuel_marge_lf_franco  = fields.Float(string='TM actuel forcé LF franco' , digits='Product Price', tracking=True)
-    is_prix_vente_actuel_marge_ft         = fields.Float(string='TM actuel forcé FT'        , digits='Product Price', tracking=True)
+    is_prix_vente_actuel_marge_cdf_quai   = fields.Float(string='TM actuel forcé A QUAI'  , digits='Product Price', tracking=True)
+    is_prix_vente_actuel_marge_cdf_franco = fields.Float(string='TM actuel forcé FRANCO'  , digits='Product Price', tracking=True)
+    is_prix_vente_actuel_marge_ft         = fields.Float(string='TM actuel forcé FROMTOME', digits='Product Price', tracking=True)
+    is_prix_vente_actuel_marge_lf         = fields.Float(string='TM actuel forcé LF        (Ne plus utiliser)', digits='Product Price', tracking=True)
+    is_prix_vente_actuel_marge_lf_coll    = fields.Float(string='TM actuel forcé LF coll.  (Ne plus utiliser)', digits='Product Price', tracking=True)
+    is_prix_vente_actuel_marge_lf_franco  = fields.Float(string='TM actuel forcé LF franco (Ne plus utiliser)', digits='Product Price', tracking=True)
 
-    is_prix_vente_futur_cdf_quai   = fields.Float(string='PV futur Cdf quai'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
-    is_prix_vente_futur_cdf_franco = fields.Float(string='PV futur Cdf franco', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
-    is_prix_vente_futur_lf         = fields.Float(string='PV futur LF'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
-    is_prix_vente_futur_lf_coll    = fields.Float(string='PV futur LF coll.'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
-    is_prix_vente_futur_lf_franco  = fields.Float(string='PV futur LF franco' , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
-    is_prix_vente_futur_ft         = fields.Float(string='PV futur FT'        , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
+    is_prix_vente_futur_cdf_quai   = fields.Float(string='PV futur A QUAI'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
+    is_prix_vente_futur_cdf_franco = fields.Float(string='PV futur FRANCO'  , digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
+    is_prix_vente_futur_ft         = fields.Float(string='PV futur FROMTOME', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
+    is_prix_vente_futur_lf         = fields.Float(string='PV futur LF        (Ne plus utiliser)', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
+    is_prix_vente_futur_lf_coll    = fields.Float(string='PV futur LF coll.  (Ne plus utiliser)', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
+    is_prix_vente_futur_lf_franco  = fields.Float(string='PV futur LF franco (Ne plus utiliser)', digits='Product Price', compute='_compute_tarifs', readonly=True, store=True, tracking=True)
 
-    is_prix_vente_futur_marge_cdf_quai   = fields.Float(string='TM futur forcé Cdf quai'  , digits='Product Price', tracking=True)
-    is_prix_vente_futur_marge_cdf_franco = fields.Float(string='TM futur forcé Cdf franco', digits='Product Price', tracking=True)
-    is_prix_vente_futur_marge_lf         = fields.Float(string='TM futur forcé LF'        , digits='Product Price', tracking=True)
-    is_prix_vente_futur_marge_lf_coll    = fields.Float(string='TM futur forcé LF coll.'  , digits='Product Price', tracking=True)
-    is_prix_vente_futur_marge_lf_franco  = fields.Float(string='TM futur forcé LF franco' , digits='Product Price', tracking=True)
-    is_prix_vente_futur_marge_ft         = fields.Float(string='TM futur forcé FT'        , digits='Product Price', tracking=True)
+    is_prix_vente_futur_marge_cdf_quai   = fields.Float(string='TM futur forcé A QUAI'  , digits='Product Price', tracking=True)
+    is_prix_vente_futur_marge_cdf_franco = fields.Float(string='TM futur forcé FRANCO'  , digits='Product Price', tracking=True)
+    is_prix_vente_futur_marge_ft         = fields.Float(string='TM futur forcé FROMTOME', digits='Product Price', tracking=True)
+    is_prix_vente_futur_marge_lf         = fields.Float(string='TM futur forcé LF        (Ne plus utiliser)', digits='Product Price', tracking=True)
+    is_prix_vente_futur_marge_lf_coll    = fields.Float(string='TM futur forcé LF coll.  (Ne plus utiliser)', digits='Product Price', tracking=True)
+    is_prix_vente_futur_marge_lf_franco  = fields.Float(string='TM futur forcé LF franco (Ne plus utiliser)', digits='Product Price', tracking=True)
+
     is_discount  = fields.Float(string="Remise (%)", compute='_compute_is_discount', readonly=True, store=True, digits="Discount", tracking=True, help="Remise du fournisseur par défaut (actualisé la nuit par la gestion des promos)")
     is_colisage  = fields.Selection(string='Colisage', selection=_COLISAGE, required=True, tracking=True, default='1', help="Utilisé dans 'Préparation transfert entrepôt'")
 
@@ -373,15 +373,9 @@ class ProductTemplate(models.Model):
                  'seller_ids.date_start',
                  'is_prix_vente_actuel_marge_cdf_quai',
                  'is_prix_vente_actuel_marge_cdf_franco',
-                 'is_prix_vente_actuel_marge_lf',
-                 'is_prix_vente_actuel_marge_lf_coll',
-                 'is_prix_vente_actuel_marge_lf_franco',
                  'is_prix_vente_actuel_marge_ft',
                  'is_prix_vente_futur_marge_cdf_quai',
                  'is_prix_vente_futur_marge_cdf_franco',
-                 'is_prix_vente_futur_marge_lf',
-                 'is_prix_vente_futur_marge_lf_coll',
-                 'is_prix_vente_futur_marge_lf_franco',
                  'is_prix_vente_futur_marge_ft',
                  'active'
     )

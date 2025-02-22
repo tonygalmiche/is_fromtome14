@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models, _
-from odoo.exceptions import UserError, ValidationError, Warning
-from odoo.tools.float_utils import float_compare, float_is_zero, float_round
+from odoo import api, fields, models, _                                      # type: ignore
+from odoo.exceptions import UserError, ValidationError, Warning              # type: ignore
+from odoo.tools.float_utils import float_compare, float_is_zero, float_round # type: ignore
+from odoo.osv import expression                                              # type: ignore
 import time
-from odoo.osv import expression
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, Color, Fill, Alignment,PatternFill
 from copy import copy
