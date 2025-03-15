@@ -34,6 +34,7 @@ class Company(models.Model):
 
     is_import_excel_ids   = fields.Many2many('ir.attachment' , 'res_company_is_import_excel_ids_rel', 'company_id', 'attachment_id'    , 'Tarifs .xlsx à importer')
     is_import_alerte      = fields.Text('Alertes importation')
+    is_mini_cde_franco    = fields.Integer(string='Mini de commande franco (€)')
 
 
     def actualiser_tarif_futur_action(self):

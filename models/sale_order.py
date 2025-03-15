@@ -520,6 +520,7 @@ class SaleOrder(models.Model):
     is_nb_lignes             = fields.Integer('Nb lignes (hors transport)', compute='_compute_is_nb_lignes')
     is_heure_envoi_id        = fields.Many2one('is.heure.maxi', 'Jour / Heure limite', tracking=True, help="Heure maxi d'envoi de la commande au fournisseur")
     is_fusion_order_id       = fields.Many2one('sale.order', 'Fusionnée dans', copy=False,readonly=True)
+    is_frais_port_id           = fields.Many2one(related='partner_id.is_frais_port_id')
 
 
     def _message_auto_subscribe_notify(self, partner_ids, template):
@@ -529,22 +530,27 @@ class SaleOrder(models.Model):
 
     def ajout_frais_de_port(self):
         "Ajout des frais de port"
+        is_mini_cde_franco = self.company_id.is_mini_cde_franco
         for order in self:
-            if order.partner_id.is_frais_port_id:
-                test = True
-                for line in order.order_line:
-                    if line.product_id==order.partner_id.is_frais_port_id:
+                if order.partner_id.is_frais_port_id:
+                    test=True
+                    for line in order.order_line:
+                        if line.product_id==order.partner_id.is_frais_port_id:
+                            test=False
+                            if is_mini_cde_franco>0 and order.amount_untaxed>=is_mini_cde_franco:
+                                line.unlink()
+                            break
+                    if is_mini_cde_franco>0 and order.amount_untaxed>=is_mini_cde_franco:
                         test=False
-                        break
-                if test:
-                    vals={
-                        "order_id": order.id,
-                        "sequence": 999,
-                        "product_id": order.partner_id.is_frais_port_id.id,
-                        "price_unit": order.partner_id.is_frais_port_id.lst_price,
-                        "product_uom_qty": 1,
-                    }
-                    order_line = self.env['sale.order.line'].create(vals)
+                    if test:
+                        vals={
+                            "order_id": order.id,
+                            "sequence": 999,
+                            "product_id": order.partner_id.is_frais_port_id.id,
+                            "price_unit": order.partner_id.is_frais_port_id.lst_price,
+                            "product_uom_qty": 1,
+                        }
+                        order_line = self.env['sale.order.line'].create(vals)
 
 
     @api.model

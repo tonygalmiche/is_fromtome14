@@ -18,6 +18,11 @@
             </field>
             <page name="general_info" position="after">
                 <page string="Fromtome">
+                    <group string="Paramètres">
+                        <group>
+                            <field name="is_mini_cde_franco"/>
+                        </group>
+                    </group>
                     <group>
                         <group string="Taux de marge">
                             <field name="is_coef_cdf_quai"/>
