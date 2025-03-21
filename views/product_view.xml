@@ -29,6 +29,7 @@
             </field>
             <xpath expr="//page/group[@name='purchase']" position="before">
                 <group>
+                    <field name="is_fournisseur_id"/>
                     <field name="is_discount"/>
                 </group>
             </xpath>

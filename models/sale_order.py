@@ -16,7 +16,7 @@ _logger = logging.getLogger(__name__)
 class IsModeleCommandeLigne(models.Model):
     _name = 'is.modele.commande.ligne'
     _description = "Lignes des modèles de commandes"
-    _order='modele_id,sequence'
+    _order='modele_id,sequence,product_id'
 
 
     @api.depends('product_id')
@@ -128,6 +128,8 @@ class IsModeleCommande(models.Model):
         for obj in self:
             if not obj.enseigne_id:
                 raise Warning("Enseigne obligatoire pour générer la commande Excel !")
+            for line in obj.ligne_ids:
+                line._compute()
             for modele in obj.enseigne_id.modele_commande_ids:
                 name = obj.name
 
