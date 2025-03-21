@@ -92,6 +92,8 @@ class ResPartner(models.Model):
     is_contact_relance_facture_id = fields.Many2one('res.partner', 'Contact relance facture')
     is_remise_particuliere_ids    = fields.One2many('is.remise.particuliere', 'partner_id', 'Remises particulières')
     is_commentaire_commande       = fields.Char(string="Commentaire commande")
+    is_emplacement_fournisseur    = fields.Integer(string="Emplacement palette fournisseur")
+
 
 
     default_supplierinfo_discount = fields.Float(

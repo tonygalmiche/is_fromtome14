@@ -660,6 +660,19 @@ class Picking(models.Model):
             return res
 
 
+    def trier_par_emplacement_fournisseur(self):
+        for obj in self:            
+            moves = self.env['stock.move'].search([('picking_id','=',obj.id)])
+            for move in moves:
+                move.is_fournisseur_id          = move.product_id.is_fournisseur_id
+                move.is_emplacement_fournisseur = move.product_id.is_fournisseur_id.is_emplacement_fournisseur
+                move.is_poids_net_colis         = move.product_id.is_poids_net_colis
+            moves = self.env['stock.move'].search([('picking_id','=',obj.id)],order="is_emplacement_fournisseur,is_poids_net_colis desc, product_id")
+            sequence=10
+            for move in moves:
+                move.sequence=sequence
+                sequence+=10
+
 
     def trier_par_designation_action(self):
         for obj in self:

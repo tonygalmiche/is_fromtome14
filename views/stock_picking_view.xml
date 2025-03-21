@@ -444,12 +444,15 @@
             <xpath expr="//page[@name='operations']/field/tree" position="attributes">
                 <attribute name="limit">500</attribute>
             </xpath>
-
+            <xpath expr="//page[@name='operations']/field/tree/field[@name='product_id']" position="attributes">
+                <attribute name="widget">many2one_clickable</attribute>
+            </xpath>
             <xpath expr="//page[@name='operations']/field/tree/field[@name='product_id']" position="before">
                 <button name="voir_mouvement_action" type="object" title="Mouvement" icon="fa-search-plus"/>
+                <field name="is_emplacement_fournisseur" optional="hide"/>
+                <field name="is_fournisseur_id"          optional="hide" widget="many2one_clickable"/>
+                <field name="is_poids_net_colis"         optional="hide"/>
             </xpath> 
-
-
             <xpath expr="//page[@name='operations']/field/tree/field[@name='description_picking']" position="after">
                 <field name="is_description_cde" optional="show"/>
                 <field name="is_ref_fournisseur" optional="show"/>
@@ -475,6 +478,13 @@
 
             <field name="move_ids_without_package" position="before">
                 <div style="margin-bottom:10px">
+                    <button 
+                        name="trier_par_emplacement_fournisseur" 
+                        type="object"
+                        string="Trier par emplacement fournisseur"
+                        class="oe_inline btn btn-sm btn-secondary"
+                        style="margin-right:10px"
+                    />
                     <button 
                         name="trier_par_designation_action" 
                         type="object"

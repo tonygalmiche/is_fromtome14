@@ -163,8 +163,10 @@ class StockMove(models.Model):
     is_nb_colis_cde    = fields.Float('Nb Colis Cde'  , digits=(14,2), compute=_compute_is_nb_colis_cde)
     is_poids_net_reel  = fields.Float('Poids net réel', digits=(14,4), compute=_compute_is_nb_colis_poids)
     is_description_cde = fields.Text('Description commande', compute=_compute_is_description_cde)
-    #is_ref_fournisseur = fields.Char(related="purchase_line_id.is_ref_fournisseur")
     is_ref_fournisseur = fields.Char(string='Réf fournisseur', compute='_compute_is_ref_fournisseur', readonly=True, store=True)
+    is_fournisseur_id          = fields.Many2one('res.partner', 'Fournisseur', readonly=True)
+    is_emplacement_fournisseur = fields.Integer(string="Emplacement", help="Emplacement palette fournisseur", readonly=True)
+    is_poids_net_colis         = fields.Float(string='Poids net colis (Kg)', digits='Stock Weight', readonly=True)
 
 
     def get_nb_colis(self):
