@@ -14,7 +14,7 @@
                     <p t-field="o.is_date_livraison"/>
                 </div>
                 <div class="col-auto">
-                    <strong>Transporteur:</strong>
+                    <strong>Transporteur 2:</strong>
                     <p t-field="o.is_transporteur_id"/>
                 </div>
             </div>
@@ -34,12 +34,10 @@
 
 
             </style>
-
-
-
                <table class="table table-sm mt48">
                     <thead>
                         <tr>
+                            <th class="text-left"> <strong></strong></th>
                             <th class="text-left"> <strong>Désignation</strong></th>
                             <th class="text-left"> <strong>Réf</strong></th>
                             <th class="text-right"> <strong>Colis Cde</strong></th>
@@ -52,14 +50,9 @@
                     </thead>
                     <tbody>
                         <tr t-foreach="o.move_ids_without_package" t-as="line">
+                            <td style="width: 2mm"   class="text-center"><span t-field="line.is_emplacement_fournisseur"/></td>
                             <td style="width: 150mm" class="text-left">
-                                <!-- <div t-field="line.product_id.display_name"/> -->
-                                <!-- <div t-if="line.product_id.description_picking" t-field="line.product_id.description_picking"/> -->
-
-
                                 <div><strong><span t-field="line.is_description_cde"/></strong></div>
-
-
                             </td>
                             <td style="width: 10mm" class="text-left"><span t-field="line.is_ref_fournisseur"/></td>
                             <td style="width: 10mm" class="text-right"><b><span t-field="line.is_nb_colis_cde"/></b></td>
@@ -76,7 +69,7 @@
                     </tbody>
                     <thead>
                         <tr>
-                            <th class="text-left">  <strong>Total : </strong></th>
+                            <th colspan="2" class="text-left">  <strong>Total : </strong></th>
                             <th class="text-center"><strong><span t-field="o.is_nb_colis"/></strong></th>
                             <th colspan="7"> </th>
                         </tr>
