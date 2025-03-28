@@ -38,10 +38,11 @@ class IsExportCompta(models.Model):
     _description = "Export Compta"
     _order = 'name desc'
 
-    name       = fields.Char(u"N°Folio", readonly=True)
-    date_fin   = fields.Date(u"Date de fin"  , required=True)
-    escompte   = fields.Boolean(u"Exporter les escomptes", default=True)
-
+    name       = fields.Char("N°Folio", readonly=True)
+    date_fin   = fields.Date("Date de fin"  , required=True)
+    facture    = fields.Boolean("Exporter les factures", default=True)
+    escompte   = fields.Boolean("Exporter les escomptes", default=True)
+    traite     = fields.Boolean("Exporter les traites", default=True)
     ligne_ids  = fields.One2many('is.export.compta.ligne', 'export_compta_id', u'Lignes')
     file_ids   = fields.Many2many('ir.attachment', 'is_export_compta_attachment_rel', 'doc_id', 'file_id', u'Fichiers')
     company_id = fields.Many2one('res.company', u'Société',required=True,default=lambda self: self.env.user.company_id.id)
@@ -56,82 +57,83 @@ class IsExportCompta(models.Model):
 
     def generer_lignes_action(self):
         cr, user, context, su = self.env.args
+        ct=0
         for obj in self:
-            invoices = self.env['account.move'].search([('is_export_compta_id','=',obj.id)])
-            for invoice in invoices:
-                invoice.is_export_compta_id=False
             obj.ligne_ids.unlink()
-            self._cr.commit()
-            sql="""
-                SELECT  
-                    aj.name,
-                    am.name,
-                    am.invoice_date,
-                    aa.code,
-                    aa.name,
-                    am.invoice_date,
-                    'aml.name',
-                    sum(aml.debit),
-                    sum(aml.credit),
-                    rp.name,
-                    rp.ref,
-                    am.id,
-                    aj.code,
-                    am.partner_id
-                FROM account_move_line aml inner join account_move am                on aml.move_id=am.id
-                                           inner join account_account aa             on aml.account_id=aa.id
-                                           left outer join res_partner rp            on aml.partner_id=rp.id
-                                           inner join account_journal aj             on aml.journal_id=aj.id
-                WHERE 
-                    am.is_export_compta_id is null and
-                    am.invoice_date<=%s and aj.name in ('VE','AC')
-                GROUP BY 
-                    aj.name,
-                    am.name,
-                    am.invoice_date,
-                    aa.code,
-                    aa.name,
-                    am.invoice_date,
-                    rp.name,
-                    rp.ref,
-                    am.id,
-                    aj.code,
-                    am.partner_id
-                ORDER BY am.invoice_date,am.name,aa.code
-            """
-            cr.execute(sql,[obj.date_fin])
-            ct=0
-            for row in cr.fetchall():
-                invoice_id = row[11]
-                invoices = self.env['account.move'].search([('id','=',invoice_id)])
-                compte_num = row[3]
-                comp_aux_num = ''
-                if compte_num[:3] in ['401','411']:
-                    comp_aux_num = row[10]
+            if obj.facture:
+                invoices = self.env['account.move'].search([('is_export_compta_id','=',obj.id)])
                 for invoice in invoices:
-                    invoice.is_export_compta_id = obj.id
-                    if compte_num[:3]=='411':
-                        compte_num = invoice.partner_id.property_account_receivable_id.code
-                    if compte_num[:3]=='401':
-                        compte_num = invoice.partner_id.property_account_payable_id.code
-                ct=ct+1
-                vals={
-                    'export_compta_id': obj.id,
-                    'ligne'           : ct,
-                    'journal_code'           : row[0],
-                    'ecriture_num'           : row[1],
-                    'ecriture_date'          : row[2],
-                    'compte_num'             : compte_num,
-                    'comp_aux_num'           : comp_aux_num,
-                    'piece_ref'              : row[1],
-                    'piece_date'             : row[5],
-                    'ecriture_lib'           : row[9] or row[6],
-                    'debit'                  : row[7],
-                    'credit'                 : row[8],
-                    'invoice_id'             : invoice_id,
-                    'partner_id'             : row[13],
-                }
-                self.env['is.export.compta.ligne'].create(vals)
+                    invoice.is_export_compta_id=False
+                self._cr.commit()
+                sql="""
+                    SELECT  
+                        aj.name,
+                        am.name,
+                        am.invoice_date,
+                        aa.code,
+                        aa.name,
+                        am.invoice_date,
+                        'aml.name',
+                        sum(aml.debit),
+                        sum(aml.credit),
+                        rp.name,
+                        rp.ref,
+                        am.id,
+                        aj.code,
+                        am.partner_id
+                    FROM account_move_line aml inner join account_move am                on aml.move_id=am.id
+                                            inner join account_account aa             on aml.account_id=aa.id
+                                            left outer join res_partner rp            on aml.partner_id=rp.id
+                                            inner join account_journal aj             on aml.journal_id=aj.id
+                    WHERE 
+                        am.is_export_compta_id is null and
+                        am.invoice_date<=%s and aj.name in ('VE','AC')
+                    GROUP BY 
+                        aj.name,
+                        am.name,
+                        am.invoice_date,
+                        aa.code,
+                        aa.name,
+                        am.invoice_date,
+                        rp.name,
+                        rp.ref,
+                        am.id,
+                        aj.code,
+                        am.partner_id
+                    ORDER BY am.invoice_date,am.name,aa.code
+                """
+                cr.execute(sql,[obj.date_fin])
+                for row in cr.fetchall():
+                    invoice_id = row[11]
+                    invoices = self.env['account.move'].search([('id','=',invoice_id)])
+                    compte_num = row[3]
+                    comp_aux_num = ''
+                    if compte_num[:3] in ['401','411']:
+                        comp_aux_num = row[10]
+                    for invoice in invoices:
+                        invoice.is_export_compta_id = obj.id
+                        if compte_num[:3]=='411':
+                            compte_num = invoice.partner_id.property_account_receivable_id.code
+                        if compte_num[:3]=='401':
+                            compte_num = invoice.partner_id.property_account_payable_id.code
+                    ct=ct+1
+                    vals={
+                        'export_compta_id': obj.id,
+                        'ligne'           : ct,
+                        'journal_code'           : row[0],
+                        'ecriture_num'           : row[1],
+                        'ecriture_date'          : row[2],
+                        'compte_num'             : compte_num,
+                        'comp_aux_num'           : comp_aux_num,
+                        'piece_ref'              : row[1],
+                        'piece_date'             : row[5],
+                        'ecriture_lib'           : row[9] or row[6],
+                        'debit'                  : row[7],
+                        'credit'                 : row[8],
+                        'invoice_id'             : invoice_id,
+                        'partner_id'             : row[13],
+                    }
+                    self.env['is.export.compta.ligne'].create(vals)
 
             if obj.escompte:
                 payments = self.env['account.payment'].search([('is_export_compta_id','=',obj.id)])
@@ -213,6 +215,41 @@ class IsExportCompta(models.Model):
                             'partner_id'             : row[0],
                         }
                         self.env['is.export.compta.ligne'].create(vals)
+
+
+            if obj.traite:
+                journal_code  = 'RG'
+                payments = self.env['account.payment.order'].search([('is_export_compta_id','=',obj.id)])
+                for payment in payments:
+                    payment.is_export_compta_id=False
+                domain=[
+                    ('is_export_compta_id','=',False),
+                    ('date_generated','<=',obj.date_fin),
+                    ('state','!=','cancel'),
+                ]
+                payments = self.env['account.payment.order'].search(domain)
+                for payment in payments:
+                    for invoice in payment.move_ids:
+                        for line in invoice.line_ids:
+                            ct=ct+1
+                            vals={
+                                'export_compta_id': obj.id,
+                                'ligne'           : ct,
+                                'journal_code'           : journal_code,
+                                'ecriture_num'           : payment.name,
+                                'ecriture_date'          : payment.date_generated,
+                                'compte_num'             : line.account_id.code,
+                                'piece_ref'              : payment.name,
+                                'piece_date'             : payment.date_generated,
+                                'ecriture_lib'           : line.name,
+                                'debit'                  : line.debit,
+                                'credit'                 : line.credit,
+                                #'payment_id'             : payment_id,
+                                'partner_id'             : line.partner_id.id,
+                            }
+                            self.env['is.export.compta.ligne'].create(vals)
+                            ct=ct+1
+                    payment.is_export_compta_id=obj.id
 
 
     def generer_fichier_action(self):

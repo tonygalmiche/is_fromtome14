@@ -94,6 +94,11 @@
         <field name="model">is.export.compta</field>
         <field name="arch" type="xml">
             <form>
+                <style>
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
                 <header>
                     <button
                         name="generer_lignes_action"
@@ -118,7 +123,9 @@
                         <field name="name"/>
                         <field name="company_id" readonly="1"/>
                         <field name="date_fin"/>
+                        <field name="facture"/>
                         <field name="escompte"/>
+                        <field name="traite"/>
                         <field 
                             name="file_ids" 
                             widget="many2many_binary"

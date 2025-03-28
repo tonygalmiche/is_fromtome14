@@ -177,6 +177,7 @@ class IsScanPicking(models.Model):
 
     type         = fields.Selection(string='Type', selection=[('picking', 'Picking'), ('inventory', 'Inventaire')], required=True, default='picking')
     picking_id   = fields.Many2one('stock.picking', 'Picking'     , required=False)
+    partner_id   = fields.Many2one(related="picking_id.partner_id")
     inventory_id = fields.Many2one('stock.inventory', 'Inventaire', required=False)
     ean          = fields.Char("EAN")
     product_id   = fields.Many2one('product.product', 'Article')

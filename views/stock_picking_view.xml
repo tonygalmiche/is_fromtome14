@@ -113,6 +113,10 @@
                             <div class="o_row no-gutters d-flex">
                                 <field name="picking_id" readonly="1" class="oe_inline"/>
                             </div>
+                            <label for="partner_id"/>
+                            <div class="o_row no-gutters d-flex">
+                                <field name="partner_id" readonly="1" class="oe_inline"/>
+                            </div>
                             <button 
                                 name="maj_picking_action" 
                                 type="object" string="Mise à jour du Picking"   
