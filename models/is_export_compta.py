@@ -231,6 +231,12 @@ class IsExportCompta(models.Model):
                 for payment in payments:
                     for invoice in payment.move_ids:
                         for line in invoice.line_ids:
+                            num_fac=False
+                            for l in line.bank_payment_line_id:
+                                num_fac=l.communication
+                            ecriture_lib = line.partner_id.name or line.name
+                            if num_fac:
+                                ecriture_lib = "%s:%s"%(num_fac,line.partner_id.name or '')
                             ct=ct+1
                             vals={
                                 'export_compta_id': obj.id,
@@ -241,10 +247,9 @@ class IsExportCompta(models.Model):
                                 'compte_num'             : line.account_id.code,
                                 'piece_ref'              : payment.name,
                                 'piece_date'             : payment.date_generated,
-                                'ecriture_lib'           : line.name,
-                                'debit'                  : line.debit,
-                                'credit'                 : line.credit,
-                                #'payment_id'             : payment_id,
+                                'ecriture_lib'           : ecriture_lib,
+                                'debit'                  : line.credit,
+                                'credit'                 : line.debit,
                                 'partner_id'             : line.partner_id.id,
                             }
                             self.env['is.export.compta.ligne'].create(vals)
