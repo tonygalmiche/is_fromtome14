@@ -586,7 +586,10 @@ class SaleOrder(models.Model):
                 if line.product_uom_qty==0:
                     line.unlink()
             obj.recopie_qt_prepa_dans_qt_cde_action(force=True)
-        return super(SaleOrder, self).action_confirm()
+            res = super(SaleOrder, self).action_confirm()
+            for picking in obj.picking_ids:
+                picking.trier_par_emplacement_fournisseur()
+        return res
 
 
     @api.onchange('partner_id','company_id','user_id','is_enseigne_id')
