@@ -238,13 +238,16 @@ class IsExportCompta(models.Model):
                             if num_fac:
                                 ecriture_lib = "%s:%s"%(num_fac,line.partner_id.name or '')
                             ct=ct+1
+                            compte_num = line.account_id.code or ''
+                            if compte_num == '512100':
+                                 compte_num = '511130'
                             vals={
                                 'export_compta_id': obj.id,
                                 'ligne'           : ct,
                                 'journal_code'           : journal_code,
                                 'ecriture_num'           : payment.name,
                                 'ecriture_date'          : payment.date_generated,
-                                'compte_num'             : line.account_id.code,
+                                'compte_num'             : compte_num,
                                 'piece_ref'              : payment.name,
                                 'piece_date'             : payment.date_generated,
                                 'ecriture_lib'           : ecriture_lib,
