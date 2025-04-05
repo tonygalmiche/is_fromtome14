@@ -720,10 +720,10 @@ class SaleOrder(models.Model):
                                 order=orders[0]
                             else:
                                 vals={
-                                    'partner_id'  : partner_id,
-                                    'date_planned': date_planned,
-                                    'picking_type_id': supplierinfo.name.is_warehouse_id.in_type_id.id,
-                                    'is_adresse_livraison_id': supplierinfo.name.is_enseigne_id.name.id,
+                                    'partner_id'             : partner_id,
+                                    'date_planned'           : date_planned,
+                                    'picking_type_id'        : supplierinfo.name.is_warehouse_id.in_type_id.id,
+                                    'is_adresse_livraison_id': supplierinfo.name.is_enseigne_id.warehouse_id.partner_id.id,  #supplierinfo.name.is_enseigne_id.name.id,
                                 }
                                 order=self.env['purchase.order'].create(vals)
                                 if order:

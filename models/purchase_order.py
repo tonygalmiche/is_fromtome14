@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models
+from odoo import api, fields, models                   # type: ignore
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT  # type: ignore
 from datetime import datetime, timedelta, date
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class PurchaseOrder(models.Model):
@@ -67,10 +67,18 @@ class PurchaseOrder(models.Model):
     is_fromtome_order_vsb      = fields.Boolean(string='Créer commande dans Fromtome vsb', compute='_compute_is_fromtome_order_vsb')
     is_maj_commande_client_vsb = fields.Boolean(string='MAJ commandes clients', compute='_compute_is_maj_commande_client_vsb', readonly=True, store=False)
     is_enseigne_id             = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
-    #is_heure_envoi            = fields.Char(related='partner_id.is_heure_envoi')
     is_heure_envoi_id          = fields.Many2one(related='partner_id.is_heure_envoi_id')
     is_heure_envoi_mail        = fields.Datetime(string="Heure d'envoi du mail", compute='_compute_is_heure_envoi_mail' )
     is_fusion_order_id         = fields.Many2one('purchase.order', 'Fusionnée dans', copy=False,readonly=True)
+    is_date_enlevement         = fields.Date('Date Enlèvement')
+    is_adresse_livraison_id    = fields.Many2one('res.partner', 'Adresse Livraison') #, default=lambda self: self.env.user.company_id.partner_id.id)
+
+
+    @api.onchange('partner_id')
+    def onchange_partner_id_is_adresse_livraison_id(self):
+        for obj in self:
+            if obj.partner_id.is_enseigne_id:
+                obj.is_adresse_livraison_id = obj.partner_id.is_enseigne_id.warehouse_id.partner_id.id
 
 
     @api.onchange('partner_id')
@@ -448,12 +456,4 @@ class PurchaseOrderLine(models.Model):
                 ],
             }
             return res
-
-
-class PurchaseOrder(models.Model):
-    _inherit = 'purchase.order'
-
-
-    is_date_enlevement      = fields.Date('Date Enlèvement')
-    is_adresse_livraison_id = fields.Many2one('res.partner', 'Adresse Livraison', default=lambda self: self.env.user.company_id.partner_id.id)
 
