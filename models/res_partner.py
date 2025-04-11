@@ -25,6 +25,7 @@ class IsEnseigneCommerciale(models.Model):
     prix_sur_livraison  = fields.Boolean("Afficher le prix de vente sur le bon de livraison", default=False)
     rib                 = fields.Char("RIB")
     note_bl             = fields.Text("Note BL", help="Note à ajouter sur le BL")
+    mini_cde_franco     = fields.Integer(string='Mini de commande franco (€)')
 
 
 class IsTransporteur(models.Model):
@@ -93,7 +94,7 @@ class ResPartner(models.Model):
     is_remise_particuliere_ids    = fields.One2many('is.remise.particuliere', 'partner_id', 'Remises particulières')
     is_commentaire_commande       = fields.Char(string="Commentaire commande")
     is_emplacement_fournisseur    = fields.Integer(string="Emplacement palette fournisseur")
-
+    is_mini_cde_franco            = fields.Integer(string='Mini de commande franco (€)')
 
 
     default_supplierinfo_discount = fields.Float(

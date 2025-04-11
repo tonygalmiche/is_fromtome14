@@ -532,8 +532,8 @@ class SaleOrder(models.Model):
 
     def ajout_frais_de_port(self):
         "Ajout des frais de port"
-        is_mini_cde_franco = self.company_id.is_mini_cde_franco
         for order in self:
+                is_mini_cde_franco = order.partner_id.is_mini_cde_franco or order.is_enseigne_id.mini_cde_franco
                 if order.partner_id.is_frais_port_id:
                     test=True
                     for line in order.order_line:

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models, _
+from odoo import api, fields, models, _   # type: ignore
+from odoo.exceptions import Warning       # type: ignore
 import codecs
 import unicodedata
 import base64
 from datetime import datetime, date, timedelta
-from odoo.exceptions import Warning
 from math import *
 
 

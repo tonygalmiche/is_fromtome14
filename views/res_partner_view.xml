@@ -9,6 +9,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
+                <field name="mini_cde_franco"     optional="show"/>
                 <field name="warehouse_id"        optional="hide"/>
                 <field name="prix_sur_livraison"  optional="hide"/>
                 <field name="modele_commande_ids" optional="hide" widget="many2many_binary" />
@@ -31,6 +32,7 @@
                 <group>
                     <field name="name"/>
                     <field name="warehouse_id"/>
+                    <field name="mini_cde_franco"/>
                     <field name="prix_sur_livraison"/>
                     <field name="modele_commande_ids" widget="many2many_binary"/>
                     <field name="rib"/>
@@ -213,6 +215,7 @@
                 <field name="is_warehouse_id"                   optional="hide"/>
                 <field name="is_emplacement_fournisseur"        optional="hide"/>
                 <field name="is_frais_port_id"                  optional="hide"/>
+                <field name="is_mini_cde_franco"                optional="hide"/>
                 <field name="is_heure_appel"                    optional="hide"/>
                 <field name="is_habitude_commande"              optional="hide"/>
                 <field name="is_heure_envoi_id"                 optional="hide"/>
@@ -256,6 +259,7 @@
                 <field name="is_transporteur_id" widget="selection"/>
                 <field name="is_warehouse_id"    widget="selection"/>
                 <field name="is_frais_port_id"/>
+                <field name="is_mini_cde_franco"         attrs="{'invisible': ['|',('is_customer', '=', False),('is_company', '=', False)]}"/>
                 <field name="is_heure_envoi_id"          attrs="{'invisible': ['|',('is_supplier', '=', False),('is_company', '=', False)]}"/>
                 <field name="is_emplacement_fournisseur" attrs="{'invisible': ['|',('is_supplier', '=', False),('is_company', '=', False)]}"/>
                 <field name="is_mini_cde"                attrs="{'invisible': ['|',('is_supplier', '=', False),('is_company', '=', False)]}"/>
