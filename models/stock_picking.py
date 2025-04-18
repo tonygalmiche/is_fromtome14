@@ -525,6 +525,9 @@ class Picking(models.Model):
     is_transporteur_id = fields.Many2one('is.transporteur', 'Transporteur', compute='_compute_is_transporteur_id', store=True, readonly=False, tracking=True)
     is_alerte          = fields.Text('Alerte', compute="_compute_is_alerte", readonly=True, store=False)
     is_preparation_transfert_id = fields.Many2one('is.preparation.transfert.entrepot', 'Préparation transfert', tracking=True)
+    is_palette_europe  = fields.Integer(string='Palette Europe')
+    is_palette_perdue  = fields.Integer(string='Palette Perdue')
+    is_palette_demie   = fields.Integer(string='Palette Demie')
 
 
     @api.depends('partner_id','sale_id')

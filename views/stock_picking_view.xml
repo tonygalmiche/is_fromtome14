@@ -426,12 +426,16 @@
                 <field name="is_date_livraison" readonly="1" attrs="{'invisible': [('is_date_livraison', '=', False)]}"/>
                 <field name="sale_id"           readonly="1" attrs="{'invisible': [('sale_id', '=', False)]}"/>
                 <field name="purchase_id"       readonly="1" attrs="{'invisible': [('purchase_id', '=', False)]}"/>
-                <field name="is_poids_net" sum="Total"/>
+                <field name="is_transporteur_id"/>
+                <field name="is_palette_europe"/>
+                <field name="is_palette_perdue"/>
+                <field name="is_palette_demie"/>
                 <field name="is_preparation_transfert_id" attrs="{'invisible': [('is_preparation_transfert_id', '=', False)]}"/>
             </field>
            <field name="backorder_id" position="after">
             <field name="is_enseigne_id"/>
-            <field name="is_transporteur_id"/>
+            <field name="is_nb_colis"/>
+            <field name="is_poids_net"/>
         </field>
            <field name="partner_id" position="after">
                 <button name="scan_picking_action" type="object" string="Scan"/>
@@ -527,8 +531,13 @@
         <field name="inherit_id" ref="stock.vpicktree"/>
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
-                <field name="is_enseigne_id" optional="show"/>
+                <field name="is_enseigne_id"     optional="show"/>
                 <field name="is_transporteur_id" optional="hide"/>
+                <field name="is_poids_net"       optional="hide" sum="Total"/>
+                <field name="is_nb_colis"        optional="hide" sum="Total"/>
+                <field name="is_palette_europe"  optional="hide" sum="Total"/>
+                <field name="is_palette_perdue"  optional="hide" sum="Total"/>
+                <field name="is_palette_demie"   optional="hide" sum="Total"/>
                 <field name="user_id"            optional="hide"/>
                 <field name="date_done"/>
                 <field name="is_date_reception" widget="remaining_days" optional="show"/>
@@ -609,6 +618,14 @@
                 />
                 <separator/>
 
+                <filter 
+                    name="livre_depuis_6jours"
+                    string="Livré depuis 6 jours" 
+                    domain="[
+                        ('is_date_reception', '&gt;', (context_today()-datetime.timedelta(days=6)).strftime('%Y-%m-%d')),
+                        ('state','=','done')
+                    ]"
+                />
 
 
             </filter>
@@ -621,4 +638,44 @@
 
         </field>
     </record>
+
+
+    <record id="is_suivi_transporteur_tree" model="ir.ui.view">
+        <field name="name">is_suivi_transporteur</field>
+        <field name="model">stock.picking</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <tree default_order='date_done desc'>
+                <field name="date_done"          optional="show"/>
+                <field name="partner_id"         optional="show" widget="many2one_clickable"/>
+                <field name="sale_id"            optional="show" widget="many2one_clickable"/>
+                <field name="name"               optional="show"/>
+                <field name="is_transporteur_id" optional="show" widget="many2one_clickable"/>
+                <field name="is_nb_colis"        optional="show" sum="Total"/>
+                <field name="is_poids_net"       optional="show" sum="Total"/>
+                <field name="is_palette_europe"  optional="show" sum="Total"/>
+                <field name="is_palette_perdue"  optional="show" sum="Total"/>
+                <field name="is_palette_demie"   optional="show" sum="Total"/>
+                <field name="picking_type_id"    optional="hide"/>
+                <field name="state" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+    <record  id="is_suivi_transporteur_action" model="ir.actions.act_window">
+        <field name="name">Suivi transporteur</field>
+        <field name="res_model">stock.picking</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="is_fromtome14.is_suivi_transporteur_tree"/>
+        <field name="domain">[('state','=','done'),('picking_type_id.code','=','outgoing')]</field>
+        <field name="limit">200</field>
+    </record>
+    <menuitem
+        id="is_suivi_transporteur_menu"
+        name="Suivi transporteur"
+        parent="stock.menu_stock_warehouse_mgmt"
+        sequence="993"
+        action="is_suivi_transporteur_action"
+    />
+
+
 </odoo>
