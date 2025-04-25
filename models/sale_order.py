@@ -4,7 +4,7 @@ from odoo.exceptions import UserError, ValidationError, Warning              # t
 from odoo.tools.float_utils import float_compare, float_is_zero, float_round # type: ignore
 from odoo.osv import expression                                              # type: ignore
 import time
-from openpyxl import Workbook, load_workbook
+from openpyxl import Workbook, load_workbook, utils
 from openpyxl.styles import Font, Color, Fill, Alignment,PatternFill
 from copy import copy
 import base64
@@ -160,6 +160,15 @@ class IsModeleCommande(models.Model):
                         sheet.cell(row=row, column=5).value = line.price_unit or ''
                         sheet.cell(row=row, column=6).value = line.product_id.uom_id.name
                         sheet.cell(row=row, column=8).value = line.heure_envoi_id.name or ''
+
+                        #** Ajout de la formule pour le montant ***************
+                        key_price   = sheet.cell(row=row, column=5).coordinate
+                        key_qty     = sheet.cell(row=row, column=7).coordinate
+                        key_montant = sheet.cell(row=row, column=9).coordinate
+                        formule = "=%s*%s"%(key_price,key_qty)
+                        sheet[key_montant]=formule
+                        #******************************************************
+
                         if line.is_mise_en_avant or line.is_preco:
                             if line.is_mise_en_avant:
                                 txt = "Produit mis en avant"
@@ -173,7 +182,7 @@ class IsModeleCommande(models.Model):
                             sheet.cell(row=row, column=6).alignment = Alignment(vertical='center', horizontal='center') 
                             sheet.cell(row=row, column=2).value = "%s:\n%s"%(txt,line.product_id.name)
                             sheet.row_dimensions[row].height=34 
-                            for i in  range(1,7):
+                            for i in  range(1,10):
                                 cell = sheet.cell(row=row,column=i)
                                 font = copy(cell.font)
                                 font.size = 12
@@ -182,6 +191,8 @@ class IsModeleCommande(models.Model):
                                 cell.fill=fill
                         row+=1
                         lig+=1
+
+                sheet.print_area = 'A1:I1000'
                 wb.save(path)
                 #**************************************************************
 
