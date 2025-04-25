@@ -161,12 +161,26 @@ class IsModeleCommande(models.Model):
                         sheet.cell(row=row, column=6).value = line.product_id.uom_id.name
                         sheet.cell(row=row, column=8).value = line.heure_envoi_id.name or ''
 
+                        sheet.cell(row=row, column=10).value = line.product_id.is_nb_pieces_par_colis
+                        sheet.cell(row=row, column=11).value = line.product_id.is_poids_net_colis
+
+
+
+
                         #** Ajout de la formule pour le montant ***************
-                        key_price   = sheet.cell(row=row, column=5).coordinate
-                        key_qty     = sheet.cell(row=row, column=7).coordinate
+
+                        #formule='SI(F8="Pc";E8*G8*J8;E8*K8*G8)'
+                        l=lig+6
                         key_montant = sheet.cell(row=row, column=9).coordinate
-                        formule = "=%s*%s"%(key_price,key_qty)
+                        formule='=IF(F%s="Pc",E%s*G%s*J%s,E%s*K%s*G%s)'%(l,l,l,l,l,l,l)
                         sheet[key_montant]=formule
+
+
+                        # key_price   = sheet.cell(row=row, column=5).coordinate
+                        # key_qty     = sheet.cell(row=row, column=7).coordinate
+                        # key_montant = sheet.cell(row=row, column=9).coordinate
+                        # formule = "=%s*%s"%(key_price,key_qty)
+                        # sheet[key_montant]=formule
                         #******************************************************
 
                         if line.is_mise_en_avant or line.is_preco:
