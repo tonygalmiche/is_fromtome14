@@ -93,25 +93,36 @@
                     </thead>
                     <tbody class="invoice_tbody">
                         <t t-set="lines" t-value="o.invoice_line_ids.sorted(key=lambda l: (-l.sequence, l.date, l.move_name, -l.id), reverse=True)"/>
-                        <tr t-foreach="lines" t-as="line">
-                            <td class="text-left"><span t-field="line.product_id.default_code"/></td>
-                            <td class="text-left">
-                                <b><div t-field="line.name"/></b>
-                                <div t-if="line.is_lots" t-field="line.is_lots"/>
-                                <div t-if="line.product_id.is_bio_id"><i><span t-field="line.product_id.is_bio_id.name"/></i></div>
-                                <div t-if="line.discount">Remise effectuée de <span t-field="line.discount"/>%</div>
-                            </td>
-                            <td t-if="o.move_type not in ['in_refund','out_refund']" class="text-right"><b><span t-field="line.is_nb_colis"/></b></td>
-                            <td class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
-                            <td class="text-right" style="border-right:none"><span t-if="o.move_type in ['in_refund','out_refund']">-</span><span t-field="line.quantity"/></td>
-                            <td class="text-left"  style="border-left:none"><span t-field="line.product_uom_id"/></td>
-                            <td t-if="o.move_type not in ['in_refund','out_refund']" class="text-right"><span t-field="line.is_poids_net"/></td>
-                            <td class="text-right"><span t-field="line.price_unit"/></td>
-                            <td class="text-right"><span t-if="o.move_type in ['in_refund','out_refund']">-</span><span t-field="line.price_subtotal"/></td>
-                            <td class="text-center">
-                                <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_ids))" id="line_tax_ids"/>
-                            </td>
-                        </tr>
+                        <t t-foreach="lines" t-as="line">
+                            <t t-if="line.display_type != 'line_section'">
+                                <tr>
+                                    <td class="text-left"><span t-field="line.product_id.default_code"/></td>
+                                    <td class="text-left">
+                                        <b><div t-field="line.name"/></b>
+                                        <div t-if="line.is_lots" t-field="line.is_lots"/>
+                                        <div t-if="line.product_id.is_bio_id"><i><span t-field="line.product_id.is_bio_id.name"/></i></div>
+                                        <div t-if="line.discount">Remise effectuée de <span t-field="line.discount"/>%</div>
+                                    </td>
+                                    <td t-if="o.move_type not in ['in_refund','out_refund']" class="text-right"><b><span t-field="line.is_nb_colis"/></b></td>
+                                    <td class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
+                                    <td class="text-right" style="border-right:none"><span t-if="o.move_type in ['in_refund','out_refund']">-</span><span t-field="line.quantity"/></td>
+                                    <td class="text-left"  style="border-left:none"><span t-field="line.product_uom_id"/></td>
+                                    <td t-if="o.move_type not in ['in_refund','out_refund']" class="text-right"><span t-field="line.is_poids_net"/></td>
+                                    <td class="text-right"><span t-field="line.price_unit"/></td>
+                                    <td class="text-right"><span t-if="o.move_type in ['in_refund','out_refund']">-</span><span t-field="line.price_subtotal"/></td>
+                                    <td class="text-center">
+                                        <span t-esc="', '.join(map(lambda x: (x.description or x.name), line.tax_ids))" id="line_tax_ids"/>
+                                    </td>
+                                </tr>
+                             </t>
+                            <t t-if="line.display_type == 'line_section'">
+                                <tr class="fondgris">
+                                    <td colspan="99">
+                                        <span t-field="line.name" t-options="{'widget': 'text'}"/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </t>
                     </tbody>
                     <thead>
                         <tr>

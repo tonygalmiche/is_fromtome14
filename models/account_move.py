@@ -58,6 +58,7 @@ class AccountMoveLine(models.Model):
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2) , compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True)
     is_poids_net           = fields.Float(string='Poids net', digits=(14,4), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
     is_lots                = fields.Text('Lots', compute='_compute_is_lots')
+    is_picking_id          = fields.Many2one('stock.picking', 'BL', copy=False)
 
 
     def stock_move_line_action(self):
@@ -92,18 +93,15 @@ class AccountMove(models.Model):
             alertes=[]
             nb_frais_de_port=0
             for line in obj.invoice_line_ids:
-                if line.product_id.categ_id.name=='TRANSPORT':
-                    nb_frais_de_port+=1
-                if line.price_unit==0:
-                    alertes.append("Prix facturé à 0")
-                if line.price_unit>=9999:
-                    alertes.append("Prix facturé > 9999")
-
+                if line.display_type!='line_section':
+                    if line.product_id.categ_id.name=='TRANSPORT':
+                        nb_frais_de_port+=1
+                    if line.price_unit==0:
+                        alertes.append("Prix facturé à 0")
+                    if line.price_unit>=9999:
+                        alertes.append("Prix facturé > 9999")
             if nb_frais_de_port>1:
                 alertes.append("Il y a %s lignes de frais de port"%nb_frais_de_port)
-
-
-
             alerte=False
             if len(alertes)>0:
                 alerte = '\n'.join(alertes)
@@ -193,21 +191,21 @@ class AccountMove(models.Model):
     is_type_avoir       = fields.Selection(_TYPE_AVOIR, 'Type avoir', default="avoir_quantite", copy=False)
 
 
-    def write(self, vals):
-        res = super(AccountMove, self).write(vals)
-        #** Mettre la ligne des frais de port à la fin ************************
-        for obj in self:
-            if obj.partner_id.is_frais_port_id:
-                max=0
-                for line in obj.line_ids:
-                    if line.product_id!=obj.partner_id.is_frais_port_id:
-                        if line.sequence>max:
-                            max=line.sequence
-                for line in obj.line_ids:
-                    if line.product_id==obj.partner_id.is_frais_port_id:
-                        line.sequence=max+10
-        #**********************************************************************
-        return res
+    # def write(self, vals):
+    #     res = super(AccountMove, self).write(vals)
+    #     #** Mettre la ligne des frais de port à la fin ************************
+    #     for obj in self:
+    #         if obj.partner_id.is_frais_port_id:
+    #             max=0
+    #             for line in obj.line_ids:
+    #                 if line.product_id!=obj.partner_id.is_frais_port_id:
+    #                     if line.sequence>max:
+    #                         max=line.sequence
+    #             for line in obj.line_ids:
+    #                 if line.product_id==obj.partner_id.is_frais_port_id:
+    #                     line.sequence=max+10
+    #     #**********************************************************************
+    #     return res
 
 
     def _message_auto_subscribe_notify(self, partner_ids, template):
@@ -220,6 +218,65 @@ class AccountMove(models.Model):
             invoice.sudo().message_follower_ids.unlink()
         res = super(AccountMove, self).action_invoice_sent()
         return res
+
+
+
+    def ajout_sous_section_action(self):
+        for obj in self:
+            my_dict={}
+            for line in obj.invoice_line_ids:
+                #** Recherche du picking de la ligne facturée *****************
+                picking=line.is_picking_id
+                if not picking:
+                    for l in line.sale_line_ids:
+                        order = l.order_id
+                        for sale_line in order.order_line:
+                            for invoice_line in sale_line.invoice_lines:
+                                if line==invoice_line:
+                                    for stock_move in sale_line.move_ids:
+                                        picking = stock_move.picking_id
+                                        line.is_picking_id = picking.id
+                #**************************************************************
+
+                #** Tri par date du picking et par désignation ****************
+                date_picking = (picking and str(picking.date_done)) or 'ZZZ'
+                name=line.name
+                if line.product_id.categ_id.name=='TRANSPORT':
+                    name="ZZZ" # Pour mettre les frais de port à la fin
+                key = "%s-%s-%s"%(date_picking,name,line.id)
+                my_dict[key]=line
+                #**************************************************************
+
+            #** Modification de la séquence des lignes pour trier *************
+            sorted_dict = dict(sorted(my_dict.items()))
+            sequence=10
+            for key in sorted_dict:
+                move=sorted_dict[key]
+                move.sequence=sequence
+                sequence+=10
+            #******************************************************************
+
+            #** Suppression des anciennes sous-section ************************
+            for line in obj.invoice_line_ids:
+                if line.display_type=='line_section':
+                    line.unlink()
+            #******************************************************************
+
+            #** Ajout d'une sous-secttion par picking**************************
+            picking=False
+            for line in obj.invoice_line_ids.sorted('sequence'):
+                if picking!=line.is_picking_id:
+                    if line.is_picking_id:
+                        name = "Livraison %s du %s"%(line.is_picking_id.name,line.is_picking_id.date_done.strftime('%d/%m/%Y'))
+                        vals={
+                            'move_id'      : line.move_id.id,
+                            'sequence'     : line.sequence - 1,
+                            'display_type' : 'line_section',
+                            'name'         : name,
+                        }
+                        self.env['account.move.line'].create(vals)
+                    picking=line.is_picking_id
+            #******************************************************************
 
 
 class AccountPayment(models.Model):

@@ -26,9 +26,13 @@
                     }
                 </style>
             </xpath>
-            <!-- <xpath expr="//sheet/group/group/field[@name='date']" position="attributes">
-                 <attribute name="invisible">1</attribute>
-            </xpath> -->
+            <button name="button_draft" position="after">
+                <button 
+                        string="Ajout des sous-sections par livraison" 
+                        name="ajout_sous_section_action" 
+                        type="object"
+                />
+            </button>
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id"/>
             </field>
@@ -51,8 +55,19 @@
                 <field name="is_ref_client"/>
                 <field name="is_bl"/>
             </field>
+            <xpath expr="//page[1]/field[@name='invoice_line_ids']/tree/field[@name='name']" position="before">
+                <field name="is_picking_id" readonly="1" optional="hide"/>
+            </xpath>
+
+            <xpath expr="//field[@name='line_ids']/tree/field[@name='name']" position="before">
+                <field name="is_picking_id" optional="hide"/>
+            </xpath>
+
+
+
+
             <xpath expr="//page[1]/field[@name='invoice_line_ids']/tree/field[@name='product_uom_id']" position="after">
-                <field name="is_lots" optional="hide"/>
+                <field name="is_lots"                optional="hide"/>
                 <field name="is_nb_pieces_par_colis" optional="hide"/>
                 <field name="is_nb_colis" sum="Total"/>
                 <button 
