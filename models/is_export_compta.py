@@ -251,8 +251,8 @@ class IsExportCompta(models.Model):
                                 'piece_ref'              : payment.name,
                                 'piece_date'             : payment.date_generated,
                                 'ecriture_lib'           : ecriture_lib,
-                                'debit'                  : line.credit,
-                                'credit'                 : line.debit,
+                                'debit'                  : line.debit,
+                                'credit'                 : line.credit,
                                 'partner_id'             : line.partner_id.id,
                             }
                             self.env['is.export.compta.ligne'].create(vals)
