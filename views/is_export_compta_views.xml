@@ -12,11 +12,13 @@
                     <group>
                         <field name="ligne"/>
                         <field name="journal_code"/>
+                        <field name="journal_lib"/>
                         <field name="partner_id"/>
                         <field name="enseigne_id"/>
                         <field name="ecriture_num"/>
                         <field name="ecriture_date"/>
                         <field name="compte_num"/>
+                        <field name="compte_lib"/>
                         <field name="comp_aux_num"/>
                         <field name="piece_ref"/>
                         <field name="piece_date"/>
@@ -37,17 +39,21 @@
             <tree>
                 <field name="ligne"/>
                 <field name="journal_code"/>
-                <field name="partner_id"/>
-                <field name="enseigne_id"/>
-                <field name="ecriture_num"/>
-                <field name="ecriture_date"/>
-                <field name="compte_num"/>
-                <field name="comp_aux_num"/>
-                <field name="piece_ref"/>
-                <field name="piece_date"/>
-                <field name="ecriture_lib"/>
-                <field name="debit"  sum="Total"/>
-                <field name="credit" sum="Total"/>
+                <field name="journal_lib"   optional="hide"/>
+                <field name="partner_id"    optional="show"/>
+                <field name="enseigne_id"   optional="show"/>
+                <field name="ecriture_num"  optional="show"/>
+                <field name="ecriture_date" optional="show"/>
+                <field name="compte_num"    optional="show"/>
+                <field name="compte_lib"    optional="hide"/>
+                <field name="comp_aux_num"  optional="show"/>
+                <field name="piece_ref"     optional="show"/>
+                <field name="piece_date"    optional="show"/>
+                <field name="ecriture_lib"  optional="show"/>
+                <field name="debit"         optional="show" sum="Total"/>
+                <field name="credit"        optional="show" sum="Total"/>
+                <field name="invoice_id"    optional="hide"/>
+
             </tree>
         </field>
     </record>
@@ -121,6 +127,7 @@
                 <sheet>
                     <group>
                         <field name="name"/>
+                        <field name="format_export"/>
                         <field name="company_id" readonly="1"/>
                         <field name="date_fin"/>
                         <field name="facture"/>
@@ -148,6 +155,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
+                <field name="format_export"/>
                 <field name="date_fin"/>
             </tree>
         </field>
@@ -158,6 +166,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
+                <field name="format_export"/>
                 <field name="date_fin"/>
            </search>
         </field>
@@ -176,9 +185,4 @@
         action="is_export_compta_action"
 
     />
-
-<!--
-
--->
-
 </odoo>
