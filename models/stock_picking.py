@@ -287,10 +287,11 @@ class IsScanPicking(models.Model):
                         self.env.context = self.with_context(noonchange=True).env.context
                         obj.product_id = product.id
                 if prefix in ["15","17"]:
-                    barcode_reste = barcode[8:]
                     date = code[:6]
                     date = dateparser.parse(date, date_formats=['%y%m%d'])
-                    obj.dlc_ddm = date.strftime('%Y-%m-%d')
+                    if date:
+                        obj.dlc_ddm = date.strftime('%Y-%m-%d')
+                        barcode_reste = barcode[8:]
 
                 if prefix=="31":
                     barcode_reste = barcode[10:]
@@ -308,6 +309,8 @@ class IsScanPicking(models.Model):
                 #Lot : Longueur variable => Prendre tout le reste
                 if prefix=="10":
                     obj.lot = code.strip()
+                    barcode_reste=False
+
                 if barcode_reste:
                     obj.on_barcode_scanned(barcode_reste)
 
