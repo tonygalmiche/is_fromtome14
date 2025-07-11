@@ -573,6 +573,16 @@ class Picking(models.Model):
             if poids_scan and poids_picking:
                 if round(poids_scan,4)!=round(poids_picking,4):
                     alertes.append("Le poids du scan (%.2f) est différent du poids du picking (%.2f)"%(poids_scan,poids_picking))
+
+
+            #** Recherche des lignes sans lien avec la commande de vente ******
+            if obj.picking_type_id.code=='outgoing':
+                for move in obj.move_ids_without_package:
+                    if not move.sale_line_id and move.state!='cancel':
+                        alertes.append("Article '%s' sans lien avec la commande et donc ne sera pas facturé"%(move.product_id.name))
+            #******************************************************************
+
+
             obj.is_alerte = '\n'.join(alertes) or False
 
 
@@ -662,6 +672,16 @@ class Picking(models.Model):
                 'context': context,
             }
             return res
+
+
+    def init_sale_order_action(self):
+        for obj in self:
+            if obj.picking_type_id.code=='outgoing' and not  obj.sale_id:
+                for move in obj.move_ids_without_package:
+                    if move.sale_line_id:
+                        sale_id = move.sale_line_id.order_id.id
+                        obj.sale_id = sale_id
+                        break
 
 
     def trier_par_emplacement_fournisseur(self):

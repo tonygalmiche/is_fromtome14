@@ -375,6 +375,13 @@
 
 
     <!-- stock.picking -->
+   <record id="init_sale_order_action_server" model="ir.actions.server">
+        <field name="name">Retrouver commande client</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="code">records.init_sale_order_action()</field>
+    </record>
     <record id="view_picking_form_inherit" model="ir.ui.view">
         <field name="name">stock.picking.form.inherit</field>
         <field name="model">stock.picking</field>
@@ -421,7 +428,7 @@
             <field name="date_done" position="attributes">
                 <attribute name="invisible">1</attribute>
             </field>
-            <field name="origin" position="replace">
+            <field name="origin" position="after">
                 <field name="is_date_reception" readonly="1" attrs="{'invisible': [('is_date_reception', '=', False)]}"/>
                 <field name="is_date_livraison" readonly="1" attrs="{'invisible': [('is_date_livraison', '=', False)]}"/>
                 <field name="sale_id"           readonly="1" attrs="{'invisible': [('sale_id', '=', False)]}"/>
@@ -477,8 +484,10 @@
             </xpath> 
 
             <xpath expr="//page[@name='operations']/field/tree/field[@name='lot_ids']" position="after">
-                <field name="write_date" optional="hide" string="Modifié par"/>
-                <field name="write_uid"  optional="hide" string="Le"/>
+                <field name="sale_line_id" optional="hide"/>
+                <field name="write_date"   optional="hide" string="Modifié par"/>
+                <field name="write_uid"    optional="hide" string="Le"/>
+                <field name="state"        optional="hide"/>
             </xpath> 
 
 
@@ -532,6 +541,7 @@
         <field name="arch" type="xml">
             <field name="partner_id" position="after">
                 <field name="is_enseigne_id"     optional="show"/>
+                <field name="sale_id"            optional="hide"/>
                 <field name="is_transporteur_id" optional="hide"/>
                 <field name="is_poids_net"       optional="hide" sum="Total"/>
                 <field name="is_nb_colis"        optional="hide" sum="Total"/>
