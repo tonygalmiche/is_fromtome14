@@ -290,8 +290,13 @@ class SaleOrderLine(models.Model):
 
 
     def get_discount(self):
-        now = datetime.date.today()
         for obj in self:
+
+            now = obj.order_id.is_date_livraison or datetime.date.today()
+            print('now=',now)
+
+
+
             discount = 0
 
             #** Recherche promos **********************************************

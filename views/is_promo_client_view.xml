@@ -19,6 +19,9 @@
                 <field name="date_debut_promo"/>
                 <field name="date_fin_promo"/>
                 <field name="pourcent_promo_a_repercuter"/>
+                <field name="nb_lignes"/>
+                <field name="afficher_image" optional="hide"/>
+                <field name="afficher_prix"  optional="hide"/>
             </tree>
         </field>
     </record>
@@ -44,14 +47,22 @@
                 </header>
                 <sheet>
                     <group>
+                   <group>
                         <field name="name"/>
                         <field name="partner_id"/>
                         <field name="enseigne_id"/>
+                        <field name="pricelist_id"/>
+                        <field name="pourcent_promo_a_repercuter"/>
+                        <field name="nb_lignes"/>
+                    </group>
+                    <group>
                         <field name="date_debut_promo"/>
                         <field name="date_fin_promo"/>
-                        <field name="pourcent_promo_a_repercuter"/>
+                        <field name="afficher_image"/>
+                        <field name="afficher_prix"/>
                     </group>
-                    <field  name="ligne_ids" nolabel="1" readonly="1">
+                    </group>
+                     <field  name="ligne_ids" nolabel="1" readonly="1">
                         <tree limit="1000">
                             <field name="promo_fournisseur_id" widget="many2one_clickable"/>
                             <field name="partner_id"           widget="many2one_clickable"/>
@@ -60,6 +71,8 @@
                             <field name="product_id"           widget="many2one_clickable"/>
                             <field name="remise_fournisseur"/>
                             <field name="remise_client"/>
+                            <field name="prix_non_remise" optional="show"/>
+                            <field name="prix_remise"     optional="show"/>
                         </tree>
                     </field>
                  </sheet>

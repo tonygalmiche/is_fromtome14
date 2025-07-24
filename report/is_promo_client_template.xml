@@ -110,15 +110,27 @@
                                     </tr>
                                     <tr>
                                         <th style="width:15%" class="text-center">Référence Interne</th>
-                                        <th style="width:70%" class="text-left">Nom Article</th>
-                                        <th style="width:15%" class="text-center">Remise (%)</th>
+                                        <th style="width:50%" class="text-left">Nom Article</th>
+                                        <th t-if="o.afficher_prix" style="width:15%" class="text-right">Prix non remisé</th>
+                                        <th style="width:15%" class="text-right">Remise (%)</th>
+                                        <th t-if="o.afficher_prix" style="width:15%" class="text-right">Prix remisé</th>
+                                        <th t-if="o.afficher_image" style="width:15%" class="text-center">Photo</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr t-foreach="res[promo]" t-as="line">
-                                        <td class="text-center"><span t-field="line.product_id.default_code"/></td>
-                                        <td class="text-left"><span t-field="line.product_id.name"/></td>
-                                        <td class="text-center"><span t-field="line.remise_client"/></td>
+                                        <td class="text-center align-middle"><span t-field="line.product_id.default_code"/></td>
+                                        <td class="text-left align-middle"><span t-field="line.product_id.name"/></td>
+                                        <td t-if="o.afficher_prix" class="text-right align-middle"><span t-field="line.prix_non_remise"/></td>
+                                        <td class="text-right align-middle"><span t-field="line.remise_client"/></td>
+                                        <td t-if="o.afficher_prix" class="text-right align-middle"><span t-field="line.prix_remise"/></td>
+                                        <td t-if="o.afficher_image" class="text-center align-middle">
+                                            <img 
+                                                t-if="line and line.product_id.image_1920" 
+                                                t-att-src="image_data_uri(line.product_id.image_1920)" alt="Photo"
+                                                style="max-height:15mm"
+                                            />
+                                        </td>
                                      </tr>
                                 </tbody>
                             </table>

@@ -10,6 +10,15 @@ from odoo.tools.float_utils import float_compare, float_is_zero
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, format_datetime
 import pytz
 import logging
+import base64
+import io
+try:
+    from PyPDF2 import PdfWriter, PdfReader
+except ImportError:
+    try:
+        from PyPDF2 import PdfFileWriter as PdfWriter, PdfFileReader as PdfReader
+    except ImportError:
+        PdfWriter = PdfReader = None
 
 class IsScanPickingLine(models.Model):
     _name = 'is.scan.picking.line'
@@ -780,6 +789,91 @@ class Picking(models.Model):
             return res
 
 
+    def action_print_prepa_and_palette_combined(self):
+        """
+        Méthode pour fusionner les PDF de la fiche prépa et de la fiche palette
+        et retourner le résultat combiné (pour un ou plusieurs pickings)
+        """
+        return self.action_print_multiple_prepa_and_palette_combined()
+
+    def action_print_multiple_prepa_and_palette_combined(self):
+        """
+        Méthode pour fusionner les PDF de plusieurs fiches prépa et palette
+        et retourner le résultat combiné
+        """
+        if not PdfWriter or not PdfReader:
+            raise UserError(_("PyPDF2 n'est pas installé. Veuillez l'installer pour fusionner les PDF."))
+        
+        if not self:
+            raise UserError(_("Aucune livraison sélectionnée."))
+        
+        all_pdfs = []
+        
+        for picking in self:
+            # Générer le PDF de la fiche prépa pour ce picking
+            prepa_report = self.env.ref('stock.action_report_picking')
+            prepa_pdf, _ = prepa_report._render_qweb_pdf([picking.id])
+            all_pdfs.append(prepa_pdf)
+            
+            # Générer le PDF de la fiche palette pour ce picking
+            palette_report = self.env.ref('is_fromtome14.action_report_fiche_palette')
+            palette_pdf, _ = palette_report._render_qweb_pdf([picking.id])
+            all_pdfs.append(palette_pdf)
+        
+        # Fusionner tous les PDF
+        merged_pdf = self._merge_multiple_pdfs(all_pdfs)
+        
+        # Créer l'attachement et retourner l'action pour l'afficher
+        picking_names = "_".join([p.name for p in self[:3]])  # Limiter à 3 noms pour éviter un nom trop long
+        if len(self) > 3:
+            picking_names += f"_et_{len(self)-3}_autres"
+        elif len(self) == 1:
+            picking_names = self.name
+            
+        attachment = self.env['ir.attachment'].create({
+            'name': f'Fiche{"s" if len(self) > 1 else ""}_Prepa_Palette_{picking_names}.pdf',
+            'type': 'binary',
+            'datas': base64.b64encode(merged_pdf),
+            'res_model': self._name,
+            'res_id': self.id if len(self) == 1 else False,
+            'mimetype': 'application/pdf'
+        })
+        
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment.id}?download=true',
+            'target': 'new',
+        }
+    
+    def _merge_multiple_pdfs(self, pdf_data_list):
+        """
+        Fusionner plusieurs PDF en un seul
+        """
+        output = PdfWriter()
+        
+        for pdf_data in pdf_data_list:
+            pdf_stream = io.BytesIO(pdf_data)
+            pdf_reader = PdfReader(pdf_stream)
+            
+            # Compatibilité avec différentes versions de PyPDF2
+            if hasattr(pdf_reader, 'pages'):
+                pages = pdf_reader.pages
+            else:
+                pages = [pdf_reader.getPage(i) for i in range(pdf_reader.getNumPages())]
+                
+            for page in pages:
+                if hasattr(output, 'add_page'):
+                    output.add_page(page)
+                else:
+                    output.addPage(page)
+        
+        # Retourner le PDF fusionné
+        merged_stream = io.BytesIO()
+        output.write(merged_stream)
+        merged_stream.seek(0)
+        return merged_stream.read()
+    
+
 class PickingType(models.Model):
     _inherit = 'stock.picking.type'
 
@@ -853,6 +947,4 @@ class PickingType(models.Model):
             ],
         }
         return res
-
-
 

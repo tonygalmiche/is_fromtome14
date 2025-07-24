@@ -68,5 +68,8 @@
             <field name="report_file">is_fromtome14.report_fiche_palette_document</field>
             <field name="paperformat_id" ref="is_fromtome14.fiche_palette_paperformat"/>
         </record>
+
+
+        
     </data>
 </odoo>

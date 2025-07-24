@@ -382,6 +382,21 @@
         <field name="state">code</field>
         <field name="code">records.init_sale_order_action()</field>
     </record>
+
+    <!-- Action serveur pour imprimer plusieurs fiches prépa + palette -->
+    <record id="action_print_multiple_prepa_palette_server" model="ir.actions.server">
+        <field name="name">Imprimer Fiches Prépa + Palette</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_model_id" ref="stock.model_stock_picking"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+if records:
+    action = records.action_print_multiple_prepa_and_palette_combined()
+else:
+    raise UserError("Aucune livraison sélectionnée.")
+        </field>
+    </record>
     <record id="view_picking_form_inherit" model="ir.ui.view">
         <field name="name">stock.picking.form.inherit</field>
         <field name="model">stock.picking</field>
@@ -394,23 +409,27 @@
                     }
                 </style>
             </xpath>
-
-
             <button name="action_assign" position="attributes">
                 <attribute name="invisible">1</attribute>
             </button>
-
-
             <page name="operations" position="attributes">
                 <attribute name="autofocus">autofocus</attribute>
             </page>
+            <button name="action_confirm" position="before">
+                <button 
+                    name="action_print_prepa_and_palette_combined" 
+                    string="Imprimer Prépa + Palette" 
+                    type="object" 
+                    icon="fa-file-pdf-o"
+                />
+            </button>
             <field name="state" position="before">
                 <button 
                     name="action_picking_send" 
                     string="Envoyer par mail" type="object" 
                     attrs="{'invisible': [('picking_type_code', '!=', 'outgoing')]}" 
                     groups="base.group_user"
-                />
+                /> 
             </field>
 
             <field name="scheduled_date" position="attributes">
