@@ -10,11 +10,11 @@
                     </div>
                     <div class="col-9 text-right mb4">
                         <div name="res_company" class="mb4">
-                            <div style="font-size:13pt;font-weight:700 !important;">
+                            <div t-if="o.promo_generique==False" style="font-size:13pt;font-weight:700 !important;">
                                 Promos pour '<span t-field="o.partner_id.name"/>'
-                                <!-- <br />
-                                du <t t-esc="o.date_debut_promo" t-options="{'widget': 'date'}"/>
-                                au <t t-esc="o.date_fin_promo"   t-options="{'widget': 'date'}"/> -->
+                            </div>
+                            <div t-if="o.promo_generique==True" style="font-size:15pt;font-weight:700 !important">
+                                VOS PROMOTIONS
                             </div>
                             <div style="font-size:11pt;font-weight:700 !important;" t-field="o.enseigne_id.name.name"/>
                             <span t-field="res_company.street"/> - 
