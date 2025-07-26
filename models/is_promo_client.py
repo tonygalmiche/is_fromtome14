@@ -15,7 +15,7 @@ class IsPromoClient(models.Model):
     name              = fields.Char("N°Promo", readonly=True)
     partner_id        = fields.Many2one('res.partner', 'Client', required=True)
     enseigne_id       = fields.Many2one(related='partner_id.is_enseigne_id')
-    pricelist_id      = fields.Many2one(related="partner_id.property_product_pricelist", string="Liste de prix")
+    pricelist_id      = fields.Many2one('product.pricelist', string="Liste de prix", compute='_compute_pricelist_id', store=True)
     pourcent_promo_a_repercuter = fields.Float("Pourcentage promo fournisseur à répercuter (%)", digits=(14,2), compute='_compute_taux_remise', readonly=True, store=True)
     date_debut_promo  = fields.Date("Date début promo"         , required=True)
     date_fin_promo    = fields.Date("Date fin promo"           , required=True)
@@ -23,6 +23,13 @@ class IsPromoClient(models.Model):
     nb_lignes         = fields.Char("Nb lignes", compute='_compute_nb_lignes')
     afficher_image    = fields.Boolean("Afficher image", default=True)
     afficher_prix     = fields.Boolean("Afficher prix" , default=True)
+    promo_generique   = fields.Boolean("Promo générique" , default=False, help="Valable pour tous les clients de cette liste de prix")
+
+
+    @api.depends('partner_id','partner_id.property_product_pricelist')
+    def _compute_pricelist_id(self):
+        for obj in self:
+            obj.pricelist_id = obj.partner_id.property_product_pricelist
 
 
     @api.depends('ligne_ids')

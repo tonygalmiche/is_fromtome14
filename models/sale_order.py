@@ -291,21 +291,26 @@ class SaleOrderLine(models.Model):
 
     def get_discount(self):
         for obj in self:
-
             now = obj.order_id.is_date_livraison or datetime.date.today()
-            print('now=',now)
-
-
-
             discount = 0
 
-            #** Recherche promos **********************************************
+            #** Recherche promo client ****************************************
             filtre=[
                     ('date_debut_promo', '<=', now),
                     ('date_fin_promo', '>=', now),
                     ('partner_id', '=', obj.order_id.partner_id.id),
+                    ('promo_generique','=',False),
                 ]
             promos=self.env['is.promo.client'].search(filtre, limit=1)
+            if len(promos)==0:
+                #** Recherche promo générique *********************************
+                filtre=[
+                        ('date_debut_promo', '<=', now),
+                        ('date_fin_promo', '>=', now),
+                        ('pricelist_id', '=', obj.order_id.pricelist_id.id),
+                        ('promo_generique','=',True),
+                    ]
+                promos=self.env['is.promo.client'].search(filtre, limit=1)
             for promo in promos:
                 filtre=[
                         ('promo_id'        , '=', promo.id),
@@ -317,6 +322,7 @@ class SaleOrderLine(models.Model):
                 for ligne in lignes:
                     discount = ligne.remise_client
             #******************************************************************
+
 
             #** Recherche remises particulières *******************************
             filtre=[
