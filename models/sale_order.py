@@ -610,25 +610,25 @@ class SaleOrder(models.Model):
         return order
 
 
-    # def write(self, vals):
-    #     res = super().write(vals)
-    #     for obj in self:
-    #         obj.ajout_frais_de_port()
-    #         line_port = False
-    #         for line in obj.order_line:
-    #             if line.product_id==obj.partner_id.is_frais_port_id:
-    #                 line_port=line
-    #                 break
-    #         if line_port:
-    #             sequence=0
-    #             for line in obj.order_line:
-    #                 if line.sequence>sequence:
-    #                     sequence = line.sequence
-    #             sequence+=10
-    #             line_port.sequence=sequence
-    #         for picking in obj.picking_ids:
-    #             picking.trier_par_emplacement_fournisseur()
-    #     return res
+    def write(self, vals):
+        res = super().write(vals)
+        for obj in self:
+            obj.ajout_frais_de_port()
+            line_port = False
+            for line in obj.order_line:
+                if line.product_id==obj.partner_id.is_frais_port_id:
+                    line_port=line
+                    break
+            if line_port:
+                sequence=0
+                for line in obj.order_line:
+                    if line.sequence>sequence:
+                        sequence = line.sequence
+                sequence+=10
+                line_port.sequence=sequence
+            for picking in obj.picking_ids:
+                picking.trier_par_emplacement_fournisseur()
+        return res
 
 
     def action_confirm(self):
