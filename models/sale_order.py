@@ -569,26 +569,38 @@ class SaleOrder(models.Model):
     def ajout_frais_de_port(self):
         "Ajout des frais de port"
         for order in self:
-                is_mini_cde_franco = order.partner_id.is_mini_cde_franco or order.is_enseigne_id.mini_cde_franco
-                if order.partner_id.is_frais_port_id:
-                    test=True
-                    for line in order.order_line:
-                        if line.product_id==order.partner_id.is_frais_port_id:
-                            test=False
-                            if is_mini_cde_franco>0 and order.amount_untaxed>=is_mini_cde_franco:
-                                line.unlink()
-                            break
-                    if is_mini_cde_franco>0 and order.amount_untaxed>=is_mini_cde_franco:
+            is_mini_cde_franco = order.partner_id.is_mini_cde_franco or order.is_enseigne_id.mini_cde_franco
+            if order.partner_id.is_frais_port_id:
+                test=True
+                for line in order.order_line:
+                    if line.product_id==order.partner_id.is_frais_port_id:
                         test=False
-                    if test:
-                        vals={
-                            "order_id": order.id,
-                            "sequence": 999,
-                            "product_id": order.partner_id.is_frais_port_id.id,
-                            "price_unit": order.partner_id.is_frais_port_id.lst_price,
-                            "product_uom_qty": 1,
-                        }
-                        order_line = self.env['sale.order.line'].create(vals)
+                        if is_mini_cde_franco>0 and order.amount_untaxed>=is_mini_cde_franco:
+                            #** Pour supprimer la ligne, il ne faut pas de mouvement de stock lié
+                            filtre=[
+                                ('sale_line_id', '='     , line.id),
+                            ]
+                            moves=self.env['stock.move'].search(filtre)
+                            if len(moves)>0:
+                                line.product_uom_qty = 0
+                            else:
+                                line.unlink()
+                            #**************************************************
+                        else:
+                            line.product_uom_qty = 1
+                        break
+                if is_mini_cde_franco>0 and order.amount_untaxed>=is_mini_cde_franco:
+                    test=False
+                if test:
+                    vals={
+                        "order_id": order.id,
+                        "sequence": 999,
+                        "product_id": order.partner_id.is_frais_port_id.id,
+                        "price_unit": order.partner_id.is_frais_port_id.lst_price,
+                        "product_uom_qty": 1,
+                    }
+                    order_line = self.env['sale.order.line'].create(vals)
+        return
 
 
     @api.model
@@ -601,6 +613,7 @@ class SaleOrder(models.Model):
     def write(self, vals):
         res = super().write(vals)
         for obj in self:
+            obj.ajout_frais_de_port()
             line_port = False
             for line in obj.order_line:
                 if line.product_id==obj.partner_id.is_frais_port_id:
@@ -613,6 +626,8 @@ class SaleOrder(models.Model):
                         sequence = line.sequence
                 sequence+=10
                 line_port.sequence=sequence
+            for picking in obj.picking_ids:
+                picking.trier_par_emplacement_fournisseur()
         return res
 
 

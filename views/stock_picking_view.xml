@@ -478,6 +478,30 @@ else:
             <xpath expr="//page[@name='operations']/field/tree" position="attributes">
                 <attribute name="limit">500</attribute>
             </xpath>
+
+
+            <!-- <tree 
+                decoration-danger="not parent.immediate_transfer and state != 'done' and quantity_done &gt; reserved_availability and show_reserved_availability" 
+                decoration-muted="scrapped == True or state == 'cancel' or (state == 'done' and is_locked == True)" 
+                string="Stock Moves" editable="bottom"> -->
+
+                
+            <xpath expr="//page[@name='operations']/field/tree" position="attributes">
+                <attribute name="decoration-danger">is_ecart_demande_fait != 0 and state != 'cancel'</attribute>
+            </xpath>
+
+            <xpath expr="//page[@name='operations']/field/tree" position="attributes">
+                <attribute name="decoration-success">is_ecart_demande_fait == 0 and state != 'cancel'</attribute>
+            </xpath>
+
+
+            <xpath expr="//page[@name='operations']/field/tree" position="attributes">
+                <attribute name="decoration-muted">state == 'cancel'</attribute>
+            </xpath>
+
+
+
+
             <xpath expr="//page[@name='operations']/field/tree/field[@name='product_id']" position="attributes">
                 <attribute name="widget">many2one_clickable</attribute>
             </xpath>
@@ -498,8 +522,9 @@ else:
                 <field name="is_nb_colis_cde"   optional="hide" sum="Total"/>
             </xpath> 
             <xpath expr="//page[@name='operations']/field/tree/field[@name='quantity_done']" position="after">
-                <field name="is_nb_colis"       optional="hide" sum="Total"/>
-                <field name="is_poids_net_reel" optional="hide" sum="Total"/>
+                <field name="is_ecart_demande_fait" optional="show"/>
+                <field name="is_nb_colis"           optional="hide" sum="Total"/>
+                <field name="is_poids_net_reel"     optional="hide" sum="Total"/>
             </xpath> 
 
             <xpath expr="//page[@name='operations']/field/tree/field[@name='lot_ids']" position="after">
@@ -583,7 +608,12 @@ else:
             <field name="origin" position="after">
                 <field name="is_preparation_transfert_id" optional="hide"/>
             </field>
-
+            <field name="state" position="before">
+                <field name="create_date"               optional="hide" string="Créé le"/>
+                <field name="create_uid"                optional="hide" string="Créé par"/>
+                <field name="write_date"                optional="hide" string="Modifié le"/>
+                <field name="write_uid"                 optional="hide" string="Modifié par"/>
+            </field>
         </field>
     </record>
     <record id="is_view_picking_internal_search" model="ir.ui.view">

@@ -87,15 +87,14 @@ class StockMove(models.Model):
             obj.is_lots = "\n".join(t)
 
 
-    @api.onchange('move_line_ids','quantity_done')
+    @api.onchange('move_line_ids','move_line_ids.is_nb_colis','move_line_ids.is_poids_net_reel','quantity_done')
     def _compute_is_nb_colis_poids(self):
         for obj in self:
             nb=0
-            poids=0
+            poids=poids_net=0
             for line in obj.move_line_ids:
                 nb+=line.is_nb_colis
                 poids+=line.is_poids_net_reel
-
             # Ajout du 06/07/22 pour Le Cellier
             if nb==0:
                 nb        = obj.product_id.is_nb_pieces_par_colis
@@ -110,7 +109,6 @@ class StockMove(models.Model):
                         nb_colis = obj.quantity_done / nb
                 nb=nb_colis
                 poids = nb_colis * poids_net
-
             obj.is_nb_colis       = nb
             obj.is_poids_net_reel = poids
  
@@ -159,14 +157,22 @@ class StockMove(models.Model):
 
     is_alerte          = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
     is_lots            = fields.Text('Lots'  , copy=False, compute=_compute_is_lots)
-    is_nb_colis        = fields.Float('Nb Colis'      , digits=(14,2), compute=_compute_is_nb_colis_poids)
     is_nb_colis_cde    = fields.Float('Nb Colis Cde'  , digits=(14,2), compute=_compute_is_nb_colis_cde)
-    is_poids_net_reel  = fields.Float('Poids net réel', digits=(14,4), compute=_compute_is_nb_colis_poids)
+    is_nb_colis        = fields.Float('Nb Colis'      , digits=(14,2), compute=_compute_is_nb_colis_poids, readonly=True, store=True)
+    is_poids_net_reel  = fields.Float('Poids net réel', digits=(14,4), compute=_compute_is_nb_colis_poids, readonly=True, store=True)
     is_description_cde = fields.Text('Description commande', compute=_compute_is_description_cde)
     is_ref_fournisseur = fields.Char(string='Réf fournisseur', compute='_compute_is_ref_fournisseur', readonly=True, store=True)
     is_fournisseur_id          = fields.Many2one('res.partner', 'Fournisseur', readonly=True)
     is_emplacement_fournisseur = fields.Integer(string="Emplacement", help="Emplacement palette fournisseur", readonly=True)
     is_poids_net_colis         = fields.Float(string='Poids net colis (Kg)', digits='Stock Weight', readonly=True)
+    is_ecart_demande_fait      = fields.Float('Ecart', digits=(14,4), compute="_compute_is_ecart_demande_fait", help="Ecart entre 'Demande' et 'Fait'")
+
+
+    @api.depends('product_uom_qty','quantity_done')
+    def _compute_is_ecart_demande_fait(self):
+        for obj in self:
+            ecart = round((obj.product_uom_qty or 0.0) - (obj.quantity_done or 0.0),4)
+            obj.is_ecart_demande_fait = ecart
 
 
     def get_nb_colis(self):
