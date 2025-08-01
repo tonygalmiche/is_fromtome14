@@ -131,6 +131,18 @@ class IsExportCompta(models.Model):
                             compte_num = invoice.partner_id.property_account_payable_id.code
                     journal_lib = account_journal_type.get(row[14])
                     ct=ct+1
+
+
+                    debit = row[7]
+                    credit = row[8]
+                    solde = credit - debit
+                    debit = credit = 0
+                    if solde>0:
+                        credit = solde
+                    else:
+                        debit = - solde
+
+
                     vals={
                         'export_compta_id': obj.id,
                         'ligne'           : ct,
@@ -144,8 +156,8 @@ class IsExportCompta(models.Model):
                         'piece_ref'              : row[1],
                         'piece_date'             : row[5],
                         'ecriture_lib'           : row[9] or row[6],
-                        'debit'                  : row[7],
-                        'credit'                 : row[8],
+                        'debit'                  : debit,
+                        'credit'                 : credit,
                         'invoice_id'             : invoice_id,
                         'partner_id'             : row[13],
                     }
