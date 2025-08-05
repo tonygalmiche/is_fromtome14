@@ -582,7 +582,9 @@ class SaleOrder(models.Model):
                             ]
                             moves=self.env['stock.move'].search(filtre)
                             if len(moves)>0:
-                                line.product_uom_qty = 0
+                                for move in moves:
+                                    if move.state not in ['cancel','done']:
+                                        line.product_uom_qty = 0
                             else:
                                 line.unlink()
                             #**************************************************
@@ -633,6 +635,7 @@ class SaleOrder(models.Model):
 
     def action_confirm(self):
         for obj in self:
+            obj.ajout_frais_de_port()
             for line in obj.order_line:
                 if line.product_uom_qty==0:
                     line.unlink()

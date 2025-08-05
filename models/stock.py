@@ -46,7 +46,7 @@ class StockProductionLot(models.Model):
 class StockMove(models.Model):
     _inherit = "stock.move"
 
-    @api.onchange('move_line_ids')
+    @api.depends('move_line_ids')
     def _compute_is_alerte(self):
         for obj in self:
             if obj.picking_id:
@@ -67,7 +67,7 @@ class StockMove(models.Model):
                 obj.is_alerte=alerte
 
 
-    @api.onchange('move_line_ids')
+    @api.depends('move_line_ids')
     def _compute_is_lots(self):
         for obj in self:
             lots={}
@@ -87,7 +87,7 @@ class StockMove(models.Model):
             obj.is_lots = "\n".join(t)
 
 
-    @api.onchange('move_line_ids','move_line_ids.is_nb_colis','move_line_ids.is_poids_net_reel','quantity_done')
+    @api.depends('move_line_ids','move_line_ids.is_nb_colis','move_line_ids.is_poids_net_reel','quantity_done')
     def _compute_is_nb_colis_poids(self):
         for obj in self:
             nb=0
@@ -113,7 +113,7 @@ class StockMove(models.Model):
             obj.is_poids_net_reel = poids
  
 
-    @api.onchange('product_uom_qty','product_id')
+    @api.depends('product_uom_qty','product_id')
     def _compute_is_nb_colis_cde(self):
         for obj in self:
             nb        = obj.product_id.is_nb_pieces_par_colis
