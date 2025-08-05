@@ -585,10 +585,12 @@ class Picking(models.Model):
                 colis+=line.is_nb_colis
             obj.is_poids_net=poids
             obj.is_nb_colis=colis
-            if obj.sale_id:
-                obj.sale_id.commande_soldee_action_server()
-            if obj.purchase_id:
-                obj.purchase_id.commande_soldee_action_server()
+
+            #TODO : Le 05/08/2025 : Je désactive cela car les commandes se solde au moment de leur validation
+            # if obj.sale_id:
+            #     obj.sale_id.commande_soldee_action_server()
+            # if obj.purchase_id:
+            #     obj.purchase_id.commande_soldee_action_server()
 
 
     def action_picking_send(self):
