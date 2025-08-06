@@ -29,12 +29,15 @@
                     </div>
                     <group>
                         <field name="product_id"/>
+                        <field name="uom_id"/>
                         <field name="code_ean"/>
                         <field name="type_tracabilite"/>
                         <field name="lot"/>
                         <field name="dluo" attrs="{'invisible': [('type_tracabilite', '!=', 'ddm')]}"/>
                         <field name="dlc"  attrs="{'invisible': [('type_tracabilite', '!=', 'dlc')]}"/>
-                        <field name="poids"/>
+                        <field name="poids_vsb" invisible="1"/>
+                        <field name="poids_char"         default_focus="1" attrs="{'invisible':[('poids_vsb','=',False)], 'required':[('poids_vsb','!=',False)]}"/>
+                        <field name="poids" readonly="1" force_save="1"    attrs="{'invisible':[('poids_vsb','=',False)]}"/>
                         <field name="qt_imprime"/>
                         <field name="imprimante_id" required="1"/>
                     </group>

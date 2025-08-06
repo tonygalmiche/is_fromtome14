@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models                   # type: ignore
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT  # type: ignore
+from odoo import api, fields, models                           # type: ignore
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT          # type: ignore
+from odoo.tools.float_utils import float_compare, float_round  # type: ignore
+
 from datetime import datetime, timedelta, date
 
 
@@ -438,11 +440,6 @@ class PurchaseOrderLine(models.Model):
         return {"discount": seller.discount}
 
 
-
-
-
-
-
     def acceder_commande_client(self):
         for obj in self:
             res= {
@@ -456,4 +453,47 @@ class PurchaseOrderLine(models.Model):
                 ],
             }
             return res
+
+
+    def _create_or_update_picking(self):
+        """"
+            Remplacement de cette methode standard le 06/08/2025 pour revoir 
+            la mise à jour du picking lors de la mise à jour de la commande
+        """
+        for line in self:
+            qty = line.product_qty - line.qty_received
+            if qty<0:
+                qty=0
+
+            #** Ne pas modifier le picking si la ligne est déja facturée
+            if line.qty_invoiced==0:
+                domain=[
+                    ('purchase_line_id', '=', line.id),
+                ]
+                moves=self.env['stock.move'].search(domain)
+                create=True
+                for move in moves:
+                    #Modifier le mouvement uniquement si le picking et le stock.move sont en cours
+                    if move.picking_id not in ['draft','done', 'cancel']:
+                        if move.state not in ['draft','done', 'cancel']:
+                            create=False
+                            move.product_uom_qty = qty
+                            break
+                #** Création du stock.move si non trouvé précédemment
+                if create:
+                    pickings = line.order_id.picking_ids.filtered(lambda x: x.state not in ('done', 'cancel') and x.location_dest_id.usage in ('internal', 'transit', 'customer'))
+                    for picking in pickings:
+                        vals={
+                            "picking_id"        : picking.id,
+                            "product_id"        : line.product_id.id,
+                            "company_id"        : picking.company_id.id,
+                            "product_uom_id"    : line.product_id.uom_id.id,
+                            "location_id"       : picking.location_id.id,
+                            "location_dest_id"  : picking.location_dest_id.id,
+                        }
+                        res = self.env['stock.move.line'].create(vals)
+                        res.move_id.product_uom_qty = qty
+                        res.move_id.purchase_line_id = line.id
+                        break
+
 

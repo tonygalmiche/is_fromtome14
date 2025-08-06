@@ -528,10 +528,11 @@ else:
             </xpath> 
 
             <xpath expr="//page[@name='operations']/field/tree/field[@name='lot_ids']" position="after">
-                <field name="sale_line_id" optional="hide"/>
-                <field name="write_date"   optional="hide" string="Modifié par"/>
-                <field name="write_uid"    optional="hide" string="Le"/>
-                <field name="state"        optional="hide"/>
+                <field name="purchase_line_id" optional="hide" widget="many2one_clickable"/>
+                <field name="sale_line_id"     optional="hide" widget="many2one_clickable"/>
+                <field name="write_date"       optional="hide" string="Modifié par"/>
+                <field name="write_uid"        optional="hide" string="Le"/>
+                <field name="state"            optional="hide"/>
             </xpath> 
 
 

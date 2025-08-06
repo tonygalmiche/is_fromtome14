@@ -30,15 +30,42 @@ class IsImprimerEtiquetteGS1(models.Model):
     code_gs1   = fields.Text("Code GS1")
     code_ean   = fields.Char("Code EAN (01)")
     product_id = fields.Many2one('product.product', 'Article', required=True)
+    uom_id     = fields.Many2one('uom.uom', 'Unité', related='product_id.uom_id')
     type_tracabilite = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
     lot        = fields.Char("Lot (10)", required=True)
     dlc        = fields.Date("DLC (17)")
     dluo       = fields.Date("DDM (15)")
     nb_pieces  = fields.Integer("Nb pièces (37)", required=True, default=1)
-    poids      = fields.Float("Poids (31xx)"    , required=True, digits='Stock Weight')
+
+    poids_char = fields.Char("Poids (31xx)")
+    poids      = fields.Float("Poids", digits='Stock Weight')
+    poids_vsb  = fields.Boolean("Poids vsb", compute='_compute_poids_vsb', readonly=True, store=False)
+
     qt_imprime = fields.Integer("Quantité à Imprimer", required=True, default=1)
     imprimante_id = fields.Many2one('is.imprimante.etiquette', 'Imprimante étiquettes',default=lambda self: self.get_imprimante())
     alerte = fields.Text("Message")
+
+    @api.depends('product_id')
+    def _compute_poids_vsb(self):
+        for obj in self:
+            vsb=False
+            if obj.product_id:
+                unite = obj.product_id.uom_id.category_id.name
+                if unite=="Poids":
+                    vsb=True
+            obj.poids_vsb = vsb
+
+
+    @api.onchange('poids_char')
+    def onchange_poids_chare(self):
+        for obj in self:
+            try:
+                poids = float((obj.poids_char or '').replace(',','.'))
+            except ValueError:
+                poids = 0
+            obj.poids = poids
+           
+
 
 
     @api.model
@@ -201,53 +228,6 @@ class IsImprimerEtiquetteGS1(models.Model):
     def imprimer_etiquette_action(self):
         for obj in self:
             obj.alerte=False
-
-
-#             code_ean = self.code_ean or ''
-#             lot      = obj.lot or ''
-           
-#             gs1 = "(01)"+code_ean
-#             if obj.dluo:
-#                 gs1+=" (15)"+obj.dluo.strftime("%y%m%d")
-#             if obj.dlc:
-#                 gs1+=" (17)"+obj.dlc.strftime("%y%m%d")
-#             gs1+=" (3103)"+("000000"+str(int(obj.poids*1000)))[-6:]
-#             gs1+=" (10)"+lot
-#             if obj.nb_pieces>1:
-#                 gs1+=" (37)"+("00"+str(obj.nb_pieces))[-2:]
-
-
-
-#             ZPL="""
-# ^XA
-# ^CI28
-# ^BY3
-# ^FO50,50^BCN,150,Y,N,,D
-# ^FD%s^FS
-# ^CF0,40                                     ^FX CF0 = Choix de la foncte (font 0) et taille de 40pt
-# ^FO50,330^FDArticle : %s^FS                 ^FX Position et texte
-# ^CF0,40                                     ^FX CF0 = Choix de la fonte (font 0) et taille de 30pt
-# ^FO50,380^FD%s^FS                           ^FX Position et texte
-# ^FO50,430^FDCode EAN (01) : %s^FS           ^FX Position et texte
-# ^FO50,480^FDLot (10) : %s^FS                ^FX Position et texte
-# ^FO50,580^FDDDM (15) : %s^FS                ^FX Position et texte
-# ^FO50,530^FDDLC (17) : %s^FS                ^FX Position et texte
-# ^FO50,630^FDPoids (3103) : %s^FS            ^FX Position et texte
-# ^FO50,680^FDNb pièces (37) : %s^FS
-# ^XZ
-#             """ % (
-#                 gs1,
-#                 obj.product_id.default_code,
-#                 obj.product_id.name,
-#                 code_ean,
-#                 lot,
-#                 obj.dluo or '',
-#                 obj.dlc or '',
-#                 round(obj.poids,4),
-#                 obj.nb_pieces
-#             )
-
-
             ZPL = obj.get_ZPL()
             imprimante = obj.imprimante_id.name_cups or 'GX430T'
             name='etiquette-gs1-%s-zpl'%(imprimante)
