@@ -112,7 +112,6 @@ class PurchaseOrder(models.Model):
  
 
     def commande_soldee_action_server(self):
-        cr,uid,context,su = self.env.args
         for obj in self:
             solde=False
             if obj.state not in ["draft","sent","to_approve"]:
@@ -121,7 +120,6 @@ class PurchaseOrder(models.Model):
                     ('purchase_id','=',obj.id),
                     ('state','not in',['done','cancel']),
                 ]
-
                 pickings = self.env['stock.picking'].search(filtre)
                 for picking in pickings:
                     solde=False

@@ -593,6 +593,25 @@ class Picking(models.Model):
             #     obj.purchase_id.commande_soldee_action_server()
 
 
+    def solde_commande_action(self):
+        domain=[
+            ('is_commande_soldee', '=', False),
+            ('state'             , '=', 'sale'),
+        ]
+        orders = self.env['sale.order'].search(domain)
+        print('TEST sale_order',orders, len(orders))
+        orders.commande_soldee_action_server()
+
+        domain=[
+            ('is_commande_soldee', '=', False),
+            ('state'             , '=', 'purchase'),
+        ]
+        orders = self.env['purchase.order'].search(domain)
+        print('TEST purchase_order',orders, len(orders))
+        orders.commande_soldee_action_server()
+
+
+
     def action_picking_send(self):
         self.ensure_one()
         template = self.env.ref(

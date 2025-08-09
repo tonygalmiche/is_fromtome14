@@ -690,20 +690,14 @@ class SaleOrder(models.Model):
 
 
     def commande_soldee_action_server(self):
-        cr,uid,context,su = self.env.args
         for obj in self:
             solde=False
-            if obj.state not in ["draft","sent"]:
+            if obj.state=="sale":
                 solde=True
-                SQL="""
-                    SELECT id, sale_id, state
-                    FROM stock_picking
-                    WHERE state not in ('done','cancel') and sale_id=%s
-                    limit 1
-                """
-                cr.execute(SQL,[obj.id])
-                for row in cr.fetchall():
-                    solde=False
+                pickings = obj.picking_ids  
+                for picking in pickings:
+                    if picking.state not in ['done','cancel']:
+                        solde=False
             obj.is_commande_soldee=solde
 
 

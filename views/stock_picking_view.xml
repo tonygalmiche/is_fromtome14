@@ -375,6 +375,17 @@
 
 
     <!-- stock.picking -->
+    <record id="is_solde_commande_ir_cron" model="ir.cron">
+        <field name="name">Solde des commandes clients et fournisseurs</field>
+        <field name="model_id" ref="stock.model_stock_picking"/>
+        <field name="state">code</field>
+        <field name="code">model.solde_commande_action()</field>
+        <field name="interval_type">hours</field>
+        <field name="numbercall">-1</field>
+    </record>
+
+
+
    <record id="init_sale_order_action_server" model="ir.actions.server">
         <field name="name">Retrouver commande client</field>
         <field name="model_id" ref="stock.model_stock_picking"/>
