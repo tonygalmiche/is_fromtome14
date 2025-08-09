@@ -586,12 +586,6 @@ class Picking(models.Model):
             obj.is_poids_net=poids
             obj.is_nb_colis=colis
 
-            #TODO : Le 05/08/2025 : Je désactive cela car les commandes se solde au moment de leur validation
-            # if obj.sale_id:
-            #     obj.sale_id.commande_soldee_action_server()
-            # if obj.purchase_id:
-            #     obj.purchase_id.commande_soldee_action_server()
-
 
     def solde_commande_action(self):
         domain=[
@@ -599,7 +593,6 @@ class Picking(models.Model):
             ('state'             , '=', 'sale'),
         ]
         orders = self.env['sale.order'].search(domain)
-        print('TEST sale_order',orders, len(orders))
         orders.commande_soldee_action_server()
 
         domain=[
@@ -607,9 +600,7 @@ class Picking(models.Model):
             ('state'             , '=', 'purchase'),
         ]
         orders = self.env['purchase.order'].search(domain)
-        print('TEST purchase_order',orders, len(orders))
         orders.commande_soldee_action_server()
-
 
 
     def action_picking_send(self):
