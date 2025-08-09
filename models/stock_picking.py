@@ -525,7 +525,7 @@ class Picking(models.Model):
             obj.is_transporteur_id = obj.sale_id.is_transporteur_id.id or obj.partner_id.is_transporteur_id.id
 
 
-    @api.depends('move_line_ids_without_package')
+    @api.depends('move_line_ids_without_package','is_palette_europe')
     def _compute_is_alerte(self):
         for obj in self:
             alertes=[]
@@ -547,7 +547,7 @@ class Picking(models.Model):
                 unite = line.product_id.uom_id.category_id.name
                 if unite=="Poids":
                     poids_picking+=line.quantity_done
-                    if line.quantity_done!=line.is_poids_net_reel:
+                    if round(line.quantity_done,4)!=round(line.is_poids_net_reel,4):
                         alertes.append("[%s] Poids net réel différent de Fait (%.4f!=%.4f)"%(line.product_id.default_code, line.is_poids_net_reel, line.quantity_done))
 
             for line in obj.move_line_ids_without_package:
