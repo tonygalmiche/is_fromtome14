@@ -575,7 +575,8 @@ class SaleOrder(models.Model):
                 for line in order.order_line:
                     if line.product_id==order.partner_id.is_frais_port_id:
                         test=False
-                        if is_mini_cde_franco>0 and order.amount_untaxed>=is_mini_cde_franco:
+                        port = order.partner_id.is_frais_port_id.lst_price
+                        if is_mini_cde_franco>0 and (order.amount_untaxed - port)>=is_mini_cde_franco:
                             #** Pour supprimer la ligne, il ne faut pas de mouvement de stock lié
                             filtre=[
                                 ('sale_line_id', '='     , line.id),
