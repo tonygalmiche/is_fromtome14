@@ -728,7 +728,7 @@ else:
                 <field name="is_palette_perdue"  optional="show" sum="Total"/>
                 <field name="is_palette_demie"   optional="show" sum="Total"/>
                 <field name="picking_type_id"    optional="hide"/>
-                <field name="state" invisible="1"/>
+                <field name="state"/>
             </tree>
         </field>
     </record>
@@ -737,7 +737,7 @@ else:
         <field name="res_model">stock.picking</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="is_fromtome14.is_suivi_transporteur_tree"/>
-        <field name="domain">[('state','=','done'),('picking_type_id.code','=','outgoing')]</field>
+        <field name="domain">[('state','!=','cancel'),('picking_type_id.code','=','outgoing')]</field>
         <field name="limit">200</field>
     </record>
     <menuitem
