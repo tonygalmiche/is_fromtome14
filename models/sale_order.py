@@ -704,7 +704,34 @@ class SaleOrder(models.Model):
 
     def commande_entierement_facturee_action_server(self):
         for obj in self:
-            obj.invoice_status = "invoiced"
+            # Forcer l'état de facturation au niveau des lignes de commande
+            for line in obj.order_line:
+                if not line.display_type:  # Exclure les lignes de section et note
+                    line.invoice_status = "invoiced"
+            # Le champ invoice_status de la commande sera automatiquement recalculé
+            # grâce aux dépendances @api.depends
+
+
+    # def _get_invoice_status(self):
+    #     """
+    #     Surcharge pour permettre le forçage manuel de l'état de facturation
+    #     via commande_entierement_facturee_action_server
+    #     """
+    #     # Vérifier si toutes les lignes sont forcées en "invoiced"
+    #     for order in self:
+    #         all_lines_forced_invoiced = True
+    #         for line in order.order_line:
+    #             if not line.display_type and line.invoice_status != 'invoiced':
+    #                 all_lines_forced_invoiced = False
+    #                 break
+            
+    #         # Si toutes les lignes sont forcées en "invoiced", garder cet état
+    #         if all_lines_forced_invoiced and order.state in ('sale', 'done'):
+    #             order.invoice_status = 'invoiced'
+    #             continue
+        
+    #     # Sinon, utiliser la logique standard d'Odoo
+    #     super()._get_invoice_status()
 
 
     def initialisation_etat_facturee_action_server(self):
