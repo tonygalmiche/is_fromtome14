@@ -25,7 +25,7 @@
             </field>
             <field name="type" position="after">
                 <field name="is_stock_mini"/>
-                <field name="is_stock_mini_lc"/>
+                <!-- <field name="is_stock_mini_lc"/> -->
             </field>
             <xpath expr="//page/group[@name='purchase']" position="before">
                 <group>
@@ -58,6 +58,12 @@
                 <field name="property_account_expense_id" optional="hide"/>
                 <field name="property_stock_inventory" optional="hide"/>
             </field>
+
+            <field name="qty_available" position="before">
+                <field name="is_colis_en_stock"  optional="show"/>
+            </field>
+
+
             <field name="uom_id" position="before">
                 <button 
                     title="Lignes commandes en cours" 

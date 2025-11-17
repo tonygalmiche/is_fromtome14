@@ -31,8 +31,23 @@ class IsEnseigneCommerciale(models.Model):
 class IsTransporteur(models.Model):
     _name = 'is.transporteur'
     _description = "Transporteur"
+    _order = 'sequence, name'
 
+    @api.depends('sequence', 'name')
+    def _compute_transporteur_par_ordre(self):
+        # Récupérer la séquence maximale
+        max_sequence = self.search([], order='sequence desc', limit=1).sequence or 0
+        # Calculer le nombre de chiffres nécessaires
+        nb_chiffres = len(str(max_sequence)) if max_sequence > 0 else 1
+        
+        for obj in self:
+            # Formater la séquence avec des zéros devant
+            sequence_str = str(obj.sequence).zfill(nb_chiffres)
+            obj.transporteur_par_ordre = f"{sequence_str} - {obj.name}"
+
+    sequence = fields.Integer('Séquence', default=10)
     name = fields.Char('Transporteur', required=True)
+    transporteur_par_ordre = fields.Char('Transporteur par ordre', compute='_compute_transporteur_par_ordre', store=True, readonly=True)
 
 
 class IsHeureMaxi(models.Model):

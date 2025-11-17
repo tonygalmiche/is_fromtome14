@@ -281,9 +281,6 @@ class ProductTemplate(models.Model):
     is_stock_mini         = fields.Float("Stock mini FT", digits=(14,4), tracking=True)
     is_stock_mini_lc      = fields.Float("Stock mini LC", digits=(14,4), tracking=True)
     is_pricelist_item_ids = fields.One2many('product.pricelist.item', 'product_tmpl_id', 'Liste de prix') #, domain=[('pricelist_id.active','in',[0,1]),('active','in',[0,1])])
-    is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis', tracking=True)
-    is_poids_net_colis     = fields.Float(string='Poids net colis (Kg)', digits='Stock Weight', tracking=True)
-    is_forcer_poids_colis  = fields.Boolean(string='Forcer le scan au poids du colis', tracking=True, default=False, help="Cocher cette case si l'article est configuré par erreur au poids alors qu'il fallait le configuer à la pièce")
 
     is_note_importation = fields.Text(string='Note importation Fusion Fromtome / Le Cellier')
 
@@ -318,12 +315,36 @@ class ProductTemplate(models.Model):
     is_prix_vente_futur_marge_lf         = fields.Float(string='TM futur forcé LF        (Ne plus utiliser)', digits='Product Price', tracking=True)
     is_prix_vente_futur_marge_lf_coll    = fields.Float(string='TM futur forcé LF coll.  (Ne plus utiliser)', digits='Product Price', tracking=True)
     is_prix_vente_futur_marge_lf_franco  = fields.Float(string='TM futur forcé LF franco (Ne plus utiliser)', digits='Product Price', tracking=True)
+    is_discount                          = fields.Float(string="Remise (%)", compute='_compute_is_discount', readonly=True, store=True, digits="Discount", tracking=True, help="Remise du fournisseur par défaut (actualisé la nuit par la gestion des promos)")
+    is_fiche_technique_ids               = fields.Many2many('ir.attachment', 'product_is_fiche_technique_rel', 'product_id', 'file_id', 'Fiche techinque')
+    is_fiche_technique_import            =  fields.Text('Résultat importation fiche techinque')
 
-    is_discount  = fields.Float(string="Remise (%)", compute='_compute_is_discount', readonly=True, store=True, digits="Discount", tracking=True, help="Remise du fournisseur par défaut (actualisé la nuit par la gestion des promos)")
-    is_colisage  = fields.Selection(string='Colisage', selection=_COLISAGE, required=True, tracking=True, default='1', help="Utilisé dans 'Préparation transfert entrepôt'")
 
-    is_fiche_technique_ids    = fields.Many2many('ir.attachment', 'product_is_fiche_technique_rel', 'product_id', 'file_id', 'Fiche techinque')
-    is_fiche_technique_import =  fields.Text('Résultat importation fiche techinque')
+    is_colisage            = fields.Selection(string='Colisage', selection=_COLISAGE, required=True, tracking=True, default='1', help="Utilisé dans 'Préparation transfert entrepôt'")
+    is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis', tracking=True)
+    is_poids_net_colis     = fields.Float(string='Poids net colis (Kg)', digits='Stock Weight', tracking=True)
+    is_forcer_poids_colis  = fields.Boolean(string='Forcer le scan au poids du colis', tracking=True, default=False, help="Cocher cette case si l'article est configuré par erreur au poids alors qu'il fallait le configuer à la pièce")
+    is_colis_en_stock      = fields.Float(string='Nb colis en stock', digits=(14,1), compute='_compute_is_colis_en_stock',)
+
+
+    def _compute_is_colis_en_stock(self):
+        for obj in self:
+            stock     = obj.qty_available
+            nb        = obj.is_nb_pieces_par_colis
+            poids_net = obj.is_poids_net_colis
+            unite     = obj.uom_id.category_id.name
+            nb_colis  = 0
+            if unite=="Poids":
+                if poids_net>0:
+                    nb_colis = stock/poids_net
+
+                    print('Poids',stock,poids_net,nb_colis)
+            else:
+                if nb>0:
+                    nb_colis = stock / nb
+            nb_colis = math.floor(nb_colis * 2) / 2  # Arrondir au 1/2 colis inférieur
+            obj.is_colis_en_stock = round(nb_colis,1)
+
 
     @api.depends('seller_ids','seller_ids.discount')
     def _compute_is_discount(self):

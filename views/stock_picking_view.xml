@@ -721,7 +721,8 @@ else:
                 <field name="partner_id"         optional="show" widget="many2one_clickable"/>
                 <field name="sale_id"            optional="show" widget="many2one_clickable"/>
                 <field name="name"               optional="show"/>
-                <field name="is_transporteur_id" optional="show" widget="many2one_clickable"/>
+                <!-- <field name="is_transporteur_id" optional="hide" widget="many2one_clickable"/> -->
+                <field name="is_transporteur_par_ordre" optional="show"/>
                 <field name="is_nb_colis"        optional="show" sum="Total"/>
                 <field name="is_poids_net"       optional="show" sum="Total"/>
                 <field name="is_palette_europe"  optional="show" sum="Total"/>
@@ -732,10 +733,27 @@ else:
             </tree>
         </field>
     </record>
+    <record id="is_suivi_transporteur_pivot" model="ir.ui.view">
+        <field name="name">is_suivi_transporteur_pivot</field>
+        <field name="model">stock.picking</field>
+        <field name="priority">100</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="date_done" type="row" interval="year"/>
+                <field name="date_done" type="row" interval="week"/>
+                <field name="is_transporteur_par_ordre" type="row"/>
+                <field name="is_nb_colis" type="measure"/>
+                <field name="is_poids_net" type="measure"/>
+                <field name="is_palette_europe" type="measure"/>
+                <field name="is_palette_perdue" type="measure"/>
+                <field name="is_palette_demie" type="measure"/>
+            </pivot>
+        </field>
+    </record>
     <record  id="is_suivi_transporteur_action" model="ir.actions.act_window">
         <field name="name">Suivi transporteur</field>
         <field name="res_model">stock.picking</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">tree,pivot,form</field>
         <field name="view_id" ref="is_fromtome14.is_suivi_transporteur_tree"/>
         <field name="domain">[('state','!=','cancel'),('picking_type_id.code','=','outgoing')]</field>
         <field name="limit">200</field>

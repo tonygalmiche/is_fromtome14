@@ -512,6 +512,7 @@ class Picking(models.Model):
     is_date_reception = fields.Datetime('Date réception'   , help="Date de réception chez Fromtome indiquée sur la commande", related='purchase_id.date_planned')
     is_enseigne_id    = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
     is_transporteur_id = fields.Many2one('is.transporteur', 'Transporteur', compute='_compute_is_transporteur_id', store=True, readonly=False, tracking=True)
+    is_transporteur_par_ordre = fields.Char('Transporteur par ordre', related='is_transporteur_id.transporteur_par_ordre', store=True, readonly=True)
     is_alerte          = fields.Text('Alerte', compute="_compute_is_alerte", readonly=True, store=False)
     is_preparation_transfert_id = fields.Many2one('is.preparation.transfert.entrepot', 'Préparation transfert', tracking=True)
     is_palette_europe  = fields.Integer(string='Palette Europe')

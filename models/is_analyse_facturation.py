@@ -107,6 +107,10 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                             poids_net=0
                         #**********************************************************
 
+
+
+
+
                         vals={
                             "invoice_id"     : invoice.id,
                             "invoice_line_id": line.id,
@@ -118,7 +122,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                             "product_uom_id": line.product_uom_id.id,
                             "libelle"       : line.name,
                             "quantity"      : line.quantity,
-                            "nb_colis"      : line.is_nb_colis or 0,
+                            "nb_colis"      : sens*(line.is_nb_colis or 0),
                             "poids_net"     : poids_net,
                             "price_unit"    : line.price_unit,
                             "price_subtotal": line.price_subtotal*sens,
@@ -163,7 +167,6 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                 if scrap.product_id.is_nb_pieces_par_colis>0:
                     nb_colis = scrap.scrap_qty / scrap.product_id.is_nb_pieces_par_colis
                     poids_net = nb_colis * scrap.product_id.is_poids_net_colis
-
                 vals={
                     "scrap_id"      : scrap.id,
                     "invoice_date"  : scrap.date_done,
