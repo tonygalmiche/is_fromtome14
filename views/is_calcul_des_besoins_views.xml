@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- is.calcul.des.besoins.ligne -->
+    <record id="is_calcul_des_besoins_ligne_form" model="ir.ui.view">
+        <field name="name">is.calcul.des.besoins.ligne.form</field>
+        <field name="model">is.calcul.des.besoins.ligne</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="sequence"/>
+                        <field name="product_id"/>
+                        <field name="uom_id"/>
+                        <field name="nb_pieces_par_colis"/>
+                        <field name="poids_net_colis"/>
+                        <field name="unite"/>
+                        <field name="stock_mini"/>
+                        <field name="stock"/>
+                        <!-- <field name="stock_lc"/> -->
+                        <field name="sale_qty"/>
+                        <field name="purchase_qty"/>
+                        <field name="product_qty"/>
+                         <field name="order_line_id"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_calcul_des_besoins_ligne_tree" model="ir.ui.view">
+        <field name="name">is.calcul.des.besoins.ligne.tree</field>
+        <field name="model">is.calcul.des.besoins.ligne</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="calcul_besoins_id"         optional="hide" widget="many2one_clickable"/>
+                <field name="sequence"            optional="show"/>
+                <field name="product_id"                          widget="many2one_clickable"/>
+                <field name="poids_net_colis"     optional="hide"/>
+                <field name="nb_pieces_par_colis" optional="hide"/>
+                <field name="uom_id"              optional="hide"/>
+                <field name="unite"/>
+                <field name="stock_mini"          optional="show"/>
+                <field name="stock"               optional="show" sum="Total"/>
+                <field name="sale_qty"            optional="show" sum="Total"/>
+                <button name="action_view_sale_lines" type="object" icon="fa-shopping-cart" title="Commandes clients" attrs="{'invisible': [('sale_qty', '=', 0)]}"/>
+                <field name="purchase_qty"        optional="show" sum="Total"/>
+                <button name="action_view_purchase_lines" type="object" icon="fa-truck" title="Commandes fournisseurs" attrs="{'invisible': [('purchase_qty', '=', 0)]}"/>
+                <field name="product_qty"         optional="show" sum="Total"/>
+                <field name="order_line_id"       invisible="1"/>
+                <button name="action_view_created_purchase_line"  type="object" icon="fa-search-plus" title="Ligne de commande fournisseur créée" attrs="{'invisible': [('order_line_id', '=', False)]}"/>
+                <button name="action_view_created_purchase_order" type="object" icon="fa-file-text-o" title="Commande fournisseur créée"          attrs="{'invisible': [('order_line_id', '=', False)]}"/>
+                <field name="create_date"         optional="hide"/>
+                <field name="write_date"          optional="hide"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_calcul_des_besoins_ligne_search" model="ir.ui.view">
+        <field name="name">is.calcul.des.besoins.ligne.search</field>
+        <field name="model">is.calcul.des.besoins.ligne</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="calcul_besoins_id"/>
+                <field name="product_id"/>
+                <filter string="Commande client > 0" name="sale_qty_gt_0" domain="[('sale_qty', '>', 0)]"/>
+                <filter string="Commande fournisseur > 0" name="purchase_qty_gt_0" domain="[('purchase_qty', '>', 0)]"/>
+                <filter string="Qt à commander > 0" name="product_qty_gt_0" domain="[('product_qty', '>', 0)]"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_calcul_des_besoins_ligne_action" model="ir.actions.act_window">
+        <field name="name">Détail des lignes</field>
+        <field name="res_model">is.calcul.des.besoins.ligne</field>
+        <field name="limit">1000</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('calcul_besoins_id','=',active_id)]</field>
+        <field name="context">{'default_calcul_besoins_id': active_id, 'search_default_product_qty_gt_0': 1}</field>
+    </record>
+    <record  id="is_calcul_des_besoins_ligne_toutes_action" model="ir.actions.act_window">
+        <field name="name">Calcul des besoins (Lignes)</field>
+        <field name="res_model">is.calcul.des.besoins.ligne</field>
+        <field name="limit">1000</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_with_moves': 1}</field>
+    </record>
+
+
+
+
+    <!-- is.calcul.des.besoins -->
+    <record id="is_calcul_des_besoins_seq" model="ir.sequence">
+        <field name="name">Calcul des besoins</field>
+        <field name="code">is.calcul.des.besoins</field>
+        <field name="prefix"></field>
+        <field name="padding">5</field>
+        <field eval="False" name="company_id"/>
+    </record>
+    <record id="is_calcul_des_besoins_form" model="ir.ui.view">
+        <field name="name">is.calcul.des.besoins.form</field>
+        <field name="model">is.calcul.des.besoins</field>
+        <field name="arch" type="xml">
+            <form>
+                <style>
+                    .o_form_label{
+                        white-space: nowrap;
+                    }
+                </style>
+                <header>
+                    <field name="ligne_ids" invisible="1"/>
+                    <button
+                        name="calcul_besoins_action"
+                        type="object"
+                        string="Calcul des besoins"
+                        confirm="Confirmer ?"
+                        attrs="{'invisible': [('state', '=', 'done')]}"
+                    />
+                    <button 
+                        name="action_view_lines"
+                        type="object"
+                        string="Voir les lignes"
+                        attrs="{'invisible': [('ligne_ids', '=', [])]}"
+                    />
+                    <button 
+                        name="action_view_sale_orders"
+                        type="object"
+                        string="Voir les commandes clients"
+                        attrs="{'invisible': [('ligne_ids', '=', [])]}"
+                    />
+                    <button 
+                        name="action_view_purchase_orders"
+                        type="object"
+                        string="Voir les commandes fournisseurs en cours"
+                        attrs="{'invisible': [('ligne_ids', '=', [])]}"
+                    />
+                    <button 
+                        name="action_view_created_purchase_orders"
+                        type="object"
+                        string="Voir les commandes créées"
+                        attrs="{'invisible': [('ligne_ids', '=', [])]}"
+                    />
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archivé" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="active" invisible="1"/>
+                    <div class="alert alert-info" role="alert" style="margin-bottom:10px;" attrs="{'invisible': ['|', ('state', '!=', 'done'), ('nb_created_purchase_orders', '=', 0)]}">
+                        <strong><field name="nb_created_purchase_orders" readonly="1" class="oe_inline"/> commande(s) fournisseur(s) créée(s)</strong>
+                    </div>
+                    <div class="alert alert-warning" role="alert" style="margin-bottom:10px;" attrs="{'invisible': ['|', ('state', '!=', 'done'), ('nb_created_purchase_orders', '!=', 0)]}">
+                        <strong>Aucune commande fournisseur créée</strong>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_fin"          attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="enseigne_id"       attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="is_heure_envoi_id" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="stock_mini"        attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="calcul_en_colis"   attrs="{'readonly': [('state', '=', 'done')]}"/>
+                        </group>
+                        <group name="info">
+                            <field name="name"/>
+                            <field name="duree_calcul"               attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                            <field name="date_fin_calcul"            attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                            <field name="nb_lignes"                  attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                            <field name="nb_sale_orders"             attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                            <field name="nb_purchase_orders"         attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                            <field name="nb_created_purchase_orders" attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                            <field name="total_stock"                attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                            <field name="total_sale_qty"             attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                            <field name="total_purchase_qty"         attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                            <field name="total_product_qty"          attrs="{'invisible': [('state', '!=', 'done')]}"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="is_calcul_des_besoins_tree" model="ir.ui.view">
+        <field name="name">is.calcul.des.besoins.tree</field>
+        <field name="model">is.calcul.des.besoins</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="date_fin"/>
+                <field name="is_heure_envoi_id" optional="show"/>
+                <field name="enseigne_id" optional="hide"/>
+                <field name="stock_mini" optional="show"/>
+                <field name="calcul_en_colis" optional="show"/>
+                <field name="nb_lignes" optional="show"/>
+                <field name="nb_sale_orders" optional="hide"/>
+                <field name="nb_purchase_orders" optional="hide"/>
+                <field name="nb_created_purchase_orders" optional="show"/>
+                <field name="total_sale_qty" optional="hide"/>
+                <field name="total_purchase_qty" optional="hide"/>
+                <field name="total_product_qty" optional="hide"/>
+                <field name="total_stock" optional="hide"/>
+                <field name="duree_calcul" optional="hide"/>
+                <field name="date_fin_calcul" optional="hide"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'done'"/>
+                <field name="create_date" optional="hide"/>
+                <field name="write_date" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_calcul_des_besoins_search" model="ir.ui.view">
+        <field name="name">is.calcul.des.besoins.search</field>
+        <field name="model">is.calcul.des.besoins</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="enseigne_id"/>
+                <field name="warehouse_id"/>
+                <!-- <field name="order_id"/> -->
+           </search>
+        </field>
+    </record>
+    <record  id="is_calcul_des_besoins_action" model="ir.actions.act_window">
+        <field name="name">Calcul des besoins</field>
+        <field name="res_model">is.calcul.des.besoins</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_calcul_des_besoins_menu"
+        name="Calcul des besoins"
+        parent="purchase.menu_procurement_management"
+        sequence="910"
+        action="is_calcul_des_besoins_action"
+    />
+    <menuitem
+        id="is_calcul_des_besoins_ligne_toutes_menu"
+        name="Calcul des besoins (Lignes)"
+        parent="purchase.menu_procurement_management"
+        sequence="911"
+        action="is_calcul_des_besoins_ligne_toutes_action"
+    />
+
+</odoo>

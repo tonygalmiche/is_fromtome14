@@ -46,6 +46,9 @@ class StockProductionLot(models.Model):
 class StockMove(models.Model):
     _inherit = "stock.move"
 
+    created_purchase_line_id = fields.Many2one('purchase.order.line',
+        'Created Purchase Order Line', ondelete='set null', readonly=True, copy=False, index=True)
+
     @api.depends('move_line_ids')
     def _compute_is_alerte(self):
         for obj in self:

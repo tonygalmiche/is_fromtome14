@@ -253,7 +253,7 @@ class ProductTemplate(models.Model):
     is_type_conditionnement   = fields.Char(string='Type de conditionnement')
     is_poids_brut             = fields.Char(string='Poids brut')
     is_atelier_transformation = fields.Char(string='Atelier de transformation')
-    no_agrement_sanitaire     = fields.Char(string="N° d'agrément fabriquant")
+    no_agrement_sanitaire     = fields.Char(string="N° d'agrément fabricant")
     temperature_stock         = fields.Char(string='T° de conservation')
     is_ogm_ionisation         = fields.Char(string='OGM / Ionisation')
 

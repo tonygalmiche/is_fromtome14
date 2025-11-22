@@ -12,12 +12,14 @@ InfoSaône - Module Odoo 14 pour Fromtome
     'website'    : 'http://www.infosaone.com',
     'depends'    : [
         'base',
+        'mail',
         'sale',
         'product',
         'sale_management',
         'account',
         'stock',
         'purchase',
+        'purchase_stock',
         'mrp',
         'board',
         'hr',
@@ -60,7 +62,10 @@ InfoSaône - Module Odoo 14 pour Fromtome
         'views/product_supplierinfo_view.xml',
         'views/is_account_invoice_line.xml',
         'views/is_analyse_facturation_views.xml',
+
         'views/is_commande_fromtome_views.xml',
+        'views/is_calcul_des_besoins_views.xml',
+
         'views/is_export_compta_views.xml',
         'views/is_fnc_views.xml',
         'views/is_imprimer_etiquette_gs1_views.xml',

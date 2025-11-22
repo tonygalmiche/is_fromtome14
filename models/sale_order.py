@@ -68,7 +68,7 @@ class IsModeleCommandeLigne(models.Model):
 
     modele_id       = fields.Many2one('is.modele.commande', 'Modèle de commandes', required=True, ondelete='cascade')
     sequence        = fields.Integer('Séquence')
-    product_id      = fields.Many2one('product.product', 'Article', required=True)
+    product_id      = fields.Many2one('product.product', 'Article', required=True, index=True)
     product_name    = fields.Char('Désignation article'                    , compute='_compute', readonly=True, store=True)
     default_code    = fields.Char('Réf Fromtome'                           , compute='_compute', readonly=True, store=True)
     ref_fournisseur = fields.Char('Réf Fournisseur'                        , compute='_compute', readonly=True, store=True)
@@ -398,6 +398,25 @@ class SaleOrderLine(models.Model):
     is_colis_liv              = fields.Float(string='Colis Liv', digits=(14,2), compute='_compute_is_colis_liv', readonly=True, store=False)
     is_qt_cde                 = fields.Float(string='Qt Cde', digits='Product Unit of Measure',readonly=True,help="Ce champ permet de mémoriser la valeur du champ product_uom_qty au moment de la validation de la commande")
     is_ecart_qt_cde_prepa     = fields.Float(string='Qt Prépa - Qt Cde', digits='Product Unit of Measure', compute='_compute_is_ecart_qt_cde_prepa', readonly=True, store=True)
+    is_calcul_besoins_purchase_line_id = fields.Many2one('purchase.order.line', compute='_compute_is_calcul_besoins_purchase_line_id', string="Ligne achat (Calcul)")
+
+
+    def _compute_is_calcul_besoins_purchase_line_id(self):
+        for line in self:
+            calcul_line = self.env['is.calcul.des.besoins.ligne'].search([('sale_line_ids', 'in', line.id)], limit=1, order='id desc')
+            line.is_calcul_besoins_purchase_line_id = calcul_line.order_line_id if calcul_line else False
+
+
+    def acceder_commande_fournisseur_calcul(self):
+        self.ensure_one()
+        if self.is_calcul_besoins_purchase_line_id:
+            return {
+                'name': 'Ligne commande fournisseur (Calcul)',
+                'view_mode': 'form',
+                'res_model': 'purchase.order.line',
+                'res_id': self.is_calcul_besoins_purchase_line_id.id,
+                'type': 'ir.actions.act_window',
+            }
 
 
     def write(self, vals):
@@ -546,8 +565,8 @@ class SaleOrder(models.Model):
  
 
     is_enseigne_id           = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
-    is_date_livraison        = fields.Date('Date livraison client', help="Date d'arrivée chez le client", tracking=True)
-    is_commande_soldee       = fields.Boolean(string='Commande soldée', default=False, copy=False, tracking=True, help="Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
+    is_date_livraison        = fields.Date('Date livraison client', help="Date d'arrivée chez le client", tracking=True, index=True)
+    is_commande_soldee       = fields.Boolean(string='Commande soldée', default=False, copy=False, tracking=True, help="Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci", index=True)
     is_frequence_facturation = fields.Selection(string='Fréquence facturation', related="partner_id.is_frequence_facturation") #, selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')])
     is_type_doc              = fields.Selection([('cc', 'CC'), ('offre', 'Offre')], string='Type document', default="cc", tracking=True)
     is_modele_commande_id    = fields.Many2one('is.modele.commande', 'Modèle de commande', related='partner_id.is_modele_commande_id', tracking=True)

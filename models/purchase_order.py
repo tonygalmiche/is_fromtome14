@@ -64,7 +64,7 @@ class PurchaseOrder(models.Model):
             obj.is_heure_envoi_mail=heure
 
 
-    is_commande_soldee         = fields.Boolean(string='Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci")
+    is_commande_soldee         = fields.Boolean(string='Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci", index=True)
     is_fromtome_order_id       = fields.Many2one('sale.order', 'Commande Fromtome', copy=False,readonly=True)
     is_fromtome_order_vsb      = fields.Boolean(string='Créer commande dans Fromtome vsb', compute='_compute_is_fromtome_order_vsb')
     is_maj_commande_client_vsb = fields.Boolean(string='MAJ commandes clients', compute='_compute_is_maj_commande_client_vsb', readonly=True, store=False)

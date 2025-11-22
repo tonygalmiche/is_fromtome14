@@ -36,5 +36,6 @@ from . import is_preparation_transfert_entrepot
 from . import is_promo_fournisseur
 from . import is_promo_client
 from . import is_suivi_temps
+from . import is_calcul_des_besoins
 
 

@@ -89,7 +89,7 @@ class ResPartner(models.Model):
     is_code_fromtome            = fields.Char('Code Fournisseur', tracking=True, help="Code Fromtome chez le client")
     is_code_interne             = fields.Char('Code Interne'    , tracking=True, help="Code interne utilisé en particulier pour Le Cellier")
     is_code_tarif               = fields.Char('Code Tarif'      , tracking=True, help="Code utilisé par Le Cellier pour la gestion des tarifs")
-    is_enseigne_id              = fields.Many2one('is.enseigne.commerciale', 'Enseigne', tracking=True, help="Enseigne commerciale")
+    is_enseigne_id              = fields.Many2one('is.enseigne.commerciale', 'Enseigne', tracking=True, help="Enseigne commerciale", index=True)
     is_customer                 = fields.Boolean("Est un Client", tracking=True)
     is_supplier                 = fields.Boolean("Est un Fournisseur", tracking=True)
     is_frequence_facturation    = fields.Selection(string='Fréquence facturation', selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')], tracking=True)

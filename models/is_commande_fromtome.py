@@ -26,7 +26,7 @@ class IsCommandeFromtomeLigne(models.Model):
     stock            = fields.Float("Stock FT"      , digits=(14,2))
     stock_lc         = fields.Float("Stock LC"      , digits=(14,2))
     stock_mini       = fields.Float("Stock mini"    , digits=(14,2))
-    order_line_id    = fields.Many2one('purchase.order.line', 'Ligne commande fournisseur')
+    order_line_id    = fields.Many2one('purchase.order.line', 'Ligne commande fournisseur', index=True)
 
 
 class IsCommandeFromtome(models.Model):
