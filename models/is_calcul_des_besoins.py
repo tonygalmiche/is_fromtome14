@@ -205,6 +205,8 @@ class is_calcul_des_besoins(models.Model):
                 ('order_id.is_date_livraison', '>=', '2020-10-01'),
                 ('order_id.is_date_livraison', '<=', obj.date_fin),
                 ('product_id', 'in', products.ids),
+                '|', ('order_id.partner_id.is_enseigne_id', '=', False), 
+                ('order_id.partner_id.is_enseigne_id.calcul_des_besoins', '=', True),
             ]
             if obj.enseigne_id:
                 sale_lines_domain.append(('order_id.partner_id.is_enseigne_id', '=', obj.enseigne_id.id))
@@ -351,9 +353,8 @@ class is_calcul_des_besoins(models.Model):
                         if supplierinfo.name.active and supplierinfo.name.is_warehouse_id:
                             if supplierinfo.name.is_heure_envoi_id == obj.is_heure_envoi_id or not obj.is_heure_envoi_id:
                                 partner_id = supplierinfo.name.id
-                                date_reception = str(obj.date_fin)
-                                date_planned = date_reception + ' 08:00:00'
-                                
+                                #date_reception = str(obj.date_fin)
+                                date_reception = str(date.today()+timedelta(days=2))
                                 filtre = [
                                     ('partner_id', '=', partner_id),
                                     ('state', '=', 'draft'),
@@ -364,6 +365,7 @@ class is_calcul_des_besoins(models.Model):
                                 if orders:
                                     order = orders[0]
                                 else:
+                                    date_planned = date_reception + ' 08:00:00'
                                     vals = {
                                         'partner_id': partner_id,
                                         'date_planned': date_planned,

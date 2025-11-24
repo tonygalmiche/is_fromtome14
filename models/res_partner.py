@@ -26,6 +26,7 @@ class IsEnseigneCommerciale(models.Model):
     rib                 = fields.Char("RIB")
     note_bl             = fields.Text("Note BL", help="Note à ajouter sur le BL")
     mini_cde_franco     = fields.Integer(string='Mini de commande franco (€)')
+    calcul_des_besoins  = fields.Boolean("Prendre en compte cette enseigne dans le calcul des besoins", default=True)
 
 
 class IsTransporteur(models.Model):

@@ -12,6 +12,7 @@
                 <field name="mini_cde_franco"     optional="show"/>
                 <field name="warehouse_id"        optional="hide"/>
                 <field name="prix_sur_livraison"  optional="hide"/>
+                <field name="calcul_des_besoins"  optional="hide"/>
                 <field name="modele_commande_ids" optional="hide" widget="many2many_binary" />
                 <field name="rib"                 optional="hide"/>
                 <field name="note_bl"             optional="hide"/>
@@ -34,6 +35,7 @@
                     <field name="warehouse_id"/>
                     <field name="mini_cde_franco"/>
                     <field name="prix_sur_livraison"/>
+                    <field name="calcul_des_besoins"/>
                     <field name="modele_commande_ids" widget="many2many_binary"/>
                     <field name="rib"/>
                     <field name="note_bl"/>
