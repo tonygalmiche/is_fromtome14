@@ -299,7 +299,7 @@ class is_calcul_des_besoins(models.Model):
                     #***********************************************************
 
                     #** Calcul de la quantité à commander **********************
-                    product_qty = sale_qty - stock - stock_mini - purchase_qty
+                    product_qty = sale_qty - stock + stock_mini - purchase_qty
                     if product_qty<0:
                         product_qty=0
                     #***********************************************************
@@ -355,6 +355,7 @@ class is_calcul_des_besoins(models.Model):
                                 partner_id = supplierinfo.name.id
                                 #date_reception = str(obj.date_fin)
                                 date_reception = str(date.today()+timedelta(days=2))
+                                date_planned = date_reception + ' 08:00:00'
                                 filtre = [
                                     ('partner_id', '=', partner_id),
                                     ('state', '=', 'draft'),
@@ -365,7 +366,6 @@ class is_calcul_des_besoins(models.Model):
                                 if orders:
                                     order = orders[0]
                                 else:
-                                    date_planned = date_reception + ' 08:00:00'
                                     vals = {
                                         'partner_id': partner_id,
                                         'date_planned': date_planned,
