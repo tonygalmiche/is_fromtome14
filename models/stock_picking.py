@@ -518,6 +518,8 @@ class Picking(models.Model):
     is_palette_europe  = fields.Integer(string='Palette Europe')
     is_palette_perdue  = fields.Integer(string='Palette Perdue')
     is_palette_demie   = fields.Integer(string='Palette Demie')
+    is_nb_erreurs      = fields.Integer(string="Nombre d'erreurs")
+    is_employe_id      = fields.Many2one('hr.employee', 'Employé concerné')
 
 
     @api.depends('partner_id','sale_id')

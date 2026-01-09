@@ -324,7 +324,9 @@ class ProductTemplate(models.Model):
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis', tracking=True)
     is_poids_net_colis     = fields.Float(string='Poids net colis (Kg)', digits='Stock Weight', tracking=True)
     is_forcer_poids_colis  = fields.Boolean(string='Forcer le scan au poids du colis', tracking=True, default=False, help="Cocher cette case si l'article est configuré par erreur au poids alors qu'il fallait le configuer à la pièce")
-    is_colis_en_stock      = fields.Float(string='Nb colis en stock', digits=(14,1), compute='_compute_is_colis_en_stock',)
+    is_colis_en_stock      = fields.Float(string='Nb colis théorique', digits=(14,1), compute='_compute_is_colis_en_stock',)
+    is_colis_en_stock_scan = fields.Float(string='Nb colis scan'     , digits=(14,1), help="Nombre de colis en stock calculé d'après les scan")
+    is_colis_ecart         = fields.Float(string='Ecart nb colis'    , digits=(14,1), help="Ecart entre le nombre de colis théorique et d'après les scans")
 
 
     def _compute_is_colis_en_stock(self):
@@ -337,13 +339,128 @@ class ProductTemplate(models.Model):
             if unite=="Poids":
                 if poids_net>0:
                     nb_colis = stock/poids_net
-
-                    print('Poids',stock,poids_net,nb_colis)
+                    #print('Poids',stock,poids_net,nb_colis)
             else:
                 if nb>0:
                     nb_colis = stock / nb
             nb_colis = math.floor(nb_colis * 2) / 2  # Arrondir au 1/2 colis inférieur
             obj.is_colis_en_stock = round(nb_colis,1)
+
+
+
+    def recalcule_colis_stock_scans_action(self):
+        """
+        Recalcule le champ is_colis_en_stock_scan en remontant dans le passé
+        à partir du stock actuel et en analysant les mouvements de stock.
+        """
+        for obj in self:
+            # Récupérer tous les product.product liés à ce template
+            product_ids = obj.product_variant_ids.ids
+            if not product_ids:
+                obj.is_colis_en_stock_scan = 0
+                continue
+
+            # Stock actuel
+            stock_actuel = obj.qty_available
+            stock_calcule = stock_actuel
+            total_colis = 0.0
+
+            # Recherche des mouvements de stock terminés, triés par date décroissante
+            # On prend les mouvements qui affectent le stock (entrant ou sortant de l'emplacement interne)
+            moves = self.env['stock.move'].search([
+                ('product_id', 'in', product_ids),
+                ('state', '=', 'done'),
+            ], order='date desc')
+
+            _logger.info("=" * 100)
+            _logger.info("Recalcul colis stock scan pour: %s (Réf: %s)", obj.name, obj.default_code)
+            _logger.info("Stock actuel: %.4f", stock_actuel)
+            _logger.info("-" * 100)
+            _logger.info("%-20s | %-15s | %-20s | %-12s | %12s | %10s | %12s", 
+                        "Date", "Picking", "Référence", "Type", "Qté", "Nb Colis", "Stock calculé")
+            _logger.info("-" * 100)
+
+            for move in moves:
+                picking = move.picking_id
+                picking_name = picking.name if picking else "N/A"
+                reference = move.reference or "N/A"
+                date_move = move.date.strftime('%Y-%m-%d %H:%M') if move.date else "N/A"
+                
+                # Déterminer le type de mouvement (réception ou livraison)
+                # Réception: location_dest_id est un emplacement interne (usage='internal')
+                # Livraison: location_id est un emplacement interne
+                # Inventaire: utilise un emplacement virtuel d'inventaire (usage='inventory')
+                location_src = move.location_id
+                location_dest = move.location_dest_id
+                
+                qty = move.quantity_done
+                nb_colis = move.is_nb_colis
+                
+                # Si la destination est interne et source n'est pas interne => Réception
+                # Si la destination est interne et source est inventaire => Inventaire positif (ajout)
+                # Si la source est interne et destination n'est pas interne => Livraison
+                # Si la source est interne et destination est inventaire => Inventaire négatif (retrait)
+                if location_dest.usage == 'internal' and location_src.usage not in ('internal',):
+                    if location_src.usage == 'inventory':
+                        type_mouvement = "Inv. +"
+                    else:
+                        type_mouvement = "Réception"
+                    # Pour remonter dans le passé, on soustrait les réceptions/ajouts
+                    stock_calcule -= qty
+                    # Les colis comptent positivement
+                    total_colis += nb_colis
+                elif location_src.usage == 'internal' and location_dest.usage not in ('internal',):
+                    if location_dest.usage == 'inventory':
+                        type_mouvement = "Inv. -"
+                    else:
+                        type_mouvement = "Livraison"
+                    # Pour remonter dans le passé, on ajoute les livraisons/retraits
+                    stock_calcule += qty
+                    # Les colis comptent négativement (ils sont sortis)
+                    total_colis -= nb_colis
+                elif location_src.usage == 'internal' and location_dest.usage == 'internal':
+                    type_mouvement = "Transfert"
+                    # Les transferts internes ne changent pas le stock global
+                    continue
+                else:
+                    type_mouvement = "Autre"
+                    continue
+
+                _logger.info("%-20s | %-20s | %-12s | %12.4f | %10.2f | %12.4f",
+                            date_move, reference, type_mouvement, qty, nb_colis, stock_calcule)
+
+                # Arrêter uniquement si le stock calculé atteint exactement 0 (avec tolérance pour les erreurs de virgule flottante)
+                # Le stock peut être négatif, dans ce cas on continue
+                if abs(stock_calcule) <= 0.0001:
+                    break
+
+            _logger.info("-" * 100)
+            _logger.info("Total colis calculé: %.2f", total_colis)
+            _logger.info("=" * 100)
+
+            # Mise à jour du champ
+            obj.is_colis_en_stock_scan = total_colis
+            obj.is_colis_ecart = abs(total_colis - obj.is_colis_en_stock)
+
+
+    def recalcule_colis_stock_scans_ir_cron(self):
+        """
+        Tâche cron pour recalculer is_colis_en_stock_scan pour tous les articles
+        ayant un stock disponible > 0.
+        """
+        # Recherche des articles avec du stock disponible
+        products = self.env['product.template'].search([
+            ('qty_available', '>', 0),
+            ('active', '=', True),
+        ])
+        nb = len(products)
+        _logger.info("recalcule_colis_stock_scans_ir_cron : Début du traitement de %s articles", nb)
+        ct = 1
+        for product in products:
+            _logger.info("recalcule_colis_stock_scans_ir_cron : %s/%s : %s (%s)", ct, nb, product.default_code, product.name)
+            product.recalcule_colis_stock_scans_action()
+            ct += 1
+        _logger.info("recalcule_colis_stock_scans_ir_cron : Fin du traitement")
 
 
     @api.depends('seller_ids','seller_ids.discount')
