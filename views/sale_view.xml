@@ -29,6 +29,23 @@
                         <field name="partner_id"/>
                         <field name="enseigne_id"/>
                         <field name="modele_commande_ids" widget="many2many_binary"/>
+
+
+                        <field name="product_ids" widget="many2many_tags"/>
+                        <label for="product_ids" string=" "/>
+                        <div>
+                            <button
+                                name="ajouter_articles_action"
+                                type="object"
+                                string="Ajouter ces articles"
+                                class="oe_inline oe_highlight"
+                                attrs="{'invisible':[('product_ids','=',[])]}"
+                            />
+                        </div>
+
+
+
+
                     </group>
                     <field name="ligne_ids">
                         <tree decoration-danger="weight==0" editable="bottom" limit="200">

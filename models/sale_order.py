@@ -106,6 +106,49 @@ class IsModeleCommande(models.Model):
     modele_commande_ids = fields.Many2many('ir.attachment', 'is_modele_commande_modele_commande_rel', 'enseigne_id', 'file_id', 'Modèle de commande client')
     ligne_ids           = fields.One2many('is.modele.commande.ligne', 'modele_id', 'Lignes')
     alerte              = fields.Boolean('Alerte', compute='_compute_alerte')
+    product_ids         = fields.Many2many('product.product', 'is_modele_commande_product_rel', 'modele_id', 'product_id', 'Articles à ajouter')
+
+
+
+    def ajouter_articles_action(self):
+        for obj in self:
+            product_ids=[]
+            for l in obj.ligne_ids:
+                if l.product_id not in product_ids:
+                    product_ids.append(l.product_id)
+            new_product_ids=[]
+            for p in obj.product_ids:
+                if p not in product_ids:
+                    new_product_ids.append(p._origin)
+            for p in new_product_ids:
+                vals={
+                    'modele_id'   : obj._origin.id,
+                    'product_id' : p.id,
+                }
+                self.env['is.modele.commande.ligne'].create(vals)
+            obj.product_ids=False
+
+
+
+
+    # modele_id       = fields.Many2one('is.modele.commande', 'Modèle de commandes', required=True, ondelete='cascade')
+    # sequence        = fields.Integer('Séquence')
+    # product_id      = fields.Many2one('product.product', 'Article', required=True, index=True)
+    # product_name    = fields.Char('Désignation article'                    , compute='_compute', readonly=True, store=True)
+    # default_code    = fields.Char('Réf Fromtome'                           , compute='_compute', readonly=True, store=True)
+    # ref_fournisseur = fields.Char('Réf Fournisseur'                        , compute='_compute', readonly=True, store=True)
+    # heure_envoi_id  = fields.Many2one('is.heure.maxi', 'Limite fournisseur', compute='_compute', readonly=True, store=True)
+    # weight          = fields.Float(string='Poids unitaire', digits='Stock Weight', compute='_compute', readonly=True, store=True)
+    # qt_livree       = fields.Float(string='Qt livrée', help="quantité livrée au moment de l'initialisation", readonly=True)
+    # price_unit      = fields.Float("Prix", digits='Product Price', compute='_compute_price_unit', readonly=True, store=False)
+    # alerte          = fields.Boolean('Alerte', compute='_compute_alerte')
+    # is_mise_en_avant = fields.Boolean(related="product_id.is_mise_en_avant")
+    # is_preco         = fields.Boolean(related="product_id.is_preco")
+
+
+
+
+
 
 
     @api.depends('ligne_ids')

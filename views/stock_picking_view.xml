@@ -423,6 +423,17 @@ else:
             <button name="action_assign" position="attributes">
                 <attribute name="invisible">1</attribute>
             </button>
+            <!-- Remplacement du bouton Print standard par Envoyer par mail -->
+            <!-- <xpath expr="//button[@name='%(stock.action_report_delivery)d']" position="replace">
+                <button 
+                    name="action_picking_send_direct" 
+                    string="Envoyer par mail 2" 
+                    type="object" 
+                    attrs="{'invisible': [('state', '!=', 'done')]}" 
+                    groups="base.group_user"
+                    confirm="Voulez-vous envoyer le BL par mail au client ?"
+                />
+            </xpath> -->
             <page name="operations" position="attributes">
                 <attribute name="autofocus">autofocus</attribute>
             </page>
