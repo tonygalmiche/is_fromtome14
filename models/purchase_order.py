@@ -64,6 +64,23 @@ class PurchaseOrder(models.Model):
             obj.is_heure_envoi_mail=heure
 
 
+    @api.depends('is_livraison_ids', 'is_livraison_ids.state', 'is_livraison_ids.is_nb_colis', 'is_livraison_ids.is_poids_net', 'is_livraison_ids.is_nb_colis_cde_total', 'is_livraison_ids.is_poids_net_cde_total')
+    def _compute_totaux_livraisons(self):
+        """Calcul de la somme des colis et poids net des livraisons associées"""
+        for obj in self:
+            total_colis = 0.0
+            total_poids = 0.0
+            for picking in obj.is_livraison_ids:
+                if picking.state == 'done':
+                    total_colis += picking.is_nb_colis
+                    total_poids += picking.is_poids_net
+                elif picking.state != 'cancel':
+                    total_colis += picking.is_nb_colis_cde_total
+                    total_poids += picking.is_poids_net_cde_total
+            obj.is_total_colis_livraisons = total_colis
+            obj.is_total_poids_livraisons = total_poids
+
+
     is_commande_soldee         = fields.Boolean(string='Commande soldée', default=False, copy=False, help=u"Cocher cette case pour indiquer qu'aucune nouvelle livraison n'est prévue sur celle-ci", index=True)
     is_fromtome_order_id       = fields.Many2one('sale.order', 'Commande Fromtome', copy=False,readonly=True)
     is_fromtome_order_vsb      = fields.Boolean(string='Créer commande dans Fromtome vsb', compute='_compute_is_fromtome_order_vsb')
@@ -74,6 +91,17 @@ class PurchaseOrder(models.Model):
     is_fusion_order_id         = fields.Many2one('purchase.order', 'Fusionnée dans', copy=False,readonly=True)
     is_date_enlevement         = fields.Date('Date Enlèvement')
     is_adresse_livraison_id    = fields.Many2one('res.partner', 'Adresse Livraison') #, default=lambda self: self.env.user.company_id.partner_id.id)
+    is_livraison_ids           = fields.Many2many(
+        'stock.picking', 
+        'is_purchase_order_livraison_client_rel', 
+        'purchase_order_id', 
+        'picking_id', 
+        'Livraisons clients associées',
+        domain=[('state', 'not in', ['draft', 'done', 'cancel']), ('picking_type_code', '=', 'outgoing')]
+    )
+    is_transporteur            = fields.Boolean(related='partner_id.is_transporteur', store=False)
+    is_total_colis_livraisons  = fields.Float(string='Total colis livraisons', digits=(14,2), compute='_compute_totaux_livraisons', readonly=True, store=True, help="Somme des colis des livraisons associées")
+    is_total_poids_livraisons  = fields.Float(string='Total poids livraisons', digits='Stock Weight', compute='_compute_totaux_livraisons', readonly=True, store=True, help="Somme du poids net des livraisons associées")
 
 
     @api.onchange('partner_id')

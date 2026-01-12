@@ -508,6 +508,8 @@ class Picking(models.Model):
 
     is_poids_net      = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_poids_colis', readonly=True, store=True)
     is_nb_colis       = fields.Float(string='Nb colis' , digits=(14,1)        , compute='_compute_poids_colis', readonly=True, store=True)
+    is_nb_colis_cde_total = fields.Float(string='Nb colis commandé total', digits=(14,1), compute='_compute_totaux_commande', readonly=True, store=True, help="Nombre total de colis commandés")
+    is_poids_net_cde_total = fields.Float(string='Poids net commandé total', digits='Stock Weight', compute='_compute_totaux_commande', readonly=True, store=True, help="Poids net total commandé")
     is_date_livraison = fields.Date('Date livraison client', help="Date d'arrivée chez le client prévue sur la commande"    , related='sale_id.is_date_livraison')
     is_date_reception = fields.Datetime('Date réception'   , help="Date de réception chez Fromtome indiquée sur la commande", related='purchase_id.date_planned')
     is_enseigne_id    = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
@@ -526,6 +528,19 @@ class Picking(models.Model):
     def _compute_is_transporteur_id(self):
         for obj in self:
             obj.is_transporteur_id = obj.sale_id.is_transporteur_id.id or obj.partner_id.is_transporteur_id.id
+
+
+    def ouvrir_picking_action(self):
+        """Ouvre le formulaire du picking"""
+        self.ensure_one()
+        return {
+            'name': 'Bon de livraison',
+            'view_mode': 'form',
+            'view_type': 'form',
+            'res_model': 'stock.picking',
+            'type': 'ir.actions.act_window',
+            'res_id': self.id,
+        }
 
 
     @api.depends('move_line_ids_without_package','is_palette_europe')
@@ -588,6 +603,19 @@ class Picking(models.Model):
                 colis+=line.is_nb_colis
             obj.is_poids_net=poids
             obj.is_nb_colis=colis
+
+
+    @api.depends('move_ids_without_package','move_ids_without_package.is_nb_colis_cde_from_sale','move_ids_without_package.is_poids_net_cde_from_sale')
+    def _compute_totaux_commande(self):
+        """Calcul du nombre de colis total et du poids net total commandés"""
+        for obj in self:
+            nb_colis_cde_total = 0
+            poids_net_cde_total = 0
+            for move in obj.move_ids_without_package:
+                nb_colis_cde_total += move.is_nb_colis_cde_from_sale
+                poids_net_cde_total += move.is_poids_net_cde_from_sale
+            obj.is_nb_colis_cde_total = nb_colis_cde_total
+            obj.is_poids_net_cde_total = poids_net_cde_total
 
 
     def solde_commande_action(self):

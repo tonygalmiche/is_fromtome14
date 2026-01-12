@@ -128,6 +128,8 @@
             <field name="origin" position="before">
                 <field name="is_date_enlevement"/>
                 <field name="is_heure_envoi_mail"/>
+                <field name="is_total_colis_livraisons" attrs="{'invisible': [('is_transporteur', '=', False)]}"/>
+                <field name="is_total_poids_livraisons" attrs="{'invisible': [('is_transporteur', '=', False)]}"/>
             </field>
             <field name="picking_type_id" position="attributes">
                 <attribute name="invisible">1</attribute>
@@ -156,6 +158,30 @@
                 <field name="discount" />
             </xpath>
 
+            <xpath expr="//page[@name='purchase_delivery_invoice']" position="after">
+                <page string="Livraisons clients associées" attrs="{'invisible': [('is_transporteur', '=', False)]}">
+                    <field name="is_transporteur" invisible="1"/>
+                    <field name="is_livraison_ids" nolabel="1">
+                        <tree limit="200">
+                            <button 
+                                name="ouvrir_picking_action" 
+                                type="object" 
+                                icon="fa-search-plus" 
+                                class="oe_stat_button"
+                                title="Accéder au picking"
+                            />
+                            <field name="name" string="N°BL"/>
+                            <field name="sale_id" string="N°Commande client"/>
+                            <field name="partner_id" string="Adresse de livraison"/>
+                            <field name="is_nb_colis_cde_total"  string="Nb colis commandés" sum="Total"/>
+                            <field name="is_poids_net_cde_total" string="Poids net commandé" sum="Total"/>
+                            <field name="is_nb_colis"            string="Nb colis livrés"    sum="Total"/>
+                            <field name="is_poids_net"           string="Poids net livré"    sum="Total"/>
+                            <field name="state" string="Statut"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
 
 
         </field>

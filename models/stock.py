@@ -158,11 +158,27 @@ class StockMove(models.Model):
             obj.is_ref_fournisseur = ref
 
 
+    @api.depends('sale_line_id', 'sale_line_id.is_nb_colis')
+    def _compute_is_nb_colis_cde_from_sale(self):
+        """Récupère le nombre de colis de la ligne de commande client"""
+        for obj in self:
+            obj.is_nb_colis_cde_from_sale = obj.sale_line_id.is_nb_colis if obj.sale_line_id else 0.0
+
+
+    @api.depends('sale_line_id', 'sale_line_id.is_poids_net')
+    def _compute_is_poids_net_cde_from_sale(self):
+        """Récupère le poids net de la ligne de commande client"""
+        for obj in self:
+            obj.is_poids_net_cde_from_sale = obj.sale_line_id.is_poids_net if obj.sale_line_id else 0.0
+
+
     is_alerte          = fields.Text('Alerte', copy=False, compute=_compute_is_alerte)
     is_lots            = fields.Text('Lots'  , copy=False, compute=_compute_is_lots)
     is_nb_colis_cde    = fields.Float('Nb Colis Cde'  , digits=(14,2), compute=_compute_is_nb_colis_cde)
     is_nb_colis        = fields.Float('Nb Colis'      , digits=(14,2), compute=_compute_is_nb_colis_poids, readonly=True, store=True)
     is_poids_net_reel  = fields.Float('Poids net réel', digits=(14,4), compute=_compute_is_nb_colis_poids, readonly=True, store=True)
+    is_nb_colis_cde_from_sale = fields.Float('Nb Colis commandé', digits=(14,2), compute='_compute_is_nb_colis_cde_from_sale', readonly=True, store=True, help="Nombre de colis de la ligne de commande client")
+    is_poids_net_cde_from_sale = fields.Float('Poids net commandé', digits=(14,4), compute='_compute_is_poids_net_cde_from_sale', readonly=True, store=True, help="Poids net de la ligne de commande client")
     is_description_cde = fields.Text('Description commande', compute=_compute_is_description_cde)
     is_ref_fournisseur = fields.Char(string='Réf fournisseur', compute='_compute_is_ref_fournisseur', readonly=True, store=True)
     is_fournisseur_id          = fields.Many2one('res.partner', 'Fournisseur', readonly=True)

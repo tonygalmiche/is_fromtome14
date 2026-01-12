@@ -35,7 +35,8 @@
                 <!-- <h2 t-if="o.state == 'draft'">Request for Quotation #<span t-field="o.name"/></h2>
                 <h2 t-if="o.state in ['sent', 'to approve']">Purchase Order #<span t-field="o.name"/></h2>
                 <h2 t-if="o.state in ['purchase', 'done']">Confirmation du Bon de commande N°<span t-field="o.name"/></h2> -->
-                <h2 t-if="o.state != ['cancel']">Confirmation du Bon de commande N°<span t-field="o.name"/></h2>
+                <h2 t-if="o.is_transporteur and o.state != 'done'">Demande de prix N°<span t-field="o.name"/></h2>
+                <h2 t-elif="o.state != 'cancel'">Confirmation du Bon de commande N°<span t-field="o.name"/></h2>
                 <h2 t-if="o.state == 'cancel'">Cancelled Purchase Order #<span t-field="o.name"/></h2>
                 <div id="informations" class="row mt32 mb32">
                     <div t-if="o.is_date_enlevement" class="col-3 bm-2">
@@ -90,6 +91,80 @@
 
                     </tbody>
                 </table>
+                
+                <!-- Tableau des livraisons pour les transporteurs -->
+                <t t-if="o.is_transporteur and o.is_livraison_ids">
+                    <br/>
+                    <h3>Livraisons clients associées</h3>
+                    <table class="table table-sm o_main_table">
+                        <thead>
+                            <tr>
+                                <th class="text-left"><strong>N°BL</strong></th>
+                                <th class="text-left"><strong>N°Commande client</strong></th>
+                                <th class="text-left"><strong>Adresse de livraison</strong></th>
+                                <th class="text-right"><strong>Nb colis commandés</strong></th>
+                                <th class="text-right"><strong>Poids net commandé</strong></th>
+                                <!-- <th class="text-right"><strong>Nb colis livrés</strong></th>
+                                <th class="text-right"><strong>Poids net livré</strong></th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.is_livraison_ids" t-as="picking">
+                                <td class="text-left">
+                                    <span t-field="picking.name"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="picking.sale_id.name"/>
+                                </td>
+                                <td class="text-left">
+                                    <span t-field="picking.partner_id.name"/>
+                                    <span t-if="picking.partner_id.street">
+                                        <br/>
+                                        <span t-field="picking.partner_id.street"/>
+                                    </span>
+                                    <span t-if="picking.partner_id.zip or picking.partner_id.city">
+                                        <br/>
+                                        <span t-field="picking.partner_id.zip"/> <span t-field="picking.partner_id.city"/>
+                                    </span>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="picking.is_nb_colis_cde_total"/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="picking.is_poids_net_cde_total"/>
+                                </td>
+                                <!-- <td class="text-right">
+                                    <span t-field="picking.is_nb_colis"/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="picking.is_poids_net"/>
+                                </td> -->
+                              
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <!-- Totaux -->
+                    <div class="row">
+                        <div class="col-6 offset-6">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td class="text-right"><strong>Total colis:</strong></td>
+                                    <td class="text-right">
+                                        <span t-field="o.is_total_colis_livraisons"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right"><strong>Total poids (kg):</strong></td>
+                                    <td class="text-right">
+                                        <span t-field="o.is_total_poids_livraisons"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+                
                 <p t-field="o.notes"/>
                 <div class="oe_structure"/>
             </div>

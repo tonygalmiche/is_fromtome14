@@ -185,6 +185,7 @@
                     widget="badge" 
                     optional="show"
                 />
+                <field name="is_transporteur" optional="show"/>
             </field>
             <field name="email" position="attributes">
                 <attribute name="optional">hide</attribute>
@@ -393,6 +394,7 @@
         <field name="arch" type="xml">
             <field name="property_supplier_payment_term_id" position="before">
                 <field name="is_supplier"/>
+                <field name="is_transporteur"/>
                 <field name="is_date_debut_nouveau_tarif"/>
                 <field name="is_date_fin_nouveau_tarif"/>
                 <field name="is_date_reception" readonly="1"/>
@@ -417,6 +419,7 @@
             <filter name="type_company" position="after">
                 <filter string="Clients"      name="is_customer" domain="[('is_customer', '=', True)]"/>
                 <filter string="Fournisseurs" name="is_supplier" domain="[('is_supplier', '=', True)]"/>
+                <filter string="Transporteurs" name="is_transporteur" domain="[('is_transporteur', '=', True)]"/>
             </filter>
         </field>
     </record>

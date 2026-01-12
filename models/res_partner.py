@@ -93,6 +93,7 @@ class ResPartner(models.Model):
     is_enseigne_id              = fields.Many2one('is.enseigne.commerciale', 'Enseigne', tracking=True, help="Enseigne commerciale", index=True)
     is_customer                 = fields.Boolean("Est un Client", tracking=True)
     is_supplier                 = fields.Boolean("Est un Fournisseur", tracking=True)
+    is_transporteur             = fields.Boolean("Est un transporteur", default=False, tracking=True)
     is_frequence_facturation    = fields.Selection(string='Fréquence facturation', selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')], tracking=True)
     is_modele_commande_id       = fields.Many2one('is.modele.commande', 'Modèle de commande', tracking=True)
     is_presentation_bl          = fields.Selection(string='Présentation BL', selection=[('standard', 'Standard'),('detaillee', 'Détaillée')], default="standard", tracking=True)
