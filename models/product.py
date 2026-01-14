@@ -1129,12 +1129,21 @@ class ProductProduct(models.Model):
 
 
     def get_product_pricelist(self,pricelist):
+        """
+        Récupère le prix d'un produit pour une liste de prix donnée.
+        Gère correctement les listes de prix basées sur des remises globales ou d'autres listes de prix.
+        """
         price=0
-        items = self.env['product.pricelist.item'].search([
-                ('pricelist_id','=',pricelist.id),('product_tmpl_id','=',self.product_tmpl_id.id)
-            ], order="date_start desc", limit=1)
-        for item in items:
-            price=item.fixed_price
+        if pricelist:
+            # Utilise la méthode standard d'Odoo pour calculer le prix
+            # Cela gère automatiquement les listes de prix basées sur d'autres listes de prix
+            price = pricelist.get_product_price(
+                product=self,
+                quantity=1.0,
+                partner=None,
+                date=False,
+                uom_id=False
+            )
         return price
 
 
