@@ -64,6 +64,16 @@ class PurchaseOrder(models.Model):
             obj.is_heure_envoi_mail=heure
 
 
+    @api.depends('partner_id')
+    def _compute_is_enseigne_id(self):
+        """Recherche l'enseigne contenant FROMTOME"""
+        for obj in self:
+            enseigne = self.env['is.enseigne.commerciale'].search([
+                ('name', 'ilike', 'FROMTOME')
+            ], limit=1)
+            obj.is_enseigne_id = enseigne.id if enseigne else False
+
+
     @api.depends('is_livraison_ids', 'is_livraison_ids.state', 'is_livraison_ids.is_nb_colis', 'is_livraison_ids.is_poids_net', 'is_livraison_ids.is_nb_colis_cde_total', 'is_livraison_ids.is_poids_net_cde_total')
     def _compute_totaux_livraisons(self):
         """Calcul de la somme des colis et poids net des livraisons associées"""
@@ -85,7 +95,7 @@ class PurchaseOrder(models.Model):
     is_fromtome_order_id       = fields.Many2one('sale.order', 'Commande Fromtome', copy=False,readonly=True)
     is_fromtome_order_vsb      = fields.Boolean(string='Créer commande dans Fromtome vsb', compute='_compute_is_fromtome_order_vsb')
     is_maj_commande_client_vsb = fields.Boolean(string='MAJ commandes clients', compute='_compute_is_maj_commande_client_vsb', readonly=True, store=False)
-    is_enseigne_id             = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
+    is_enseigne_id             = fields.Many2one('is.enseigne.commerciale', 'Enseigne', compute='_compute_is_enseigne_id', store=True)
     is_heure_envoi_id          = fields.Many2one(related='partner_id.is_heure_envoi_id')
     is_heure_envoi_mail        = fields.Datetime(string="Heure d'envoi du mail", compute='_compute_is_heure_envoi_mail' )
     is_fusion_order_id         = fields.Many2one('purchase.order', 'Fusionnée dans', copy=False,readonly=True)

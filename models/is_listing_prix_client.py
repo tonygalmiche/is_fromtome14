@@ -135,12 +135,22 @@ class IsListingPrixClient(models.Model):
                     ct=0
                     for p in products:
                         ct+=1
-                        items = self.env['product.pricelist.item'].search([
-                                ('pricelist_id','=',obj.pricelist_id.id),('product_tmpl_id','=',p.product_tmpl_id.id)
-                            ], order="date_start desc", limit=1)
+
+                        # #** Recherche du prix (ancienne méthode) **************
+                        # items = self.env['product.pricelist.item'].search([
+                        #         ('pricelist_id','=',obj.pricelist_id.id),('product_tmpl_id','=',p.product_tmpl_id.id)
+                        #     ], order="date_start desc", limit=1)
+                        # price=False
+                        # for item in items:
+                        #     price=item.price
+                        # #******************************************************
+
+                        #** Recherche du prix (du 15/02/26) *******************
                         price=False
-                        for item in items:
-                            price=item.price
+                        if obj.afficher_prix:
+                            price = p.get_product_pricelist(obj.pricelist_id)
+                        #******************************************************
+
                         img=''
                         if p.image_1920:
                             img = tools.image_data_uri(p.image_1920)
