@@ -339,7 +339,6 @@ class ProductTemplate(models.Model):
             if unite=="Poids":
                 if poids_net>0:
                     nb_colis = stock/poids_net
-                    #print('Poids',stock,poids_net,nb_colis)
             else:
                 if nb>0:
                     nb_colis = stock / nb
@@ -1035,6 +1034,17 @@ class ProductProduct(models.Model):
 
 
     def update_pricelist_ir_cron(self):
+        # Log de la langue par défaut avant modification
+        lang_before = self.env.context.get('lang', 'Non définie')
+        _logger.info("update_pricelist_ir_cron : Langue du contexte par défaut : %s", lang_before)
+        
+        # Forcer le contexte fr_FR pour que le search utilise les noms traduits
+        self = self.with_context(lang='fr_FR')
+        
+        # Log de la langue après modification
+        lang_after = self.env.context.get('lang', 'Non définie')
+        _logger.info("update_pricelist_ir_cron : Langue du contexte après with_context : %s", lang_after)
+        
         cr, user, context, su = self.env.args
         products = self.env['product.template'].search([])
         ids=[]
@@ -1045,7 +1055,14 @@ class ProductProduct(models.Model):
         for key in _PRICELISTS:
             name = _PRICELISTS[key]
             pricelists = self.env['product.pricelist'].search([('name', '=', name)], limit=1)
+
+
+
             for pricelist in pricelists:
+
+
+
+
                 #** Supprimer les lignes sans article correspondand ***********
                 items = self.env['product.pricelist.item'].search([('pricelist_id'   ,'=',pricelist.id)])
                 nb1=len(items)
@@ -1067,6 +1084,7 @@ class ProductProduct(models.Model):
                             price = round(getattr(product, field_name),6)
                             if price>0:
                                 product.product_variant_ids.update_pricelist(product_tmpl_id=product.id)
+
                 #**************************************************************
 
                 items = self.env['product.pricelist.item'].search([('pricelist_id'   ,'=',pricelist.id)])
@@ -1075,15 +1093,21 @@ class ProductProduct(models.Model):
 
 
     def update_pricelist(self, product_tmpl_id=False, pricelist=False):
+        # Forcer le contexte fr_FR pour que le search utilise les noms traduits
+        self = self.with_context(lang='fr_FR')
         prices = _PRICELISTS
         if pricelist:
             prices={pricelist: _PRICELISTS[pricelist]}
 
         for key in prices:
             name = prices[key]
-            pricelists = self.env['product.pricelist'].search([('name', '=', name)])
+            pricelists = self.env['product.pricelist'].search([('name', '=', name)], limit=1)
             if pricelists:
                 pricelist = pricelists[0]
+
+
+
+
             else:
                 vals={
                     'name': name
@@ -1121,9 +1145,14 @@ class ProductProduct(models.Model):
                             'fixed_price'    : price,
                         }
                         item = self.env['product.pricelist.item'].create(vals)
+
+                        _logger.info("update_pricelist:create : %s (id=%s) : %s/%s : %s : %s"%(key, pricelist.id,ct,nb,product.default_code,price))
+
+
+
                     if item:
                         item.fixed_price = price
-                        _logger.info("update_pricelist : %s : %s/%s : %s : %s"%(key,ct,nb,product.default_code,price))
+                        _logger.info("update_pricelist : %s (id=%s) : %s/%s : %s : %s"%(key, pricelist.id,ct,nb,product.default_code,price))
                     ct+=1
 
 
