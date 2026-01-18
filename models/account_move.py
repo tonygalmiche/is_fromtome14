@@ -59,6 +59,17 @@ class AccountMoveLine(models.Model):
     is_poids_net           = fields.Float(string='Poids net', digits=(14,4), compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
     is_lots                = fields.Text('Lots', compute='_compute_is_lots')
     is_picking_id          = fields.Many2one('stock.picking', 'BL', copy=False)
+    is_bio_id              = fields.Many2one('is.bio', 'BIO', copy=False)
+
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Lors de la création d'une ligne de facture, recopie is_bio_id depuis l'article"""
+        lines = super(AccountMoveLine, self).create(vals_list)
+        for line in lines:
+            if line.product_id and line.product_id.is_bio_id:
+                line.is_bio_id = line.product_id.is_bio_id.id
+        return lines
 
 
     def stock_move_line_action(self):

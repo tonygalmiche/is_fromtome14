@@ -30,6 +30,7 @@ InfoSaône - Module Odoo 14 pour Fromtome
         'account_banking_fr_lcr',
         'account_banking_sepa_credit_transfer',
         'account_banking_sepa_direct_debit',
+        'account_edi',
         'l10n_fr_department',
         'l10n_fr_fec',
         'l10n_fr_intrastat_product',

@@ -229,11 +229,10 @@ class ProductTemplate(models.Model):
     is_creation_le   = fields.Date(string='Création le', default=lambda *a: fields.Date.today())
     is_mis_a_jour_le = fields.Date(string='Mise à jour le')
     is_mise_en_avant = fields.Boolean(string='Mise en avant', help="Mise en avant de cet article dans le listing client", default=False)
-    is_bio_id   = fields.Many2one('is.bio', 'BIO')
-    #is_bio           = fields.Boolean(string='BIO', help="Article issue de l'agriculture biologique", default=False)
+    is_bio_id        = fields.Many2one('is.bio', 'BIO', copy=False)
     is_preco         = fields.Boolean(string='Préco.', default=False)
-    is_presentation = fields.Text(string='Présentation')
-    is_conseils     = fields.Text(string='Conseils')
+    is_presentation  = fields.Text(string='Présentation')
+    is_conseils      = fields.Text(string='Conseils')
 
 
     # CARACTÉRISTIQUES GÉNÉRALES DU PRODUIT:

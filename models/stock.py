@@ -185,6 +185,7 @@ class StockMove(models.Model):
     is_emplacement_fournisseur = fields.Integer(string="Emplacement", help="Emplacement palette fournisseur", readonly=True)
     is_poids_net_colis         = fields.Float(string='Poids net colis (Kg)', digits='Stock Weight', readonly=True)
     is_ecart_demande_fait      = fields.Float('Ecart', digits=(14,4), compute="_compute_is_ecart_demande_fait", help="Ecart entre 'Demande' et 'Fait'")
+    is_bio_id                  = fields.Many2one('is.bio', 'BIO', copy=False)
 
 
     @api.depends('product_uom_qty','quantity_done')
@@ -192,6 +193,16 @@ class StockMove(models.Model):
         for obj in self:
             ecart = round((obj.product_uom_qty or 0.0) - (obj.quantity_done or 0.0),4)
             obj.is_ecart_demande_fait = ecart
+
+
+    @api.model
+    def create(self, vals):
+        """Lors de la création d'un mouvement, recopie is_bio_id depuis l'article"""
+        res = super(StockMove, self).create(vals)
+        for move in res:
+            if move.product_id and move.product_id.is_bio_id:
+                move.is_bio_id = move.product_id.is_bio_id.id
+        return res
 
 
     def get_nb_colis(self):

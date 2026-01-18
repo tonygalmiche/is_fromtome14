@@ -138,9 +138,8 @@
                                             <div><strong><span t-field="line.is_description_cde"/></strong></div>
                                             <div t-if="line.is_lots" t-field="line.is_lots"/>
                                             <div t-if="line.sale_line_id.discount">Remise prévue de <span t-field="line.sale_line_id.discount"/>%</div>
-                                            <div t-if="line.product_id.is_bio_id"><i><span t-field="line.product_id.is_bio_id.name"/></i></div>
+                                            <div t-if="line.is_bio_id"><i><span t-field="line.is_bio_id.name"/></i></div>
                                         </td>
-                                        <!-- <td class="text-left;"><span style="font-size:6pt" t-field="line.product_id.barcode"/></td> -->
 
                                         <td class="text-right" t-if="o.partner_id.is_enseigne_id.prix_sur_livraison">
                                             <span t-field="line.sale_line_id.price_unit"/>€/<span t-field="line.sale_line_id.product_uom"/>
@@ -168,9 +167,8 @@
                                             Lot:<span t-field="line.lot_id"/>-<span t-field="line.is_type_tracabilite"/>:<span t-field="line.is_dlc_ddm"/>
                                         </div> 
                                         <div t-if="line.move_id.sale_line_id.discount">Remise prévue de <span t-field="line.move_id.sale_line_id.discount"/>%</div>
-                                        <div t-if="line.product_id.is_bio_id"><i><span t-field="line.product_id.is_bio_id.name"/></i></div>
+                                        <div t-if="line.is_bio_id"><i><span t-field="line.is_bio_id.name"/></i></div>
                                     </td>
-                                    <!-- <td class="text-left;"><span style="font-size:6pt" t-field="line.product_id.barcode"/></td> -->
 
                                     <td class="text-right" t-if="o.partner_id.is_enseigne_id.prix_sur_livraison">
                                         <span t-field="line.sale_line_id.price_unit"/>€/<span t-field="line.sale_line_id.product_uom"/>
