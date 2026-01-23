@@ -92,12 +92,12 @@
                             <field name="prix_achat"/>
                             <field name="montant_achat"/>
                             <field name="marge_brute"/>
+                            <field name="discount_fournisseur"/>
                             <field name="montant_achat_avec_remise"/>
                             <field name="marge_brute_avec_remise"/>
                             <field name="date_facture_fournisseur"/>
                             <field name="fournisseur_id"/>
                             <field name="ligne_facture_fournisseur_id"/>
-                            <field name="discount_fournisseur"/>
                         </group>
                         <group>
                             <field name="bloquer"/>
