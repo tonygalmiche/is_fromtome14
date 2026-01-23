@@ -63,17 +63,7 @@ class IsPromoClient(models.Model):
                 ('date_debut_promo', '<=', obj.date_fin_promo),
             ]
             lines = self.env['is.promo.fournisseur'].search(filtre, order="date_debut_promo")
-
-
-            print('TEST 1', lines)
-
             for promo in lines:
-                remise_client = round(promo.taux_remise * obj.pourcent_promo_a_repercuter/100)
-
-                print('TEST 2',remise_client)
-
-
-                if remise_client>=3:
                     for ligne in promo.ligne_ids:
                         # Méthode utilisée dans is.listing.prix.client
                         # items = self.env['product.pricelist.item'].search([
@@ -86,23 +76,25 @@ class IsPromoClient(models.Model):
                         # Méthode standard d'Odoo
 
                         if ligne.redistribue_client:
-                            prix_non_remise = obj.pricelist_id._compute_price_rule(
-                                [(ligne.product_id, 1, obj.partner_id)],
-                                promo.date_debut_promo,
-                                ligne.product_id.uom_id.id
-                            )[ligne.product_id.id][0]
-                            if prix_non_remise>0.1 and prix_non_remise<1000:
-                                prix_remise = prix_non_remise - remise_client*prix_non_remise/100
-                                vals={
-                                    'promo_id'            : obj.id,
-                                    'promo_fournisseur_id': promo.id,
-                                    'product_id'          : ligne.product_id.id,
-                                    'remise_fournisseur'  : ligne.taux_remise,
-                                    'remise_client'       : remise_client,
-                                    'prix_non_remise'     : prix_non_remise,
-                                    'prix_remise'         : prix_remise,
-                                }
-                                self.env['is.promo.client.ligne'].create(vals)
+                            remise_client = round(ligne.taux_remise * obj.pourcent_promo_a_repercuter/100)
+                            if remise_client>=3:
+                                prix_non_remise = obj.pricelist_id._compute_price_rule(
+                                    [(ligne.product_id, 1, obj.partner_id)],
+                                    promo.date_debut_promo,
+                                    ligne.product_id.uom_id.id
+                                )[ligne.product_id.id][0]
+                                if prix_non_remise>0.1 and prix_non_remise<1000:
+                                    prix_remise = prix_non_remise - remise_client*prix_non_remise/100
+                                    vals={
+                                        'promo_id'            : obj.id,
+                                        'promo_fournisseur_id': promo.id,
+                                        'product_id'          : ligne.product_id.id,
+                                        'remise_fournisseur'  : ligne.taux_remise,
+                                        'remise_client'       : remise_client,
+                                        'prix_non_remise'     : prix_non_remise,
+                                        'prix_remise'         : prix_remise,
+                                    }
+                                    self.env['is.promo.client.ligne'].create(vals)
 
 
     def get_products(self):
