@@ -72,7 +72,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
 
 
                         #** Recherche du dernier prix d'achat pour cet article ****
-                        prix_achat=montant_achat=marge_brute=0
+                        prix_achat=montant_achat=marge_brute=discount_fournisseur=0
                         ligne_facture_fournisseur_id = date_facture_fournisseur = False
                         fournisseur_id = False
                         if invoice.move_type in ('out_invoice', 'out_refund'):
@@ -82,7 +82,8 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                                         aml.price_unit,
                                         am.invoice_date,
                                         aml.id,
-                                        am.partner_id
+                                        am.partner_id,
+                                        aml.discount
                                     FROM account_move_line aml inner join account_move am on aml.move_id=am.id
                                     WHERE 
                                         am.invoice_date<=%s and
@@ -97,8 +98,14 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                                     date_facture_fournisseur     = row[1]
                                     ligne_facture_fournisseur_id = row[2]
                                     fournisseur_id               = row[3]
+                                    discount_fournisseur         = row[4] or 0
                                     montant_achat = prix_achat*line.quantity*sens
                             marge_brute = line.price_subtotal*sens-montant_achat
+                        #**********************************************************
+
+                        #** Calcul avec remise fournisseur *************************
+                        montant_achat_avec_remise = montant_achat * (1 - discount_fournisseur / 100)
+                        marge_brute_avec_remise = line.price_subtotal*sens - montant_achat_avec_remise
                         #**********************************************************
 
                         #** Poids en fonction du type d'avoir et du sens **********
@@ -125,15 +132,19 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                             "nb_colis"      : sens*(line.is_nb_colis or 0),
                             "poids_net"     : poids_net,
                             "price_unit"    : line.price_unit,
+                            "discount"      : line.discount,
                             "price_subtotal": line.price_subtotal*sens,
                             "move_type"     : _MOVE_TYPE[invoice.move_type],
                             "is_type_avoir" : is_type_avoir,
                             "prix_achat"    : prix_achat,
                             "montant_achat" : montant_achat,
                             "marge_brute"   : marge_brute,
+                            "montant_achat_avec_remise": montant_achat_avec_remise,
+                            "marge_brute_avec_remise"  : marge_brute_avec_remise,
                             "ligne_facture_fournisseur_id": ligne_facture_fournisseur_id,
                             "date_facture_fournisseur"    : date_facture_fournisseur,
                             "fournisseur_id"              : fournisseur_id,
+                            "discount_fournisseur"        : discount_fournisseur or 0,
                         }
                         self.env['is.analyse.facturation'].create(vals)
 
@@ -182,6 +193,8 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
                     "price_unit"    : price_unit,
                     "price_subtotal": price_subtotal,
                     "marge_brute"   : price_subtotal,
+                    "montant_achat_avec_remise": 0,
+                    "marge_brute_avec_remise"  : price_subtotal,
                     "move_type"     : "Rebut",
                     "fournisseur_id": partner_id,
                 }
@@ -216,11 +229,16 @@ class IsAnalyseFacturation(models.Model):
     poids_net         = fields.Float(string='Poids net', digits=(14,3))
     nb_colis          = fields.Float(string='Nb colis' , digits=(14,1))
     price_unit        = fields.Float("Prix"    , digits='Product Price')
+    discount          = fields.Float("Remise", digits='Discount')
     price_subtotal    = fields.Float("Montant HT")
 
+    discount_fournisseur = fields.Float("Remise fournisseur", digits='Discount')
+
     prix_achat        = fields.Float("Prix d'achat" , digits='Product Price')
-    montant_achat     = fields.Float("Montant achat")
-    marge_brute       = fields.Float("Marge brute")
+    montant_achat     = fields.Float("Montant achat sans remise")
+    marge_brute       = fields.Float("Marge brute sans remise fournisseur")
+    montant_achat_avec_remise = fields.Float("Montant achat avec remise")
+    marge_brute_avec_remise   = fields.Float("Marge brute avec remise fournisseur")
     ligne_facture_fournisseur_id = fields.Many2one('account.move.line', 'Ligne facture fournisseur')
     date_facture_fournisseur     = fields.Date("Date facture fournisseur")
     fournisseur_id               = fields.Many2one('res.partner', 'Fournisseur')
@@ -246,4 +264,84 @@ class IsAnalyseFacturation(models.Model):
     def update_fournisseur_action(self):
         for obj in self:
             obj.fournisseur_id = obj.ligne_facture_fournisseur_id.move_id.partner_id.id
+
+
+    def update_discount_action(self):
+        """Actualise les champs discount et discount_fournisseur à partir des lignes de factures"""
+        cr = self.env.cr
+        debut = datetime.now()
+        
+        _logger.info("Début de la mise à jour globale des champs discount et discount_fournisseur")
+        
+        # Mise à jour globale directe via SQL (sans limite de sélection)
+        # Mise à jour discount client
+        sql = """
+            UPDATE is_analyse_facturation iaf
+            SET discount = COALESCE(aml.discount, 0)
+            FROM account_move_line aml
+            WHERE iaf.invoice_line_id = aml.id
+            AND iaf.invoice_line_id IS NOT NULL
+        """
+        
+        cr.execute(sql)
+        nb_lignes = cr.rowcount
+        
+        # Mettre à 0 les lignes sans invoice_line_id (rebuts, etc.)
+        sql2 = """
+            UPDATE is_analyse_facturation
+            SET discount = 0
+            WHERE invoice_line_id IS NULL
+        """
+        
+        cr.execute(sql2)
+        nb_lignes2 = cr.rowcount
+        
+        # Mise à jour discount_fournisseur
+        sql3 = """
+            UPDATE is_analyse_facturation iaf
+            SET discount_fournisseur = COALESCE(aml.discount, 0)
+            FROM account_move_line aml
+            WHERE iaf.ligne_facture_fournisseur_id = aml.id
+            AND iaf.ligne_facture_fournisseur_id IS NOT NULL
+        """
+        
+        cr.execute(sql3)
+        nb_lignes3 = cr.rowcount
+        
+        # Mettre à 0 les lignes sans ligne_facture_fournisseur_id
+        sql4 = """
+            UPDATE is_analyse_facturation
+            SET discount_fournisseur = 0
+            WHERE ligne_facture_fournisseur_id IS NULL
+        """
+        
+        cr.execute(sql4)
+        nb_lignes4 = cr.rowcount
+        
+        # Recalcul du montant_achat_avec_remise et marge_brute_avec_remise
+        sql5 = """
+            UPDATE is_analyse_facturation
+            SET montant_achat_avec_remise = montant_achat * (1 - discount_fournisseur / 100),
+                marge_brute_avec_remise = price_subtotal - (montant_achat * (1 - discount_fournisseur / 100))
+            WHERE move_type != 'Rebut'
+        """
+        
+        cr.execute(sql5)
+        nb_lignes5 = cr.rowcount
+        
+        # Pour les rebuts, marge_brute_avec_remise = marge_brute
+        sql6 = """
+            UPDATE is_analyse_facturation
+            SET montant_achat_avec_remise = 0,
+                marge_brute_avec_remise = marge_brute
+            WHERE move_type = 'Rebut'
+        """
+        
+        cr.execute(sql6)
+        nb_lignes6 = cr.rowcount
+        cr.commit()
+        
+        duree = datetime.now() - debut
+        _logger.info("Mise à jour terminée en %s: discount (%s avec facture + %s sans facture), discount_fournisseur (%s avec facture + %s sans facture), montants recalculés (%s factures + %s rebuts)", 
+                     duree, nb_lignes, nb_lignes2, nb_lignes3, nb_lignes4, nb_lignes5, nb_lignes6)
 

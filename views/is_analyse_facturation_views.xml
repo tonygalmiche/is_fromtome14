@@ -36,6 +36,13 @@
         <field name="state">code</field>
         <field name="code">action = records.update_fournisseur_action()</field>
     </record>
+    <record id="is_analyse_facturation_discount_action_server" model="ir.actions.server">
+        <field name="name">Mise à jour de la remise</field>
+        <field name="model_id" ref="is_fromtome14.model_is_analyse_facturation"/>
+        <field name="binding_model_id" ref="is_fromtome14.model_is_analyse_facturation"/>
+        <field name="state">code</field>
+        <field name="code">action = records.update_discount_action()</field>
+    </record>
     <record id="is_analyse_facturation_ir_cron" model="ir.cron">
         <field name="name">Mise à jour analyse facturation sur 30 jours</field>
         <field name="model_id" ref="is_fromtome14.model_is_analyse_facturation"/>
@@ -71,6 +78,7 @@
                             <field name="nb_colis"/>
                             <field name="poids_net"/>
                             <field name="price_unit"/>
+                            <field name="discount"/>
                             <field name="price_subtotal"/>
                         </group>
                         <group>
@@ -84,9 +92,12 @@
                             <field name="prix_achat"/>
                             <field name="montant_achat"/>
                             <field name="marge_brute"/>
+                            <field name="montant_achat_avec_remise"/>
+                            <field name="marge_brute_avec_remise"/>
                             <field name="date_facture_fournisseur"/>
                             <field name="fournisseur_id"/>
                             <field name="ligne_facture_fournisseur_id"/>
+                            <field name="discount_fournisseur"/>
                         </group>
                         <group>
                             <field name="bloquer"/>
@@ -103,23 +114,30 @@
             <tree decoration-danger="price_subtotal &lt; 0">
                 <field name="invoice_date"/>
                 <field name="move_type"      optional="show"/>
+                <field name="invoice_id"      optional="hide" widget="many2one_clickable"/>
                 <field name="is_type_avoir"  optional="show"/>
-                <field name="partner_id"     optional="show"/>
+                <field name="partner_id"     optional="show" widget="many2one_clickable"/>
                 <field name="enseigne"       optional="show"/>
                 <field name="user_id"        optional="hide"/>
-                <field name="product_id"     optional="hide"/>
+                <field name="invoice_line_id"     optional="hide" widget="many2one_clickable"/>
+                <field name="product_id"     optional="hide" widget="many2one_clickable"/>
                 <field name="libelle"        optional="hide"/>
                 <field name="quantity"       optional="show" sum="Total"/>
                 <field name="product_uom_id" optional="show"/>
                 <field name="nb_colis"       optional="show" sum="Total"/>
                 <field name="poids_net"      optional="show" sum="Total"/>
                 <field name="price_unit"     optional="show"/>
+                <field name="discount"       optional="show"/>
                 <field name="price_subtotal" optional="show" sum="Total"/>
                 <field name="invoice_id"     optional="hide"/>
                 <field name="scrap_id"       optional="hide"/>
+                <field name="ligne_facture_fournisseur_id"     optional="hide" widget="many2one_clickable"/>
                 <field name="prix_achat"     optional="show"/>
-                <field name="montant_achat"  optional="show" sum="Total"/>
-                <field name="marge_brute"    optional="show" sum="Total"/>
+                <field name="discount_fournisseur"     optional="hide"/>
+                <field name="montant_achat"            optional="show" sum="Total"/>
+                <field name="marge_brute"              optional="show" sum="Total"/>
+                <field name="montant_achat_avec_remise" optional="hide" sum="Total"/>
+                <field name="marge_brute_avec_remise"   optional="show" sum="Total"/>
                 <field name="date_facture_fournisseur" optional="hide"/>
                 <field name="fournisseur_id"           optional="hide"/>
                 <field name="bloquer"                  optional="hide"/>
@@ -151,6 +169,8 @@
                 <filter name="facture_client_lc"          string="Factures client LC" domain="[('enseigne' , 'in', ['CELLIER DU FROMAGER']),('move_type', 'in', ['Facture client'])]"/>
                 <filter name="2023" string="2023" domain="[('invoice_date', '&gt;=', '2023-01-01'),('invoice_date', '&lt;=', '2023-12-31')]"/>
                 <filter name="2024" string="2024" domain="[('invoice_date', '&gt;=', '2024-01-01'),('invoice_date', '&lt;=', '2024-12-31')]"/>
+                <filter name="2025" string="2025" domain="[('invoice_date', '&gt;=', '2025-01-01'),('invoice_date', '&lt;=', '2025-12-31')]"/>
+                <filter name="2026" string="2026" domain="[('invoice_date', '&gt;=', '2026-01-01'),('invoice_date', '&lt;=', '2026-12-31')]"/>
            </search>
         </field>
     </record>
@@ -254,6 +274,45 @@
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'pivot', 'view_id': ref('achat_vente_par_enseigne_action_pivot')}),
                 (0, 0, {'view_mode': 'graph', 'view_id': ref('achat_vente_par_enseigne_action_graph')}),
+            ]"
+        />
+    </record>
+
+
+    <!-- Analyse marge brute -->
+    <record id="analyse_marge_brute_pivot" model="ir.ui.view">
+        <field name="name">analyse_marge_brute_pivot</field>
+        <field name="model">is.analyse.facturation</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="move_type" type="row"/>
+                <field name="price_subtotal" type="measure"/>
+                <field name="montant_achat" type="measure"/>
+                <field name="marge_brute" type="measure"/>
+                <field name="montant_achat_avec_remise" type="measure"/>
+                <field name="marge_brute_avec_remise" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="analyse_marge_brute_graph" model="ir.ui.view">
+        <field name="name">analyse_marge_brute_graph</field>
+        <field name="model">is.analyse.facturation</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="False">
+                <field name="invoice_date" type="row" interval="month"/>
+                <field name="marge_brute_avec_remise" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="analyse_marge_brute_action" model="ir.actions.act_window">
+        <field name="name">Analyse marge brute</field>
+        <field name="res_model">is.analyse.facturation</field>
+        <field name="view_mode">pivot,graph,tree,form</field>
+        <field name="domain">[('move_type','in',['Facture client','Avoir client','Rebut'])]</field>
+        <field name="context">{}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'pivot', 'view_id': ref('analyse_marge_brute_pivot')}),
+                (0, 0, {'view_mode': 'graph', 'view_id': ref('analyse_marge_brute_graph')}),
             ]"
         />
     </record>
