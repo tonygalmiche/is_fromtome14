@@ -6,8 +6,49 @@ from datetime import datetime, timedelta, date
 class Pricelist(models.Model):
     _inherit = "product.pricelist"
 
+    is_pricelist_id = fields.Many2one('product.pricelist', string="Liste de prix d'origine")
     is_augmentation = fields.Float("Pourcentage d'augmentation à appliquer", digits=(16, 2))
- 
+    is_product_ids = fields.Many2many('product.template', 'is_pricelist_product_tmpl_rel', 'pricelist_id', 'product_tmpl_id', 'Articles à ajouter')
+    is_existing_product_tmpl_ids = fields.One2many('product.template', compute='_compute_is_existing_product_tmpl_ids')
+
+    @api.depends('item_ids', 'item_ids.product_tmpl_id')
+    def _compute_is_existing_product_tmpl_ids(self):
+        for obj in self:
+            obj.is_existing_product_tmpl_ids = obj.item_ids.mapped('product_tmpl_id')
+
+    def ajouter_articles_action(self):
+        """Ajouter les articles sélectionnés dans la liste de prix à partir de la liste de prix d'origine"""
+        for obj in self:
+            if not obj.is_pricelist_id:
+                continue
+            # Récupérer les articles déjà présents dans la liste de prix
+            existing_product_tmpl_ids = obj.item_ids.mapped('product_tmpl_id').ids
+            
+            for product_tmpl in obj.is_product_ids:
+                # Vérifier si l'article n'existe pas déjà dans la liste de prix
+                if product_tmpl.id not in existing_product_tmpl_ids:
+                    # Rechercher la ligne correspondante dans la liste de prix d'origine
+                    origin_items = self.env['product.pricelist.item'].search([
+                        ('pricelist_id', '=', obj.is_pricelist_id.id),
+                        ('product_tmpl_id', '=', product_tmpl.id),
+                    ])
+                    if origin_items:
+                        # Copier les valeurs de la première ligne trouvée
+                        origin_item = origin_items[0]
+                        vals = {
+                            'pricelist_id': obj.id,
+                            'product_tmpl_id': product_tmpl.id,
+                            'product_id': origin_item.product_id.id if origin_item.product_id else False,
+                            'min_quantity': origin_item.min_quantity,
+                            'fixed_price': origin_item.fixed_price,
+                            'date_start': origin_item.date_start,
+                            'date_end': origin_item.date_end,
+                            'applied_on': origin_item.applied_on,
+                            'base': origin_item.base,
+                        }
+                        self.env['product.pricelist.item'].create(vals)
+            # Vider la sélection après l'ajout
+            obj.is_product_ids = False
 
     def appliquer_augmentation_action(self):
         for obj in self:

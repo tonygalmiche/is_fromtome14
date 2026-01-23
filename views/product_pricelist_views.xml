@@ -76,6 +76,19 @@
             <field name="model">product.pricelist</field>
             <field name="inherit_id" ref="product.product_pricelist_view"/>
             <field name="arch" type="xml">
+
+                <xpath expr="//sheet[1]" position="inside">
+                    <style>
+                        .o_form_view .o_form_sheet_bg > .o_form_sheet{
+                            max-width: 1800px;
+                        }
+                        .o_form_label{
+                            white-space: nowrap;
+                        }
+                    </style>
+                </xpath>
+
+
                 <sheet position="before">
                     <header>
                         <button 
@@ -87,22 +100,30 @@
                 </sheet>
                 <field name="currency_id" position="before">
                     <field name="partner_id"/>
+                    <field name="is_pricelist_id"/>
                 </field>
-                <!-- <xpath expr="//field[@name='item_ids']" position="after">
-                    <group col="4" style="text-align:right">
-                        <label for="is_augmentation" string="Pourcentage d'augmentation à appliquer"/>
-                        <div class="o_row">
-                            <field name="is_augmentation" nolabel="1"/>
-                            <span>%%</span>
+                <xpath expr="//group[1]" position="after">
+                    <group string="Ajouter des articles" attrs="{'invisible':[('is_pricelist_id','=',False)]}">
+                        <field name="is_existing_product_tmpl_ids" invisible="1"/>
+                        <field name="is_product_ids" domain="[('id', 'not in', is_existing_product_tmpl_ids)]" options="{'no_create': True}" nolabel="1" colspan="2">
+                            <tree>
+                                <button name="is_voir_article_action" type="object" icon="fa-search" title="Voir l'article"/>
+                                <field name="name" string="Article"/>
+                                <field name="default_code" string="Réf. interne"/>
+                                <field name="is_ref_fournisseur" string="Réf. fournisseur"/>
+                            </tree>
+                        </field>
+                        <div>
                             <button
-                                name="appliquer_augmentation_action"
+                                name="ajouter_articles_action"
                                 type="object"
-                                string="Appliquer l'augmentation"
-                                confirm="Êtes-vous certain de vouloir appliquer l'augmentation sur toutes les lignes ?"
+                                string="Ajouter ces articles"
+                                class="oe_highlight"
+                                attrs="{'invisible':[('is_product_ids','=',[])]}"
                             />
                         </div>
                     </group>
-                </xpath> -->
+                </xpath>
                 <xpath expr="//field[@name='item_ids']/tree/field[@name='date_end']" position="after">
                     <field name="is_prix_achat" optional="show"/>
                     <field name="is_taux_marge" optional="show"/>

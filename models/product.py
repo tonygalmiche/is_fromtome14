@@ -155,6 +155,19 @@ class ProductTemplate(models.Model):
     _inherit = ['product.template', 'barcodes.barcode_events_mixin']
 
 
+    def is_voir_article_action(self):
+        """Ouvrir la fiche article"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': self.name,
+            'res_model': 'product.template',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+
     def on_barcode_scanned(self, barcode):
         for obj in self:
             code   = str(barcode)[2:]
