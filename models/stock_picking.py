@@ -522,6 +522,7 @@ class Picking(models.Model):
     is_palette_demie   = fields.Integer(string='Palette Demie')
     is_nb_erreurs      = fields.Integer(string="Nombre d'erreurs")
     is_employe_id      = fields.Many2one('hr.employee', 'Employé concerné')
+    is_afficher_manquants = fields.Boolean(string='Afficher les manquants', default=True)
 
 
     @api.depends('partner_id','sale_id')

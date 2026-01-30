@@ -3,14 +3,6 @@
     <template id="is_report_delivery_document" inherit_id="stock.report_delivery_document">
         <t name="partner_header" position="replace">
             Adresse de Livraison:
-
-            <!-- <t t-if="partner" name="partner_header">
-                <t t-set="address">
-                    <div t-esc="partner"
-                    t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True}'/>
-                    <div t-if="o.partner_id.is_gln">GLN:<span t-field="o.partner_id.is_gln"/></div>
-                </t>
-            </t> -->
         </t>
         <div class="page" position="replace">
             <style>
@@ -28,7 +20,6 @@
                             <div t-if="o.partner_id.street2"><span t-field="o.partner_id.street2"/></div>
                             <div><span t-field="o.partner_id.zip"/> <span t-field="o.partner_id.city"/></div>
                             <div t-if="o.partner_id.country_id"><span t-field="o.partner_id.country_id.name"/></div>
-                            <!-- <div t-if="o.partner_id.phone">N°tel:<span t-field="o.partner_id.phone"/></div> -->
                         </th>
                         <th style="border:none" t-if="o.sale_id">
                             <div style="text-decoration: underline">Adresse de facturation:</div>
@@ -41,22 +32,14 @@
                             <t t-else="">
                                 <div><b><span t-field="o.sale_id.partner_invoice_id.name"/></b></div>
                             </t>
-
-
-                            <!-- <div><b><span t-field="o.sale_id.partner_invoice_id.name"/></b></div> -->
                             <div t-field="o.sale_id.partner_invoice_id.street"/>
                             <div t-if="o.sale_id.partner_invoice_id.street2"><span t-field="o.sale_id.partner_invoice_id.street2"/></div>
                             <div><span t-field="o.sale_id.partner_invoice_id.zip"/> <span t-field="o.sale_id.partner_invoice_id.city"/></div>
                             <div t-if="o.sale_id.partner_invoice_id.country_id"><span t-field="o.sale_id.partner_invoice_id.country_id.name"/></div>
-                            <!-- <div t-if="o.sale_id.partner_invoice_id.phone">N°tel:<span t-field="o.sale_id.partner_invoice_id.phone"/></div> -->
                         </th>
                     </tr>
                 </table>
                 <br />
-
-                <!-- <h2>
-                    <span t-field="o.name"/>
-                </h2> -->
                 <table class="table table-sm">
                     <thead>
                         <tr>
@@ -116,11 +99,7 @@
                         <tr>
                             <th class="text-left"> <strong>Code</strong></th>
                             <th class="text-left"> <strong>Désignation</strong></th>
-
                             <th class="text-right" t-if="o.partner_id.is_enseigne_id.prix_sur_livraison"> <strong>Prix</strong></th>
-
-
-                            <!-- <th class="text-left"> <strong>Gencode</strong></th> -->
                             <th class="text-center"> <strong>Colis</strong></th>
                             <th class="text-center"> <strong>PCB</strong></th>
                             <th class="text-center" colspan="2"><strong>Qt</strong></th>
@@ -201,6 +180,64 @@
                         </tr>
                     </thead>
                 </table>
+
+                <!-- Tableau des manquants -->
+                <t t-if="o.is_afficher_manquants and o.sale_id">
+                    <t t-set="has_manquants" t-value="False"/>
+                    <t t-foreach="o.sale_id.order_line" t-as="sale_line">
+                        <t t-set="colis_commandes" t-value="sale_line.is_nb_colis"/>
+                        <t t-set="colis_livres" t-value="0"/>
+                        <t t-foreach="o.move_ids_without_package" t-as="move">
+                            <t t-if="move.sale_line_id.id == sale_line.id">
+                                <t t-set="colis_livres" t-value="colis_livres + move.is_nb_colis"/>
+                            </t>
+                        </t>
+                        <t t-if="colis_commandes != colis_livres">
+                            <t t-set="has_manquants" t-value="True"/>
+                        </t>
+                    </t>
+
+                    <t t-if="has_manquants">
+                        <br/>
+                        <h4><strong>Articles manquants</strong></h4>
+                        <table class="table table-sm mt16">
+                            <thead>
+                                <tr>
+                                    <th class="text-left"><strong>Code</strong></th>
+                                    <th class="text-left"><strong>Désignation</strong></th>
+                                    <th class="text-center"><strong>PCB</strong></th>
+                                    <th class="text-center"><strong>Colis commandés</strong></th>
+                                    <th class="text-center"><strong>Colis préparés</strong></th>
+                                    <th class="text-center"><strong>Colis livrés</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.sale_id.order_line" t-as="sale_line">
+                                    <t t-set="colis_commandes" t-value="sale_line.is_nb_colis"/>
+                                    <t t-set="colis_prepares" t-value="0"/>
+                                    <t t-set="colis_livres" t-value="0"/>
+                                    <t t-foreach="o.move_ids_without_package" t-as="move">
+                                        <t t-if="move.sale_line_id.id == sale_line.id">
+                                            <t t-set="colis_prepares" t-value="colis_prepares + move.is_nb_colis"/>
+                                            <t t-set="colis_livres" t-value="colis_livres + move.is_nb_colis"/>
+                                        </t>
+                                    </t>
+                                    <t t-if="colis_commandes != colis_livres">
+                                        <tr>
+                                            <td class="text-left"><span t-field="sale_line.product_id.default_code"/></td>
+                                            <td class="text-left"><span t-field="sale_line.product_id.name"/></td>
+                                            <td class="text-center"><span t-field="sale_line.product_id.is_nb_pieces_par_colis"/></td>
+                                            <td class="text-center"><span t-esc="'%.2f' % colis_commandes"/></td>
+                                            <td class="text-center"><span t-esc="'%.2f' % colis_prepares"/></td>
+                                            <td class="text-center"><span t-esc="'%.2f' % colis_livres"/></td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+                    </t>
+                </t>
+
                 <t t-if="o.partner_id.is_enseigne_id.note_bl">
                     <br />
                     <strong><div t-field="o.partner_id.is_enseigne_id.note_bl"/></strong>

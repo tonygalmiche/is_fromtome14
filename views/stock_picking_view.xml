@@ -481,6 +481,7 @@ else:
                 <field name="is_preparation_transfert_id" attrs="{'invisible': [('is_preparation_transfert_id', '=', False)]}"/>
                 <field name="is_nb_erreurs"/>
                 <field name="is_employe_id"/>
+                <field name="is_afficher_manquants"/>
             </field>
            <field name="backorder_id" position="after">
             <field name="is_enseigne_id"/>

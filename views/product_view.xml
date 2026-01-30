@@ -111,6 +111,10 @@
                 <field name="is_ref_fournisseur"/>
                 <field name="barcode"/>
             </field>
+            <filter name="filter_to_sell" position="after">
+                <filter string="Avec image" name="avec_image" domain="[('image_1920', '!=', False)]"/>
+                <filter string="Sans image" name="sans_image" domain="[('image_1920', '=', False)]"/>
+            </filter>
         </field>
     </record>
     <record id="is_product_normal_form_view" model="ir.ui.view">
