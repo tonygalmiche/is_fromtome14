@@ -185,14 +185,7 @@
                 <t t-if="o.is_afficher_manquants and o.sale_id">
                     <t t-set="has_manquants" t-value="False"/>
                     <t t-foreach="o.sale_id.order_line" t-as="sale_line">
-                        <t t-set="colis_commandes" t-value="sale_line.is_nb_colis"/>
-                        <t t-set="colis_livres" t-value="0"/>
-                        <t t-foreach="o.move_ids_without_package" t-as="move">
-                            <t t-if="move.sale_line_id.id == sale_line.id">
-                                <t t-set="colis_livres" t-value="colis_livres + move.is_nb_colis"/>
-                            </t>
-                        </t>
-                        <t t-if="colis_commandes != colis_livres">
+                        <t t-if="sale_line.is_colis_cde_origine != sale_line.is_colis_liv">
                             <t t-set="has_manquants" t-value="True"/>
                         </t>
                     </t>
@@ -213,23 +206,14 @@
                             </thead>
                             <tbody>
                                 <t t-foreach="o.sale_id.order_line" t-as="sale_line">
-                                    <t t-set="colis_commandes" t-value="sale_line.is_nb_colis"/>
-                                    <t t-set="colis_prepares" t-value="0"/>
-                                    <t t-set="colis_livres" t-value="0"/>
-                                    <t t-foreach="o.move_ids_without_package" t-as="move">
-                                        <t t-if="move.sale_line_id.id == sale_line.id">
-                                            <t t-set="colis_prepares" t-value="colis_prepares + move.is_nb_colis"/>
-                                            <t t-set="colis_livres" t-value="colis_livres + move.is_nb_colis"/>
-                                        </t>
-                                    </t>
-                                    <t t-if="colis_commandes != colis_livres">
+                                    <t t-if="sale_line.is_colis_cde_origine != sale_line.is_colis_liv">
                                         <tr>
                                             <td class="text-left"><span t-field="sale_line.product_id.default_code"/></td>
                                             <td class="text-left"><span t-field="sale_line.product_id.name"/></td>
                                             <td class="text-center"><span t-field="sale_line.product_id.is_nb_pieces_par_colis"/></td>
-                                            <td class="text-center"><span t-esc="'%.2f' % colis_commandes"/></td>
-                                            <td class="text-center"><span t-esc="'%.2f' % colis_prepares"/></td>
-                                            <td class="text-center"><span t-esc="'%.2f' % colis_livres"/></td>
+                                            <td class="text-center"><span t-field="sale_line.is_colis_cde_origine"/></td>
+                                            <td class="text-center"><span t-field="sale_line.is_colis_cde"/></td>
+                                            <td class="text-center"><span t-field="sale_line.is_colis_liv"/></td>
                                         </tr>
                                     </t>
                                 </t>
