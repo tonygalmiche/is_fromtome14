@@ -427,6 +427,13 @@ class SaleOrderLine(models.Model):
             obj.is_ecart_qt_cde_prepa = ecart
 
 
+    @api.depends('is_colis_cde', 'is_colis_cde_origine', 'is_colis_liv')
+    def _compute_is_colis_manquant(self):
+        for obj in self:
+            colis_max = max(obj.is_colis_cde, obj.is_colis_cde_origine)
+            obj.is_colis_manquant = colis_max - obj.is_colis_liv
+
+
     is_purchase_line_id       = fields.Many2one('purchase.order.line', string=u'Ligne commande fournisseur', index=True, copy=False)
     is_date_reception         = fields.Date(string=u'Date réception')
     is_livraison_directe      = fields.Boolean(string=u'Livraison directe', help=u"Si cette case est cochée, une commande fournisseur spécifique pour ce client sera créée",default=False)
@@ -438,9 +445,10 @@ class SaleOrderLine(models.Model):
     is_correction_prix_achat  = fields.Float(string="Correction Prix d'achat", digits='Product Price', help="Utilsé dans 'Lignes des mouvements valorisés'")
     is_default_code           = fields.Char(string='Réf Fromtome'   , compute='_compute_ref', readonly=True, store=True)
     is_ref_fournisseur        = fields.Char(string='Réf Fournisseur', compute='_compute_ref', readonly=True, store=True)
-    is_colis_liv              = fields.Float(string='Colis Liv', digits=(14,2), compute='_compute_is_colis_liv', readonly=True, store=False)
+    is_colis_liv              = fields.Float(string='Colis Liv', digits=(14,2), compute='_compute_is_colis_liv', readonly=True, store=True)
     is_qt_cde                 = fields.Float(string='Qt Cde', digits='Product Unit of Measure',readonly=True,help="Ce champ permet de mémoriser la valeur du champ product_uom_qty au moment de la validation de la commande")
     is_ecart_qt_cde_prepa     = fields.Float(string='Qt Prépa - Qt Cde', digits='Product Unit of Measure', compute='_compute_is_ecart_qt_cde_prepa', readonly=True, store=True)
+    is_colis_manquant         = fields.Float(string='Manquant', digits=(14,2), compute='_compute_is_colis_manquant', readonly=True, store=True, help="Nombre de colis manquants : max(Colis Prépa, Colis Cde) - Colis Liv")
     is_calcul_besoins_purchase_line_id = fields.Many2one('purchase.order.line', compute='_compute_is_calcul_besoins_purchase_line_id', string="Ligne achat (Calcul)")
 
 
@@ -605,6 +613,15 @@ class SaleOrder(models.Model):
     def _compute_is_transporteur_id(self):
         for obj in self:
             obj.is_transporteur_id = obj.partner_id.is_transporteur_id.id
+
+
+    @api.depends('order_line.is_colis_manquant')
+    def _compute_is_total_colis_manquant(self):
+        for obj in self:
+            total = 0
+            for line in obj.order_line:
+                total += line.is_colis_manquant
+            obj.is_total_colis_manquant = total
  
 
     is_enseigne_id           = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
@@ -621,6 +638,7 @@ class SaleOrder(models.Model):
     is_heure_envoi_id        = fields.Many2one('is.heure.maxi', 'Jour / Heure limite', tracking=True, help="Heure maxi d'envoi de la commande au fournisseur")
     is_fusion_order_id       = fields.Many2one('sale.order', 'Fusionnée dans', copy=False,readonly=True)
     is_frais_port_id           = fields.Many2one(related='partner_id.is_frais_port_id')
+    is_total_colis_manquant  = fields.Float('Manquants', help='Total colis manquants', digits=(14,2), compute='_compute_is_total_colis_manquant', readonly=True, store=True)
 
 
     def _message_auto_subscribe_notify(self, partner_ids, template):

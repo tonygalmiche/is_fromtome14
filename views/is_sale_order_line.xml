@@ -69,6 +69,8 @@
                 <field name="product_uom"            optional="hide"/>
                 <field name="is_colis_cde_origine"   optional="show" sum="Total"/>
                 <field name="is_colis_cde"           optional="show" sum="Total"/>
+                <field name="is_colis_liv"           optional="show" sum="Total"/>
+                <field name="is_colis_manquant"      optional="show" sum="Total"/>
                 <field name="is_nb_pieces_par_colis" optional="show"/>
                 <field name="is_poids_net"           optional="show" sum="Total"/>
                 <field name="price_unit"             optional="hide"/>
@@ -97,6 +99,7 @@
                 <field name="is_commande_soldee"/>
                 <field name="state"/>
                 <field name="purchase_order_id"/>
+                <filter string="Manquants" name="manquants" domain="[('is_colis_manquant', '>', 0)]"/>
            </search>
         </field>
     </record>

@@ -51,6 +51,8 @@ class is_sale_order_line(models.Model):
     is_ref_fournisseur        = fields.Char(string='Réf Fournisseur', compute='_compute_ref', readonly=True, store=True)
     is_qt_cde                 = fields.Float(string='Qt Cde', digits='Product Unit of Measure',readonly=True,help="Ce champ permet de mémoriser la valeur du champ product_uom_qty au moment de la validation de la commande")
     is_ecart_qt_cde_prepa     = fields.Float(string='Qt Prépa - Qt Cde', digits='Product Unit of Measure', compute='_compute_is_ecart_qt_cde_prepa', readonly=True, store=True)
+    is_colis_liv              = fields.Float(string='Colis Liv', digits=(14,2))
+    is_colis_manquant         = fields.Float(string='Manquant', digits=(14,2), help="Nombre de colis manquants : max(Colis Prépa, Colis Cde) - Colis Liv")
 
 
 
@@ -95,7 +97,9 @@ class is_sale_order_line(models.Model):
                     sol.is_default_code,
                     sol.is_ref_fournisseur,
                     sol.is_qt_cde,
-                    sol.is_ecart_qt_cde_prepa
+                    sol.is_ecart_qt_cde_prepa,
+                    sol.is_colis_liv,
+                    sol.is_colis_manquant
                 from sale_order so    inner join sale_order_line     sol on so.id=sol.order_id
                                       inner join product_product     pp on sol.product_id=pp.id
                                       inner join product_template    pt on pp.product_tmpl_id=pt.id

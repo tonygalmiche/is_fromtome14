@@ -185,7 +185,7 @@
                 <t t-if="o.is_afficher_manquants and o.sale_id">
                     <t t-set="has_manquants" t-value="False"/>
                     <t t-foreach="o.sale_id.order_line" t-as="sale_line">
-                        <t t-if="sale_line.is_colis_cde_origine != sale_line.is_colis_liv">
+                        <t t-if="sale_line.is_colis_manquant != 0">
                             <t t-set="has_manquants" t-value="True"/>
                         </t>
                     </t>
@@ -202,11 +202,12 @@
                                     <th class="text-center"><strong>Colis commandés</strong></th>
                                     <th class="text-center"><strong>Colis préparés</strong></th>
                                     <th class="text-center"><strong>Colis livrés</strong></th>
+                                    <th class="text-center"><strong>Manquant</strong></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <t t-foreach="o.sale_id.order_line" t-as="sale_line">
-                                    <t t-if="sale_line.is_colis_cde_origine != sale_line.is_colis_liv">
+                                    <t t-if="sale_line.is_colis_manquant != 0">
                                         <tr>
                                             <td class="text-left"><span t-field="sale_line.product_id.default_code"/></td>
                                             <td class="text-left"><span t-field="sale_line.product_id.name"/></td>
@@ -214,6 +215,7 @@
                                             <td class="text-center"><span t-field="sale_line.is_colis_cde_origine"/></td>
                                             <td class="text-center"><span t-field="sale_line.is_colis_cde"/></td>
                                             <td class="text-center"><span t-field="sale_line.is_colis_liv"/></td>
+                                            <td class="text-center"><span t-field="sale_line.is_colis_manquant"/></td>
                                         </tr>
                                     </t>
                                 </t>
