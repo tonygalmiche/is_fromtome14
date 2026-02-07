@@ -164,7 +164,7 @@
                 <attribute name="string">Unité d'achat</attribute>
             </field>
             <field name="barcode" position="attributes">
-                <attribute name="string">GTIN14 (EAN128) </attribute>
+                <attribute name="string">GTIN 14 (EAN128) </attribute>
             </field>
         </field>
     </record>
@@ -181,7 +181,7 @@
                 </style>
             </xpath>
             <field name="barcode" position="attributes">
-                <attribute name="string">GTIN14 (EAN128) </attribute>
+                <attribute name="string">GTIN 14 (EAN128) </attribute>
             </field>
             <field name="uom_id" position="before">
                 <hr/><hr/>
