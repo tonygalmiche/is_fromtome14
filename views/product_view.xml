@@ -44,6 +44,7 @@
         <field name="arch" type="xml">
             <field name="categ_id" position="after">
                 <field name="is_ref_fournisseur"/>
+                <field name="is_gtin_13"/>
             </field>
             <field name="type" position="after">
                 <field name="is_stock_mini"/>
@@ -65,6 +66,7 @@
             <field name="default_code" position="after">
                 <field name="is_fournisseur_id"  optional="hide" widget="many2one_clickable"/>
                 <field name="is_ref_fournisseur" optional="show"/>
+                <field name="is_gtin_13" optional="show"/>
             </field>
              <field name="uom_id" position="after">
                 <field name="is_stock_mini" optional="hide"/>
@@ -110,6 +112,7 @@
              <field name="name" position="after">
                 <field name="is_ref_fournisseur"/>
                 <field name="barcode"/>
+                <field name="is_gtin_13"/>
             </field>
             <filter name="filter_to_sell" position="after">
                 <filter string="Avec image" name="avec_image" domain="[('image_1920', '!=', False)]"/>
@@ -161,7 +164,7 @@
                 <attribute name="string">Unité d'achat</attribute>
             </field>
             <field name="barcode" position="attributes">
-                <attribute name="string">code barre interne</attribute>
+                <attribute name="string">GTIN14 (EAN128) </attribute>
             </field>
         </field>
     </record>
@@ -178,7 +181,7 @@
                 </style>
             </xpath>
             <field name="barcode" position="attributes">
-                <attribute name="string">code barre interne</attribute>
+                <attribute name="string">GTIN14 (EAN128) </attribute>
             </field>
             <field name="uom_id" position="before">
                 <hr/><hr/>

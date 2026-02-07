@@ -115,6 +115,17 @@
                                         <td class="text-left"><span t-field="line.product_id.default_code"/></td>
                                         <td class="text-left">
                                             <div><strong><span t-field="line.is_description_cde"/></strong></div>
+
+                                            <div t-if="o.partner_id.is_enseigne_id.name.name=='FROMTOME SAS'">
+                                                <i>
+                                                    <t t-if="line.product_id.is_gtin_13">GTIN 13: <span t-field="line.product_id.is_gtin_13"/> - </t>
+                                                    <t t-if="line.product_id.barcode">GTIN 14: <span t-field="line.product_id.barcode"/></t>
+                                                </i>
+                                            </div>
+
+
+
+
                                             <div t-if="line.is_lots" t-field="line.is_lots"/>
                                             <div t-if="line.sale_line_id.discount">Remise prévue de <span t-field="line.sale_line_id.discount"/>%</div>
                                             <div t-if="line.is_bio_id"><i><span t-field="line.is_bio_id.name"/></i></div>

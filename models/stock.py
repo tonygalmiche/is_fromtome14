@@ -79,13 +79,14 @@ class StockMove(models.Model):
                     cle="%s-%s-%s"%(obj.product_id.id,line.lot_id.name,line.is_dlc_ddm)
                     if cle not in lots:
                         dlc = (line.is_dlc_ddm and line.is_dlc_ddm.strftime('%d/%m/%Y')) or ''
-                        lots[cle]=[(line.lot_id.name or ''),(line.is_type_tracabilite or '').upper(),dlc,0,0]
+                        lots[cle]=[(line.lot_id.name or ''),(line.is_type_tracabilite or '').upper(),dlc,0,0,0]
                     lots[cle][3]+=line.qty_done
                     lots[cle][4]+=line.is_nb_colis
+                    lots[cle][5]+=line.is_poids_net_reel
             t=[]
             for lot in lots:
                 l=lots[lot]
-                x="Lot:%s - %s:%s - Colis:%.1f"%(l[0],l[1],l[2],l[4])
+                x="Lot:%s - %s:%s - Colis:%.1f - Poids:%.1f"%(l[0],l[1],l[2],l[4],l[5])
                 t.append(x)
             obj.is_lots = "\n".join(t)
 

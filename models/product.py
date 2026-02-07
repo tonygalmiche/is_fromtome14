@@ -231,9 +231,9 @@ class ProductTemplate(models.Model):
             obj.is_fournisseur_id  = fournisseur_id
 
 
+    is_gtin_13         = fields.Char(string='GTIN 13', help="GTIN 13 = EAN13", tracking=True)
     is_ref_fournisseur = fields.Char(string='Réf fournisseur'        , compute='_compute_is_ref_fournisseur', readonly=True, store=True, tracking=True)
     is_fournisseur_id  = fields.Many2one('res.partner', 'Fournisseur', compute='_compute_is_ref_fournisseur', readonly=True, store=True, tracking=True)
-
 
     contrat_date_id = fields.One2many('contrat.date.client','product_id','Contrat Date')
 
