@@ -184,7 +184,8 @@ class IsListingPrixClient(models.Model):
                         else:
                             html+='<div style="text-align:center;height:25mm"/>'
                         if price:
-                            html+='<div class="prix">'+str(price)+'/'+p.uom_id.name+'</div>'
+                            price_fmt = '{:,.2f}'.format(price).replace(',', ' ').replace('.', ',')
+                            html+='<div class="prix">'+price_fmt+'&nbsp;€/'+p.uom_id.name+'</div>'
                         else:
                             html+='<div class="prix"/>'
                         html+='<div style="line-height:2.1">'

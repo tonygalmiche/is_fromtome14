@@ -37,5 +37,6 @@ from . import is_promo_fournisseur
 from . import is_promo_client
 from . import is_suivi_temps
 from . import is_calcul_des_besoins
+from . import is_modele_commande
 
 
