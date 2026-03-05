@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Vue formulaire -->
+    <record id="is_marge_brute_article_form" model="ir.ui.view">
+        <field name="name">is.marge.brute.article.form</field>
+        <field name="model">is.marge.brute.article</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="product_id"/>
+                            <field name="default_code"/>
+                            <field name="categ_id"/>
+                            <field name="is_fournisseur_id"/>
+                            <field name="annee"/>
+                        </group>
+                        <group>
+                            <field name="facturation_client"/>
+                            <field name="facturation_fournisseur"/>
+                            <field name="marge_brute_facturation"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue liste -->
+    <record id="is_marge_brute_article_tree" model="ir.ui.view">
+        <field name="name">is.marge.brute.article.tree</field>
+        <field name="model">is.marge.brute.article</field>
+        <field name="arch" type="xml">
+            <tree create="false">
+                <field name="product_id"/>
+                <field name="default_code" optional="show"/>
+                <field name="categ_id" optional="show"/>
+                <field name="is_fournisseur_id" optional="show"/>
+                <field name="annee"/>
+                <field name="facturation_client" sum="Total"/>
+                <field name="facturation_fournisseur" sum="Total"/>
+                <field name="marge_brute_facturation" sum="Total"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue recherche -->
+    <record id="is_marge_brute_article_search" model="ir.ui.view">
+        <field name="name">is.marge.brute.article.search</field>
+        <field name="model">is.marge.brute.article</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+                <field name="default_code"/>
+                <field name="categ_id"/>
+                <field name="is_fournisseur_id"/>
+                <field name="annee"/>
+                <filter name="group_by_annee" string="Année" context="{'group_by': 'annee'}"/>
+                <filter name="group_by_product" string="Article" context="{'group_by': 'product_id'}"/>
+                <filter name="group_by_categ" string="Catégorie" context="{'group_by': 'categ_id'}"/>
+                <filter name="group_by_fournisseur" string="Fournisseur" context="{'group_by': 'is_fournisseur_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vue pivot -->
+    <record id="is_marge_brute_article_pivot" model="ir.ui.view">
+        <field name="name">is.marge.brute.article.pivot</field>
+        <field name="model">is.marge.brute.article</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="annee" type="row"/>
+                <field name="facturation_client" type="measure"/>
+                <field name="facturation_fournisseur" type="measure"/>
+                <field name="marge_brute_facturation" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Vue graphique -->
+    <record id="is_marge_brute_article_graph" model="ir.ui.view">
+        <field name="name">is.marge.brute.article.graph</field>
+        <field name="model">is.marge.brute.article</field>
+        <field name="arch" type="xml">
+            <graph type="bar">
+                <field name="annee"/>
+                <field name="marge_brute_facturation" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="is_marge_brute_article_action" model="ir.actions.act_window">
+        <field name="name">Marge brute par article</field>
+        <field name="res_model">is.marge.brute.article</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+    </record>
+
+    <!-- Tâche planifiée -->
+    <record id="is_marge_brute_article_ir_cron" model="ir.cron">
+        <field name="name">Marge brute par article</field>
+        <field name="model_id" ref="is_fromtome14.model_is_marge_brute_article"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_marge_brute_article()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="nextcall">2026-03-06 03:00:00</field>
+        <field name="numbercall">-1</field>
+        <field name="active">True</field>
+    </record>
+
+</odoo>

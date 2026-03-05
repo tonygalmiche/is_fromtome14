@@ -111,6 +111,22 @@
 
 
     <menuitem
+        name="Audit marge brute"
+        id="is_audit_marge_brute_menu"
+        parent="is_analyse_facturation_main_menu"
+        sequence="35"
+        action="is_audit_marge_brute_action"
+    />
+
+    <menuitem
+        name="Marge brute par article"
+        id="is_marge_brute_article_menu"
+        parent="is_analyse_facturation_main_menu"
+        sequence="40"
+        action="is_marge_brute_article_action"
+    />
+
+    <menuitem
         id="is_analyse_facturation_update_menu"
         name="Mise à jour analyse facturation"
         parent="is_analyse_facturation_main_menu"

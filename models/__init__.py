@@ -38,5 +38,7 @@ from . import is_promo_client
 from . import is_suivi_temps
 from . import is_calcul_des_besoins
 from . import is_modele_commande
+from . import is_audit_marge_brute
+from . import is_marge_brute_article
 
 

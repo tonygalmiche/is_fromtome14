@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Action serveur : Recalculer analyse facturation -->
+    <record id="is_audit_marge_brute_recalculer_action_server" model="ir.actions.server">
+        <field name="name">Recalculer analyse facturation</field>
+        <field name="model_id" ref="is_fromtome14.model_is_audit_marge_brute"/>
+        <field name="binding_model_id" ref="is_fromtome14.model_is_audit_marge_brute"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_recalculer_analyse_facturation()</field>
+    </record>
+
+    <!-- Vue formulaire -->
+    <record id="is_audit_marge_brute_form" model="ir.ui.view">
+        <field name="name">is.audit.marge.brute.form</field>
+        <field name="model">is.audit.marge.brute</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false">
+                <header>
+                    <button name="action_actualiser" string="Actualiser" type="object" class="oe_highlight" icon="fa-refresh"/>
+                </header>
+                <sheet>
+                    <style>
+                        .o_form_label{
+                            white-space: nowrap;
+                        }
+                    </style>
+                    <group>
+                        <group string="Semaine">
+                            <field name="semaine"/>
+                            <field name="champ_date"/>
+                            <field name="date_lundi"/>
+                            <field name="annee"/>
+                            <field name="annee_comptable"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Facturation (account.move)">
+                            <label for="facturation_client"/>
+                            <div class="o_row">
+                                <button name="action_voir_facturation_client" type="object" icon="fa-search-plus" class="btn btn-link btn-sm p-0" title="Voir le détail"/>
+                                <field name="facturation_client" class="oe_inline"/>
+                            </div>
+                            <label for="facturation_fournisseur"/>
+                            <div class="o_row">
+                                <button name="action_voir_facturation_fournisseur" type="object" icon="fa-search-plus" class="btn btn-link btn-sm p-0" title="Voir le détail"/>
+                                <field name="facturation_fournisseur" class="oe_inline"/>
+                            </div>
+                            <field name="marge_brute_facturation"/>
+                        </group>
+                        <group string="Analyse facturation (is.analyse.facturation)">
+                            <label for="analyse_facturation_client"/>
+                            <div class="o_row">
+                                <button name="action_voir_analyse_facturation_client" type="object" icon="fa-search-plus" class="btn btn-link btn-sm p-0" title="Voir le détail"/>
+                                <field name="analyse_facturation_client" class="oe_inline"/>
+                            </div>
+                            <field name="analyse_facturation_fournisseur"/>
+                            <field name="marge_brute_analyse_facturation"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Écarts">
+                            <label for="ecart_facturation_client"/>
+                            <div class="o_row">
+                                <button name="action_recalculer_analyse_facturation" type="object" icon="fa-cogs" class="btn btn-link btn-sm p-0" title="Recalculer analyse facturation" attrs="{'invisible': [('ecart_facturation_client', '=', 0)]}"/>
+                                <field name="ecart_facturation_client" class="oe_inline"/>
+                            </div>
+                            <field name="ecart_facturation_fournisseur"/>
+                            <field name="ecart_marge_brute"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vue liste -->
+    <record id="is_audit_marge_brute_tree" model="ir.ui.view">
+        <field name="name">is.audit.marge.brute.tree</field>
+        <field name="model">is.audit.marge.brute</field>
+        <field name="arch" type="xml">
+            <tree create="false">
+                <field name="semaine"/>
+                <field name="date_lundi" optional="show"/>
+                <field name="annee" optional="show"/>
+                <field name="annee_comptable" optional="show"/>
+                <field name="champ_date" optional="show"/>
+                <button name="action_voir_facturation_client" type="object" icon="fa-search-plus" title="Voir le détail"/>
+                <field name="facturation_client" sum="Total"/>
+                <button name="action_voir_facturation_fournisseur" type="object" icon="fa-search-plus" title="Voir le détail"/>
+                <field name="facturation_fournisseur" sum="Total"/>
+                <field name="marge_brute_facturation" sum="Total"/>
+                <button name="action_voir_analyse_facturation_client" type="object" icon="fa-search-plus" title="Voir le détail"/>
+                <field name="analyse_facturation_client" sum="Total"/>
+                <field name="analyse_facturation_fournisseur" sum="Total"/>
+                <field name="marge_brute_analyse_facturation" sum="Total"/>
+                <field name="ecart_facturation_client" sum="Total"/>
+                <field name="ecart_facturation_fournisseur" sum="Total"/>
+                <field name="ecart_marge_brute" sum="Total"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vue recherche -->
+    <record id="is_audit_marge_brute_search" model="ir.ui.view">
+        <field name="name">is.audit.marge.brute.search</field>
+        <field name="model">is.audit.marge.brute</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="semaine"/>
+                <field name="annee"/>
+                <field name="annee_comptable"/>
+                <filter name="ecart_facturation_client_ne_zero" string="Écart facturation client ≠ 0" domain="[('ecart_facturation_client', '!=', 0)]"/>
+                <filter name="ecart_facturation_fournisseur_ne_zero" string="Écart facturation fournisseur ≠ 0" domain="[('ecart_facturation_fournisseur', '!=', 0)]"/>
+                <filter name="ecart_marge_brute_ne_zero" string="Écart marge brute ≠ 0" domain="[('ecart_marge_brute', '!=', 0)]"/>
+                <filter name="group_by_annee" string="Année" context="{'group_by': 'annee'}"/>
+                <filter name="group_by_annee_comptable" string="Année comptable" context="{'group_by': 'annee_comptable'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vue pivot -->
+    <record id="is_audit_marge_brute_pivot" model="ir.ui.view">
+        <field name="name">is.audit.marge.brute.pivot</field>
+        <field name="model">is.audit.marge.brute</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="semaine" type="row"/>
+                <field name="facturation_client" type="measure"/>
+                <field name="facturation_fournisseur" type="measure"/>
+                <field name="marge_brute_facturation" type="measure"/>
+                <field name="analyse_facturation_client" type="measure"/>
+                <field name="analyse_facturation_fournisseur" type="measure"/>
+                <field name="marge_brute_analyse_facturation" type="measure"/>
+                <field name="ecart_facturation_client" type="measure"/>
+                <field name="ecart_facturation_fournisseur" type="measure"/>
+                <field name="ecart_marge_brute" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Vue graphique -->
+    <record id="is_audit_marge_brute_graph" model="ir.ui.view">
+        <field name="name">is.audit.marge.brute.graph</field>
+        <field name="model">is.audit.marge.brute</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="False">
+                <field name="semaine" type="row"/>
+                <field name="marge_brute_facturation" type="measure"/>
+                <field name="marge_brute_analyse_facturation" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="is_audit_marge_brute_action" model="ir.actions.act_window">
+        <field name="name">Audit marge brute</field>
+        <field name="res_model">is.audit.marge.brute</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">[]</field>
+    </record>
+
+    <!-- Tâche planifiée -->
+    <record id="is_audit_marge_brute_ir_cron" model="ir.cron">
+        <field name="name">Audit marge brute - Mise à jour nocturne</field>
+        <field name="model_id" ref="is_fromtome14.model_is_audit_marge_brute"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_audit_marge_brute()</field>
+        <field name="interval_type">days</field>
+        <field name="interval_number">1</field>
+        <field name="numbercall">-1</field>
+        <field name="nextcall" eval="'2026-03-06 02:00:00'"/>
+    </record>
+
+</odoo>

@@ -61,7 +61,7 @@ class IsAnalyseFacturationUpdate(models.TransientModel):
             _logger.info("%s/%s : %s"%(ct,nb,invoice.name))
             for line in invoice.invoice_line_ids:
                 if line.id not in invoice_line_ids:
-                    if line.price_subtotal>0.0:
+                    if line.price_subtotal!=0.0:
                         sens=1
                         if invoice.move_type in ["out_refund","in_invoice"]:
                             sens=-1
