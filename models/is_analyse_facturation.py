@@ -223,6 +223,7 @@ class IsAnalyseFacturation(models.Model):
     user_id           = fields.Many2one('res.users', 'Vendeur')
     enseigne          = fields.Char('Enseigne')
     product_id        = fields.Many2one('product.product', 'Article')
+    categ_id          = fields.Many2one('product.category', 'Catégorie', related='product_id.categ_id', store=True)
     product_uom_id    = fields.Many2one('uom.uom', 'Unité')
     libelle           = fields.Text('Libellé')
     quantity          = fields.Float("Quantité", digits='Product Unit of Measure')

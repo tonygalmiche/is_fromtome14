@@ -74,6 +74,7 @@
                             <field name="user_id"/>
                             <field name="enseigne"/>
                             <field name="product_id"/>
+                            <field name="categ_id"/>
                             <field name="quantity"/>
                             <field name="nb_colis"/>
                             <field name="poids_net"/>
@@ -121,6 +122,7 @@
                 <field name="user_id"        optional="hide"/>
                 <field name="invoice_line_id"     optional="hide" widget="many2one_clickable"/>
                 <field name="product_id"     optional="hide" widget="many2one_clickable"/>
+                <field name="categ_id"       optional="hide"/>
                 <field name="libelle"        optional="hide"/>
                 <field name="quantity"       optional="show" sum="Total"/>
                 <field name="product_uom_id" optional="show"/>
@@ -154,6 +156,7 @@
                 <field name="partner_id"/>
                 <field name="enseigne"/>
                 <field name="product_id"/>
+                <field name="categ_id"/>
                 <field name="user_id"/>
                 <field name="invoice_id"/>
                 <field name="scrap_id"/>
@@ -162,6 +165,7 @@
                 <filter name="group_by_partner_id"   string="Partenaire"      context="{'group_by': 'partner_id'}"/>
                 <filter name="group_by_enseigne"     string="Enseigne"        context="{'group_by': 'enseigne'}"/>
                 <filter name="group_by_product_id"   string="Article"         context="{'group_by': 'product_id'}"/>
+                <filter name="group_by_categ_id"    string="Catégorie"       context="{'group_by': 'categ_id'}"/>
                 <filter name="group_by_invoice_date" string="Date"            context="{'group_by': 'invoice_date'}"/>
                 <filter name="filter_bloquer"        string="Bloquer"         domain="[('bloquer', '=', True)]"/>
                 <filter name="facture_client"        string="Factures client" domain="[('move_type', 'in', ['Facture client'])]"/>
