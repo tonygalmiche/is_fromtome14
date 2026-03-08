@@ -114,6 +114,7 @@
                                         <th t-if="o.afficher_prix" style="width:15%" class="text-right">Prix non remisé</th>
                                         <th style="width:15%" class="text-right">Remise (%)</th>
                                         <th t-if="o.afficher_prix" style="width:15%" class="text-right">Prix remisé</th>
+                                        <th t-if="o.afficher_prix" style="width:10%" class="text-center">Unité</th>
                                         <th t-if="o.afficher_image" style="width:15%" class="text-center">Photo</th>
                                     </tr>
                                 </thead>
@@ -124,6 +125,7 @@
                                         <td t-if="o.afficher_prix" class="text-right align-middle"><span t-field="line.prix_non_remise"/></td>
                                         <td class="text-right align-middle"><span t-field="line.remise_client"/></td>
                                         <td t-if="o.afficher_prix" class="text-right align-middle"><span t-field="line.prix_remise"/></td>
+                                        <td t-if="o.afficher_prix" class="text-center align-middle"><span t-field="line.uom_id"/></td>
                                         <td t-if="o.afficher_image" class="text-center align-middle">
                                             <img 
                                                 t-if="line and line.product_id.image_1920" 

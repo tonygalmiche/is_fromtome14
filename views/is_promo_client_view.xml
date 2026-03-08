@@ -76,6 +76,7 @@
                             <field name="date_debut_promo"/>
                             <field name="date_fin_promo"/>
                             <field name="product_id"           widget="many2one_clickable"/>
+                            <field name="uom_id"/>
                             <field name="remise_fournisseur"/>
                             <field name="remise_client"/>
                             <field name="prix_non_remise" optional="show"/>

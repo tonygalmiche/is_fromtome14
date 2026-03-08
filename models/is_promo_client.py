@@ -125,6 +125,7 @@ class IsPromoClientLigne(models.Model):
 
     promo_id             = fields.Many2one('is.promo.client', 'Promo client', required=True, ondelete='cascade')
     product_id           = fields.Many2one('product.product', 'Article', required=True)
+    uom_id               = fields.Many2one('uom.uom', "Unité", related='product_id.uom_id', store=True)
     promo_fournisseur_id = fields.Many2one('is.promo.fournisseur', 'Promo fournisseur', required=True)
     partner_id           = fields.Many2one(related="promo_fournisseur_id.partner_id")
     date_debut_promo     = fields.Date(related="promo_fournisseur_id.date_debut_promo")
