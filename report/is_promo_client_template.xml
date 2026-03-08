@@ -6,7 +6,7 @@
            <div class="o_boxed_header">
                 <div class="row mb8">
                     <div class="col-3">
-                        <img t-if="o.enseigne_id.name.image_1920" t-att-src="image_data_uri(o.enseigne_id.name.image_1920)" alt="Logo"/>
+                        <img t-if="o.enseigne_id.name.image_256" t-att-src="image_data_uri(o.enseigne_id.name.image_256)" alt="Logo"/>
                     </div>
                     <div class="col-9 text-right mb4">
                         <div name="res_company" class="mb4">
@@ -128,8 +128,8 @@
                                         <td t-if="o.afficher_prix" class="text-center align-middle"><span t-field="line.uom_id"/></td>
                                         <td t-if="o.afficher_image" class="text-center align-middle">
                                             <img 
-                                                t-if="line and line.product_id.image_1920" 
-                                                t-att-src="image_data_uri(line.product_id.image_1920)" alt="Photo"
+                                                t-if="line and line.product_id.image_128" 
+                                                t-att-src="image_data_uri(line.product_id.image_128)" alt="Photo"
                                                 style="max-height:15mm"
                                             />
                                         </td>
