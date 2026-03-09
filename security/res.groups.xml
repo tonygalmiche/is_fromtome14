@@ -25,4 +25,12 @@
     </record>
 
 
+    <record model="res.groups" id="is_analyse_marge_brute_group" >
+        <field name="name">Analyse marge brute</field>
+        <field name="comment">Ce groupe est le seul pouvant accèder aux menus d'analyse de la marge brute</field>
+        <field name="category_id" ref="is_groupe_fromtome_module_category"/>
+    </record>
+
+
+
 </odoo>

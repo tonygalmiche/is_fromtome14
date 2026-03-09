@@ -79,59 +79,53 @@
         sequence="10"
         action="is_analyse_facturation_action"
     />
-
-
     <menuitem
         name="Analyse marge brute"
         id="analyse_marge_brute_menu"
         parent="is_analyse_facturation_main_menu"
         sequence="15"
         action="analyse_marge_brute_action"
+        groups="is_analyse_marge_brute_group" 
     />
-
-
-
-
     <menuitem
         name="Poids net facturé par semaine FT+LF (hors JERMI)"
         id="poids_net_facture_menu"
         parent="is_analyse_facturation_main_menu"
         sequence="20"
         action="poids_net_facture_action"
+        groups="is_analyse_marge_brute_group" 
     />
-
-
     <menuitem
         name="Achats et ventes par enseigne"
         id="achat_vente_par_enseigne_menu"
         parent="is_analyse_facturation_main_menu"
         sequence="30"
         action="achat_vente_par_enseigne_action"
+        groups="is_analyse_marge_brute_group" 
     />
-
-
     <menuitem
         name="Audit marge brute"
         id="is_audit_marge_brute_menu"
         parent="is_analyse_facturation_main_menu"
         sequence="35"
         action="is_audit_marge_brute_action"
+        groups="is_analyse_marge_brute_group" 
     />
-
     <menuitem
         name="Marge brute par article"
         id="is_marge_brute_article_menu"
         parent="is_analyse_facturation_main_menu"
         sequence="40"
         action="is_marge_brute_article_action"
+        groups="is_analyse_marge_brute_group" 
     />
-
     <menuitem
         id="is_analyse_facturation_update_menu"
         name="Mise à jour analyse facturation"
         parent="is_analyse_facturation_main_menu"
         sequence="900"
         action="is_analyse_facturation_update_action"
+        groups="is_analyse_marge_brute_group" 
     />
 
     
