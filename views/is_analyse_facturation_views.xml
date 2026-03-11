@@ -251,6 +251,7 @@
         <field name="arch" type="xml">
             <pivot >
                 <field name="move_type"      type="row"/>
+                <field name="categ_id"       type="row"/>
                 <field name="enseigne"       type="col"/>
                 <field name="montant_achat"  type="measure"/>
                 <field name="price_subtotal" type="measure"/>
