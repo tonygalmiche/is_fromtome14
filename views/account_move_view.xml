@@ -56,7 +56,13 @@
                 <field name="is_date_releve"  attrs="{'invisible':[('is_date_releve','=',False)]}"/>
                 <field name="is_date_paiement"   attrs="{'invisible':[('is_date_paiement','=',False)]}"/>
                 <field name="is_delai_paiement"  attrs="{'invisible':[('is_delai_paiement','=',0)]}"/>
+
+                <field name="is_date_derniere_commande"/>
+                <field name="is_sale_order_id"     attrs="{'invisible':[('move_type','not in',['out_invoice','out_refund'])]}"/>
+                <field name="is_purchase_order_id" attrs="{'invisible':[('move_type','not in',['in_invoice','in_refund'])]}"/>
+
             </div>
+
             <label for="invoice_payment_term_id" position="replace"/>
             <xpath expr="//field[@name='invoice_date_due']/.." position="replace">
                 <field name="invoice_payment_term_id"/>
@@ -118,25 +124,24 @@
                 <field name="is_type_avoir"  optional="show" invisible="context.get('default_move_type') not in ('out_refund', 'in_refund')"/>
                 <field name="is_enseigne_id" optional="show"/>
             </field>
+
+            <field name="invoice_date" position="before">
+                <field name="is_sale_order_id"          optional="hide"/>
+                <field name="is_purchase_order_id"      optional="hide"/>
+                <field name="is_date_derniere_commande" optional="show"/>
+            </field>
+
             <field name="state" position="before">
                 <field name="is_date_paiement"    optional="show"/>
                 <field name="is_delai_paiement"   optional="show"/>
                 <field name="is_export_compta_id" optional="show"/>
             </field>
-            <!-- <field name="invoice_date_due" position="before">
-                <field name="invoice_payment_term_id" optional="show"/>
-                <field name="invoice_date_due"        optional="show"/>
-            </field> -->
             <field name="company_id" position="before">
                 <field name="is_date_relance"   optional="hide"/>
                 <field name="is_date_releve"    optional="hide"/>
                 <field name="date"              optional="hide"/>
                 <field name="is_motif_avoir_id" optional="hide"/>
             </field>
-            <!-- <field name="date" position="replace">
-                <field name="is_date_relance" optional="show"/>
-                <field name="date"            optional="hide"/>
-            </field> -->
         </field>
     </record>
 

@@ -200,6 +200,39 @@ class AccountMove(models.Model):
     is_date_paiement    = fields.Date(string='Date paiement'       , compute='_compute_is_date_delai_paiement', store=True, readonly=True)
     is_delai_paiement   = fields.Integer(string='Délai de paiement', compute='_compute_is_date_delai_paiement', store=True, readonly=True)
     is_type_avoir       = fields.Selection(_TYPE_AVOIR, 'Type avoir', default="avoir_quantite", copy=False)
+    is_date_derniere_commande = fields.Date(string='Date livraison commande', help="Date livraison client ou Date de réception",  compute='_compute_is_derniere_commande', store=True)
+    is_sale_order_id          = fields.Many2one('sale.order', string='Commande client', compute='_compute_is_derniere_commande', store=True)
+    is_purchase_order_id      = fields.Many2one('purchase.order', string='Commande fournisseur', compute='_compute_is_derniere_commande', store=True)
+
+
+    @api.depends('invoice_line_ids')
+    def _compute_is_derniere_commande(self):
+        for obj in self:
+            date_derniere_commande = False
+            sale_order = False
+            purchase_order = False
+            # Facture client : recherche des commandes client
+            if obj.move_type in ('out_invoice', 'out_refund'):
+                for line in obj.invoice_line_ids:
+                    for sale_line in line.sale_line_ids:
+                        order = sale_line.order_id
+                        if order and order.is_date_livraison:
+                            if not date_derniere_commande or order.is_date_livraison > date_derniere_commande:
+                                date_derniere_commande = order.is_date_livraison
+                                sale_order = order
+            # Facture fournisseur : recherche des commandes fournisseur
+            elif obj.move_type in ('in_invoice', 'in_refund'):
+                for line in obj.invoice_line_ids:
+                    if line.purchase_line_id:
+                        order = line.purchase_line_id.order_id
+                        if order and order.date_planned:
+                            order_date = order.date_planned.date() if isinstance(order.date_planned, datetime) else order.date_planned
+                            if not date_derniere_commande or order_date > date_derniere_commande:
+                                date_derniere_commande = order_date
+                                purchase_order = order
+            obj.is_date_derniere_commande = date_derniere_commande
+            obj.is_sale_order_id = sale_order
+            obj.is_purchase_order_id = purchase_order
 
 
     # def write(self, vals):
