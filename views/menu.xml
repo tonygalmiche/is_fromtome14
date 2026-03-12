@@ -101,7 +101,6 @@
         parent="is_analyse_facturation_main_menu"
         sequence="30"
         action="achat_vente_par_enseigne_action"
-        groups="is_analyse_marge_brute_group" 
     />
     <menuitem
         name="Audit marge brute"
