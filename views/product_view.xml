@@ -74,6 +74,10 @@
                 <field name="is_nb_pieces_par_colis" optional="hide"/>
                 <field name="is_poids_net_colis" optional="hide"/>
                 <field name="is_enseigne_id" optional="hide"/>
+
+                <field name="milk_type_ids" optional="hide" widget="many2many_tags"/>
+
+
             </field>
             <field name="responsible_id" position="replace">
                 <field name="responsible_id" optional="hide"/>
@@ -212,13 +216,22 @@
             <xpath expr="//form//sheet//notebook//page[1]" position="after">
                 <page string="Fiche technique">
 
+                    <field name="has_prompt_ia" invisible="1"/>
                     <group col="3">
                         <field name="is_fiche_technique_ids" widget="many2many_binary"/>
-                        <button
+                        <!-- <button
                             string="Importer cette fiche techinque" 
                             name="importer_fiche_technique_action" 
                             type="object" 
                             attrs="{'invisible': [('is_fiche_technique_ids', '=', [])]}"
+                        /> -->
+                        <button
+                            string="Analyse IA de la fiche technique" 
+                            name="analyse_ia_fiche_technique_action" 
+                            type="object" 
+                            class="btn btn-primary"
+                            attrs="{'invisible': ['|', ('is_fiche_technique_ids', '=', []), ('has_prompt_ia', '=', False)]}"
+                            confirm="Lancer l'analyse IA de la fiche technique ? Cela va mettre à jour les champs de l'onglet."
                         />
                     </group>
                     <group attrs="{'invisible': [('is_fiche_technique_import', '=', False)]}">
@@ -281,7 +294,7 @@
                         <field name="is_ingredient_import"/>
                         <field name="is_allergene_import"/>
                     </group>
-                    <group>
+                    <!-- <group>
                         <field name="is_ingredient_ids" nolabel="1" >
                             <tree editable="bottom">
                                 <field name="ordre" widget="handle"/>
@@ -289,20 +302,27 @@
                                 <field name="allergene"/>
                             </tree>
                         </field>
-                    </group>
-                    <group>
+                    </group> -->
+                    <!-- <group>
                         <field name="is_ingredient"/>
-                    </group>
+                    </group> -->
                     <group string="Germes"/>
-                    <field name="is_germe_ids" nolabel="1" >
+                    <group>
+                        <field name="is_germe_import"/>
+                    </group>
+                    <!-- <field name="is_germe_ids" nolabel="1" >
                         <tree editable="bottom">
                             <field name="ordre" widget="handle"/>
                             <field name="germe_id"/>
                             <field name="critere"/>
                         </tree>
                     </field>
-                    <button string="Recharger les germes" name="recharger_germes_action" type="object" confirm="Cela va remplacer les données ci-dessus"/>
+                    <button string="Recharger les germes" name="recharger_germes_action" type="object" confirm="Cela va remplacer les données ci-dessus"/> -->
                     <group string="Valeurs Nutritionnelles Moyennes pour 100g"/>
+                    <group>
+                        <field name="is_valeur_nutritionnelle_import"/>
+                    </group>
+                    <!-- 
                     <field name="is_valeur_nutritionnelle_ids" nolabel="1" >
                         <tree editable="bottom">
                             <field name="ordre" widget="handle"/>
@@ -310,7 +330,20 @@
                             <field name="valeur"/>
                         </tree>
                     </field>
-                    <button string="Recharger les valeurs" name="recharger_valeurs_action" type="object" confirm="Cela va remplacer les données ci-dessus"/>
+                    <button string="Recharger les valeurs" name="recharger_valeurs_action" type="object" confirm="Cela va remplacer les données ci-dessus"/> -->
+                </page>
+                <page string="Analyse IA" attrs="{'invisible': [('is_llm_prompt', '=', False)]}">
+                    <group string="Prompt envoyé">
+                        <field name="is_llm_prompt" nolabel="1"/>
+                    </group>
+                    <group string="Réponse IA">
+                        <field name="is_llm_reponse" nolabel="1"/>
+                    </group>
+                    <group>
+                        <field name="is_llm_etat"/>
+                        <field name="is_llm_temps"/>
+                        <field name="is_llm_taille_envoi"/>
+                    </group>
                 </page>
                 <page string="Gestion des tarifs">
                     <group string="Prix d'achat">

@@ -8,8 +8,11 @@ from datetime import datetime
 import pytz
 import math
 import base64
+import difflib
+import json
 from subprocess import PIPE, Popen
 import re
+import time
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -272,19 +275,22 @@ class ProductTemplate(models.Model):
 
     # CARACTÉRISTIQUES ORGANOLEPTIQUES:
     is_forme   = fields.Char(string='Forme')
-    is_couleur = fields.Char(string='Couleur')
+    is_couleur = fields.Char(string='Couleur fromage')
     texture    = fields.Char(string='Texture')
 
     degustation = fields.Char(string='Goût / Dégustation')
     odeur       = fields.Char(string='Odeur')
 
-    is_ingredient_ids    = fields.One2many('is.ingredient.line', 'product_id', "Lignes", copy=True)
-    is_ingredient        = fields.Html(string='Ingrédients (dont allergènes en gras)', compute='_compute_is_ingredient')
-    is_ingredient_import = fields.Text(string='Ingrédients importés')
-    is_allergene_import  = fields.Text(string='Allergènes importés')
-
+    is_ingredient_ids            = fields.One2many('is.ingredient.line', 'product_id', "Lignes", copy=True)
+    is_ingredient                = fields.Html(string='Ingrédients (dont allergènes en gras)', compute='_compute_is_ingredient')
     is_germe_ids                 = fields.One2many('is.germe.line'                , 'product_id', "Germes" , copy=True)
     is_valeur_nutritionnelle_ids = fields.One2many('is.valeur.nutritionnelle.line', 'product_id', "Valeurs", copy=True)
+
+    is_ingredient_import            = fields.Text(string='Liste des ingrédients')
+    is_allergene_import             = fields.Text(string='Liste des allergènes')
+    is_germe_import                 = fields.Text(string='Liste des germes')
+    is_valeur_nutritionnelle_import = fields.Text(string='Valeurs nutritionnelles')
+
 
     product_label_ids = fields.Many2many('product.label','product_label_rel','product_id','label_id', string='Labels')
     mode_vente        = fields.Selection(selection=[('colis', 'Colis'),('piece', 'Pièce'),('decoupe', 'Découpe')], string="Mode Vente", tracking=True)
@@ -330,6 +336,14 @@ class ProductTemplate(models.Model):
     is_discount                          = fields.Float(string="Remise (%)", compute='_compute_is_discount', readonly=True, store=True, digits="Discount", tracking=True, help="Remise du fournisseur par défaut (actualisé la nuit par la gestion des promos)")
     is_fiche_technique_ids               = fields.Many2many('ir.attachment', 'product_is_fiche_technique_rel', 'product_id', 'file_id', 'Fiche techinque')
     is_fiche_technique_import            =  fields.Text('Résultat importation fiche techinque')
+
+    # Champs résultat analyse IA
+    is_llm_prompt          = fields.Text(string="Prompt envoyé")
+    is_llm_reponse         = fields.Text(string="Réponse IA")
+    is_llm_temps           = fields.Float(string="Temps (s)", digits=(10, 1))
+    is_llm_taille_envoi    = fields.Float(string="Taille envoi (Mo)", digits=(10, 2))
+    is_llm_etat            = fields.Char(string="État")
+    has_prompt_ia          = fields.Boolean(string="Prompts IA disponibles", compute='_compute_has_prompt_ia')
 
 
     is_colisage            = fields.Selection(string='Colisage', selection=_COLISAGE, required=True, tracking=True, default='1', help="Utilisé dans 'Préparation transfert entrepôt'")
@@ -770,154 +784,419 @@ class ProductTemplate(models.Model):
             return res
 
 
-    def importer_fiche_technique_action(self):
-        for obj in self:
-            for attachment in obj.is_fiche_technique_ids:
-                pdf=base64.b64decode(attachment.datas)
-                name = 'fiche-technique-%s'%obj.id
-                path = "/tmp/%s.pdf"%name
-                f = open(path,'wb')
-                f.write(pdf)
-                f.close()
-                cde = "cd /tmp && pdftotext -layout %s.pdf"%name
-                p = Popen(cde, shell=True, stdout=PIPE, stderr=PIPE)
-                stdout, stderr = p.communicate()
-                path = "/tmp/%s.txt"%name
-                r = open(path,'rb').read().decode('utf-8')
-                lines = r.split('\n')
-                ledict={}
-                for line in lines:
-                    ledict = obj.regex_extract(ledict,'01-Conditionnement'          , line, 'Conditionnement :'                 , False)
-                    ledict = obj.regex_extract(ledict,'01-Poids brut'               , line, 'Poids brut :'                      , False)
-                    ledict = obj.regex_extract(ledict,"02-N° d'agrément"            , line, "N° d'agrément sanitaire européen :", False)
-                    ledict = obj.regex_extract(ledict,'03-Energie'                  , line, 'Energie :'                   , '    ')
-                    ledict = obj.regex_extract(ledict,'04-Matières Grasses'         , line, 'Matières Grasses :'          , '    ')
-                    ledict = obj.regex_extract(ledict,'05-Dont Acides gras saturés' , line, '► dont acides gras saturés :', '    ')
-                    ledict = obj.regex_extract(ledict,'06-Glucides'                 , line, 'Glucides :'                  , '    ')
-                    ledict = obj.regex_extract(ledict,'07-Dont Sucres'              , line, '► dont sucres :'             , False)
-                    ledict = obj.regex_extract(ledict,'08-Protéines'                , line, 'Protéines :'                 , False)
-                    ledict = obj.regex_extract(ledict,'09-Sel'                      , line, 'Sel :'                       , False)
-                    ledict = obj.regex_extract(ledict,'10-Listeria'                 , line, 'Listeria :'                  , False)
-                    ledict = obj.regex_extract(ledict,'11-Salmonelle'               , line, 'Salmonelle :'                , False)
-                    ledict = obj.regex_extract(ledict,'12-Escherichia coli'         , line, 'Escherichia coli :'          , False)
-                    ledict = obj.regex_extract(ledict,'13-Staphylocoques'           , line, 'Staphylocoques :'            , False)
 
-                #** Recherche des ingredients sur plusieurs lignes ************
-                search_start = search_end = False
-                ingredients=[]
-                for line in lines:
-                    if search_start:
-                        x = re.findall("Matière grasse :", line)
-                        if x:
-                            search_end=True
-                    if search_start and not search_end:
-                        ingredient = line.replace('Ingrédients :','').strip()
-                        if ingredient!='':
-                            ingredients.append(ingredient)
-                    if not search_end:
-                        x = re.findall("       PRODUIT", line)
-                        if x:
-                            search_start=True
-                ledict['14-Ingrédients']='\n'.join(ingredients)
-                #**************************************************************
+    #TODO : Remplacé le 28/03/2026 par analyse_ia_fiche_technique_action
+    # def importer_fiche_technique_action(self):
+    #     for obj in self:
+    #         for attachment in obj.is_fiche_technique_ids:
+    #             pdf=base64.b64decode(attachment.datas)
+    #             name = 'fiche-technique-%s'%obj.id
+    #             path = "/tmp/%s.pdf"%name
+    #             f = open(path,'wb')
+    #             f.write(pdf)
+    #             f.close()
+    #             cde = "cd /tmp && pdftotext -layout %s.pdf"%name
+    #             p = Popen(cde, shell=True, stdout=PIPE, stderr=PIPE)
+    #             stdout, stderr = p.communicate()
+    #             path = "/tmp/%s.txt"%name
+    #             r = open(path,'rb').read().decode('utf-8')
+    #             lines = r.split('\n')
+    #             ledict={}
+    #             for line in lines:
+    #                 ledict = obj.regex_extract(ledict,'01-Conditionnement'          , line, 'Conditionnement :'                 , False)
+    #                 ledict = obj.regex_extract(ledict,'01-Poids brut'               , line, 'Poids brut :'                      , False)
+    #                 ledict = obj.regex_extract(ledict,"02-N° d'agrément"            , line, "N° d'agrément sanitaire européen :", False)
+    #                 ledict = obj.regex_extract(ledict,'03-Energie'                  , line, 'Energie :'                   , '    ')
+    #                 ledict = obj.regex_extract(ledict,'04-Matières Grasses'         , line, 'Matières Grasses :'          , '    ')
+    #                 ledict = obj.regex_extract(ledict,'05-Dont Acides gras saturés' , line, '► dont acides gras saturés :', '    ')
+    #                 ledict = obj.regex_extract(ledict,'06-Glucides'                 , line, 'Glucides :'                  , '    ')
+    #                 ledict = obj.regex_extract(ledict,'07-Dont Sucres'              , line, '► dont sucres :'             , False)
+    #                 ledict = obj.regex_extract(ledict,'08-Protéines'                , line, 'Protéines :'                 , False)
+    #                 ledict = obj.regex_extract(ledict,'09-Sel'                      , line, 'Sel :'                       , False)
+    #                 ledict = obj.regex_extract(ledict,'10-Listeria'                 , line, 'Listeria :'                  , False)
+    #                 ledict = obj.regex_extract(ledict,'11-Salmonelle'               , line, 'Salmonelle :'                , False)
+    #                 ledict = obj.regex_extract(ledict,'12-Escherichia coli'         , line, 'Escherichia coli :'          , False)
+    #                 ledict = obj.regex_extract(ledict,'13-Staphylocoques'           , line, 'Staphylocoques :'            , False)
 
-                #** Recherche Allergènes **************************************
-                search_start = False
-                for line in lines:
-                    if search_start:
-                        x = re.findall("(.*)Froid positif :", line)
-                        if x:
-                            ledict['15-Allergènes']=x[0].strip()
-                        break
-                    x = re.findall("Conditions de conservation", line)
-                    if x:
-                        search_start=True
-                #**************************************************************
+    #             #** Recherche des ingredients sur plusieurs lignes ************
+    #             search_start = search_end = False
+    #             ingredients=[]
+    #             for line in lines:
+    #                 if search_start:
+    #                     x = re.findall("Matière grasse :", line)
+    #                     if x:
+    #                         search_end=True
+    #                 if search_start and not search_end:
+    #                     ingredient = line.replace('Ingrédients :','').strip()
+    #                     if ingredient!='':
+    #                         ingredients.append(ingredient)
+    #                 if not search_end:
+    #                     x = re.findall("       PRODUIT", line)
+    #                     if x:
+    #                         search_start=True
+    #             ledict['14-Ingrédients']='\n'.join(ingredients)
+    #             #**************************************************************
 
-                #** Conditions de conservation ********************************
-                search_start = False
-                for line in lines:
-                    if search_start:
-                        x = re.findall(".*    (.*)", line)
-                        if x:
-                            ledict['16-Conditions de conservation']=x[0].strip()
-                        break
-                    x = re.findall("Conditions de conservation", line)
-                    if x:
-                        search_start=True
-                #**************************************************************
+    #             #** Recherche Allergènes **************************************
+    #             search_start = False
+    #             for line in lines:
+    #                 if search_start:
+    #                     x = re.findall("(.*)Froid positif :", line)
+    #                     if x:
+    #                         ledict['15-Allergènes']=x[0].strip()
+    #                     break
+    #                 x = re.findall("Conditions de conservation", line)
+    #                 if x:
+    #                     search_start=True
+    #             #**************************************************************
 
-                #** OGM / Ionisation ********************************
-                search_start = False
-                for line in lines:
-                    if search_start:
-                        ledict['17-OGM / Ionisation']=line.strip()
-                        break
-                    x = re.findall("OGM / Ionisation", line)
-                    if x:
-                        search_start=True
-                #**************************************************************
+    #             #** Conditions de conservation ********************************
+    #             search_start = False
+    #             for line in lines:
+    #                 if search_start:
+    #                     x = re.findall(".*    (.*)", line)
+    #                     if x:
+    #                         ledict['16-Conditions de conservation']=x[0].strip()
+    #                     break
+    #                 x = re.findall("Conditions de conservation", line)
+    #                 if x:
+    #                     search_start=True
+    #             #**************************************************************
+
+    #             #** OGM / Ionisation ********************************
+    #             search_start = False
+    #             for line in lines:
+    #                 if search_start:
+    #                     ledict['17-OGM / Ionisation']=line.strip()
+    #                     break
+    #                 x = re.findall("OGM / Ionisation", line)
+    #                 if x:
+    #                     search_start=True
+    #             #**************************************************************
                 
-                #** Recherche Description  ************************************
-                search_start = search_end = False
-                descriptions=[]
-                for line in lines:
-                    if search_start:
-                        x = re.findall("Caractéristiques nutritionnelles", line)
-                        if x:
-                            search_end=True
-                    if search_start and not search_end:
-                        description = line.strip()
-                        if description!='':
-                            descriptions.append(description)
-                    if not search_end:
-                        x = re.findall("Description & caractéristiques organoleptiques", line)
-                        if x:
-                            search_start=True
-                ledict['18-Description']='\n'.join(descriptions)
-                #**************************************************************
+    #             #** Recherche Description  ************************************
+    #             search_start = search_end = False
+    #             descriptions=[]
+    #             for line in lines:
+    #                 if search_start:
+    #                     x = re.findall("Caractéristiques nutritionnelles", line)
+    #                     if x:
+    #                         search_end=True
+    #                 if search_start and not search_end:
+    #                     description = line.strip()
+    #                     if description!='':
+    #                         descriptions.append(description)
+    #                 if not search_end:
+    #                     x = re.findall("Description & caractéristiques organoleptiques", line)
+    #                     if x:
+    #                         search_start=True
+    #             ledict['18-Description']='\n'.join(descriptions)
+    #             #**************************************************************
 
-                #** Résultat final ********************************************
-                resultat=[]
-                sorted_dict = dict(sorted(ledict.items())) 
-                if sorted_dict:
-                    for key in sorted_dict:
-                        x = "%s : %s"%(key.ljust(30), sorted_dict[key])
-                        resultat.append(x)
-                obj.is_fiche_technique_import = '\n'.join(resultat)
-                #**************************************************************
+    #             #** Résultat final ********************************************
+    #             resultat=[]
+    #             sorted_dict = dict(sorted(ledict.items())) 
+    #             if sorted_dict:
+    #                 for key in sorted_dict:
+    #                     x = "%s : %s"%(key.ljust(30), sorted_dict[key])
+    #                     resultat.append(x)
+    #             obj.is_fiche_technique_import = '\n'.join(resultat)
+    #             #**************************************************************
 
-                #** Enregistrement des données ********************************
-                obj.is_mis_a_jour_le = datetime.today()
-                obj.is_type_conditionnement = sorted_dict.get("01-Conditionnement")
-                obj.is_poids_brut           = sorted_dict.get("01-Poids brut")
-                obj.no_agrement_sanitaire   = sorted_dict.get("02-N° d'agrément")
-                obj.is_ingredient_import    = sorted_dict.get("14-Ingrédients")
-                obj.is_allergene_import     = sorted_dict.get("15-Allergènes")
-                obj.temperature_stock       = sorted_dict.get("16-Conditions de conservation")
-                obj.is_ogm_ionisation       = sorted_dict.get("17-OGM / Ionisation")
-                obj.degustation             = sorted_dict.get("18-Description")
-                #**************************************************************
+    #             #** Enregistrement des données ********************************
+    #             obj.is_mis_a_jour_le = datetime.today()
+    #             obj.is_type_conditionnement = sorted_dict.get("01-Conditionnement")
+    #             obj.is_poids_brut           = sorted_dict.get("01-Poids brut")
+    #             obj.no_agrement_sanitaire   = sorted_dict.get("02-N° d'agrément")
+    #             obj.is_ingredient_import    = sorted_dict.get("14-Ingrédients")
+    #             obj.is_allergene_import     = sorted_dict.get("15-Allergènes")
+    #             obj.temperature_stock       = sorted_dict.get("16-Conditions de conservation")
+    #             obj.is_ogm_ionisation       = sorted_dict.get("17-OGM / Ionisation")
+    #             obj.degustation             = sorted_dict.get("18-Description")
+    #             #**************************************************************
 
-                #** Caractéristiques nutritionnelles **************************
-                obj.is_valeur_nutritionnelle_ids.unlink()
-                obj.add_valeur_nutritionnelle('Valeur Énergétique'      , sorted_dict.get("03-Energie"))
-                obj.add_valeur_nutritionnelle('Matières Grasses'        , sorted_dict.get("04-Matières Grasses"))
-                obj.add_valeur_nutritionnelle('Dont Acides gras saturés', sorted_dict.get("05-Dont Acides gras saturés"))
-                obj.add_valeur_nutritionnelle('Glucides'                , sorted_dict.get("06-Glucides"))
-                obj.add_valeur_nutritionnelle('Dont Sucres'             , sorted_dict.get("07-Dont Sucres"))
-                obj.add_valeur_nutritionnelle('Protéines'               , sorted_dict.get("08-Protéines"))
-                obj.add_valeur_nutritionnelle('Sel'                     , sorted_dict.get("09-Sel"))
-                #**************************************************************
+    #             #** Caractéristiques nutritionnelles **************************
+    #             obj.is_valeur_nutritionnelle_ids.unlink()
+    #             obj.add_valeur_nutritionnelle('Valeur Énergétique'      , sorted_dict.get("03-Energie"))
+    #             obj.add_valeur_nutritionnelle('Matières Grasses'        , sorted_dict.get("04-Matières Grasses"))
+    #             obj.add_valeur_nutritionnelle('Dont Acides gras saturés', sorted_dict.get("05-Dont Acides gras saturés"))
+    #             obj.add_valeur_nutritionnelle('Glucides'                , sorted_dict.get("06-Glucides"))
+    #             obj.add_valeur_nutritionnelle('Dont Sucres'             , sorted_dict.get("07-Dont Sucres"))
+    #             obj.add_valeur_nutritionnelle('Protéines'               , sorted_dict.get("08-Protéines"))
+    #             obj.add_valeur_nutritionnelle('Sel'                     , sorted_dict.get("09-Sel"))
+    #             #**************************************************************
 
-                #** Germes ****************************************************
-                obj.is_germe_ids.unlink()
-                obj.add_germe('Listeria monocytogenes', sorted_dict.get("10-Listeria"))
-                obj.add_germe('Salmonella'            , sorted_dict.get("11-Salmonelle"))
-                obj.add_germe('Escherichia coli'      , sorted_dict.get("12-Escherichia coli"))
-                obj.add_germe('Staphylocoques'        , sorted_dict.get("13-Staphylocoques"))
-                #**************************************************************
+    #             #** Germes ****************************************************
+    #             obj.is_germe_ids.unlink()
+    #             obj.add_germe('Listeria monocytogenes', sorted_dict.get("10-Listeria"))
+    #             obj.add_germe('Salmonella'            , sorted_dict.get("11-Salmonelle"))
+    #             obj.add_germe('Escherichia coli'      , sorted_dict.get("12-Escherichia coli"))
+    #             obj.add_germe('Staphylocoques'        , sorted_dict.get("13-Staphylocoques"))
+    #             #**************************************************************
 
+
+    def _compute_has_prompt_ia(self):
+        model_id = self.env['ir.model']._get_id('product.template')
+        count = self.env['is.prompt.ia'].sudo().search_count([('modele_id', '=', model_id)])
+        for obj in self:
+            obj.has_prompt_ia = count > 0
+
+
+    def analyse_ia_fiche_technique_action(self):
+        """Analyse IA de la fiche technique PDF : fusionne tous les prompts configurés
+        et envoie une seule requête au LLM pour extraire tous les champs en un seul JSON."""
+        self.ensure_one()
+        if not self.is_fiche_technique_ids:
+            raise UserError("Aucune fiche technique jointe à analyser.")
+
+        # 1. Rechercher les prompts configurés pour product.template
+        model_id = self.env['ir.model']._get_id('product.template')
+        prompts = self.env['is.prompt.ia'].sudo().search([('modele_id', '=', model_id)])
+        if not prompts:
+            raise UserError("Aucun prompt IA configuré pour le modèle 'product.template'.\n\n"
+                            "Allez dans le menu IA > Prompts IA pour configurer les prompts.")
+
+        # 2. Convertir les pièces jointes en images
+        images = []
+        for attachment in self.is_fiche_technique_ids:
+            mimetype = attachment.mimetype or ''
+            if not attachment.datas:
+                continue
+            if mimetype in ('image/jpeg', 'image/png', 'image/gif', 'image/webp'):
+                img_b64 = attachment.datas.decode('utf-8') if isinstance(attachment.datas, bytes) else attachment.datas
+                images.append((img_b64, mimetype))
+            elif mimetype == 'application/pdf':
+                pdf_data = base64.b64decode(attachment.datas)
+                pages_b64 = self.env['is.vllm']._pdf_to_base64_images(pdf_data)
+                for page_b64 in pages_b64:
+                    images.append((page_b64, 'image/jpeg'))
+        if not images:
+            raise UserError("Impossible de lire les pièces jointes de la fiche technique.")
+
+        # 3. Construire le prompt fusionné à partir des prompts configurés
+        json_fields = {}
+        prompts_details = []
+        for prompt_rec in prompts:
+            field_name = prompt_rec.field_id.name if prompt_rec.field_id else None
+            field_label = prompt_rec.field_id.field_description if prompt_rec.field_id else 'sans champ'
+            prompt_text = prompt_rec.prompt or ''
+            if field_name:
+                json_fields[field_name] = prompt_text or ("Extrais la valeur pour : %s" % field_label)
+                # Ajouter les contraintes selon le type de champ
+                field_meta = self._fields.get(field_name)
+                if field_meta:
+                    ttype = field_meta.type
+                    if ttype == 'integer':
+                        json_fields[field_name] += " (répondre un nombre entier uniquement)"
+                    elif ttype == 'float':
+                        json_fields[field_name] += " (répondre un nombre décimal uniquement, point comme séparateur)"
+                    elif ttype == 'boolean':
+                        json_fields[field_name] += " (répondre true ou false uniquement)"
+                    elif ttype == 'selection':
+                        selection_list = field_meta.selection
+                        if callable(selection_list):
+                            try:
+                                selection_list = selection_list(self)
+                            except Exception:
+                                selection_list = []
+                        if selection_list:
+                            choix = ', '.join("'%s' (%s)" % (k, v) for k, v in selection_list)
+                            json_fields[field_name] += " (répondre exactement une de ces clés : %s)" % choix
+                    elif ttype == 'text':
+                        json_fields[field_name] += ' (répondre une chaîne de texte. IMPORTANT: si le texte doit contenir plusieurs lignes ou paragraphes, insérer le caractère littéral \\n entre chaque ligne dans la valeur JSON. Exemple: "ligne 1\\nligne 2\\nligne 3")'
+                    elif ttype == 'many2one':
+                        comodel = field_meta.comodel_name
+                        if comodel:
+                            records = self.env[comodel].sudo().search([], limit=300)
+                            if records:
+                                choix = ', '.join("'%s'" % rec.display_name for rec in records)
+                                json_fields[field_name] += " (répondre exactement le nom d'un de ces choix : %s)" % choix
+                    elif ttype == 'many2many':
+                        comodel = field_meta.comodel_name
+                        if comodel:
+                            records = self.env[comodel].sudo().search([], limit=300)
+                            if records:
+                                choix = ', '.join("'%s'" % rec.display_name for rec in records)
+                                json_fields[field_name] += " (répondre une liste JSON de noms parmi ces choix : %s)" % choix
+                            else:
+                                json_fields[field_name] += " (répondre une liste JSON de noms)"
+                prompts_details.append("- %s (%s) : %s" % (field_name, field_label, prompt_text))
+
+        if not json_fields:
+            raise UserError("Aucun prompt IA n'a de champ associé.")
+
+        prompt_fusionne = """Analyse cette fiche technique de produit alimentaire et extrais les informations demandées.
+
+Retourne UNIQUEMENT un objet JSON valide, sans commentaire, sans explication, sans markdown.
+
+Pour chaque clé du JSON, voici le champ et l'instruction correspondante :
+
+"""
+        for fname, instruction in json_fields.items():
+            prompt_fusionne += '- "%s" : %s\n' % (fname, instruction)
+
+        prompt_fusionne += """
+Le JSON attendu doit avoir exactement ces clés : %s
+
+Si une information n'est pas trouvée dans le document, utilise null pour ce champ.
+""" % json.dumps(list(json_fields.keys()))
+
+        # 4. Calculer la taille des données envoyées
+        taille_prompt = len(prompt_fusionne.encode('utf-8'))
+        taille_images = sum(len(img_b64.encode('utf-8') if isinstance(img_b64, str) else img_b64) for img_b64, _ in images)
+        taille_envoi = round((taille_prompt + taille_images) / (1024 * 1024), 2)
+
+        # 5. Envoyer à l'IA
+        t0 = time.time()
+        result = self.env['is.vllm'].vllm_send_prompt(prompt_fusionne, images_b64=images)
+        duree = round(time.time() - t0, 1)
+
+        reponse = ""
+        success = result.get('success', False)
+        if success:
+            reponse = result.get('response', '')
+        else:
+            reponse = "Erreur : %s" % result.get('error', 'Erreur inconnue')
+
+        # 6. Stocker les informations de la requête
+        self.write({
+            'is_llm_prompt'      : prompt_fusionne,
+            'is_llm_reponse'     : reponse,
+            'is_llm_temps'       : duree,
+            'is_llm_taille_envoi': taille_envoi,
+            'is_llm_etat'        : '',
+        })
+
+        if not success:
+            self.is_llm_etat = "Erreur : %s" % result.get('error', 'Erreur inconnue')
+            raise UserError("Erreur IA : %s" % result.get('error', 'Erreur inconnue'))
+
+        # 7. Parser le JSON
+        try:
+            reponse_json = reponse.strip()
+            # Nettoyer les blocs markdown ```json ... ```
+            if reponse_json.startswith('```'):
+                reponse_json = reponse_json.split('\n', 1)[1] if '\n' in reponse_json else reponse_json[3:]
+            if reponse_json.endswith('```'):
+                reponse_json = reponse_json[:-3]
+            # Nettoyer les backticks isolés restants
+            reponse_json = reponse_json.strip().strip('`').strip()
+            # Extraire le premier objet JSON { ... }
+            debut = reponse_json.find('{')
+            fin   = reponse_json.rfind('}')
+            if debut != -1 and fin != -1 and fin > debut:
+                reponse_json = reponse_json[debut:fin+1]
+            data = json.loads(reponse_json)
+            # Reformater le JSON pour une meilleure lisibilité
+            self.is_llm_reponse = json.dumps(data, indent=4, ensure_ascii=False)
+        except (json.JSONDecodeError, ValueError) as e:
+            self.is_llm_etat = "Erreur JSON : %s" % str(e)
+            raise UserError("L'IA n'a pas retourné un JSON valide.\n\nRéponse :\n%s\n\nErreur : %s" % (reponse, str(e)))
+
+        # 8. Mettre à jour les champs du product.template
+        vals = {}
+        erreurs = []
+        for prompt_rec in prompts:
+            if not prompt_rec.field_id:
+                continue
+            field_name = prompt_rec.field_id.name
+            if field_name not in self._fields:
+                continue
+            val = data.get(field_name)
+            if val is None or val == 'null':
+                continue
+
+            field_meta = self._fields[field_name]
+            ttype = field_meta.type
+            try:
+                if ttype == 'integer':
+                    match = re.search(r'-?\d+', str(val))
+                    vals[field_name] = int(match.group()) if match else int(val)
+                elif ttype == 'float':
+                    match = re.search(r'-?\d+\.?\d*', str(val))
+                    vals[field_name] = float(match.group()) if match else float(val)
+                elif ttype == 'boolean':
+                    vals[field_name] = str(val).lower() in ('true', '1', 'oui', 'yes')
+                elif ttype == 'many2one':
+                    comodel = field_meta.comodel_name
+                    rec_id = self._match_many2one_by_name(comodel, str(val))
+                    if rec_id:
+                        vals[field_name] = rec_id
+                    else:
+                        erreurs.append("Champ '%s' : aucune correspondance pour '%s' dans %s" % (field_name, val, comodel))
+                elif ttype == 'many2many':
+                    comodel = field_meta.comodel_name
+                    items = val if isinstance(val, list) else [val]
+                    rec_ids = []
+                    for item in items:
+                        if item and str(item) != 'null':
+                            rec_id = self._match_many2one_by_name(comodel, str(item))
+                            if rec_id:
+                                rec_ids.append(rec_id)
+                            else:
+                                erreurs.append("Champ '%s' : aucune correspondance pour '%s' dans %s" % (field_name, item, comodel))
+                    if rec_ids:
+                        vals[field_name] = [(6, 0, rec_ids)]
+                elif ttype == 'selection':
+                    # Vérifier que la valeur fait partie des choix valides
+                    selection_list = field_meta.selection
+                    if callable(selection_list):
+                        try:
+                            selection_list = selection_list(self)
+                        except Exception:
+                            selection_list = []
+                    valid_keys = [k for k, v in selection_list] if selection_list else []
+                    if str(val) in valid_keys:
+                        vals[field_name] = str(val)
+                    else:
+                        erreurs.append("Champ '%s' : valeur '%s' non valide (choix : %s)" % (field_name, val, valid_keys))
+                elif ttype == 'text':
+                    # Post-traitement : ajouter des sauts de ligne entre les phrases
+                    text = str(val)
+                    text = re.sub(r'\.\s+', '.\n', text)
+                    vals[field_name] = text.strip()
+                else:
+                    vals[field_name] = str(val)
+            except Exception as e:
+                erreurs.append("Champ '%s' : %s" % (field_name, str(e)))
+
+        vals['is_mis_a_jour_le'] = fields.Date.today()
+        self.write(vals)
+
+        etat = "OK - %s champ(s) mis à jour" % len([k for k in vals if k != 'is_mis_a_jour_le'])
+        if erreurs:
+            etat += "\n" + "\n".join(erreurs)
+        self.is_llm_etat = etat
+
+
+    def _match_many2one_by_name(self, comodel, name):
+        """Recherche intelligente d'un enregistrement par nom (exact → ilike → fuzzy)."""
+        name = name.strip().strip("'\"")
+        if not name:
+            return False
+        Model = self.env[comodel].sudo()
+        # 1. Recherche exacte
+        rec = Model.search([('name', '=', name)], limit=1)
+        if rec:
+            return rec.id
+        # 2. Recherche insensible à la casse
+        rec = Model.search([('name', '=ilike', name)], limit=1)
+        if rec:
+            return rec.id
+        # 3. Recherche partielle
+        rec = Model.search([('name', 'ilike', name)], limit=1)
+        if rec:
+            return rec.id
+        # 4. Fuzzy matching
+        records = Model.search([], limit=300)
+        if records:
+            noms = {r.display_name: r.id for r in records}
+            matches = difflib.get_close_matches(name.upper(), [n.upper() for n in noms], n=1, cutoff=0.6)
+            if matches:
+                for n, rid in noms.items():
+                    if n.upper() == matches[0]:
+                        return rid
+        return False
 
 
     def add_valeur_nutritionnelle(self,name,valeur):

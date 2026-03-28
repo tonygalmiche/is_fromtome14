@@ -37,6 +37,7 @@ InfoSaône - Module Odoo 14 pour Fromtome
         'l10n_fr_siret',
         'l10n_fr_state',
         'list_export_excel_app',
+        'is_llm2odoo',
     ],
     'data' : [
         'security/res.groups.xml',
@@ -85,6 +86,7 @@ InfoSaône - Module Odoo 14 pour Fromtome
         'views/is_promo_client_view.xml',
         'views/is_suivi_temps_views.xml',
         'views/is_modele_commande_views.xml',
+        'views/is_prompt_ia_view.xml',
         "views/menu.xml",
         'views/report_invoice.xml',
         'report/is_promo_client_template.xml',

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="is_prompt_ia_tree_view" model="ir.ui.view">
+        <field name="name">is.prompt.ia.tree</field>
+        <field name="model">is.prompt.ia</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="modele_id"/>
+                <field name="field_id"/>
+                <field name="prompt"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="is_prompt_ia_form_view" model="ir.ui.view">
+        <field name="name">is.prompt.ia.form</field>
+        <field name="model">is.prompt.ia</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="Archivé" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <group>
+                        <field name="active" invisible="1"/>
+                        <field name="modele_id"/>
+                        <field name="field_id" domain="[('model_id', '=', modele_id), ('ttype', 'not in', ['one2many', 'reference', 'binary', 'serialized']), ('store', '=', True)]"/>
+                        <field name="prompt"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="is_prompt_ia_search_view" model="ir.ui.view">
+        <field name="name">is.prompt.ia.search</field>
+        <field name="model">is.prompt.ia</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="modele_id"/>
+                <field name="field_id"/>
+                <filter string="Archivé" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter string="Modèle" name="group_modele" context="{'group_by': 'modele_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="is_prompt_ia_action" model="ir.actions.act_window">
+        <field name="name">Prompts IA</field>
+        <field name="res_model">is.prompt.ia</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="is_prompt_ia_menu"
+              name="Prompts IA"
+              parent="is_llm2odoo.is_llm_menu_root"
+              action="is_prompt_ia_action"
+              groups="is_llm2odoo.group_ia_admin"
+              sequence="20"/>
+
+</odoo>
