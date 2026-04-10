@@ -143,29 +143,34 @@
                                 </tr>
                             </table>
                             <h1>INGRÉDIENTS:</h1>
-                                Ingrédients (dont allergènes en gras): <span t-raw="doc.is_ingredient"/>
-                            <h1>CRITÈRES MICROBIOLOGIQUES ET PHYSICO-CHIMIQUE:</h1>
                             <table style="width:100%">
                                 <tr>
                                     <td style="width:48%;vertical-align:top">
-                                        <table class="table" style="width:100%">
-                                            <tr><th>Germes</th><th>Critère REG EU 2073</th></tr>
-                                            <t t-foreach="doc.is_germe_ids" t-as="l">
-                                                <tr><td><span t-field="l.germe_id.name"/></td><td><span t-field="l.critere"/></td></tr>
-                                            </t>
-                                        </table>
+                                        <b>Ingrédients:</b><br/>
+                                        <span t-raw="(doc.is_ingredient_import or '').replace('\n', '&lt;br/&gt;')"/>
                                     </td>
                                     <td style="width:4%;vertical-align:top">
                                     </td>
                                     <td style="width:48%;vertical-align:top">
-                                        <table class="table" style="width:100%">
-                                            <t t-foreach="doc.is_valeur_nutritionnelle_ids" t-as="l">
-                                                <tr><td><span t-field="l.valeur_id.name"/></td><td><span t-field="l.valeur"/></td></tr>
-                                            </t>
-                                        </table>
+                                        <b>Allergènes:</b><br/>
+                                        <span t-raw="(doc.is_allergene_import or '').replace('\n', '&lt;br/&gt;')"/>
                                     </td>
                                 </tr>
                             </table>
+
+
+
+                            <h1>CRITÈRES MICROBIOLOGIQUES ET PHYSICO-CHIMIQUE:</h1>
+                            <div t-raw="(doc.is_germe_import or '').replace('\n', '&lt;br/&gt;')"/>
+
+
+
+                            <h1>VALEURS NUTRITIONNELLES:</h1>
+                            <div t-raw="(doc.is_valeur_nutritionnelle_import or '').replace('\n', '&lt;br/&gt;')"/>
+
+
+
+
                         </row>
                     </div>
     </div>

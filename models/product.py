@@ -268,7 +268,7 @@ class ProductTemplate(models.Model):
     is_type_conditionnement   = fields.Char(string='Type de conditionnement')
     is_poids_brut             = fields.Char(string='Poids brut')
     is_atelier_transformation = fields.Char(string='Atelier de transformation')
-    no_agrement_sanitaire     = fields.Char(string="N° d'agrément fabricant")
+    no_agrement_sanitaire     = fields.Char(string="Numéro d’agrément")
     temperature_stock         = fields.Char(string='T° de conservation')
     is_ogm_ionisation         = fields.Char(string='OGM / Ionisation')
 
@@ -334,8 +334,8 @@ class ProductTemplate(models.Model):
     is_prix_vente_futur_marge_lf_coll    = fields.Float(string='TM futur forcé LF coll.  (Ne plus utiliser)', digits='Product Price', tracking=True)
     is_prix_vente_futur_marge_lf_franco  = fields.Float(string='TM futur forcé LF franco (Ne plus utiliser)', digits='Product Price', tracking=True)
     is_discount                          = fields.Float(string="Remise (%)", compute='_compute_is_discount', readonly=True, store=True, digits="Discount", tracking=True, help="Remise du fournisseur par défaut (actualisé la nuit par la gestion des promos)")
-    is_fiche_technique_ids               = fields.Many2many('ir.attachment', 'product_is_fiche_technique_rel', 'product_id', 'file_id', 'Fiche techinque')
-    is_fiche_technique_import            =  fields.Text('Résultat importation fiche techinque')
+    is_fiche_technique_ids               = fields.Many2many('ir.attachment', 'product_is_fiche_technique_rel', 'product_id', 'file_id', 'Fiche technique')
+    is_fiche_technique_import            =  fields.Text('Résultat importation fiche technique')
 
     # Champs résultat analyse IA
     is_llm_prompt          = fields.Text(string="Prompt envoyé")
