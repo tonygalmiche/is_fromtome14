@@ -218,7 +218,7 @@ class ProductTemplate(models.Model):
             obj.weight = obj.is_poids_net_colis / (obj.is_nb_pieces_par_colis or 1)
  
 
-    @api.depends('seller_ids')
+    @api.depends('seller_ids','seller_ids.date_end')
     def _compute_is_ref_fournisseur(self):
         for obj in self:
             filtre=[
@@ -226,17 +226,21 @@ class ProductTemplate(models.Model):
             ]
             ref=False
             fournisseur_id = False
-            suppliers=self.env['product.supplierinfo'].search(filtre,limit=1)
+            is_date_fin = False
+            suppliers=self.env['product.supplierinfo'].search(filtre, order="date_end desc",limit=1)
             for s in suppliers:
-                ref=s.product_code
+                ref            = s.product_code
                 fournisseur_id = s.name.id
+                is_date_fin    = s.date_end
             obj.is_ref_fournisseur = ref
             obj.is_fournisseur_id  = fournisseur_id
+            obj.is_date_fin        = is_date_fin
 
 
     is_gtin_13         = fields.Char(string='GTIN 13', help="GTIN 13 = EAN13", tracking=True)
     is_ref_fournisseur = fields.Char(string='Réf fournisseur'        , compute='_compute_is_ref_fournisseur', readonly=True, store=True, tracking=True)
     is_fournisseur_id  = fields.Many2one('res.partner', 'Fournisseur', compute='_compute_is_ref_fournisseur', readonly=True, store=True, tracking=True)
+    is_date_fin        = fields.Date('Date fin tarif', compute='_compute_is_ref_fournisseur'                , readonly=True, store=True, tracking=True)
 
     contrat_date_id = fields.One2many('contrat.date.client','product_id','Contrat Date')
 

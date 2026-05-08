@@ -510,7 +510,7 @@ class Picking(models.Model):
     is_nb_colis       = fields.Float(string='Nb colis' , digits=(14,1)        , compute='_compute_poids_colis', readonly=True, store=True)
     is_nb_colis_cde_total = fields.Float(string='Nb colis commandé total', digits=(14,1), compute='_compute_totaux_commande', readonly=True, store=True, help="Nombre total de colis commandés")
     is_poids_net_cde_total = fields.Float(string='Poids net commandé total', digits='Stock Weight', compute='_compute_totaux_commande', readonly=True, store=True, help="Poids net total commandé")
-    is_date_livraison = fields.Date('Date livraison client', help="Date d'arrivée chez le client prévue sur la commande"    , related='sale_id.is_date_livraison')
+    is_date_livraison = fields.Date('Date livraison client', help="Date d'arrivée chez le client prévue sur la commande", compute='_compute_is_date_livraison', store=True, readonly=False)
     is_date_reception = fields.Datetime('Date réception'   , help="Date de réception chez Fromtome indiquée sur la commande", related='purchase_id.date_planned')
     is_enseigne_id    = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
     is_transporteur_id = fields.Many2one('is.transporteur', 'Transporteur', compute='_compute_is_transporteur_id', store=True, readonly=False, tracking=True)
@@ -523,6 +523,13 @@ class Picking(models.Model):
     is_nb_erreurs      = fields.Integer(string="Nombre d'erreurs")
     is_employe_id      = fields.Many2one('hr.employee', 'Employé concerné')
     is_afficher_manquants = fields.Boolean(string='Afficher les manquants', default=True)
+
+
+    @api.depends('sale_id.is_date_livraison')
+    def _compute_is_date_livraison(self):
+        for obj in self:
+            if obj.state != 'done':
+                obj.is_date_livraison = obj.sale_id.is_date_livraison
 
 
     @api.depends('partner_id','sale_id')

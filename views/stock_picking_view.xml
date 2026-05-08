@@ -471,7 +471,7 @@ else:
             </field>
             <field name="origin" position="after">
                 <field name="is_date_reception" readonly="1" attrs="{'invisible': [('is_date_reception', '=', False)]}"/>
-                <field name="is_date_livraison" readonly="1" attrs="{'invisible': [('is_date_livraison', '=', False)]}"/>
+                <field name="is_date_livraison" attrs="{'invisible': [('sale_id', '=', False)]}"/>
                 <field name="sale_id"           readonly="1" attrs="{'invisible': [('sale_id', '=', False)]}"/>
                 <field name="purchase_id"       readonly="1" attrs="{'invisible': [('purchase_id', '=', False)]}"/>
                 <field name="is_transporteur_id"/>

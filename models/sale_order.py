@@ -62,6 +62,11 @@ class SaleOrderLine(models.Model):
                 lignes=self.env['is.promo.client.ligne'].search(filtre, limit=1)
                 for ligne in lignes:
                     discount = ligne.remise_client
+                    #** Si c'est une promo générique, il faut appliquer le pourcent_promo_a_repercuter
+                    if promo.promo_generique and obj.order_id.partner_id:
+                        discount = round(ligne.remise_client * obj.order_id.partner_id.is_pourcent_promo_a_repercuter/100)
+                        if discount<3:
+                            discount=0
             #******************************************************************
 
 
@@ -414,6 +419,19 @@ class SaleOrder(models.Model):
 
     def action_confirm(self):
         for obj in self:
+            manquants = []
+            #if not obj.partner_id.bank_ids:
+            #    manquants.append("- RIB")
+            if not obj.partner_id.property_account_position_id:
+                manquants.append("- Position fiscale")
+            if not obj.partner_id.is_frequence_facturation:
+                manquants.append("- Fréquence de facturation")
+            if manquants:
+                raise ValidationError(
+                    "Impossible de valider la commande.\n"
+                    "Les informations suivantes sont manquantes sur la fiche client '%s' :\n%s"
+                    % (obj.partner_id.name, "\n".join(manquants))
+                )
             obj.ajout_frais_de_port()
             for line in obj.order_line:
                 if line.product_uom_qty==0:
