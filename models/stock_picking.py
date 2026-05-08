@@ -528,7 +528,7 @@ class Picking(models.Model):
     @api.depends('sale_id.is_date_livraison')
     def _compute_is_date_livraison(self):
         for obj in self:
-            if obj.state != 'done':
+            if not obj.is_date_livraison:
                 obj.is_date_livraison = obj.sale_id.is_date_livraison
 
 
