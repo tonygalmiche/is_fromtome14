@@ -144,6 +144,16 @@
                         class="oe_inline btn btn-sm btn-secondary"
                         style="margin-right:10px"
                     />
+                    <field name="is_reaffecter_remise_vsb" invisible="1"/>
+                    <button 
+                        name="reaffecter_mouvements_remise_action" 
+                        type="object"
+                        string="Réaffecter livraisons sur lignes avec remise"
+                        class="oe_inline btn btn-sm btn-danger"
+                        style="margin-right:10px"
+                        confirm="Réaffecter les mouvements livrés en priorité sur les lignes avec la remise la plus élevée ?"
+                        attrs="{'invisible': [('is_reaffecter_remise_vsb', '=', False)]}"
+                    />
                 </div>
             </field>
             <xpath expr="//notebook/page/field/tree" position="attributes">

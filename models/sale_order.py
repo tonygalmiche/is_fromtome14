@@ -466,7 +466,30 @@ class SaleOrder(models.Model):
             obj.is_creer_commande_fournisseur_vsb=vsb
 
 
+    @api.depends('order_line.product_id', 'order_line.discount', 'invoice_ids.state')
+    def _compute_is_reaffecter_remise_vsb(self):
+        for obj in self:
+            vsb = False
+            # Masquer si une facture validée existe
+            has_posted_invoice = any(inv.state == 'posted' for inv in obj.invoice_ids)
+            if not has_posted_invoice:
+                lines_by_product = {}
+                for line in obj.order_line:
+                    if line.display_type or not line.product_id:
+                        continue
+                    pid = line.product_id.id
+                    if pid not in lines_by_product:
+                        lines_by_product[pid] = set()
+                    lines_by_product[pid].add(line.discount)
+                for discounts in lines_by_product.values():
+                    if len(discounts) > 1:
+                        vsb = True
+                        break
+            obj.is_reaffecter_remise_vsb = vsb
+
+
     is_creer_commande_fournisseur_vsb = fields.Boolean(string=u'Créer commande fournisseur', compute='_compute_is_creer_commande_fournisseur_vsb', readonly=True, store=False)
+    is_reaffecter_remise_vsb          = fields.Boolean(string=u'Réaffecter remises', compute='_compute_is_reaffecter_remise_vsb', readonly=True, store=False)
 
 
     def initialiser_depuis_modele_commande(self):
@@ -496,6 +519,68 @@ class SaleOrder(models.Model):
                     if picking.state not in ['done','cancel']:
                         solde=False
             obj.is_commande_soldee=solde
+
+
+    def reaffecter_mouvements_remise_action(self):
+        """Réaffecte les mouvements de stock livrés en priorité sur les lignes
+        ayant le taux de remise le plus élevé, pour les articles présents sur
+        plusieurs lignes avec des remises différentes."""
+        for order in self:
+            # Regrouper les lignes par produit
+            lines_by_product = {}
+            for line in order.order_line:
+                if line.display_type or not line.product_id:
+                    continue
+                pid = line.product_id.id
+                if pid not in lines_by_product:
+                    lines_by_product[pid] = []
+                lines_by_product[pid].append(line)
+
+            affected_line_ids = []
+            for pid, lines in lines_by_product.items():
+                # Traiter uniquement les produits avec plusieurs lignes et des remises différentes
+                discounts = set(l.discount for l in lines)
+                if len(discounts) <= 1:
+                    continue
+
+                # Trier par remise décroissante (remise la plus haute en priorité)
+                lines_sorted = sorted(lines, key=lambda l: l.discount, reverse=True)
+                affected_line_ids += [l.id for l in lines_sorted]
+
+                # Récupérer tous les mouvements sortants validés liés à ces lignes
+                # On filtre sur location_dest_id.usage = 'customer' (cohérent avec _get_outgoing_incoming_moves)
+                all_moves = self.env['stock.move'].search([
+                    ('sale_line_id', 'in', [l.id for l in lines]),
+                    ('state', '=', 'done'),
+                    ('scrapped', '=', False),
+                    ('location_dest_id.usage', '=', 'customer'),
+                ])
+                if not all_moves:
+                    continue
+
+                # Réaffecter les mouvements ligne par ligne (remise décroissante)
+                line_idx = 0
+                remaining = lines_sorted[line_idx].product_uom_qty
+
+                for move in all_moves:
+                    move_qty = move.product_uom._compute_quantity(
+                        move.product_uom_qty,
+                        lines_sorted[line_idx].product_uom,
+                        rounding_method='HALF-UP',
+                    )
+                    # Passer à la ligne suivante si la capacité est épuisée
+                    while line_idx < len(lines_sorted) - 1 and remaining <= 0:
+                        line_idx += 1
+                        remaining = lines_sorted[line_idx].product_uom_qty
+
+                    move.write({'sale_line_id': lines_sorted[line_idx].id})
+                    remaining -= move_qty
+
+            # Invalider le cache ORM pour forcer le recalcul de qty_delivered
+            if affected_line_ids:
+                affected_lines = self.env['sale.order.line'].browse(affected_line_ids)
+                affected_lines.invalidate_cache(['move_ids', 'qty_delivered'])
+                affected_lines._compute_qty_delivered()
 
 
     def commande_entierement_facturee_action_server(self):
