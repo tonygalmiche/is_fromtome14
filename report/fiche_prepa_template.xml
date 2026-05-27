@@ -4,6 +4,10 @@
 
         <template id="report_picking_inherit" inherit_id="stock.report_picking">
 
+            <xpath expr="//t[@t-foreach='docs']" position="attributes">
+                <attribute name="t-lang">'fr_FR'</attribute>
+            </xpath>
+
             <div name="right_box" position="replace"/>
 
             <h1 t-field="o.name" position="replace"/>
@@ -14,7 +18,7 @@
                     <p t-field="o.is_date_livraison"/>
                 </div>
                 <div class="col-auto">
-                    <strong>Transporteur 2:</strong>
+                    <strong>Transporteur:</strong>
                     <p t-field="o.is_transporteur_id"/>
                 </div>
             </div>

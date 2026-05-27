@@ -26,6 +26,7 @@ from mes_fonctions import (
     find_or_create_product_tag,
     find_public_category_by_name,
     prepare_product_data,
+    find_uom_by_name,
 )
 
 
@@ -36,7 +37,7 @@ def get_products(models, database, uid, password, limit=None):
     # Utiliser search_read pour une requête plus efficace
     domain = []
     # Exclure image_1920 de la récupération initiale pour éviter les erreurs de parsing XML
-    fields = ['id', 'name', 'default_code', 'list_price', 'categ_id', 'type', 'active', 'write_date', 'milk_type_ids', 'is_region_id', 'traitement_thermique']
+    fields = ['id', 'name', 'default_code', 'list_price', 'categ_id', 'type', 'active', 'write_date', 'milk_type_ids', 'is_region_id', 'traitement_thermique', 'is_famille_fromage_id', 'is_colisage', 'is_nb_pieces_par_colis', 'is_poids_net_colis', 'uom_id']
     
     search_params = {
         'fields': fields,
@@ -127,7 +128,88 @@ def get_regions_origine(models, database, uid, password):
     return regions
 
 
-def sync_milk_type_to_public_category(milk_type, ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password):
+def get_familles_fromage(models, database, uid, password):
+    """Récupérer la liste des familles de fromage depuis Odoo"""
+    print("Récupération des familles de fromage depuis Odoo...")
+
+    fields = ['id', 'name', 'write_date']
+
+    familles = models.execute_kw(
+        database, uid, password,
+        'is.famille.fromage', 'search_read',
+        [[]],
+        {
+            'fields': fields,
+            'context': {'lang': 'fr_FR'}
+        }
+    )
+
+    print(f"Nombre de familles de fromage récupérées: {len(familles)}")
+    return familles
+
+
+def find_or_create_is_record(ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password, model, name):
+    """Trouver ou créer un enregistrement dans un modèle IS de l'e-commerce par son nom"""
+    if not name:
+        return None
+
+    existing = ecommerce_models.execute_kw(
+        ecommerce_database, ecommerce_uid, ecommerce_password,
+        model, 'search_read',
+        [[['name', '=', name]]],
+        {'fields': ['id'], 'limit': 1}
+    )
+    if existing:
+        return existing[0]['id']
+
+    try:
+        new_id = ecommerce_models.execute_kw(
+            ecommerce_database, ecommerce_uid, ecommerce_password,
+            model, 'create',
+            [{'name': name}],
+            {'context': {'lang': 'fr_FR'}}
+        )
+        return new_id
+    except Exception as e:
+        print(f"    Erreur création {model} '{name}': {e}")
+        return None
+
+
+def sync_is_table_to_ecommerce(records, model, label, ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password):
+    """Synchroniser une table IS (is.region.origine ou is.famille.fromage) vers l'e-commerce.
+    Retourne un dict {main_id: ecom_id} pour la résolution lors de la synchro produits."""
+    print(f"\n{'='*80}")
+    print(f"{'SYNCHRONISATION ' + label.upper():^80}")
+    print(f"{'='*80}")
+
+    id_map = {}
+    success_count = 0
+    error_count = 0
+
+    for record in records:
+        name = record.get('name')
+        main_id = record.get('id')
+        if not name:
+            continue
+
+        ecom_id = find_or_create_is_record(
+            ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password,
+            model, name
+        )
+        if ecom_id:
+            id_map[main_id] = ecom_id
+            print(f"{label}: {name:<40} ✓ (ecom ID: {ecom_id})")
+            success_count += 1
+        else:
+            print(f"{label}: {name:<40} ✗ Échec")
+            error_count += 1
+
+    print(f"{'-'*80}")
+    print(f"Résultat {label}: {success_count} succès, {error_count} erreurs")
+    return id_map
+
+
+def sync_milk_type_to_ecommerce(milk_type, ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password):
     """Synchroniser un type de lait vers une catégorie publique"""
     if not milk_type.get('name'):
         return False
@@ -268,6 +350,8 @@ def format_product_log(product, status, current_index=1, total_count=1, extra_in
     counter = f"[{current_index:3d}/{total_count:3d}]"
     code = product.get('default_code', 'N/A')
     name = product.get('name', 'N/A')[:30]
+    uom = product.get('uom_id')
+    uom_name = (uom[1] if isinstance(uom, list) else uom) if uom else ''
     
     # Analyser extra_info pour extraire et aligner les colonnes
     if extra_info:
@@ -292,12 +376,12 @@ def format_product_log(product, status, current_index=1, total_count=1, extra_in
         # Formater avec alignement fixe
         formatted_extra = f" (image: {image_info:<8}) (catég: {categ_info:<2}) (tags: {tags_info:<2}) (Odoo: {odoo_info})"
         
-        return f"{counter} {code:<15} {name:<30} {status}{formatted_extra}"
+        return f"{counter} {code:<15} {uom_name:<6} {name:<30} {status}{formatted_extra}"
     else:
-        return f"{counter} {code:<15} {name:<30} {status}"
+        return f"{counter} {code:<15} {uom_name:<6} {name:<30} {status}"
 
 
-def sync_product_to_ecommerce(product, ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password, main_models, main_database, main_uid, main_password, force_days=0, update_images=True, current_index=1, total_count=1):
+def sync_product_to_ecommerce(product, ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password, main_models, main_database, main_uid, main_password, force_days=0, update_images=True, current_index=1, total_count=1, region_id_map=None, famille_id_map=None, type_article_id_map=None):
     """Synchroniser un produit vers l'e-commerce avec vérification de date et synchronisation des catégories publiques"""
     if not product.get('default_code'):
         return False
@@ -335,75 +419,54 @@ def sync_product_to_ecommerce(product, ecommerce_models, ecommerce_database, eco
         reason = "Création"
         odoo_date_str = product.get('write_date', 'N/A')
     
-    # Récupérer les catégories publiques correspondantes aux milk_type_ids
-    public_categ_ids = []
-    category_names = []
-    
-    # Ajouter les types de lait aux catégories publiques
-    if product.get('milk_type_ids'):
-        # Récupérer les noms des types de lait
-        milk_type_names = get_milk_type_names_by_ids(
-            main_models, main_database, main_uid, main_password, 
-            product['milk_type_ids']
-        )
-        category_names.extend(milk_type_names)
-    
-    # Récupérer les IDs des catégories publiques correspondantes
-    if category_names:
-        public_categ_ids = get_public_category_ids_by_names(
-            ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password,
-            category_names
-        )
-    
-    # Récupérer les tags produits correspondants à traitement_thermique, is_region_id et milk_type_ids
-    product_tag_ids = []
-    tag_names = []
-    
-    # Ajouter les types de lait aux tags avec préfixe
-    if product.get('milk_type_ids'):
-        # Récupérer les noms des types de lait
-        milk_type_names = get_milk_type_names_by_ids(
-            main_models, main_database, main_uid, main_password, 
-            product['milk_type_ids']
-        )
-        for milk_type_name in milk_type_names:
-            type_with_prefix = f"Type {milk_type_name}"
-            tag_names.append(type_with_prefix)
-    
-    # Ajouter traitement_thermique aux tags avec préfixe
-    if product.get('traitement_thermique'):
-        # Convertir la valeur de sélection en nom lisible
-        traitement_mapping = {
-            'laitcru': 'Lait Cru',
-            'laitthermise': 'Lait Thermisé',
-            'laitpasteurisé': 'Lait Pasteurisé'
-        }
-        traitement_name = traitement_mapping.get(product['traitement_thermique'], product['traitement_thermique'])
-        traitement_with_prefix = f"Traitement Thermique {traitement_name}"
-        tag_names.append(traitement_with_prefix)
-    
-    # Ajouter la région d'origine aux tags avec préfixe  
+    # Résoudre is_region_id vers l'ID ecommerce
+    ecom_region_id = None
     if product.get('is_region_id'):
-        # is_region_id est un Many2one, donc c'est [id, nom] ou juste id
-        region_id = product['is_region_id'][0] if isinstance(product['is_region_id'], list) else product['is_region_id']
-        region_name = get_region_name_by_id(
-            main_models, main_database, main_uid, main_password, 
-            region_id
-        )
-        if region_name:
-            region_with_prefix = f"Région {region_name}"
-            tag_names.append(region_with_prefix)
-    
-    # Créer/récupérer les tags
-    if tag_names:
-        for tag_name in tag_names:
-            tag_id = find_or_create_product_tag(
-                ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password, 
-                tag_name
+        main_region_id = product['is_region_id'][0] if isinstance(product['is_region_id'], list) else product['is_region_id']
+        if region_id_map:
+            ecom_region_id = region_id_map.get(main_region_id)
+        if not ecom_region_id:
+            # Fallback: chercher par nom
+            region_name = product['is_region_id'][1] if isinstance(product['is_region_id'], list) else None
+            if region_name:
+                ecom_region_id = find_or_create_is_record(
+                    ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password,
+                    'is.region.origine', region_name
+                )
+
+    # Résoudre is_famille_fromage_id vers l'ID ecommerce
+    ecom_famille_id = None
+    if product.get('is_famille_fromage_id'):
+        main_famille_id = product['is_famille_fromage_id'][0] if isinstance(product['is_famille_fromage_id'], list) else product['is_famille_fromage_id']
+        if famille_id_map:
+            ecom_famille_id = famille_id_map.get(main_famille_id)
+        if not ecom_famille_id:
+            # Fallback: chercher par nom
+            famille_name = product['is_famille_fromage_id'][1] if isinstance(product['is_famille_fromage_id'], list) else None
+            if famille_name:
+                ecom_famille_id = find_or_create_is_record(
+                    ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password,
+                    'is.famille.fromage', famille_name
+                )
+
+    # Résoudre is_type_article_id vers l'ID ecommerce (premier élément de milk_type_ids)
+    ecom_type_article_id = None
+    if product.get('milk_type_ids'):
+        first_milk_type_id = product['milk_type_ids'][0]
+        if type_article_id_map:
+            ecom_type_article_id = type_article_id_map.get(first_milk_type_id)
+        if not ecom_type_article_id:
+            # Fallback: récupérer le nom du premier milk.type sur le main
+            milk_type_names = get_milk_type_names_by_ids(
+                main_models, main_database, main_uid, main_password,
+                [first_milk_type_id]
             )
-            if tag_id:
-                product_tag_ids.append(tag_id)
-    
+            if milk_type_names:
+                ecom_type_article_id = find_or_create_is_record(
+                    ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password,
+                    'is.type.article', milk_type_names[0]
+                )
+
     if existing_product:
         # Récupérer l'ID du template
         template_id = existing_product.get('product_tmpl_id', [None])[0] if existing_product.get('product_tmpl_id') else None
@@ -412,16 +475,33 @@ def sync_product_to_ecommerce(product, ecommerce_models, ecommerce_database, eco
             # Préparer les données
             product_data = prepare_product_data(product, update_images)
             
+            # Résoudre uom_id par nom
+            uom_id_ecom = None
+            if product.get('uom_id'):
+                uom_name = product['uom_id'][1] if isinstance(product['uom_id'], list) else product['uom_id']
+                uom_id_ecom = find_uom_by_name(ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password, uom_name)
+
             try:
                 # Mettre à jour le template en français
                 update_data = {
                     'name': product_data['name'],
                     'list_price': 0,
-                    'public_categ_ids': [(6, 0, public_categ_ids)],
                     'is_published': True,
-                    'product_tag_ids': [(6, 0, product_tag_ids)],
-                    'website_ribbon_id': random.randint(1, 4)
+                    'website_ribbon_id': random.randint(1, 4),
+                    'is_colisage': product_data.get('is_colisage', '1'),
+                    'is_nb_pieces_par_colis': product_data.get('is_nb_pieces_par_colis', 0),
+                    'is_poids_net_colis': product_data.get('is_poids_net_colis', 0.0),
+                    'is_traitement_thermique': product.get('traitement_thermique') or False,
+                    'public_categ_ids': [(5, 0, 0)],
                 }
+                if uom_id_ecom:
+                    update_data['uom_id'] = uom_id_ecom
+                if ecom_region_id:
+                    update_data['is_region_id'] = ecom_region_id
+                if ecom_famille_id:
+                    update_data['is_famille_fromage_id'] = ecom_famille_id
+                if ecom_type_article_id:
+                    update_data['is_type_article_id'] = ecom_type_article_id
                 
                 # Ajouter l'image si elle existe et si l'option est activée
                 image_info = ""
@@ -437,10 +517,6 @@ def sync_product_to_ecommerce(product, ecommerce_models, ecommerce_database, eco
                 else:
                     image_info = " (image: ignorée)"
                 
-                # Info sur les catégories et tags
-                categ_info = f" (catég: {len(public_categ_ids)})" if public_categ_ids else ""
-                tag_info = f" (tags: {len(product_tag_ids)})" if product_tag_ids else ""
-                
                 template_result = ecommerce_models.execute_kw(
                     ecommerce_database, ecommerce_uid, ecommerce_password,
                     'product.template', 'write', [[template_id], update_data],
@@ -449,12 +525,12 @@ def sync_product_to_ecommerce(product, ecommerce_models, ecommerce_database, eco
                 
                 if template_result:
                     status = f"✓ {reason}"
-                    extra_info = f"{image_info}{categ_info}{tag_info} (Odoo: {odoo_date_str})"
+                    extra_info = f"{image_info} (Odoo: {odoo_date_str})"
                     print(format_product_log(product, status, current_index, total_count, extra_info))
                     return True
                 else:
                     status = f"✗ Échec {reason.lower()}"
-                    extra_info = f"{image_info}{categ_info}{tag_info} (Odoo: {odoo_date_str})"
+                    extra_info = f"{image_info} (Odoo: {odoo_date_str})"
                     print(format_product_log(product, status, current_index, total_count, extra_info))
                     return False
                     
@@ -464,28 +540,28 @@ def sync_product_to_ecommerce(product, ecommerce_models, ecommerce_database, eco
                 if update_images and product_data.get('image_1920'):
                     image_size = get_image_size(product_data['image_1920'])
                     error_msg += f" (image: {format_size(image_size)})"
-                categ_info = f" (catég: {len(public_categ_ids)})" if public_categ_ids else ""
-                tag_info = f" (tags: {len(product_tag_ids)})" if product_tag_ids else ""
                 status = f"✗ Erreur {reason.lower()}: {error_msg}"
-                extra_info = f"{categ_info}{tag_info} (Odoo: {odoo_date_str})"
+                extra_info = f" (Odoo: {odoo_date_str})"
                 print(format_product_log(product, status, current_index, total_count, extra_info))
                 return False
         else:
-            categ_info = f" (catég: {len(public_categ_ids)})" if public_categ_ids else ""
-            tag_info = f" (tags: {len(product_tag_ids)})" if product_tag_ids else ""
             status = f"✗ Template non trouvé pour {reason.lower()}"
-            extra_info = f"{categ_info}{tag_info} (Odoo: {odoo_date_str})"
+            extra_info = f" (Odoo: {odoo_date_str})"
             print(format_product_log(product, status, current_index, total_count, extra_info))
             return False
     else:
         # Créer un nouveau template
         product_data = prepare_product_data(product, update_images)
         
-        # Ajouter les catégories publiques
-        product_data['public_categ_ids'] = [(6, 0, public_categ_ids)]
-        
-        # Ajouter les tags produits
-        product_data['product_tag_ids'] = [(6, 0, product_tag_ids)]
+        # Ajouter les 4 champs supplémentaires
+        product_data['is_traitement_thermique'] = product.get('traitement_thermique') or False
+        product_data['public_categ_ids'] = [(5, 0, 0)]
+        if ecom_region_id:
+            product_data['is_region_id'] = ecom_region_id
+        if ecom_famille_id:
+            product_data['is_famille_fromage_id'] = ecom_famille_id
+        if ecom_type_article_id:
+            product_data['is_type_article_id'] = ecom_type_article_id
         
         # Ajouter l'image si nécessaire
         image_info = ""
@@ -508,12 +584,9 @@ def sync_product_to_ecommerce(product, ecommerce_models, ecommerce_database, eco
                 {'context': {'lang': 'fr_FR'}}
             )
             
-            # Info sur les catégories et tags
-            categ_info = f" (catég: {len(public_categ_ids)})" if public_categ_ids else ""
-            tag_info = f" (tags: {len(product_tag_ids)})" if product_tag_ids else ""
-            
+            # Info sur le résultat
             status = f"✓ {reason} (ID: {new_template_id})"
-            extra_info = f"{image_info}{categ_info}{tag_info} (Odoo: {odoo_date_str})"
+            extra_info = f"{image_info} (Odoo: {odoo_date_str})"
             print(format_product_log(product, status, current_index, total_count, extra_info))
             return True
         except Exception as e:
@@ -521,10 +594,8 @@ def sync_product_to_ecommerce(product, ecommerce_models, ecommerce_database, eco
             if update_images and product_data.get('image_1920'):
                 image_size = get_image_size(product_data['image_1920'])
                 error_msg += f" (image: {format_size(image_size)})"
-            categ_info = f" (catég: {len(public_categ_ids)})" if public_categ_ids else ""
-            tag_info = f" (tags: {len(product_tag_ids)})" if product_tag_ids else ""
             status = f"✗ Erreur {reason.lower()}: {error_msg}"
-            extra_info = f"{categ_info}{tag_info} (Odoo: {odoo_date_str})"
+            extra_info = f" (Odoo: {odoo_date_str})"
             print(format_product_log(product, status, current_index, total_count, extra_info))
             return False
 
@@ -616,7 +687,7 @@ def sort_product_tags_alphabetically(ecommerce_models, ecommerce_database, ecomm
         return 0, 1
 
 
-def synchronize_products(main_products, ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password, main_models, main_database, main_uid, main_password, force_days=0, update_images=True):
+def synchronize_products(main_products, ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password, main_models, main_database, main_uid, main_password, force_days=0, update_images=True, region_id_map=None, famille_id_map=None, type_article_id_map=None):
     """Synchroniser tous les produits vers l'e-commerce"""
     success_count = 0
     error_count = 0
@@ -626,7 +697,8 @@ def synchronize_products(main_products, ecommerce_models, ecommerce_database, ec
         success = sync_product_to_ecommerce(
             product, ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password,
             main_models, main_database, main_uid, main_password, force_days, update_images,
-            index, total_products
+            index, total_products, region_id_map=region_id_map, famille_id_map=famille_id_map,
+            type_article_id_map=type_article_id_map
         )
         if success:
             success_count += 1
@@ -698,13 +770,30 @@ def main():
     # Connexion au serveur e-commerce
     ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password = connect_odoo(config['ecommerce'])
     
-    # 1. Synchroniser d'abord les types de lait vers les catégories publiques
+    # 1. Récupérer les types de lait (utilisés pour is.type.article)
     milk_types = get_milk_types(main_models, main_database, main_uid, main_password)
-    milk_success, milk_errors = synchronize_milk_types_to_public_categories(
-        milk_types, ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password
+
+    # 2. Synchroniser les régions d'origine vers is.region.origine dans l'e-commerce
+    regions = get_regions_origine(main_models, main_database, main_uid, main_password)
+    region_id_map = sync_is_table_to_ecommerce(
+        regions, 'is.region.origine', "Région d'origine",
+        ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password
     )
-    
-    # 2. Récupérer les produits du serveur principal
+
+    # 3. Synchroniser les familles de fromage vers is.famille.fromage dans l'e-commerce
+    familles = get_familles_fromage(main_models, main_database, main_uid, main_password)
+    famille_id_map = sync_is_table_to_ecommerce(
+        familles, 'is.famille.fromage', "Famille de fromage",
+        ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password
+    )
+
+    # 4. Synchroniser les types article (milk.type) vers is.type.article dans l'e-commerce
+    type_article_id_map = sync_is_table_to_ecommerce(
+        milk_types, 'is.type.article', "Type article",
+        ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password
+    )
+
+    # 5. Récupérer les produits du serveur principal
     products = get_products(main_models, main_database, main_uid, main_password, config['odoo']['limit'])
     
     # Récupérer les paramètres de configuration
@@ -719,19 +808,16 @@ def main():
     else:
         print("Mise à jour des images désactivée")
     
-    # 3. Synchroniser les produits vers l'e-commerce
+    # 5. Synchroniser les produits vers l'e-commerce
     print(f"\n{'='*100}")
     print(f"{'SYNCHRONISATION DES PRODUITS':^100}")
     print(f"{'='*100}")
     
     success_count, error_count = synchronize_products(
         products, ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password,
-        main_models, main_database, main_uid, main_password, force_days, update_images
-    )
-    
-    # 4. Trier tous les tags produits par ordre alphabétique
-    tag_success, tag_errors = sort_product_tags_alphabetically(
-        ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password
+        main_models, main_database, main_uid, main_password, force_days, update_images,
+        region_id_map=region_id_map, famille_id_map=famille_id_map,
+        type_article_id_map=type_article_id_map
     )
     
     # Heure de fin et durée
@@ -741,9 +827,10 @@ def main():
     print(f"\n{'='*100}")
     print(f"{'RÉSUMÉ FINAL':^100}")
     print(f"{'='*100}")
-    print(f"Types de lait (catégories): {milk_success} succès, {milk_errors} erreurs")
+    print(f"Régions d'origine (is.region.origine): {len(region_id_map)} synchronisées")
+    print(f"Familles de fromage (is.famille.fromage): {len(famille_id_map)} synchronisées")
+    print(f"Types article (is.type.article): {len(type_article_id_map)} synchronisés")
     print(f"Produits: {success_count} succès, {error_count} erreurs")
-    print(f"Tags (tri alphabétique): {tag_success} succès, {tag_errors} erreurs")
     print(f"Fin: {end_time.strftime('%d/%m/%Y %H:%M:%S')} - Durée: {duration.total_seconds():.2f}s")
     print(f"{'='*100}")
 

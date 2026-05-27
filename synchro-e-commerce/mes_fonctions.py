@@ -167,7 +167,7 @@ def get_product_by_id(models, database, uid, password, product_id, is_template=T
     
     if is_template:
         # Ajouter les champs spécifiques aux templates
-        fields.extend(['milk_type_ids', 'is_region_id', 'traitement_thermique'])
+        fields.extend(['milk_type_ids', 'is_region_id', 'traitement_thermique', 'is_colisage', 'is_nb_pieces_par_colis', 'is_poids_net_colis', 'uom_id'])
     
     try:
         products = models.execute_kw(
@@ -414,6 +414,29 @@ def find_or_create_product_tag(models, database, uid, password, tag_name):
         return None
 
 
+def find_uom_by_name(models, database, uid, password, uom_name):
+    """Trouver l'ID d'une unité de mesure par son nom sur l'e-commerce"""
+    if not uom_name:
+        return None
+    # Recherche exacte
+    res = models.execute_kw(
+        database, uid, password,
+        'uom.uom', 'search_read',
+        [[['name', '=', uom_name]]],
+        {'fields': ['id', 'name'], 'limit': 1}
+    )
+    if res:
+        return res[0]['id']
+    # Recherche insensible à la casse
+    res = models.execute_kw(
+        database, uid, password,
+        'uom.uom', 'search_read',
+        [[['name', '=ilike', uom_name]]],
+        {'fields': ['id', 'name'], 'limit': 1}
+    )
+    return res[0]['id'] if res else None
+
+
 # =============================================================================
 # CRÉATION DE PRODUIT E-COMMERCE
 # =============================================================================
@@ -438,7 +461,10 @@ def prepare_product_data(product, update_images=True):
         'active': product.get('active', True),
         'description': product.get('description', ''),
         'is_published': True,
-        'website_ribbon_id': random.randint(1, 4)
+        'website_ribbon_id': random.randint(1, 4),
+        'is_colisage': product.get('is_colisage', '1'),
+        'is_nb_pieces_par_colis': product.get('is_nb_pieces_par_colis', 0),
+        'is_poids_net_colis': product.get('is_poids_net_colis', 0.0),
     }
     
     return data
@@ -492,7 +518,9 @@ def create_product_on_ecommerce(product,
                 {
                     'fields': ['id', 'name', 'default_code', 'list_price', 'categ_id', 'type', 
                               'active', 'write_date', 'description', 'milk_type_ids', 
-                              'is_region_id', 'traitement_thermique'],
+                              'is_region_id', 'traitement_thermique',
+                              'is_colisage', 'is_nb_pieces_par_colis', 'is_poids_net_colis',
+                              'uom_id'],
                     'context': {'lang': 'fr_FR'},
                     'limit': 1
                 }
@@ -515,7 +543,9 @@ def create_product_on_ecommerce(product,
                 {
                     'fields': ['id', 'name', 'default_code', 'list_price', 'categ_id', 'type', 
                               'active', 'write_date', 'description', 'milk_type_ids', 
-                              'is_region_id', 'traitement_thermique'],
+                              'is_region_id', 'traitement_thermique',
+                              'is_colisage', 'is_nb_pieces_par_colis', 'is_poids_net_colis',
+                              'uom_id'],
                     'context': {'lang': 'fr_FR'},
                     'limit': 1
                 }
@@ -587,10 +617,19 @@ def create_product_on_ecommerce(product,
         if tag_id:
             product_tag_ids.append(tag_id)
     
+    # Résoudre uom_id par nom
+    if product.get('uom_id'):
+        uom_name = product['uom_id'][1] if isinstance(product['uom_id'], list) else product['uom_id']
+        uom_id_ecom = find_uom_by_name(ecommerce_models, ecommerce_database, ecommerce_uid, ecommerce_password, uom_name)
+    else:
+        uom_id_ecom = None
+
     # Préparer les données
     product_data = prepare_product_data(product, update_images)
     product_data['public_categ_ids'] = [(6, 0, public_categ_ids)]
     product_data['product_tag_ids'] = [(6, 0, product_tag_ids)]
+    if uom_id_ecom:
+        product_data['uom_id'] = uom_id_ecom
     
     # Ajouter l'image si nécessaire
     if update_images:

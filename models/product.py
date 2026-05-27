@@ -353,6 +353,8 @@ class ProductTemplate(models.Model):
     is_colisage            = fields.Selection(string='Colisage', selection=_COLISAGE, required=True, tracking=True, default='1', help="Utilisé dans 'Préparation transfert entrepôt'")
     is_nb_pieces_par_colis = fields.Integer(string='Nb Pièces / colis', tracking=True)
     is_poids_net_colis     = fields.Float(string='Poids net colis (Kg)', digits='Stock Weight', tracking=True)
+
+
     is_forcer_poids_colis  = fields.Boolean(string='Forcer le scan au poids du colis', tracking=True, default=False, help="Cocher cette case si l'article est configuré par erreur au poids alors qu'il fallait le configuer à la pièce")
     is_colis_en_stock      = fields.Float(string='Nb colis théorique', digits=(14,1), compute='_compute_is_colis_en_stock',)
     is_colis_en_stock_scan = fields.Float(string='Nb colis scan'     , digits=(14,1), help="Nombre de colis en stock calculé d'après les scan")
