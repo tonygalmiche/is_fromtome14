@@ -14,6 +14,8 @@ from subprocess import PIPE, Popen
 import re
 import time
 import logging
+import zipfile
+import io
 _logger = logging.getLogger(__name__)
 
 
@@ -1261,6 +1263,59 @@ Si une information n'est pas trouvée dans le document, utilise null pour ce cha
             cr.execute(sql,[obj.id])
             rows = cr.dictfetchall()
             return rows
+
+
+    def download_photos_zip_action(self):
+        """Crée un ZIP contenant les photos des articles sélectionnés"""
+        if not self:
+            raise UserError("Aucun article sélectionné")
+        
+        # Créer un buffer ZIP en mémoire
+        zip_buffer = io.BytesIO()
+        zip_file = zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED)
+        
+        photo_count = 0
+        for product in self:
+            if product.image_1920:
+                # Décoder l'image en base64
+                image_data = base64.b64decode(product.image_1920)
+                
+                # Déterminer l'extension de fichier
+                filename = product.default_code or product.id
+                # Par défaut les images Odoo sont en JPEG
+                filename = f"{filename}.jpg"
+                
+                # Ajouter l'image au ZIP
+                try:
+                    zip_file.writestr(filename, image_data)
+                    photo_count += 1
+                except Exception as e:
+                    _logger.warning(f"Erreur lors de l'ajout de l'image pour {product.name}: {str(e)}")
+        
+        if photo_count == 0:
+            raise UserError("Aucune photo trouvée pour les articles sélectionnés")
+        
+        zip_file.close()
+        zip_buffer.seek(0)
+        
+        # Créer une pièce jointe avec le ZIP pour le téléchargement
+        zip_content = base64.b64encode(zip_buffer.getvalue())
+        
+        # Créer un ir.attachment pour le fichier ZIP
+        attachment = self.env['ir.attachment'].create({
+            'name': 'photos_articles.zip',
+            'type': 'binary',
+            'datas': zip_content,
+            'res_model': 'product.template',
+            'res_id': self.ids[0] if len(self.ids) == 1 else False,
+        })
+        
+        # Retourner l'action de téléchargement
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment.id}?download=true&filename=photos_articles.zip',
+            'target': 'self',
+        }
 
 
     def lignes_commandes_action(self):

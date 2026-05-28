@@ -34,6 +34,14 @@
         <field name="active">True</field>
     </record>
 
+    <record id="download_photos_zip_action_server" model="ir.actions.server">
+        <field name="name">Télécharger les photos en ZIP</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="state">code</field>
+        <field name="code">action = records.download_photos_zip_action()</field>
+    </record>
+
 
 
 

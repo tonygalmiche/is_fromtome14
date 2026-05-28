@@ -349,6 +349,25 @@ class SaleOrder(models.Model):
         return True
 
 
+    def acceder_lignes_commande_action(self):
+        """Ouvre les lignes de la commande dans une vue tree éditable"""
+        self.ensure_one()
+        return {
+            'name': 'Lignes de la commande',
+            'view_mode': 'tree,form',
+            'res_model': 'sale.order.line',
+            'type': 'ir.actions.act_window',
+            'domain': [('order_id', '=', self.id)],
+            'views': [
+                (self.env.ref('is_fromtome14.is_sale_order_line_editable_tree_view').id, 'tree'),
+                (False, 'form'),
+            ],
+            'context': {
+                'default_order_id': self.id,
+            }
+        }
+
+
     def ajout_frais_de_port(self):
         "Ajout des frais de port"
         for order in self:

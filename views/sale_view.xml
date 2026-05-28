@@ -117,6 +117,13 @@
             <field name="order_line" position="before">
                 <div style="margin-bottom:10px">
                     <button 
+                        name="acceder_lignes_commande_action"
+                        type="object"
+                        string="Lignes de la commande"
+                        class="oe_inline btn btn-sm btn-secondary"
+                        style="margin-right:10px"
+                    />
+                    <button 
                         name="trier_par_designation_action" 
                         type="object"
                         string="Trier par désignation"
@@ -394,6 +401,39 @@
                 <field name="price_unit" string="Prix de vente"/>
                 <field name="discount"        readonly="1" optional="show"/>
                 <field name="price_subtotal"  readonly="1" optional="show" sum="Total"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_sale_order_line_editable_tree_view" model="ir.ui.view">
+        <field name="name">is_sale_order_line_editable_tree_view</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <tree editable="top">
+                <field name="company_id" invisible="1" readonly="1"/>
+                <field name="order_id" invisible="1" readonly="1"/>
+                <field name="product_uom_category_id" invisible="1" readonly="1"/>
+                <field name="product_id" optional="show"/>
+                <field name="name" optional="hide"/>
+                <field name="is_default_code" optional="hide" readonly="1"/>
+                <field name="is_ref_fournisseur" optional="hide" readonly="1"/>
+                <field name="is_livraison_directe" optional="hide"/>
+                <field name="is_date_reception" optional="hide"/>
+                <field name="is_qt_cde" sum="Total" optional="show" readonly="1"/>
+                <field name="product_uom_qty" sum="Total" optional="show" string="Qt Prépa"/>
+                <field name="is_ecart_qt_cde_prepa" optional="show" readonly="1"/>
+                <field name="product_uom" optional="hide"/>
+                <field name="is_colis_cde_origine" sum="Total" optional="hide" readonly="1"/>
+                <field name="is_colis_cde" sum="Total" optional="hide"/>
+                <field name="is_colis_liv" sum="Total" optional="hide" readonly="1"/>
+                <field name="is_colis_manquant" sum="Total" optional="show" readonly="1"/>
+                <field name="is_nb_pieces_par_colis" optional="hide" readonly="1"/>
+                <field name="is_poids_net" sum="Total" optional="hide" readonly="1"/>
+                <field name="price_unit" string="Prix de vente" optional="show"/>
+                <field name="discount" optional="hide"/>
+                <field name="price_subtotal" sum="Total" optional="show" readonly="1"/>
+                <field name="qty_delivered" sum="Total" optional="hide" readonly="1"/>
+                <field name="qty_invoiced" sum="Total" optional="hide" readonly="1"/>
+                <field name="is_correction_prix_achat" optional="hide"/>
             </tree>
         </field>
     </record>
