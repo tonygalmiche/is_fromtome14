@@ -175,6 +175,8 @@
                 <filter name="2024" string="2024" domain="[('invoice_date', '&gt;=', '2024-01-01'),('invoice_date', '&lt;=', '2024-12-31')]"/>
                 <filter name="2025" string="2025" domain="[('invoice_date', '&gt;=', '2025-01-01'),('invoice_date', '&lt;=', '2025-12-31')]"/>
                 <filter name="2026" string="2026" domain="[('invoice_date', '&gt;=', '2026-01-01'),('invoice_date', '&lt;=', '2026-12-31')]"/>
+                <filter name="last_12_months" string="12 derniers mois" domain="[('invoice_date', '&gt;=', (datetime.datetime.today() - datetime.timedelta(days=365)).strftime('%Y-%m-%d'))]"/>
+                <filter name="last_12_months_no_transport" string="12 derniers mois hors transport" domain="[('invoice_date', '&gt;=', (datetime.datetime.today() - datetime.timedelta(days=365)).strftime('%Y-%m-%d')), ('categ_id', 'not ilike', 'TRANSPORT')]"/>
            </search>
         </field>
     </record>
@@ -318,6 +320,78 @@
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'pivot', 'view_id': ref('analyse_marge_brute_pivot')}),
                 (0, 0, {'view_mode': 'graph', 'view_id': ref('analyse_marge_brute_graph')}),
+            ]"
+        />
+    </record>
+
+    <!-- Analyse marge brute 12 derniers mois -->
+    <record id="analyse_marge_brute_12mois_pivot" model="ir.ui.view">
+        <field name="name">analyse_marge_brute_12mois_pivot</field>
+        <field name="model">is.analyse.facturation</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="move_type" type="col"/>
+                <field name="invoice_date" type="row" interval="month"/>
+                <field name="price_subtotal" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="analyse_marge_brute_12mois_graph" model="ir.ui.view">
+        <field name="name">analyse_marge_brute_12mois_graph</field>
+        <field name="model">is.analyse.facturation</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="False">
+                <field name="invoice_date" type="row" interval="month"/>
+                <!-- <field name="move_type" type="row"/> -->
+                <field name="price_subtotal" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="analyse_marge_brute_12mois_action" model="ir.actions.act_window">
+        <field name="name">Analyse marge brute (12 derniers mois)</field>
+        <field name="res_model">is.analyse.facturation</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="domain">[]
+        </field>
+        <field name="context">{'search_default_last_12_months': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'graph', 'view_id': ref('analyse_marge_brute_12mois_graph')}),
+                (0, 0, {'view_mode': 'pivot', 'view_id': ref('analyse_marge_brute_12mois_pivot')}),
+            ]"
+        />
+    </record>
+
+    <!-- Analyse marge brute 12 derniers mois hors transport -->
+    <record id="analyse_marge_brute_12mois_no_transport_pivot" model="ir.ui.view">
+        <field name="name">analyse_marge_brute_12mois_no_transport_pivot</field>
+        <field name="model">is.analyse.facturation</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="move_type" type="col"/>
+                <field name="invoice_date" type="row" interval="month"/>
+                <field name="price_subtotal" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="analyse_marge_brute_12mois_no_transport_graph" model="ir.ui.view">
+        <field name="name">analyse_marge_brute_12mois_no_transport_graph</field>
+        <field name="model">is.analyse.facturation</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="False">
+                <field name="invoice_date" type="row" interval="month"/>
+                <field name="price_subtotal" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="analyse_marge_brute_12mois_no_transport_action" model="ir.actions.act_window">
+        <field name="name">Analyse marge brute (12 derniers mois hors transport)</field>
+        <field name="res_model">is.analyse.facturation</field>
+        <field name="view_mode">graph,pivot,tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{'search_default_last_12_months_no_transport': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'graph', 'view_id': ref('analyse_marge_brute_12mois_no_transport_graph')}),
+                (0, 0, {'view_mode': 'pivot', 'view_id': ref('analyse_marge_brute_12mois_no_transport_pivot')}),
             ]"
         />
     </record>

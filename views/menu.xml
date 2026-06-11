@@ -66,6 +66,9 @@
         sequence="306"
         groups="account.group_account_manager" 
     />
+
+
+
     <menuitem
         name="Analyse facturation"
         id="is_analyse_facturation_main_menu"
@@ -126,6 +129,35 @@
         action="is_analyse_facturation_update_action"
         groups="is_analyse_marge_brute_group" 
     />
+
+
+
+    <menuitem
+        name="Analyse marge brute"
+        id="analyse_marge_brute_main_menu"
+        parent="is_analyse_top_menu"
+        sequence="20"
+        action="analyse_marge_brute_action"
+        groups="is_analyse_marge_brute_group" 
+    />
+    <menuitem
+        name="Analyse marge brute (12 derniers mois)"
+        id="analyse_marge_brute_12mois_menu"
+        parent="analyse_marge_brute_main_menu"
+        sequence="16"
+        action="analyse_marge_brute_12mois_action"
+        groups="is_analyse_marge_brute_group" 
+    />
+    <menuitem
+        name="Analyse marge brute (12 derniers mois hors transport)"
+        id="analyse_marge_brute_12mois_no_transport_menu"
+        parent="analyse_marge_brute_main_menu"
+        sequence="17"
+        action="analyse_marge_brute_12mois_no_transport_action"
+        groups="is_analyse_marge_brute_group" 
+    />
+
+
 
     
 

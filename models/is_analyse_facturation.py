@@ -262,6 +262,11 @@ class IsAnalyseFacturation(models.Model):
         return True
     
 
+    # @api.model
+    # def get_last_12_months_date(self):
+    #     """Retourne la date d'il y a 12 mois pour les filtres dynamiques"""
+    #     return (date.today() - timedelta(days=365)).strftime('%Y-%m-%d')
+
     def update_fournisseur_action(self):
         for obj in self:
             obj.fournisseur_id = obj.ligne_facture_fournisseur_id.move_id.partner_id.id
