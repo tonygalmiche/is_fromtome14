@@ -8,8 +8,10 @@ class StockProductionLot(models.Model):
     _inherit = "stock.production.lot"
 
     is_article_actif = fields.Boolean('Article actif', related='product_id.active')
-    is_dlc_ddm       = fields.Date('DLC / DDM', required=True)
-    active           = fields.Boolean("Actif", default=True)
+    is_dlc_ddm       = fields.Date('DLC / DDM', required=True,tracking=True)
+    active           = fields.Boolean("Actif", default=True,tracking=True)
+    name             = fields.Char(tracking=True)
+    product_id       = fields.Many2one(tracking=True)
 
 
     def _check_create(self):
