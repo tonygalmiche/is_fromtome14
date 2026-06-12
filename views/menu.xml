@@ -141,19 +141,27 @@
         groups="is_analyse_marge_brute_group" 
     />
     <menuitem
-        name="Analyse marge brute (12 derniers mois)"
+        name="Analyse marge brute comptable (12 derniers mois)"
         id="analyse_marge_brute_12mois_menu"
         parent="analyse_marge_brute_main_menu"
-        sequence="16"
+        sequence="10"
         action="analyse_marge_brute_12mois_action"
         groups="is_analyse_marge_brute_group" 
     />
     <menuitem
-        name="Analyse marge brute (12 derniers mois hors transport)"
+        name="Analyse marge brute comptable (12 derniers mois hors transport)"
         id="analyse_marge_brute_12mois_no_transport_menu"
         parent="analyse_marge_brute_main_menu"
-        sequence="17"
+        sequence="20"
         action="analyse_marge_brute_12mois_no_transport_action"
+        groups="is_analyse_marge_brute_group" 
+    />
+    <menuitem
+        name="Analyse marge brute par enseigne théorique (12 derniers mois hors transport)"
+        id="analyse_marge_brute_par_enseigne_12mois_menu"
+        parent="analyse_marge_brute_main_menu"
+        sequence="30"
+        action="analyse_marge_brute_par_enseigne_12mois_action"
         groups="is_analyse_marge_brute_group" 
     />
 
