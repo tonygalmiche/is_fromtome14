@@ -1318,6 +1318,51 @@ Si une information n'est pas trouvée dans le document, utilise null pour ce cha
         }
 
 
+    def creer_article_echantillon_action(self):
+        self.ensure_one()
+        new_name = 'ECHANTILLON ' + self.name
+        default_code = ('ECH' + self.default_code) if self.default_code else False
+
+        # Vérifier que le code n'existe pas déjà
+        if default_code:
+            existing = self.env['product.template'].search([('default_code', '=', default_code)], limit=1)
+            if existing:
+                raise UserError(_("L'article '%s' existe déjà (code %s).") % (existing.name, default_code))
+
+        # Vérifier que la catégorie ECHANTILLON existe
+        categorie = self.env['product.category'].search([('name', '=', 'ECHANTILLON')], limit=1)
+        if not categorie:
+            raise UserError(_("La catégorie 'ECHANTILLON' n'existe pas. Veuillez la créer avant de continuer."))
+
+        new_product = self.copy({
+            'name'         : new_name,
+            'default_code' : default_code,
+            'barcode'      : False,
+            'is_gtin_13'   : False,
+            'categ_id'     : categorie.id,
+        })
+
+        # Dupliquer les lignes fournisseurs
+        for seller in self.seller_ids:
+            seller.copy({'product_tmpl_id': new_product.id})
+
+        # Mettre toutes les traductions du champ name au même nom français
+        translations = self.env['ir.translation'].search([
+            ('name'   , '=', 'product.template,name'),
+            ('res_id' , '=', new_product.id),
+        ])
+        translations.write({'value': new_name})
+
+        return {
+            'type'      : 'ir.actions.act_window',
+            'name'      : new_product.name,
+            'res_model' : 'product.template',
+            'res_id'    : new_product.id,
+            'view_mode' : 'form',
+            'target'    : 'current',
+        }
+
+
     def lignes_commandes_action(self):
         for obj in self:
             ids=[]
@@ -1398,7 +1443,9 @@ class ProductProduct(models.Model):
         _logger.info("update_pricelist_ir_cron : Langue du contexte après with_context : %s", lang_after)
         
         cr, user, context, su = self.env.args
-        products = self.env['product.template'].search([])
+        products = self.env['product.template'].search([
+            ('categ_id.name', '!=', 'ECHANTILLON')
+        ])
         ids=[]
         for product in products:
             ids.append(str(product.id))
@@ -1470,7 +1517,9 @@ class ProductProduct(models.Model):
                 # filtre=[
                 #     (field_name, '>', 0)
                 # ]
-                filtre=[]
+                filtre=[
+                    ('product_tmpl_id.categ_id.name', '!=', 'ECHANTILLON')
+                ]
                 if product_tmpl_id:
                     filtre.append(('product_tmpl_id','=', product_tmpl_id))
                 products = self.env['product.product'].search(filtre, order='default_code') #, limit=10)

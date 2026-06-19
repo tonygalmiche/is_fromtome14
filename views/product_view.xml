@@ -42,6 +42,14 @@
         <field name="code">action = records.download_photos_zip_action()</field>
     </record>
 
+    <record id="creer_article_echantillon_action_server" model="ir.actions.server">
+        <field name="name">Créer un article échantillon à partir de cet article</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="state">code</field>
+        <field name="code">action = records.creer_article_echantillon_action()</field>
+    </record>
+
 
 
 
@@ -131,6 +139,7 @@
             <filter name="filter_to_sell" position="after">
                 <filter string="Avec image" name="avec_image" domain="[('image_1920', '!=', False)]"/>
                 <filter string="Sans image" name="sans_image" domain="[('image_1920', '=', False)]"/>
+                <filter string="Échantillons" name="echantillons" domain="[('categ_id.name', '=', 'ECHANTILLON')]"/>
             </filter>
         </field>
     </record>
