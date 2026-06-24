@@ -208,6 +208,7 @@
                 <filter name="2024" string="2024" domain="[('invoice_date', '&gt;=', '2024-01-01'),('invoice_date', '&lt;=', '2024-12-31')]"/>
                 <filter name="2025" string="2025" domain="[('invoice_date', '&gt;=', '2025-01-01'),('invoice_date', '&lt;=', '2025-12-31')]"/>
                 <filter name="2026" string="2026" domain="[('invoice_date', '&gt;=', '2026-01-01'),('invoice_date', '&lt;=', '2026-12-31')]"/>
+                <filter name="depuis_2025" string="Depuis le 01/01/2025" domain="[('invoice_date', '&gt;=', '2025-01-01')]"/>
                 <filter name="last_12_months" string="12 derniers mois" domain="[('invoice_date', '&gt;=', (datetime.datetime.today() - datetime.timedelta(days=365)).strftime('%Y-%m-%d'))]"/>
                 <filter name="last_12_months_no_transport" string="12 derniers mois hors transport" domain="[('invoice_date', '&gt;=', (datetime.datetime.today() - datetime.timedelta(days=365)).strftime('%Y-%m-%d')), ('categ_id', 'not ilike', 'TRANSPORT')]"/>
            </search>
@@ -509,6 +510,90 @@
 
 
 
+    <!-- Toutes les factures et avoirs (account.move) -->
+    <record id="is_all_invoices_tree" model="ir.ui.view">
+        <field name="name">is.all.invoices.tree</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="move_type in ('out_refund','in_refund')">
+                <field name="invoice_date"/>
+                <field name="name"/>
+                <field name="move_type"/>
+                <field name="partner_id"/>
+                <field name="journal_id"      optional="hide"/>
+                <field name="state"/>
+                <field name="amount_untaxed"  sum="Total HT"/>
+                <field name="amount_tax"      optional="hide" sum="Total TVA"/>
+                <field name="amount_total"    sum="Total TTC"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_all_invoices_pivot" model="ir.ui.view">
+        <field name="name">is.all.invoices.pivot</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <pivot>
+                <field name="invoice_date"   type="row" interval="month"/>
+                <field name="move_type"      type="col"/>
+                <field name="amount_untaxed" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="is_all_invoices_graph" model="ir.ui.view">
+        <field name="name">is.all.invoices.graph</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" stacked="False">
+                <field name="invoice_date"   type="row" interval="month"/>
+                <field name="amount_untaxed" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="is_all_invoices_search" model="ir.ui.view">
+        <field name="name">is.all.invoices.search</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="move_type"/>
+                <field name="journal_id"/>
+                <filter name="facture_client"   string="Factures client"    domain="[('move_type', '=', 'out_invoice')]"/>
+                <filter name="avoir_client"     string="Avoirs client"      domain="[('move_type', '=', 'out_refund')]"/>
+                <filter name="facture_fournisseur" string="Factures fournisseur" domain="[('move_type', '=', 'in_invoice')]"/>
+                <filter name="avoir_fournisseur" string="Avoirs fournisseur" domain="[('move_type', '=', 'in_refund')]"/>
+                <separator/>
+                <filter name="state_posted"     string="Validée"            domain="[('state', '=', 'posted')]"/>
+                <filter name="state_draft"      string="Brouillon"          domain="[('state', '=', 'draft')]"/>
+                <separator/>
+                <filter name="2023" string="2023" domain="[('invoice_date', '&gt;=', '2023-01-01'),('invoice_date', '&lt;=', '2023-12-31')]"/>
+                <filter name="2024" string="2024" domain="[('invoice_date', '&gt;=', '2024-01-01'),('invoice_date', '&lt;=', '2024-12-31')]"/>
+                <filter name="2025" string="2025" domain="[('invoice_date', '&gt;=', '2025-01-01'),('invoice_date', '&lt;=', '2025-12-31')]"/>
+                <filter name="2026" string="2026" domain="[('invoice_date', '&gt;=', '2026-01-01'),('invoice_date', '&lt;=', '2026-12-31')]"/>
+                <filter name="depuis_2025" string="Depuis le 01/01/2025" domain="[('invoice_date', '&gt;=', '2025-01-01')]"/>
+                <filter name="last_12_months" string="12 derniers mois" domain="[('invoice_date', '&gt;=', (datetime.datetime.today() - datetime.timedelta(days=365)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="group_by_move_type"    string="Type"       context="{'group_by': 'move_type'}"/>
+                <filter name="group_by_partner_id"   string="Partenaire" context="{'group_by': 'partner_id'}"/>
+                <filter name="group_by_invoice_date" string="Date"       context="{'group_by': 'invoice_date'}"/>
+                <filter name="group_by_journal_id"   string="Journal"    context="{'group_by': 'journal_id'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="is_all_invoices_action" model="ir.actions.act_window">
+        <field name="name">Toutes les factures et avoirs</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">tree,pivot,graph</field>
+        <field name="domain">[('move_type', 'in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])]</field>
+        <field name="search_view_id" ref="is_all_invoices_search"/>
+        <field name="context">{'search_default_last_12_months': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'tree',  'view_id': ref('is_all_invoices_tree')}),
+                (0, 0, {'view_mode': 'pivot', 'view_id': ref('is_all_invoices_pivot')}),
+                (0, 0, {'view_mode': 'graph', 'view_id': ref('is_all_invoices_graph')}),
+            ]"
+        />
+    </record>
 
 
 </odoo>

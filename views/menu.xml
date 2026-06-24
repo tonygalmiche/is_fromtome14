@@ -141,6 +141,13 @@
         groups="is_analyse_marge_brute_group" 
     />
     <menuitem
+        name="Toutes les factures et avoirs"
+        id="is_all_invoices_menu"
+        parent="analyse_marge_brute_main_menu"
+        sequence="5"
+        action="is_all_invoices_action"
+    />
+    <menuitem
         name="Analyse marge brute comptable (12 derniers mois)"
         id="analyse_marge_brute_12mois_menu"
         parent="analyse_marge_brute_main_menu"
