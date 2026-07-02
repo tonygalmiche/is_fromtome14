@@ -155,6 +155,13 @@ class IsBio(models.Model):
     name = fields.Char("Bio", required=True)
 
 
+class IsRayonMagasin(models.Model):
+    _name = "is.rayon.magasin"
+    _description = "Rayon magasin"
+    _order = "name"
+    name = fields.Char("Rayon magasin", required=True)
+
+
 class ProductTemplate(models.Model):
     _name = 'product.template'
     _inherit = ['product.template', 'barcodes.barcode_events_mixin']
@@ -252,6 +259,7 @@ class ProductTemplate(models.Model):
     is_mis_a_jour_le = fields.Date(string='Mise à jour le')
     is_mise_en_avant = fields.Boolean(string='Mise en avant', help="Mise en avant de cet article dans le listing client", default=False)
     is_bio_id        = fields.Many2one('is.bio', 'BIO', copy=False)
+    is_rayon_magasin_id = fields.Many2one('is.rayon.magasin', 'Rayon magasin')
     is_preco         = fields.Boolean(string='Préco.', default=False)
     is_presentation  = fields.Text(string='Présentation')
     is_conseils      = fields.Text(string='Conseils')

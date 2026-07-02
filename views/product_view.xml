@@ -61,6 +61,7 @@
             <field name="categ_id" position="after">
                 <field name="is_ref_fournisseur"/>
                 <field name="is_gtin_13"/>
+                <field name="is_rayon_magasin_id"/>
             </field>
             <field name="type" position="after">
                 <field name="is_stock_mini"/>
@@ -85,6 +86,7 @@
                 <field name="is_ref_fournisseur" optional="show"/>
                 <field name="is_date_fin"        optional="show"/>
                 <field name="is_gtin_13" optional="show"/>
+                <field name="is_rayon_magasin_id" optional="hide"/>
             </field>
              <field name="uom_id" position="after">
                 <field name="is_stock_mini" optional="hide"/>
@@ -135,6 +137,7 @@
                 <field name="is_ref_fournisseur"/>
                 <field name="barcode"/>
                 <field name="is_gtin_13"/>
+                <field name="is_rayon_magasin_id"/>
             </field>
             <filter name="filter_to_sell" position="after">
                 <filter string="Avec image" name="avec_image" domain="[('image_1920', '!=', False)]"/>
@@ -797,11 +800,57 @@
         <field name="res_model">is.bio</field>
         <field name="view_mode">tree,form</field>
     </record>
-    <menuitem 
-        id="is_bio_menu" 
-        name="BIO" 
-        parent="sale.prod_config_main" 
+    <menuitem
+        id="is_bio_menu"
+        name="BIO"
+        parent="sale.prod_config_main"
         sequence="930"
         action="is_bio_action"
+    />
+
+    <!-- is.rayon.magasin -->
+    <record id="is_rayon_magasin_tree_view" model="ir.ui.view">
+        <field name="name">is_rayon_magasin_tree_view</field>
+        <field name="model">is.rayon.magasin</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_rayon_magasin_form_view" model="ir.ui.view">
+        <field name="name">is_rayon_magasin_form_view</field>
+        <field name="model">is.rayon.magasin</field>
+        <field name="arch" type="xml">
+        <form>
+            <sheet>
+                <group>
+                    <field name="name"/>
+                </group>
+            </sheet>
+        </form>
+        </field>
+    </record>
+    <record id="is_rayon_magasin_search_view" model="ir.ui.view">
+        <field name="name">is_rayon_magasin_search_view</field>
+        <field name="model">is.rayon.magasin</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+            </search>
+        </field>
+    </record>
+    <record id="is_rayon_magasin_action" model="ir.actions.act_window" >
+        <field name="name">Rayon magasin</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">is.rayon.magasin</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem
+        id="is_rayon_magasin_menu"
+        name="Rayon magasin"
+        parent="sale.prod_config_main"
+        sequence="940"
+        action="is_rayon_magasin_action"
     />
 </odoo>
