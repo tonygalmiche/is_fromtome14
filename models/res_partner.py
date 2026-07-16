@@ -83,7 +83,42 @@ class ResPartner(models.Model):
             obj.is_encours_client = val
 
   
+    @api.depends('is_localisation')
+    def _compute_is_localisation_google_maps_url(self):
+        for record in self:
+            if record.is_localisation:
+                # Format attendu : "latitude,longitude" (exemple: "46.918792,5.741772")
+                record.is_localisation_google_maps_url = f"https://www.google.com/maps/search/?api=1&query={record.is_localisation}"
+            else:
+                record.is_localisation_google_maps_url = False
+
+    def action_open_google_maps_multiple(self):
+        """Ouvre une carte OpenStreetMap avec tous les contacts ayant une localisation"""
+        partners_with_location = self.filtered(lambda p: p.is_localisation)
+
+        if not partners_with_location:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Aucune localisation',
+                    'message': 'Aucun contact sélectionné ne possède de coordonnées GPS.',
+                    'type': 'warning',
+                }
+            }
+
+        partner_ids = ','.join(str(p.id) for p in partners_with_location)
+        url = f'/partner/map?partner_ids={partner_ids}'
+
+        return {
+            'type': 'ir.actions.act_url',
+            'url': url,
+            'target': 'new',
+        }
+
     is_date_reception           = fields.Date(string='Dernière date de réception saisie', tracking=True)
+    is_localisation              = fields.Char("Localisation", tracking=True)
+    is_localisation_google_maps_url = fields.Char("Maps", compute='_compute_is_localisation_google_maps_url', readonly=True)
     is_product_supplierinfo_ids = fields.One2many('product.supplierinfo', 'name', 'Liste de prix', tracking=True)
     is_gln                      = fields.Char('GLN Client', tracking=True)
     is_iln                      = fields.Char('ILN Client', tracking=True)

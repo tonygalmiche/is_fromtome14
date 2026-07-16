@@ -188,6 +188,8 @@ class ProductTemplate(models.Model):
                 obj.barcode = code
 
 
+    # Ce controle ne se declenche que sur product.template : editer le default_code
+    # depuis une variante (product.product) ne passe pas par ici, d'ou des doublons possibles.
     @api.onchange('default_code')
     def default_code_uniq(self):
         list = []
