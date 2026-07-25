@@ -209,8 +209,8 @@
                 <filter name="2025" string="2025" domain="[('invoice_date', '&gt;=', '2025-01-01'),('invoice_date', '&lt;=', '2025-12-31')]"/>
                 <filter name="2026" string="2026" domain="[('invoice_date', '&gt;=', '2026-01-01'),('invoice_date', '&lt;=', '2026-12-31')]"/>
                 <filter name="depuis_2025" string="Depuis le 01/01/2025" domain="[('invoice_date', '&gt;=', '2025-01-01')]"/>
-                <filter name="last_12_months" string="12 derniers mois" domain="[('invoice_date', '&gt;=', (datetime.datetime.today() - datetime.timedelta(days=365)).strftime('%Y-%m-%d'))]"/>
-                <filter name="last_12_months_no_transport" string="12 derniers mois hors transport" domain="[('invoice_date', '&gt;=', (datetime.datetime.today() - datetime.timedelta(days=365)).strftime('%Y-%m-%d')), ('categ_id', 'not ilike', 'TRANSPORT')]"/>
+                <filter name="last_18_months" string="18 derniers mois" domain="[('invoice_date', '&gt;=', (datetime.datetime.today() - datetime.timedelta(days=548)).strftime('%Y-%m-%d'))]"/>
+                <filter name="last_18_months_no_transport" string="18 derniers mois hors transport" domain="[('invoice_date', '&gt;=', (datetime.datetime.today() - datetime.timedelta(days=548)).strftime('%Y-%m-%d')), ('categ_id', 'not ilike', 'TRANSPORT')]"/>
            </search>
         </field>
     </record>
@@ -358,9 +358,9 @@
         />
     </record>
 
-    <!-- Analyse marge brute comptable 12 derniers mois -->
-    <record id="analyse_marge_brute_12mois_pivot" model="ir.ui.view">
-        <field name="name">analyse_marge_brute_12mois_pivot</field>
+    <!-- Analyse marge brute comptable 18 derniers mois -->
+    <record id="analyse_marge_brute_18mois_pivot" model="ir.ui.view">
+        <field name="name">analyse_marge_brute_18mois_pivot</field>
         <field name="model">is.analyse.facturation</field>
         <field name="arch" type="xml">
             <pivot>
@@ -370,8 +370,8 @@
             </pivot>
         </field>
     </record>
-    <record id="analyse_marge_brute_12mois_graph" model="ir.ui.view">
-        <field name="name">analyse_marge_brute_12mois_graph</field>
+    <record id="analyse_marge_brute_18mois_graph" model="ir.ui.view">
+        <field name="name">analyse_marge_brute_18mois_graph</field>
         <field name="model">is.analyse.facturation</field>
         <field name="arch" type="xml">
             <graph type="bar" orientation="vertical" stacked="False">
@@ -381,16 +381,16 @@
             </graph>
         </field>
     </record>
-    <record id="analyse_marge_brute_12mois_action" model="ir.actions.act_window">
-        <field name="name">Analyse marge brute comptable (12 derniers mois)</field>
+    <record id="analyse_marge_brute_18mois_action" model="ir.actions.act_window">
+        <field name="name">Analyse marge brute comptable (18 derniers mois)</field>
         <field name="res_model">is.analyse.facturation</field>
         <field name="view_mode">graph,pivot,tree,form</field>
         <field name="domain">[]
         </field>
-        <field name="context">{'search_default_last_12_months': 1}</field>
+        <field name="context">{'search_default_last_18_months': 1}</field>
         <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'graph', 'view_id': ref('analyse_marge_brute_12mois_graph')}),
-                (0, 0, {'view_mode': 'pivot', 'view_id': ref('analyse_marge_brute_12mois_pivot')}),
+                (0, 0, {'view_mode': 'graph', 'view_id': ref('analyse_marge_brute_18mois_graph')}),
+                (0, 0, {'view_mode': 'pivot', 'view_id': ref('analyse_marge_brute_18mois_pivot')}),
                 (0, 0, {'view_mode': 'tree' , 'view_id': ref('is_analyse_facturation_marge_brute_comptable_tree')}),
             ]"
         />
@@ -399,9 +399,9 @@
 
 
 
-    <!-- Analyse marge brute comptable 12 derniers mois hors transport -->
-    <record id="analyse_marge_brute_12mois_no_transport_pivot" model="ir.ui.view">
-        <field name="name">analyse_marge_brute_12mois_no_transport_pivot</field>
+    <!-- Analyse marge brute comptable 18 derniers mois hors transport -->
+    <record id="analyse_marge_brute_18mois_no_transport_pivot" model="ir.ui.view">
+        <field name="name">analyse_marge_brute_18mois_no_transport_pivot</field>
         <field name="model">is.analyse.facturation</field>
         <field name="arch" type="xml">
             <pivot>
@@ -411,8 +411,8 @@
             </pivot>
         </field>
     </record>
-    <record id="analyse_marge_brute_12mois_no_transport_graph" model="ir.ui.view">
-        <field name="name">analyse_marge_brute_12mois_no_transport_graph</field>
+    <record id="analyse_marge_brute_18mois_no_transport_graph" model="ir.ui.view">
+        <field name="name">analyse_marge_brute_18mois_no_transport_graph</field>
         <field name="model">is.analyse.facturation</field>
         <field name="arch" type="xml">
             <graph type="bar" orientation="vertical" stacked="False">
@@ -421,15 +421,15 @@
             </graph>
         </field>
     </record>
-    <record id="analyse_marge_brute_12mois_no_transport_action" model="ir.actions.act_window">
-        <field name="name">Analyse marge brute comptable (12 derniers mois hors transport)</field>
+    <record id="analyse_marge_brute_18mois_no_transport_action" model="ir.actions.act_window">
+        <field name="name">Analyse marge brute comptable (18 derniers mois hors transport)</field>
         <field name="res_model">is.analyse.facturation</field>
         <field name="view_mode">graph,pivot,tree,form</field>
         <field name="domain">[]</field>
-        <field name="context">{'search_default_last_12_months_no_transport': 1}</field>
+        <field name="context">{'search_default_last_18_months_no_transport': 1}</field>
         <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'graph', 'view_id': ref('analyse_marge_brute_12mois_no_transport_graph')}),
-                (0, 0, {'view_mode': 'pivot', 'view_id': ref('analyse_marge_brute_12mois_no_transport_pivot')}),
+                (0, 0, {'view_mode': 'graph', 'view_id': ref('analyse_marge_brute_18mois_no_transport_graph')}),
+                (0, 0, {'view_mode': 'pivot', 'view_id': ref('analyse_marge_brute_18mois_no_transport_pivot')}),
                 (0, 0, {'view_mode': 'tree' , 'view_id': ref('is_analyse_facturation_marge_brute_comptable_tree')}),
             ]"
         />
@@ -437,9 +437,9 @@
 
 
 
-    <!-- Analyse marge brute par enseigne théorique (12 derniers mois hors transport) -->
-    <record id="analyse_marge_brute_par_enseigne_12mois_tree" model="ir.ui.view">
-        <field name="name">analyse_marge_brute_par_enseigne_12mois_tree</field>
+    <!-- Analyse marge brute par enseigne théorique (18 derniers mois hors transport) -->
+    <record id="analyse_marge_brute_par_enseigne_18mois_tree" model="ir.ui.view">
+        <field name="name">analyse_marge_brute_par_enseigne_18mois_tree</field>
         <field name="model">is.analyse.facturation</field>
         <field name="arch" type="xml">
             <tree>
@@ -470,8 +470,8 @@
             </tree>
         </field>
     </record>
-    <record id="analyse_marge_brute_par_enseigne_12mois_pivot" model="ir.ui.view">
-        <field name="name">analyse_marge_brute_par_enseigne_12mois_pivot</field>
+    <record id="analyse_marge_brute_par_enseigne_18mois_pivot" model="ir.ui.view">
+        <field name="name">analyse_marge_brute_par_enseigne_18mois_pivot</field>
         <field name="model">is.analyse.facturation</field>
         <field name="arch" type="xml">
             <pivot>
@@ -481,8 +481,8 @@
             </pivot>
         </field>
     </record>
-    <record id="analyse_marge_brute_par_enseigne_12mois_graph" model="ir.ui.view">
-        <field name="name">analyse_marge_brute_par_enseigne_12mois_graph</field>
+    <record id="analyse_marge_brute_par_enseigne_18mois_graph" model="ir.ui.view">
+        <field name="name">analyse_marge_brute_par_enseigne_18mois_graph</field>
         <field name="model">is.analyse.facturation</field>
         <field name="arch" type="xml">
             <graph type="bar" orientation="vertical" stacked="True">
@@ -494,16 +494,16 @@
     </record>
 
 
-    <record  id="analyse_marge_brute_par_enseigne_12mois_action" model="ir.actions.act_window">
-        <field name="name">Analyse marge brute par enseigne théorique (12 derniers mois hors transport)</field>
+    <record  id="analyse_marge_brute_par_enseigne_18mois_action" model="ir.actions.act_window">
+        <field name="name">Analyse marge brute par enseigne théorique (18 derniers mois hors transport)</field>
         <field name="res_model">is.analyse.facturation</field>
         <field name="view_mode">graph,pivot,tree,form</field>
         <field name="domain">[('move_type','in',['Facture client','Avoir client','Rebut']),('enseigne','!=',False)]</field>
-        <field name="context">{'search_default_last_12_months_no_transport': 1}</field>
+        <field name="context">{'search_default_last_18_months_no_transport': 1}</field>
         <field name="view_ids" eval="[(5, 0, 0),
-                (0, 0, {'view_mode': 'graph', 'view_id': ref('analyse_marge_brute_par_enseigne_12mois_graph')}),
-                (0, 0, {'view_mode': 'pivot', 'view_id': ref('analyse_marge_brute_par_enseigne_12mois_pivot')}),
-                (0, 0, {'view_mode': 'tree' , 'view_id': ref('analyse_marge_brute_par_enseigne_12mois_tree')}),
+                (0, 0, {'view_mode': 'graph', 'view_id': ref('analyse_marge_brute_par_enseigne_18mois_graph')}),
+                (0, 0, {'view_mode': 'pivot', 'view_id': ref('analyse_marge_brute_par_enseigne_18mois_pivot')}),
+                (0, 0, {'view_mode': 'tree' , 'view_id': ref('analyse_marge_brute_par_enseigne_18mois_tree')}),
             ]"
         />
     </record>
@@ -571,7 +571,7 @@
                 <filter name="2025" string="2025" domain="[('invoice_date', '&gt;=', '2025-01-01'),('invoice_date', '&lt;=', '2025-12-31')]"/>
                 <filter name="2026" string="2026" domain="[('invoice_date', '&gt;=', '2026-01-01'),('invoice_date', '&lt;=', '2026-12-31')]"/>
                 <filter name="depuis_2025" string="Depuis le 01/01/2025" domain="[('invoice_date', '&gt;=', '2025-01-01')]"/>
-                <filter name="last_12_months" string="12 derniers mois" domain="[('invoice_date', '&gt;=', (datetime.datetime.today() - datetime.timedelta(days=365)).strftime('%Y-%m-%d'))]"/>
+                <filter name="last_18_months" string="18 derniers mois" domain="[('invoice_date', '&gt;=', (datetime.datetime.today() - datetime.timedelta(days=548)).strftime('%Y-%m-%d'))]"/>
                 <separator/>
                 <filter name="group_by_move_type"    string="Type"       context="{'group_by': 'move_type'}"/>
                 <filter name="group_by_partner_id"   string="Partenaire" context="{'group_by': 'partner_id'}"/>
@@ -586,7 +586,7 @@
         <field name="view_mode">tree,pivot,graph</field>
         <field name="domain">[('move_type', 'in', ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])]</field>
         <field name="search_view_id" ref="is_all_invoices_search"/>
-        <field name="context">{'search_default_last_12_months': 1}</field>
+        <field name="context">{'search_default_last_18_months': 1}</field>
         <field name="view_ids" eval="[(5, 0, 0),
                 (0, 0, {'view_mode': 'tree',  'view_id': ref('is_all_invoices_tree')}),
                 (0, 0, {'view_mode': 'pivot', 'view_id': ref('is_all_invoices_pivot')}),
