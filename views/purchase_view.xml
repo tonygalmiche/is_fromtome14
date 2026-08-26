@@ -31,6 +31,13 @@
         <field name="state">code</field>
         <field name="code">action = records.initialisation_etat_facturee_fournisseur_action_server()</field>
     </record>
+    <record id="annuler_commande_devis_action_server" model="ir.actions.server">
+        <field name="name">Annuler les commandes (Devis)</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+        <field name="state">code</field>
+        <field name="code">action = records.annuler_commande_devis_action_server()</field>
+    </record>
     <record id="purchase_order_view_form_inherit" model="ir.ui.view">
         <field name="name">purchase.order.form.inherit</field>
         <field name="model">purchase.order</field>

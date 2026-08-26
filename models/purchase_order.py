@@ -164,6 +164,12 @@ class PurchaseOrder(models.Model):
             obj.is_commande_soldee=solde
 
 
+    def annuler_commande_devis_action_server(self):
+        for obj in self:
+            if obj.state in ('draft', 'sent'):
+                obj.button_cancel()
+
+
     def creer_commande_fromtome_action(self):
         cr,uid,context,su = self.env.args
         date_reception = date.today()+timedelta(days=2)

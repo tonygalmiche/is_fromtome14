@@ -262,6 +262,7 @@ class ProductTemplate(models.Model):
     is_mise_en_avant = fields.Boolean(string='Mise en avant', help="Mise en avant de cet article dans le listing client", default=False)
     is_bio_id        = fields.Many2one('is.bio', 'BIO', copy=False)
     is_rayon_magasin_id = fields.Many2one('is.rayon.magasin', 'Rayon magasin')
+    is_calcul_besoins_historique = fields.Boolean("Calcul des besoins sur historique", default=False, help="Si cette case est cochée, cet article est pris en compte dans le Calcul des besoins de type 'Sur Historique' lorsque l'option 'Uniquement les articles sur historique' est activée")
     is_preco         = fields.Boolean(string='Préco.', default=False)
     is_presentation  = fields.Text(string='Présentation')
     is_conseils      = fields.Text(string='Conseils')
@@ -760,6 +761,15 @@ class ProductTemplate(models.Model):
         nb_colis = round(nb_colis,2)                     # Arrondir à 2 decimales pour éviter les problèmes de virgules flotante
         return nb_colis
 
+
+
+    def arrondi_colisage(self, qty, arrondir="ceil"):
+        colisage = int(self.is_colisage or 1)
+        if arrondir=="ceil":
+            nb_colis = math.ceil(colisage*qty)/colisage # Arrondir au multiple de colisage supérieur
+        else:
+            nb_colis = round(colisage*qty)/colisage     # Arrondir au multiple de colisage le plus proche
+        return round(nb_colis,2)
 
 
     def colis2uom(self,colis):

@@ -14,6 +14,7 @@
                         <field name="uom_id"/>
                         <field name="nb_pieces_par_colis"/>
                         <field name="poids_net_colis"/>
+                        <field name="colisage"/>
                         <field name="unite"/>
                         <field name="stock_mini"/>
                         <field name="stock"/>
@@ -22,6 +23,22 @@
                         <field name="purchase_qty"/>
                         <field name="product_qty"/>
                          <field name="order_line_id"/>
+                    </group>
+                    <group string="Colis des 4 dernières semaines">
+                        <field name="colis_s1"/>
+                        <field name="colis_s2"/>
+                        <field name="colis_s3"/>
+                        <field name="colis_s4"/>
+                    </group>
+                    <group string="Colis des 4 même semaine de N-1">
+                        <field name="colis_s1_n1"/>
+                        <field name="colis_s2_n1"/>
+                        <field name="colis_s3_n1"/>
+                        <field name="colis_s4_n1"/>
+                    </group>
+                    <group>
+                        <field name="moyenne_8_semaines"/>
+                        <field name="colis_s1_nouveau_client"/>
                     </group>
                 </sheet>
             </form>
@@ -37,11 +54,61 @@
                 <field name="product_id"                          widget="many2one_clickable"/>
                 <field name="poids_net_colis"     optional="hide"/>
                 <field name="nb_pieces_par_colis" optional="hide"/>
+                <field name="colisage"            optional="hide"/>
                 <field name="uom_id"              optional="hide"/>
                 <field name="unite"/>
                 <field name="stock_mini"          optional="show"/>
                 <field name="stock"               optional="show" sum="Total"/>
+                <!-- 
+                <field name="colis_s1"            optional="hide" string="Colis S-1" sum="Total"/>
+                <field name="colis_s2"            optional="hide" string="Colis S-2" sum="Total"/>
+                <field name="colis_s3"            optional="hide" string="Colis S-3" sum="Total"/>
+                <field name="colis_s4"            optional="hide" string="Colis S-4" sum="Total"/>
+                <field name="colis_s1_n1"         optional="hide" string="Colis S-1 (N-1)" sum="Total"/>
+                <field name="colis_s2_n1"         optional="hide" string="Colis S-2 (N-1)" sum="Total"/>
+                <field name="colis_s3_n1"         optional="hide" string="Colis S-3 (N-1)" sum="Total"/>
+                <field name="colis_s4_n1"         optional="hide" string="Colis S-4 (N-1)" sum="Total"/>
+                <field name="moyenne_8_semaines"  optional="hide" sum="Total"/> 
+                -->
+                <field name="colis_s1_nouveau_client" optional="hide" sum="Total"/>
                 <field name="sale_qty"            optional="show" sum="Total"/>
+                <button name="action_view_sale_lines" type="object" icon="fa-shopping-cart" title="Commandes clients" attrs="{'invisible': [('sale_qty', '=', 0)]}"/>
+                <field name="purchase_qty"        optional="show" sum="Total"/>
+                <button name="action_view_purchase_lines" type="object" icon="fa-truck" title="Commandes fournisseurs" attrs="{'invisible': [('purchase_qty', '=', 0)]}"/>
+                <field name="product_qty"         optional="show" sum="Total"/>
+                <field name="order_line_id"       invisible="1"/>
+                <button name="action_view_created_purchase_line"  type="object" icon="fa-search-plus" title="Ligne de commande fournisseur créée" attrs="{'invisible': [('order_line_id', '=', False)]}"/>
+                <button name="action_view_created_purchase_order" type="object" icon="fa-file-text-o" title="Commande fournisseur créée"          attrs="{'invisible': [('order_line_id', '=', False)]}"/>
+                <field name="create_date"         optional="hide"/>
+                <field name="write_date"          optional="hide"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_calcul_des_besoins_ligne_tree_historique" model="ir.ui.view">
+        <field name="name">is.calcul.des.besoins.ligne.tree.historique</field>
+        <field name="model">is.calcul.des.besoins.ligne</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="calcul_besoins_id"         optional="hide" widget="many2one_clickable"/>
+                <field name="sequence"            optional="show"/>
+                <field name="product_id"                          widget="many2one_clickable"/>
+                <field name="poids_net_colis"     optional="hide"/>
+                <field name="nb_pieces_par_colis" optional="hide"/>
+                <field name="colisage"            optional="show"/>
+                <field name="uom_id"              optional="hide"/>
+                <field name="unite"               optional="hide"/>
+                <field name="stock"               optional="show" sum="Total"/>
+                <field name="colis_s1"            optional="show" string="Colis S-1" sum="Total"/>
+                <field name="colis_s2"            optional="show" string="Colis S-2" sum="Total"/>
+                <field name="colis_s3"            optional="show" string="Colis S-3" sum="Total"/>
+                <field name="colis_s4"            optional="show" string="Colis S-4" sum="Total"/>
+                <field name="colis_s1_n1"         optional="show" string="Colis S-1 (N-1)" sum="Total"/>
+                <field name="colis_s2_n1"         optional="show" string="Colis S-2 (N-1)" sum="Total"/>
+                <field name="colis_s3_n1"         optional="show" string="Colis S-3 (N-1)" sum="Total"/>
+                <field name="colis_s4_n1"         optional="show" string="Colis S-4 (N-1)" sum="Total"/>
+                <field name="moyenne_8_semaines"  optional="show" sum="Total"/>
+                <field name="colis_s1_nouveau_client" optional="show" sum="Total"/>
+                <field name="sale_qty"            optional="hide" sum="Total"/>
                 <button name="action_view_sale_lines" type="object" icon="fa-shopping-cart" title="Commandes clients" attrs="{'invisible': [('sale_qty', '=', 0)]}"/>
                 <field name="purchase_qty"        optional="show" sum="Total"/>
                 <button name="action_view_purchase_lines" type="object" icon="fa-truck" title="Commandes fournisseurs" attrs="{'invisible': [('purchase_qty', '=', 0)]}"/>
@@ -150,11 +217,13 @@
                     </div>
                     <group>
                         <group>
-                            <field name="date_fin"          attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="type_calcul"       attrs="{'readonly': [('state', '=', 'done')]}"/>
                             <field name="enseigne_id"       attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="is_heure_envoi_id" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="stock_mini"        attrs="{'readonly': [('state', '=', 'done')]}"/>
-                            <field name="calcul_en_colis"   attrs="{'readonly': [('state', '=', 'done')]}"/>
+                            <field name="date_fin"          attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('type_calcul', '=', 'historique')], 'required': [('type_calcul', '=', 'commande')]}"/>
+                            <field name="is_heure_envoi_id" attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('type_calcul', '=', 'historique')]}"/>
+                            <field name="stock_mini"        attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('type_calcul', '=', 'historique')]}"/>
+                            <field name="calcul_en_colis"   attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('type_calcul', '=', 'historique')]}"/>
+                            <field name="uniquement_articles_historique" attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('type_calcul', '!=', 'historique')]}"/>
                         </group>
                         <group name="info">
                             <field name="name"/>
@@ -169,6 +238,9 @@
                             <field name="total_purchase_qty"         attrs="{'invisible': [('state', '!=', 'done')]}"/>
                             <field name="total_product_qty"          attrs="{'invisible': [('state', '!=', 'done')]}"/>
                         </group>
+                    </group>
+                    <group string="Documentation">
+                        <field name="documentation" nolabel="1" colspan="2"/>
                     </group>
                 </sheet>
                 <div class="oe_chatter">
@@ -185,6 +257,7 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="name"/>
+                <field name="type_calcul" optional="show"/>
                 <field name="date_fin"/>
                 <field name="is_heure_envoi_id" optional="show"/>
                 <field name="enseigne_id" optional="hide"/>
@@ -212,6 +285,7 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
+                <field name="type_calcul"/>
                 <field name="enseigne_id"/>
                 <field name="warehouse_id"/>
                 <!-- <field name="order_id"/> -->

@@ -8,6 +8,7 @@ from datetime import datetime, date, timedelta
 from math import *
 import pytz
 import logging
+from .product import _COLISAGE
 
 _logger = logging.getLogger(__name__)
 
@@ -23,13 +24,24 @@ class is_calcul_des_besoins_ligne(models.Model):
     uom_id              = fields.Many2one('uom.uom', "Unité article")
     nb_pieces_par_colis = fields.Integer(string='PCB')
     poids_net_colis     = fields.Float(string='Poids net colis (Kg)', digits='Stock Weight')
+    colisage            = fields.Selection(_COLISAGE, string='Colisage', help="Colisage de l'article (fiche article) utilisé pour arrondir la Qt à commander au multiple supérieur")
     unite               = fields.Char("Unité calcul")
     sale_qty            = fields.Float("Qt cde client" , digits=(14,4))
-    purchase_qty        = fields.Float("Qt déja en cde", digits=(14,4))
-    product_qty         = fields.Float("Qt à cde"      , digits=(14,4))
+    purchase_qty        = fields.Float("Qt en cde", digits=(14,4))
+    product_qty         = fields.Float("Qt à cde"      , digits=(14,4), help="Sur commande : Qt cde client - Stock + Stock mini - Qt en cde\nSur historique : Moyenne 8 semaines + Colis S-1 (new) - Stock")
     stock               = fields.Float("Stock"         , digits=(14,2))
     #stock_lc            = fields.Float("Stock LC"      , digits=(14,2))
     stock_mini          = fields.Float("Stock mini"    , digits=(14,2))
+    colis_s1            = fields.Float("Colis S-1", digits=(14,2), help="Nombre de colis vendus la semaine dernière (S-1)")
+    colis_s2            = fields.Float("Colis S-2", digits=(14,2), help="Nombre de colis vendus il y a 2 semaines (S-2)")
+    colis_s3            = fields.Float("Colis S-3", digits=(14,2), help="Nombre de colis vendus il y a 3 semaines (S-3)")
+    colis_s4            = fields.Float("Colis S-4", digits=(14,2), help="Nombre de colis vendus il y a 4 semaines (S-4)")
+    colis_s1_n1         = fields.Float("Colis S-1 (N-1)", digits=(14,2), help="Nombre de colis vendus l'année dernière, sur la même semaine calendaire que S-1")
+    colis_s2_n1         = fields.Float("Colis S-2 (N-1)", digits=(14,2), help="Nombre de colis vendus l'année dernière, sur la même semaine calendaire que S-2")
+    colis_s3_n1         = fields.Float("Colis S-3 (N-1)", digits=(14,2), help="Nombre de colis vendus l'année dernière, sur la même semaine calendaire que S-3")
+    colis_s4_n1         = fields.Float("Colis S-4 (N-1)", digits=(14,2), help="Nombre de colis vendus l'année dernière, sur la même semaine calendaire que S-4")
+    moyenne_8_semaines  = fields.Float("Moy 8S", digits=(14,2), help="Moyenne des colis vendus sur les 4 dernières semaines et sur les 4 mêmes semaines de l'année dernière (N-1)")
+    colis_s1_nouveau_client = fields.Float("Colis S-1 (new)", digits=(14,2), help="Nombre de colis vendus en S-1 aux clients dont la toute première commande date de la semaine S-1 (nouveaux clients)")
     order_line_id       = fields.Many2one('purchase.order.line', 'Ligne commande fournisseur', index=True)
     sale_line_ids       = fields.Many2many('sale.order.line', string='Lignes commande client')
     purchase_line_ids   = fields.Many2many('purchase.order.line', string='Lignes commande fournisseur')
@@ -82,11 +94,13 @@ class is_calcul_des_besoins(models.Model):
     _order='name desc'
 
     name               = fields.Char("N°", readonly=True)
+    type_calcul        = fields.Selection([('commande', 'Sur commande'), ('historique', 'Sur Historique')], string='Type de calcul', default='commande', required=True, tracking=True)
     enseigne_id        = fields.Many2one('is.enseigne.commerciale', 'Enseigne', required=False, help="Enseigne commerciale", tracking=True)
     warehouse_id       = fields.Many2one(related='enseigne_id.warehouse_id', tracking=True)
     stock_mini         = fields.Boolean("Stock mini", default=True, help=u"Si cette case est cochée, il faut tenir compte du stock mini", tracking=True)
+    uniquement_articles_historique = fields.Boolean("Uniquement les articles sur historique", default=True, help="Utilisé uniquement si Type de calcul = 'Sur Historique'.\nSi cette case est cochée, seuls les articles ayant la case 'Calcul des besoins sur historique' cochée sur leur fiche article sont pris en compte dans le calcul.", tracking=True)
     ligne_ids          = fields.One2many('is.calcul.des.besoins.ligne', 'calcul_besoins_id', 'Lignes')
-    date_fin           = fields.Date("Date de fin", required=True, default=lambda self: fields.Datetime.now()+timedelta(7), help="Date prise en compte:\nCommande client: Date livraison client entête\nCommande fournisseur: Date de réception entête", tracking=True)
+    date_fin           = fields.Date("Date de fin", default=lambda self: fields.Datetime.now()+timedelta(7), help="Date prise en compte:\nCommande client: Date livraison client entête\nCommande fournisseur: Date de réception entête", tracking=True)
     calcul_en_colis    = fields.Boolean("Calcul en colis", default=True, help="Le résultat affiché sera en colis", tracking=True)
     active             = fields.Boolean("Actif", default=True, tracking=True)
     state              = fields.Selection([('draft', 'En cours'), ('done', 'Terminé')], string='État', default='draft', tracking=True)
@@ -101,6 +115,7 @@ class is_calcul_des_besoins(models.Model):
     total_stock         = fields.Float("Total Stock", compute='_compute_totals', store=True, digits=(14,2))
     duree_calcul        = fields.Float("Durée du calcul (s)", readonly=True, copy=False)
     date_fin_calcul     = fields.Datetime("Fin du dernier calcul", readonly=True, copy=False)
+    documentation       = fields.Html("Documentation", compute='_compute_documentation', help="Explique, en fonction des options cochées, comment la quantité à commander est calculée")
 
     @api.depends('ligne_ids')
     def _compute_nb_lignes(self):
@@ -118,13 +133,73 @@ class is_calcul_des_besoins(models.Model):
             record.total_product_qty  = sum(line.product_qty for line in record.ligne_ids)
             record.total_stock        = sum(line.stock for line in record.ligne_ids)
 
+    @api.depends('type_calcul', 'stock_mini', 'calcul_en_colis', 'uniquement_articles_historique', 'enseigne_id.display_name', 'is_heure_envoi_id.display_name', 'date_fin')
+    def _compute_documentation(self):
+        for record in self:
+            unite = "colis" if record.calcul_en_colis else "unité de vente (UdV)"
+            lines = ["<ul>"]
+            if record.type_calcul == 'historique':
+                lines.append("<li>Le calcul est fait <b>sur historique</b> : "
+                              "pour chaque article, la Qt à commander = Moyenne 8 semaines + Colis S-1 (nouveaux clients) - Stock.</li>")
+                lines.append("<li>La <b>Moyenne 8 semaines</b> est la moyenne des colis vendus sur les 4 dernières semaines "
+                              "et sur les 4 mêmes semaines de l'année dernière (N-1).</li>")
+                lines.append("<li><b>Colis S-1 (nouveaux clients)</b> correspond aux colis vendus en S-1 aux clients dont "
+                              "la toute première commande date de cette même semaine.</li>")
+                if record.calcul_en_colis:
+                    lines.append("<li>La Qt à commander est arrondie au multiple de <b>Colisage</b> supérieur "
+                                  "(champ de la fiche article : Colis entier, 1/2 colis ou 1/4 colis).</li>")
+                if record.uniquement_articles_historique:
+                    lines.append("<li>Seuls les articles ayant la case <i>« Calcul des besoins sur historique »</i> "
+                                  "cochée sur leur fiche article sont pris en compte.</li>")
+                else:
+                    lines.append("<li>Tous les articles vendables sont pris en compte, sans restriction sur la fiche article.</li>")
+            else:
+                lines.append("<li>Le calcul est fait <b>sur commande</b> : "
+                              "pour chaque article, la Qt à commander = Qt cde client - Stock + Stock mini - Qt en cde.</li>")
+                if record.date_fin:
+                    lines.append("<li>La <b>Date de fin</b> (%s) détermine les commandes prises en compte : "
+                                  "date de livraison client jusqu'à cette date pour les commandes clients, "
+                                  "date de réception jusqu'à cette date pour les commandes fournisseurs.</li>"
+                                  % record.date_fin.strftime('%d/%m/%Y'))
+                else:
+                    lines.append("<li>Aucune <b>Date de fin</b> n'est renseignée : ce champ est pourtant requis pour ce type de calcul.</li>")
+                if record.stock_mini:
+                    lines.append("<li>Le <b>Stock mini</b> de l'article est pris en compte dans le calcul.</li>")
+                else:
+                    lines.append("<li>Le <b>Stock mini</b> n'est <u>pas</u> pris en compte (Qt à commander diminuée d'autant).</li>")
+                if record.is_heure_envoi_id:
+                    lines.append("<li>Seules les commandes fournisseurs sont créées pour les fournisseurs ayant "
+                                  "le Jour / Heure limite « %s ».</li>" % record.is_heure_envoi_id.display_name)
+            lines.append("<li>Le résultat est exprimé en <b>%s</b>.</li>" % unite)
+            if record.enseigne_id:
+                lines.append("<li>Le calcul est restreint à l'enseigne <b>%s</b>.</li>" % record.enseigne_id.display_name)
+            else:
+                lines.append("<li>Toutes les enseignes sont prises en compte.</li>")
+            lines.append("</ul>")
+            record.documentation = "".join(lines)
+
+    @api.onchange('type_calcul')
+    def _onchange_type_calcul(self):
+        if self.type_calcul == 'historique':
+            #self.date_fin = False
+            self.stock_mini = False
+        else:
+            #self.date_fin = fields.Datetime.now() + timedelta(7)
+            self.stock_mini = True
+
     def action_view_lines(self):
         self.ensure_one()
+        if self.type_calcul == 'historique':
+            tree_view = self.env.ref('is_fromtome14.is_calcul_des_besoins_ligne_tree_historique')
+        else:
+            tree_view = self.env.ref('is_fromtome14.is_calcul_des_besoins_ligne_tree')
+        form_view = self.env.ref('is_fromtome14.is_calcul_des_besoins_ligne_form')
         return {
             'name': 'Détail des lignes',
             'type': 'ir.actions.act_window',
             'res_model': 'is.calcul.des.besoins.ligne',
             'view_mode': 'tree,form',
+            'views': [(tree_view.id, 'tree'), (form_view.id, 'form')],
             'domain': [('calcul_besoins_id', '=', self.id)],
             'context': {'default_calcul_besoins_id': self.id, 'search_default_product_qty_gt_0': 1},
             'limit': 1000,
@@ -190,6 +265,8 @@ class is_calcul_des_besoins(models.Model):
                 #('default_code','in',['0107001','1212017','1212022','1212035','0901019','1501008','1907005','1901010','1217002','1217001','0107002'])
                 #('default_code','in',['1301002','1212020'])
             ]
+            if obj.type_calcul == 'historique' and obj.uniquement_articles_historique:
+                filtre.append(('is_calcul_besoins_historique', '=', True))
 
             #TODO : Bien penser à mettre une limite haute à la fin des tests
             limit=20000
@@ -238,6 +315,66 @@ class is_calcul_des_besoins(models.Model):
             t1_purchase = datetime.now()
             total_purchase_duration = (t1_purchase - t0_purchase).total_seconds()
             #*******************************************************************
+
+            #** Optimisation : Recherche globale de l'historique des ventes (type_calcul = historique) ***
+            historique_qty_by_product_week = {}
+            historique_new_client_qty_by_product = {}
+            if obj.type_calcul == 'historique':
+                week_bounds = []
+                for i in range(4):
+                    end = now - timedelta(days=7*i)
+                    start = end - timedelta(days=7)
+                    week_bounds.append(('s%s' % (i+1), start, end))
+                    week_bounds.append(('s%s_n1' % (i+1), start - timedelta(days=364), end - timedelta(days=364)))
+                min_date = min(b[1] for b in week_bounds)
+                max_date = max(b[2] for b in week_bounds)
+                historique_domain = [
+                    ('order_id.state', 'in', ('sale', 'done')),
+                    ('order_id.is_date_livraison', '>=', str(min_date)),
+                    ('order_id.is_date_livraison', '<', str(max_date)),
+                    ('product_id', 'in', products.ids),
+                ]
+                if obj.enseigne_id:
+                    historique_domain.append(('order_id.partner_id.is_enseigne_id', '=', obj.enseigne_id.id))
+                all_historique_lines = self.env['sale.order.line'].search(historique_domain)
+                for line in all_historique_lines:
+                    line_date = line.order_id.is_date_livraison
+                    if not line_date:
+                        continue
+                    for key, start, end in week_bounds:
+                        if start <= line_date < end:
+                            k = (line.product_id.id, key)
+                            historique_qty_by_product_week[k] = historique_qty_by_product_week.get(k, 0.0) + line.qty_delivered
+                            break
+
+                #** Colis S-1 nouveaux clients : 1ère commande du client tombant en S-1 *
+                s1_start, s1_end = next((b[1], b[2]) for b in week_bounds if b[0] == 's1')
+                s1_lines_data = []
+                s1_partner_ids = set()
+                for line in all_historique_lines:
+                    line_date = line.order_id.is_date_livraison
+                    if line_date and s1_start <= line_date < s1_end:
+                        s1_lines_data.append((line.product_id.id, line.order_id.partner_id.id, line.qty_delivered))
+                        s1_partner_ids.add(line.order_id.partner_id.id)
+                if s1_partner_ids:
+                    first_order_groups = self.env['sale.order'].read_group(
+                        [('partner_id', 'in', list(s1_partner_ids)), ('state', 'in', ('sale', 'done'))],
+                        ['partner_id', 'is_date_livraison:min'],
+                        ['partner_id'],
+                    )
+                    first_order_date_by_partner = {
+                        g['partner_id'][0]: g['is_date_livraison']
+                        for g in first_order_groups if g['partner_id']
+                    }
+                    new_client_partner_ids = {
+                        partner_id for partner_id, first_date in first_order_date_by_partner.items()
+                        if first_date and s1_start <= first_date < s1_end
+                    }
+                    for product_id, partner_id, qty in s1_lines_data:
+                        if partner_id in new_client_partner_ids:
+                            historique_new_client_qty_by_product[product_id] = historique_new_client_qty_by_product.get(product_id, 0.0) + qty
+                #**************************************************************************
+            #*******************************************************************************************
 
             sequence=1
             total_create_duration = 0
@@ -304,6 +441,23 @@ class is_calcul_des_besoins(models.Model):
                         product_qty=0
                     #***********************************************************
 
+                    #** Historique des ventes (type_calcul = historique) *******
+                    if obj.type_calcul == 'historique':
+                        colis_semaines = {}
+                        for key in ('s1', 's2', 's3', 's4', 's1_n1', 's2_n1', 's3_n1', 's4_n1'):
+                            qty = historique_qty_by_product_week.get((product.id, key), 0.0)
+                            colis_semaines[key] = product.product_tmpl_id.uom2colis(qty)
+                        moyenne_8_semaines = sum(colis_semaines.values()) / 8
+                        colis_s1_nouveau_client = product.product_tmpl_id.uom2colis(historique_new_client_qty_by_product.get(product.id, 0.0))
+                        product_qty = moyenne_8_semaines + colis_s1_nouveau_client - stock
+                        if product_qty<0:
+                            product_qty=0
+                        #** Arrondi de la Qt à commander au colisage supérieur *
+                        if obj.calcul_en_colis:
+                            product_qty = product.product_tmpl_id.arrondi_colisage(product_qty)
+                        #********************************************************
+                    #***********************************************************
+
 
 
 
@@ -320,6 +474,7 @@ class is_calcul_des_besoins(models.Model):
                             'uom_id'             : product.uom_id.id,
                             'nb_pieces_par_colis': product.is_nb_pieces_par_colis,
                             'poids_net_colis'    : product.is_poids_net_colis,
+                            'colisage'           : product.is_colisage,
                             'unite'              : unite,
                             'sale_qty'           : sale_qty,
                             'purchase_qty'       : purchase_qty,
@@ -330,6 +485,19 @@ class is_calcul_des_besoins(models.Model):
                             'sale_line_ids'      : [(6, 0, sale_lines.ids)],
                             'purchase_line_ids'  : [(6, 0, purchase_lines.ids)],
                         }
+                        if obj.type_calcul == 'historique':
+                            vals.update({
+                                'colis_s1'           : colis_semaines['s1'],
+                                'colis_s2'           : colis_semaines['s2'],
+                                'colis_s3'           : colis_semaines['s3'],
+                                'colis_s4'           : colis_semaines['s4'],
+                                'colis_s1_n1'        : colis_semaines['s1_n1'],
+                                'colis_s2_n1'        : colis_semaines['s2_n1'],
+                                'colis_s3_n1'        : colis_semaines['s3_n1'],
+                                'colis_s4_n1'        : colis_semaines['s4_n1'],
+                                'moyenne_8_semaines' : moyenne_8_semaines,
+                                'colis_s1_nouveau_client' : colis_s1_nouveau_client,
+                            })
                         ligne=self.env['is.calcul.des.besoins.ligne'].create(vals)
                         sequence+=1
                     #***********************************************************

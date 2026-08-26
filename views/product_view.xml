@@ -62,6 +62,7 @@
                 <field name="is_ref_fournisseur"/>
                 <field name="is_gtin_13"/>
                 <field name="is_rayon_magasin_id"/>
+                <field name="is_calcul_besoins_historique"/>
             </field>
             <field name="type" position="after">
                 <field name="is_stock_mini"/>
