@@ -66,6 +66,11 @@ class Pricelist(models.Model):
 class PricelistItem(models.Model):
     _inherit = "product.pricelist.item"
 
+    base = fields.Selection(
+        selection_add=[('is_prix_achat_actuel', "PA actuel")],
+        ondelete={'is_prix_achat_actuel': 'set default'},
+    )
+
     def is_alerte_action(self):
         for obj in self:
             print(obj)
