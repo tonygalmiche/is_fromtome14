@@ -313,8 +313,8 @@ class ProductTemplate(models.Model):
     mode_vente        = fields.Selection(selection=[('colis', 'Colis'),('piece', 'Pièce'),('decoupe', 'Découpe')], string="Mode Vente", tracking=True)
     douane            = fields.Char(string='Nomenclature Douane')
 
-    is_stock_mini         = fields.Float("Stock mini FT", digits=(14,4), tracking=True)
-    is_stock_mini_lc      = fields.Float("Stock mini LC", digits=(14,4), tracking=True)
+    is_stock_mini         = fields.Float("Stock mini FT", digits=(14,4), tracking=True, copy=False)
+    is_stock_mini_lc      = fields.Float("Stock mini LC", digits=(14,4), tracking=True, copy=False)
     is_pricelist_item_ids = fields.One2many('product.pricelist.item', 'product_tmpl_id', 'Liste de prix') #, domain=[('pricelist_id.active','in',[0,1]),('active','in',[0,1])])
 
     is_note_importation = fields.Text(string='Note importation Fusion Fromtome / Le Cellier')
