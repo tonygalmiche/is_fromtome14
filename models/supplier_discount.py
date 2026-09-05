@@ -3,7 +3,6 @@
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from odoo.addons import decimal_precision as dp
 from odoo.exceptions import Warning
 from datetime import datetime, timedelta, date
 
@@ -30,7 +29,7 @@ class SupplierInfo(models.Model):
     prix_brut    = fields.Float(string="Prix Brut", digits=(14,4))
     discount_ids = fields.One2many('product.supplierdiscount','supplier_info_id',string='Taux de remises', copy=True)
     price        = fields.Float(
-        'Price', default=0.0, digits=dp.get_precision('Product Price'),
+        'Price', default=0.0, digits='Product Price',
         required=True, help="The price to purchase a product", compute="compute_prix_net", store=True
     )
     discount = fields.Float(string="Remise (%)", digits="Discount")

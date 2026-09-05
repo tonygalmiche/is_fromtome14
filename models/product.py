@@ -2,7 +2,6 @@
 from odoo import api, fields, tools, models,_           # type: ignore
 from odoo.tools import float_is_zero, pycompat          # type: ignore
 from odoo.tools.float_utils import float_round          # type: ignore
-from odoo.addons import decimal_precision as dp         # type: ignore
 from odoo.exceptions import UserError, ValidationError  # type: ignore
 from datetime import datetime
 import pytz

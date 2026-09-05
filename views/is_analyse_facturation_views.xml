@@ -71,6 +71,7 @@
                             <field name="move_type"/>
                             <field name="is_type_avoir"/>
                             <field name="partner_id"/>
+                            <field name="partner_category_id" widget="many2many_tags"/>
                             <field name="user_id"/>
                             <field name="enseigne"/>
                             <field name="product_id"/>
@@ -120,6 +121,7 @@
                 <field name="invoice_id"      optional="hide" widget="many2one_clickable"/>
                 <field name="is_type_avoir"  optional="show"/>
                 <field name="partner_id"     optional="show" widget="many2one_clickable"/>
+                <field name="partner_category_id" optional="hide" widget="many2many_tags" options="{'color_field': 'color'}"/>
                 <field name="enseigne"       optional="show"/>
                 <field name="user_id"        optional="hide"/>
                 <field name="invoice_line_id"     optional="hide" widget="many2one_clickable"/>
@@ -161,6 +163,7 @@
                 <field name="is_type_avoir"  optional="hide"/>
                 <field name="invoice_id"     optional="hide" widget="many2one_clickable"/>
                 <field name="partner_id"     optional="show" widget="many2one_clickable"/>
+                <field name="partner_category_id" optional="hide" widget="many2many_tags" options="{'color_field': 'color'}"/>
                 <field name="product_id"     optional="hide" widget="many2one_clickable"/>
                 <field name="categ_id"       optional="hide"/>
                 <field name="libelle"        optional="hide"/>
@@ -187,6 +190,7 @@
                 <field name="move_type"/>
                 <field name="is_type_avoir"/>
                 <field name="partner_id"/>
+                <field name="partner_category_id"/>
                 <field name="enseigne"/>
                 <field name="product_id"/>
                 <field name="categ_id"/>
@@ -196,6 +200,7 @@
                 <field name="fournisseur_id"/>
                 <filter name="group_by_move_type"    string="Type"            context="{'group_by': 'move_type'}"/>
                 <filter name="group_by_partner_id"   string="Partenaire"      context="{'group_by': 'partner_id'}"/>
+                <filter name="group_by_partner_category_id" string="Étiquette" context="{'group_by': 'partner_category_id'}"/>
                 <filter name="group_by_enseigne"     string="Enseigne"        context="{'group_by': 'enseigne'}"/>
                 <filter name="group_by_product_id"   string="Article"         context="{'group_by': 'product_id'}"/>
                 <filter name="group_by_categ_id"    string="Catégorie"       context="{'group_by': 'categ_id'}"/>
@@ -448,6 +453,7 @@
                 <field name="is_type_avoir"  optional="hide"/>
                 <field name="invoice_id"     optional="hide" widget="many2one_clickable"/>
                 <field name="partner_id"     optional="show" widget="many2one_clickable"/>
+                <field name="partner_category_id" optional="hide" widget="many2many_tags" options="{'color_field': 'color'}"/>
                 <field name="enseigne"       optional="show"/>
                 <field name="product_id"     optional="hide" widget="many2one_clickable"/>
                 <field name="categ_id"       optional="hide"/>

@@ -220,6 +220,7 @@ class IsAnalyseFacturation(models.Model):
     invoice_line_id   = fields.Many2one('account.move.line', 'Ligne de Facture', index=True)
     scrap_id          = fields.Many2one('stock.scrap', 'Rebut')
     partner_id        = fields.Many2one('res.partner', 'Partenaire')
+    partner_category_id = fields.Many2many('res.partner.category', 'is_analyse_facturation_res_partner_category_rel', 'analyse_facturation_id', 'category_id', string='Étiquettes', related='partner_id.category_id', store=True, ondelete='cascade')
     user_id           = fields.Many2one('res.users', 'Vendeur')
     enseigne          = fields.Char('Enseigne')
     product_id        = fields.Many2one('product.product', 'Article')

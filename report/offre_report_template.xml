@@ -145,13 +145,14 @@
         </t>
     </template>
 
-    <report
-            id="action_report_offre"
-            string="Offre"
-            model="sale.order"
-            report_type="qweb-pdf"
-            name="is_fromtome14.report_offre"
-            file="is_fromtome14.report_offre"
-    />
+    <record id="action_report_offre" model="ir.actions.report">
+        <field name="name">Offre</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">is_fromtome14.report_offre</field>
+        <field name="report_file">is_fromtome14.report_offre</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
 
 </odoo>
