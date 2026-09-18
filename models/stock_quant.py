@@ -10,6 +10,7 @@ class StockQuant(models.Model):
     _inherit = 'stock.quant'
 
     is_dlc_ddm         = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
+    is_fournisseur_id  = fields.Many2one('res.partner', 'Fournisseur par défaut', related="product_id.product_tmpl_id.is_fournisseur_id", store=True)
     inventory_quantity = fields.Float(digits="Product Unit of Measure")
     available_quantity = fields.Float(digits="Product Unit of Measure")
     quantity           = fields.Float(digits="Product Unit of Measure")

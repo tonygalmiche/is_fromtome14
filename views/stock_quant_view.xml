@@ -33,10 +33,27 @@
                 <field name="location_id"/>
                 <field name="lot_id"      widget="many2one_clickable"/>
                 <field name="is_dlc_ddm"/>
+                <field name="is_fournisseur_id" widget="many2one_clickable"/>
                 <field name="available_quantity" sum="Total"/>
                 <field name="quantity"           sum="Total"/>
                 <field name="product_uom_id"/>
             </tree>
+        </field>
+    </record>
+    <record id="stock_detaille_par_entrepot_search" model="ir.ui.view" >
+        <field name="name">stock_detaille_par_entrepot_search</field>
+        <field name="model">stock.quant</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_id"/>
+                <field name="location_id"/>
+                <field name="lot_id"/>
+                <field name="is_fournisseur_id"/>
+                <group expand="0" string="Grouper par">
+                    <filter name="group_by_fournisseur" string="Fournisseur par défaut" context="{'group_by':'is_fournisseur_id'}"/>
+                    <filter name="group_by_product" string="Article" context="{'group_by':'product_id'}"/>
+                </group>
+            </search>
         </field>
     </record>
     <record id="stock_detaille_par_entrepot_action" model="ir.actions.act_window" >
@@ -44,6 +61,7 @@
         <field name="res_model">stock.quant</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="stock_detaille_par_entrepot_tree"/>
+        <field name="search_view_id" ref="stock_detaille_par_entrepot_search"/>
         <field name="domain">[('location_id.usage','=','internal')]</field>
     </record>
     <menuitem 

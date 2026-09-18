@@ -433,6 +433,29 @@ class IsScanPicking(models.Model):
             #******************************************************************
 
 
+            #** Ajoute tous les articles en stock (transfert interne sans commande) ***********
+            #   même ceux non scannés, avec la Demande renseignée depuis le stock
+            if obj.picking_id.picking_type_id.code=='internal' and not obj.picking_id.sale_id and not obj.picking_id.purchase_id:
+                for product_line in obj.product_ids:
+                    moves = obj.picking_id.move_ids_without_package.filtered(lambda m: m.product_id==product_line.product_id)
+                    if moves:
+                        for move in moves:
+                            move.product_uom_qty = product_line.nb_pieces
+                    else:
+                        vals={
+                            "name"             : product_line.product_id.display_name,
+                            "picking_id"       : obj.picking_id.id,
+                            "product_id"       : product_line.product_id.id,
+                            "product_uom_qty"  : product_line.nb_pieces,
+                            "product_uom"      : product_line.product_id.uom_id.id,
+                            "location_id"      : obj.picking_id.location_id.id,
+                            "location_dest_id" : obj.picking_id.location_dest_id.id,
+                            "company_id"       : obj.picking_id.company_id.id,
+                        }
+                        self.env['stock.move'].create(vals)
+            #********************************************************************************
+
+
             #** Ajout de la ligne "Frais de port" *****************************
             if obj.picking_id.sale_id.partner_id.is_frais_port_id:
                 #** Vérification que le port est bien sur les lignes de la commande
@@ -715,12 +738,29 @@ class Picking(models.Model):
     def scan_picking_action(self):
         for obj in self:
             products={}
-            for line in obj.move_ids_without_package:
-                nb_colis=line.get_nb_colis()
-                if line.product_id not in products:
-                    products[line.product_id]=[0,0]
-                products[line.product_id][0]+=line.product_uom_qty
-                products[line.product_id][1]+=nb_colis
+            if obj.picking_type_id.code=='internal' and not obj.sale_id and not obj.purchase_id:
+                #** Transfert interne sans commande : lignes à scanner = lots en stock du fournisseur indiqué en Contact
+                #   (ou tous les articles en stock si aucun fournisseur n'est indiqué)
+                domain = [
+                    ('location_id', '=', obj.location_id.id),
+                    ('quantity', '>', 0),
+                ]
+                if obj.partner_id:
+                    domain.append(('product_id.product_tmpl_id.is_fournisseur_id', '=', obj.partner_id.id))
+                quants = self.env['stock.quant'].search(domain)
+                for quant in quants:
+                    nb_colis = quant.product_id.product_tmpl_id.uom2colis(quant.quantity)
+                    if quant.product_id not in products:
+                        products[quant.product_id]=[0,0]
+                    products[quant.product_id][0]+=quant.quantity
+                    products[quant.product_id][1]+=nb_colis
+            else:
+                for line in obj.move_ids_without_package:
+                    nb_colis=line.get_nb_colis()
+                    if line.product_id not in products:
+                        products[line.product_id]=[0,0]
+                    products[line.product_id][0]+=line.product_uom_qty
+                    products[line.product_id][1]+=nb_colis
             scans = self.env['is.scan.picking'].search([('picking_id','=',obj.id)],limit=1)
             if scans:
                 scan=scans[0]
