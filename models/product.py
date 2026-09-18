@@ -765,9 +765,11 @@ class ProductTemplate(models.Model):
     def arrondi_colisage(self, qty, arrondir="ceil"):
         colisage = int(self.is_colisage or 1)
         if arrondir=="ceil":
-            nb_colis = math.ceil(colisage*qty)/colisage # Arrondir au multiple de colisage supérieur
+            nb_colis = math.ceil(colisage*qty)/colisage  # Arrondir au multiple de colisage supérieur
+        elif arrondir=="floor":
+            nb_colis = math.floor(colisage*qty)/colisage # Arrondir au multiple de colisage inférieur
         else:
-            nb_colis = round(colisage*qty)/colisage     # Arrondir au multiple de colisage le plus proche
+            nb_colis = round(colisage*qty)/colisage      # Arrondir au multiple de colisage le plus proche
         return round(nb_colis,2)
 
 

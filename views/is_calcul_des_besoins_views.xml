@@ -11,6 +11,7 @@
                     <group>
                         <field name="sequence"/>
                         <field name="product_id"/>
+                        <field name="fournisseur_id"/>
                         <field name="uom_id"/>
                         <field name="nb_pieces_par_colis"/>
                         <field name="poids_net_colis"/>
@@ -39,6 +40,7 @@
                     <group>
                         <field name="moyenne_8_semaines"/>
                         <field name="colis_s1_nouveau_client"/>
+                        <field name="nb_col"/>
                     </group>
                 </sheet>
             </form>
@@ -56,6 +58,7 @@
                 <field name="nb_pieces_par_colis" optional="hide"/>
                 <field name="colisage"            optional="hide"/>
                 <field name="uom_id"              optional="hide"/>
+                <field name="fournisseur_id"      optional="hide" widget="many2one_clickable"/>
                 <field name="unite"/>
                 <field name="stock_mini"          optional="show"/>
                 <field name="stock"               optional="show" sum="Total"/>
@@ -96,7 +99,9 @@
                 <field name="nb_pieces_par_colis" optional="hide"/>
                 <field name="colisage"            optional="show"/>
                 <field name="uom_id"              optional="hide"/>
+                <field name="fournisseur_id"      optional="hide" widget="many2one_clickable"/>
                 <field name="unite"               optional="hide"/>
+                <field name="stock_mini"          optional="show"/>
                 <field name="stock"               optional="show" sum="Total"/>
                 <field name="colis_s1"            optional="show" string="Colis S-1" sum="Total"/>
                 <field name="colis_s2"            optional="show" string="Colis S-2" sum="Total"/>
@@ -108,6 +113,7 @@
                 <field name="colis_s4_n1"         optional="show" string="Colis S-4 (N-1)" sum="Total"/>
                 <field name="moyenne_8_semaines"  optional="show" sum="Total"/>
                 <field name="colis_s1_nouveau_client" optional="show" sum="Total"/>
+                <field name="nb_col"              optional="show" sum="Total"/>
                 <field name="sale_qty"            optional="hide" sum="Total"/>
                 <button name="action_view_sale_lines" type="object" icon="fa-shopping-cart" title="Commandes clients" attrs="{'invisible': [('sale_qty', '=', 0)]}"/>
                 <field name="purchase_qty"        optional="show" sum="Total"/>
@@ -128,6 +134,7 @@
             <search>
                 <field name="calcul_besoins_id"/>
                 <field name="product_id"/>
+                <field name="fournisseur_id"/>
                 <filter string="Commande client > 0" name="sale_qty_gt_0" domain="[('sale_qty', '>', 0)]"/>
                 <filter string="Commande fournisseur > 0" name="purchase_qty_gt_0" domain="[('purchase_qty', '>', 0)]"/>
                 <filter string="Qt à commander > 0" name="product_qty_gt_0" domain="[('product_qty', '>', 0)]"/>
@@ -221,7 +228,7 @@
                             <field name="enseigne_id"       attrs="{'readonly': [('state', '=', 'done')]}"/>
                             <field name="date_fin"          attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('type_calcul', '=', 'historique')], 'required': [('type_calcul', '=', 'commande')]}"/>
                             <field name="is_heure_envoi_id" attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('type_calcul', '=', 'historique')]}"/>
-                            <field name="stock_mini"        attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('type_calcul', '=', 'historique')]}"/>
+                            <field name="stock_mini"        attrs="{'readonly': [('state', '=', 'done')]}"/>
                             <field name="calcul_en_colis"   attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('type_calcul', '=', 'historique')]}"/>
                             <field name="uniquement_articles_historique" attrs="{'readonly': [('state', '=', 'done')], 'invisible': [('type_calcul', '!=', 'historique')]}"/>
                         </group>
