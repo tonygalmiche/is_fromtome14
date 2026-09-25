@@ -43,33 +43,79 @@
                         <h1><field name="name"/></h1>
                     </div>
                     <group>
-                        <group>
+                        <group string="Filtres">
                             <field name="date_debut"/>
                             <field name="date_fin"/>
                             <field name="date_calcul"/>
                             <field name="duree_calcul"/>
                         </group>
-                        <group>
-                            <field name="montant_vente"/>
-                            <field name="montant_achat"/>
-                            <field name="marge_brute"/>
-                        </group>
-                    </group>
-                    <group string="Filtres facultatifs pour limiter le calcul (relancer le calcul après modification)">
-                        <group>
+                        <group string="Filtres facultatifs (relancer le calcul après modification)">
                             <field name="client"/>
                             <field name="enseigne_id"/>
                             <field name="user_id"/>
-                        </group>
-                        <group>
                             <field name="product_id"/>
                             <field name="invoice_id"/>
                         </group>
                     </group>
-                    <group string="Options">
-                        <field name="exclure_hors_lot"/>
-                        <field name="exclure_services"/>
-                    </group>
+                    <notebook>
+                        <page string="Résultats">
+                            <group>
+                                <group string="Résultats sur les lots">
+                                    <field name="montant_vente"/>
+                                    <field name="montant_achat"/>
+                                    <field name="marge_brute"/>
+                                    <field name="taux_marge"/>
+                                </group>
+                                <group string="Chiffres comptables"
+                                       attrs="{'invisible': ['|', '|', '|', '|', ('client', '!=', False), ('enseigne_id', '!=', False), ('user_id', '!=', False), ('product_id', '!=', False), ('invoice_id', '!=', False)]}">
+                                    <field name="vente_facturee"/>
+                                    <field name="achat_facture"/>
+                                    <field name="marge_brute_comptable"/>
+                                    <field name="taux_marge_comptable"/>
+                                    <field name="ecart_marge_brute"/>
+                                    <field name="rebut"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Options">
+                            <group>
+                                <field name="exclure_hors_lot"/>
+                                <field name="exclure_services"/>
+                            </group>
+                        </page>
+                        <page string="Aide">
+                            <div>
+                                <h4>Principe</h4>
+                                <p>Marge d'un lot = <b>ventes nettes</b> (factures − avoirs clients) − <b>achats nets</b> (factures − avoirs fournisseurs), répartie par client, enseigne et commercial.</p>
+
+                                <h4>Calcul par type de ligne</h4>
+                                <ul>
+                                    <li><b>Facture client</b> : répartie par lot livré. Achat = prix de la facture d'achat du lot (remise déduite). À défaut, dernière facture d'achat de l'article à la date de la vente, avec une anomalie.</li>
+                                    <li><b>Avoir client</b> :
+                                        <ul>
+                                            <li>avec retour de marchandise : la vente et l'achat sont annulés (la marchandise revient en stock) ;</li>
+                                            <li>sans retour : la vente est annulée, l'achat est gardé (marchandise perdue) ;</li>
+                                            <li>sur prix : seule la vente est diminuée.</li>
+                                        </ul>
+                                    </li>
+                                    <li><b>Avoir fournisseur</b> : diminue le coût d'achat du lot, réparti sur les clients qui ont acheté ce lot. Non repris si la marchandise a été renvoyée au fournisseur ou refacturée.</li>
+                                    <li><b>Rebut</b> : coût du lot rebuté, réparti sur les clients qui ont acheté ce lot.</li>
+                                </ul>
+                                <p>L'enseigne est celle de la facture client. Les rebuts et avoirs fournisseurs sont comptés à leur date, même si les ventes du lot sont plus anciennes.</p>
+                                <p><b>Attention</b> : un avoir fournisseur tardif peut fortement gonfler la marge d'un client (ex : litige de 2024 soldé en 2026). Vérifier les lignes « Avoir fournisseur » en cas de taux de marge anormal.</p>
+
+                                <h4>Chiffres comptables</h4>
+                                <p>Factures − avoirs de la période, clients et fournisseurs, <b>sans tenir compte des lots</b>. L'écart avec la marge sur les lots vient surtout de la variation de stock : à comparer sur une période assez longue. Calculés seulement sans filtre facultatif.</p>
+
+                                <h4>Filtres, options et anomalies</h4>
+                                <ul>
+                                    <li><b>Filtres facultatifs</b> : limitent le calcul pour une analyse rapide (relancer le calcul après modification).</li>
+                                    <li><b>Options</b> : excluent le transport (articles non gérés par lot) et les services (véhicule, commissions…).</li>
+                                    <li><b>Anomalies</b> : lot ou facture introuvable, à corriger dans Odoo pour fiabiliser la marge.</li>
+                                </ul>
+                            </div>
+                        </page>
+                    </notebook>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_ids" widget="mail_thread"/>
@@ -85,15 +131,25 @@
                 <field name="name"/>
                 <field name="date_debut"/>
                 <field name="date_fin"/>
-                <field name="client"      optional="show"/>
-                <field name="enseigne_id" optional="show"/>
-                <field name="user_id"     optional="show"/>
-                <field name="product_id"  optional="show"/>
-                <field name="invoice_id"  optional="show"/>
-                <field name="date_calcul"/>
-                <field name="duree_calcul"/>
+                <field name="client"      optional="hide"/>
+                <field name="enseigne_id" optional="hide"/>
+                <field name="user_id"     optional="hide"/>
+                <field name="product_id"  optional="hide"/>
+                <field name="invoice_id"  optional="hide"/>
+                <field name="date_calcul"  optional="hide"/>
+                <field name="duree_calcul" optional="hide"/>
                 <field name="nb_lignes"/>
                 <field name="nb_anomalies"/>
+                <field name="montant_vente"/>
+                <field name="montant_achat"/>
+                <field name="marge_brute"/>
+                <field name="taux_marge"/>
+                <field name="vente_facturee"        optional="hide"/>
+                <field name="achat_facture"         optional="hide"/>
+                <field name="rebut"                 optional="hide"/>
+                <field name="marge_brute_comptable" optional="show"/>
+                <field name="taux_marge_comptable"  optional="show"/>
+                <field name="ecart_marge_brute"     optional="show"/>
             </tree>
         </field>
     </record>
@@ -116,6 +172,7 @@
                             <field name="analyse_id"/>
                             <field name="type_ligne"/>
                             <field name="is_type_avoir"/>
+                            <field name="sans_retour"/>
                             <field name="date"/>
                             <field name="partner_id"/>
                             <field name="enseigne_id"/>
@@ -164,6 +221,7 @@
                 <field name="date"/>
                 <field name="type_ligne"      optional="show"/>
                 <field name="is_type_avoir"   optional="hide"/>
+                <field name="sans_retour"     optional="hide"/>
                 <field name="invoice_id"      optional="show" widget="many2one"/>
                 <field name="scrap_id"        optional="hide" widget="many2one"/>
                 <field name="partner_id"      optional="hide" widget="many2one"/>
@@ -209,6 +267,8 @@
                 <filter name="facture_client" string="Factures client" domain="[('type_ligne', '=', 'Facture client')]"/>
                 <filter name="avoir_client"   string="Avoirs client"   domain="[('type_ligne', '=', 'Avoir client')]"/>
                 <filter name="rebut"          string="Rebuts"          domain="[('type_ligne', '=', 'Rebut')]"/>
+                <filter name="avoir_fournisseur" string="Avoirs fournisseurs" domain="[('type_ligne', '=', 'Avoir fournisseur')]"/>
+                <filter name="sans_retour"    string="Avoirs client sans retour" domain="[('sans_retour', '=', True)]"/>
                 <separator/>
                 <filter name="avec_anomalie"  string="Avec anomalie"   domain="[('anomalie', '!=', False)]"/>
                 <filter name="hors_transport" string="Hors transport"  domain="[('categ_id', 'not ilike', 'TRANSPORT')]"/>
