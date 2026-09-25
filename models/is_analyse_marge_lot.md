@@ -175,7 +175,7 @@ Méthode :
 
 Incohérences possibles :
 
-6. **Commercial** : celui de la fiche client **actuelle**, pas celui au moment de la facture.
+6. ✅ **Commercial** : celui de la fiche client **actuelle** ; il change normalement peu. Le vendeur de la facture (`invoice_user_id`) n'est pas utilisé car c'est souvent la personne qui a saisi la facture. Remarque : 949 factures (0,70 M€ de 2025 à mi-2026) concernent des clients sans commercial, affichés sous « Aucun » dans la marge par commercial.
 7. ✅ **Enseigne** : traité avec le point 1. Celle de la facture client pour les ventes, et aussi pour les rebuts et avoirs fournisseurs (enseigne des factures du lot).
 8. **Période récente** : factures fournisseur pas encore saisies, donc nombreuses anomalies ; analyser de préférence des mois clôturés.
 9. **Prix de repli** : dernière facture de l'article, parfois ancienne (19 lignes sur 529 à plus de 6 mois au 1er semestre 2026).
