@@ -91,6 +91,14 @@
         groups="is_analyse_marge_brute_group" 
     />
     <menuitem
+        name="Analyse marge brute sur les lots facturés"
+        id="is_analyse_marge_lot_menu"
+        parent="is_analyse_facturation_main_menu"
+        sequence="17"
+        action="is_analyse_marge_lot_action"
+        groups="is_analyse_marge_brute_group"
+    />
+    <menuitem
         name="Poids net facturé par semaine FT+LF (hors JERMI)"
         id="poids_net_facture_menu"
         parent="is_analyse_facturation_main_menu"

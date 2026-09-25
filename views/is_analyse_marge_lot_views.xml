@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- is.analyse.marge.lot -->
+    <record id="is_analyse_marge_lot_seq" model="ir.sequence">
+        <field name="name">Analyse marge brute sur les lots facturés</field>
+        <field name="code">is.analyse.marge.lot</field>
+        <field name="prefix"></field>
+        <field name="padding">5</field>
+        <field eval="False" name="company_id"/>
+    </record>
+    <record id="is_analyse_marge_lot_form" model="ir.ui.view">
+        <field name="name">is.analyse.marge.lot.form</field>
+        <field name="model">is.analyse.marge.lot</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="calculer_action"            type="object" string="Calculer" class="oe_highlight"
+                            confirm="Le calcul va remplacer les lignes existantes de cette analyse. Continuer ?"/>
+                    <button name="marge_par_client_action"    type="object" string="Marge par client"/>
+                    <button name="marge_par_enseigne_action"  type="object" string="Marge par enseigne"/>
+                    <button name="marge_par_commercial_action" type="object" string="Marge par commercial"/>
+                    <button name="marge_par_produit_action"   type="object" string="Marge par produit"/>
+                    <button name="marge_par_facture_action"   type="object" string="Marge par facture client"/>
+                </header>
+                <sheet>
+                    <style>
+                        .o_form_label{
+                            white-space: nowrap;
+                        }
+                    </style>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="lignes_action" type="object" class="oe_stat_button" icon="fa-list">
+                            <field name="nb_lignes" widget="statinfo" string="Lignes"/>
+                        </button>
+                        <button name="anomalies_action" type="object" class="oe_stat_button" icon="fa-exclamation-triangle">
+                            <field name="nb_anomalies" widget="statinfo" string="Anomalies"/>
+                        </button>
+                        <button name="anomalies_lot_action" type="object" class="oe_stat_button" icon="fa-shopping-cart">
+                            <field name="nb_lots_sans_facture" widget="statinfo" string="Lots sans facture d'achat"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_debut"/>
+                            <field name="date_fin"/>
+                            <field name="date_calcul"/>
+                            <field name="duree_calcul"/>
+                        </group>
+                        <group>
+                            <field name="montant_vente"/>
+                            <field name="montant_achat"/>
+                            <field name="marge_brute"/>
+                        </group>
+                    </group>
+                    <group string="Filtres facultatifs pour limiter le calcul (relancer le calcul après modification)">
+                        <group>
+                            <field name="client"/>
+                            <field name="enseigne_id"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="product_id"/>
+                            <field name="invoice_id"/>
+                        </group>
+                    </group>
+                    <group string="Options">
+                        <field name="exclure_hors_lot"/>
+                        <field name="exclure_services"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="is_analyse_marge_lot_tree" model="ir.ui.view">
+        <field name="name">is.analyse.marge.lot.tree</field>
+        <field name="model">is.analyse.marge.lot</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="client"      optional="show"/>
+                <field name="enseigne_id" optional="show"/>
+                <field name="user_id"     optional="show"/>
+                <field name="product_id"  optional="show"/>
+                <field name="invoice_id"  optional="show"/>
+                <field name="date_calcul"/>
+                <field name="duree_calcul"/>
+                <field name="nb_lignes"/>
+                <field name="nb_anomalies"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_analyse_marge_lot_action" model="ir.actions.act_window">
+        <field name="name">Analyse marge brute sur les lots facturés</field>
+        <field name="res_model">is.analyse.marge.lot</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <!-- is.analyse.marge.lot.ligne -->
+    <record id="is_analyse_marge_lot_ligne_form" model="ir.ui.view">
+        <field name="name">is.analyse.marge.lot.ligne.form</field>
+        <field name="model">is.analyse.marge.lot.ligne</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="analyse_id"/>
+                            <field name="type_ligne"/>
+                            <field name="is_type_avoir"/>
+                            <field name="date"/>
+                            <field name="partner_id"/>
+                            <field name="enseigne_id"/>
+                            <field name="user_id"/>
+                            <field name="product_id"/>
+                            <field name="categ_id"/>
+                            <field name="lot_id"/>
+                            <field name="libelle"/>
+                            <field name="quantity"/>
+                            <field name="product_uom_id"/>
+                            <field name="price_unit"/>
+                            <field name="discount"/>
+                            <field name="montant_vente"/>
+                        </group>
+                        <group>
+                            <field name="invoice_id"/>
+                            <field name="invoice_line_id"/>
+                            <field name="scrap_id"/>
+                            <field name="anomalie"/>
+                        </group>
+                    </group>
+                    <group string="Achat">
+                        <group>
+                            <field name="origine_prix"/>
+                            <field name="prix_achat"/>
+                            <field name="discount_fournisseur"/>
+                            <field name="prix_achat_net"/>
+                            <field name="montant_achat"/>
+                            <field name="marge_brute"/>
+                        </group>
+                        <group>
+                            <field name="fournisseur_id"/>
+                            <field name="date_facture_fournisseur"/>
+                            <field name="ligne_facture_fournisseur_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_analyse_marge_lot_ligne_tree" model="ir.ui.view">
+        <field name="name">is.analyse.marge.lot.ligne.tree</field>
+        <field name="model">is.analyse.marge.lot.ligne</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="anomalie" decoration-warning="type_ligne=='Rebut'" class="o_is_analyse_marge_lot_ligne_list" limit="200">
+                <field name="date"/>
+                <field name="type_ligne"      optional="show"/>
+                <field name="is_type_avoir"   optional="hide"/>
+                <field name="invoice_id"      optional="show" widget="many2one"/>
+                <field name="scrap_id"        optional="hide" widget="many2one"/>
+                <field name="partner_id"      optional="hide" widget="many2one"/>
+                <field name="enseigne_id"     optional="hide"/>
+                <field name="user_id"         optional="hide"/>
+                <field name="product_id"      optional="show" widget="many2one"/>
+                <field name="categ_id"        optional="hide"/>
+                <field name="lot_id"          optional="show" widget="many2one"/>
+                <field name="libelle"         optional="hide"/>
+                <field name="quantity"        optional="show" sum="Total"/>
+                <field name="product_uom_id"  optional="hide"/>
+                <field name="price_unit"      optional="hide"/>
+                <field name="discount"        optional="hide"/>
+                <field name="montant_vente"   optional="show" sum="Total"/>
+                <field name="origine_prix"    optional="show"/>
+                <field name="fournisseur_id"  optional="hide"/>
+                <field name="date_facture_fournisseur"     optional="hide"/>
+                <field name="ligne_facture_fournisseur_id" optional="hide" widget="many2one"/>
+                <field name="prix_achat"            optional="hide"/>
+                <field name="discount_fournisseur"  optional="hide"/>
+                <field name="prix_achat_net"        optional="hide"/>
+                <field name="montant_achat"         optional="show" sum="Total"/>
+                <field name="marge_brute"           optional="show" sum="Total"/>
+                <field name="anomalie"              optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_analyse_marge_lot_ligne_search" model="ir.ui.view">
+        <field name="name">is.analyse.marge.lot.ligne.search</field>
+        <field name="model">is.analyse.marge.lot.ligne</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="enseigne_id"/>
+                <field name="user_id"/>
+                <field name="product_id"/>
+                <field name="categ_id"/>
+                <field name="lot_id"/>
+                <field name="invoice_id"/>
+                <field name="scrap_id"/>
+                <field name="fournisseur_id"/>
+                <field name="anomalie"/>
+                <filter name="facture_client" string="Factures client" domain="[('type_ligne', '=', 'Facture client')]"/>
+                <filter name="avoir_client"   string="Avoirs client"   domain="[('type_ligne', '=', 'Avoir client')]"/>
+                <filter name="rebut"          string="Rebuts"          domain="[('type_ligne', '=', 'Rebut')]"/>
+                <separator/>
+                <filter name="avec_anomalie"  string="Avec anomalie"   domain="[('anomalie', '!=', False)]"/>
+                <filter name="hors_transport" string="Hors transport"  domain="[('categ_id', 'not ilike', 'TRANSPORT')]"/>
+                <separator/>
+                <filter name="group_by_type_ligne"   string="Type"         context="{'group_by': 'type_ligne'}"/>
+                <filter name="group_by_partner_id"   string="Client"       context="{'group_by': 'partner_id'}"/>
+                <filter name="group_by_enseigne_id"  string="Enseigne"     context="{'group_by': 'enseigne_id'}"/>
+                <filter name="group_by_user_id"      string="Commercial"   context="{'group_by': 'user_id'}"/>
+                <filter name="group_by_product_id"   string="Article"      context="{'group_by': 'product_id'}"/>
+                <filter name="group_by_lot_id"       string="Lot"          context="{'group_by': 'lot_id'}"/>
+                <filter name="group_by_origine_prix" string="Origine prix" context="{'group_by': 'origine_prix'}"/>
+                <filter name="group_by_anomalie"     string="Anomalie"     context="{'group_by': 'anomalie'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="is_analyse_marge_lot_ligne_pivot" model="ir.ui.view">
+        <field name="name">is.analyse.marge.lot.ligne.pivot</field>
+        <field name="model">is.analyse.marge.lot.ligne</field>
+        <field name="arch" type="xml">
+            <pivot default_order="marge_brute desc">
+                <field name="enseigne_id"   type="row"/>
+                <field name="marge_brute"   type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="is_analyse_marge_lot_ligne_graph" model="ir.ui.view">
+        <field name="name">is.analyse.marge.lot.ligne.graph</field>
+        <field name="model">is.analyse.marge.lot.ligne</field>
+        <field name="arch" type="xml">
+            <graph type="bar" orientation="vertical" order="desc">
+                <field name="enseigne_id" type="row"/>
+                <field name="marge_brute" type="measure"/>
+            </graph>
+        </field>
+    </record>
+</odoo>

@@ -169,7 +169,6 @@
         <field name="interval_type">days</field>
         <field name="interval_number">1</field>
         <field name="numbercall">-1</field>
-        <field name="nextcall" eval="'2026-03-06 02:00:00'"/>
     </record>
 
 </odoo>

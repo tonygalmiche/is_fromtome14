@@ -53,6 +53,13 @@ td [name="name"]{
     background-color: #E8E8E8;
 }
 
+// Analyse marge brute sur les lots facturés : retour à la ligne automatique
+// pour les champs avec le widget many2one (client, article, facture, lot...)
+.o_is_analyse_marge_lot_ligne_list .o_list_table tbody > tr > td.o_many2one_cell{
+    white-space: normal !important;
+    word-break: break-word;
+}
+
 
 
 /*

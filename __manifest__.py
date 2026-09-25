@@ -65,6 +65,7 @@ InfoSaône - Module Odoo 14 pour Fromtome
         'views/product_supplierinfo_view.xml',
         'views/is_account_invoice_line.xml',
         'views/is_analyse_facturation_views.xml',
+        'views/is_analyse_marge_lot_views.xml',
         'views/is_audit_marge_brute_views.xml',
         'views/is_marge_brute_article_views.xml',
 

@@ -51,6 +51,7 @@ class StockMoveLine(models.Model):
             obj.is_poids_net_estime = nb_colis * obj.product_id.is_poids_net_colis
 
 
+    lot_id                 = fields.Many2one(index=True) # Index ajouté pour l'analyse marge brute sur les lots facturés
     is_type_tracabilite    = fields.Selection(string='Traçabilité', related="product_id.is_type_tracabilite")
     is_dlc_ddm             = fields.Date('DLC / DDM', related="lot_id.is_dlc_ddm")
     status_move            = fields.Selection(string='Statut', selection=[('receptionne', 'Réceptionné'), ('manquant', 'Manquant'), ('abime', 'Abimé'), ('autre', 'Autre')], default='receptionne')
