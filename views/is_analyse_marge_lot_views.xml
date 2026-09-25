@@ -111,6 +111,7 @@
                                 <ul>
                                     <li><b>Filtres facultatifs</b> : limitent le calcul pour une analyse rapide (relancer le calcul après modification).</li>
                                     <li><b>Options</b> : excluent le transport (articles non gérés par lot) et les services (véhicule, commissions…).</li>
+                                    <li><b>Transport</b> : pas encore pris en compte (traité plus tard). La marge affichée est une marge sur marchandises, <b>avant transport</b> (frais de port facturés aux clients et factures des transporteurs exclus).</li>
                                     <li><b>Anomalies</b> : lot ou facture introuvable, à corriger dans Odoo pour fiabiliser la marge.</li>
                                 </ul>
                             </div>
