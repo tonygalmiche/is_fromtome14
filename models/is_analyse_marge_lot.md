@@ -178,7 +178,7 @@ Incohérences possibles :
 6. ✅ **Commercial** : celui de la fiche client **actuelle** ; il change normalement peu. Le vendeur de la facture (`invoice_user_id`) n'est pas utilisé car c'est souvent la personne qui a saisi la facture. Remarque : 949 factures (0,70 M€ de 2025 à mi-2026) concernent des clients sans commercial, affichés sous « Aucun » dans la marge par commercial.
 7. ✅ **Enseigne** : traité avec le point 1. Celle de la facture client pour les ventes, et aussi pour les rebuts et avoirs fournisseurs (enseigne des factures du lot).
 8. **Période récente** : factures fournisseur pas encore saisies, donc nombreuses anomalies ; analyser de préférence des mois clôturés.
-9. **Prix de repli** : dernière facture de l'article, parfois ancienne (19 lignes sur 529 à plus de 6 mois au 1er semestre 2026).
+9. ✅ **Prix de repli** (dernière facture de l'article à la date de la vente) : laissé en l'état car non significatif. Au 1er semestre 2026, il concerne 569 lignes sur 30 160 (≈ 29 k€ de ventes sur 2,45 M€), presque toujours avec un prix de moins d'un mois ; prix de plus de 3 mois : 451 € de ventes ; aucun prix d'achat : 40 lignes, 977 € de ventes.
 10. **Données** : commandes d'achat « Facturées » sans facture, lots en double ou au n° fantaisiste, facture fournisseur FF10544 datée de 7538, services paramétrés « suivi par lot ».
 
 Contrôles faits sur le 1er semestre 2026 : unités identiques à la vente et à l'achat sur toutes les lignes ; 99 % des lignes avec une marge cohérente (159 lignes vendues à plus de 20 % sous le prix d'achat, 13 lignes sans prix d'achat).
