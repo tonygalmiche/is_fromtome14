@@ -168,7 +168,10 @@ Méthode :
 2. ⏳ **Coûts d'achat** : avoirs fournisseurs pris en compte (point 1), sauf ceux sans commande (ligne sans client). Les frais annexes sont ignorés (≈ 123 k€ au 1er semestre 2026, dont ≈ 118 k€ de frais de port facturés par les transporteurs, non rattachables aux lots) : **à traiter avec le transport (point 3)**. Seules les factures validées sont prises en compte.
 3. ⏳ **Transport (CDC 2.4)** : **traité plus tard**. En attendant, le transport est exclu par défaut (articles non gérés par lot), côté ventes (≈ 27 k€ facturés aux clients au 1er semestre 2026) comme côté achats : la marge brute lot est une marge sur marchandises, **avant transport**.
 4. ✅ **Rebuts** : tous répartis sur les clients du lot, y compris les sinistres (ex : dégât des eaux). Laissé en l'état car non significatif (7,8 k€ de rebuts au 1er semestre 2026, dont 4 k€ de dégâts des eaux).
-5. **Approximations** : livraison en plusieurs fois sans BL sur la ligne de facture (répartition sur tous les lots de la commande) ; lot reçu plusieurs fois (dernière facture retenue) ; avoir non lié à une commande (repli sur l'article).
+5. ✅ **Approximations** : laissées en l'état car non significatives (mesures du 1er semestre 2026) :
+   - ligne de commande facturée en plusieurs fois sans BL sur la ligne de facture (répartition sur tous les lots de la commande) : 18 lignes, 2,1 k€ de ventes ;
+   - lot facturé par le fournisseur à des prix différents (dernière facture retenue) : 54 lots sur 12 596, écart de coût de 6,2 k€ au maximum ;
+   - avoir client non lié à une commande (repli sur l'article) : 8 lignes, −3,6 k€ de ventes.
 
 Incohérences possibles :
 
