@@ -337,6 +337,7 @@ class SaleOrder(models.Model):
     is_encours_client        = fields.Float(related='partner_id.is_encours_client')
     is_import_excel_ids      = fields.Many2many('ir.attachment' , 'sale_order_is_import_excel_ids_rel', 'order_id'     , 'attachment_id'    , 'Commande .xlsx à importer')
     is_import_alerte         = fields.Text('Alertes importation')
+    is_alerte_client         = fields.Text('Alerte fiche client', compute='_compute_is_alerte_client')
     is_nb_lignes             = fields.Integer('Nb lignes (hors transport)', compute='_compute_is_nb_lignes')
     is_heure_envoi_id        = fields.Many2one('is.heure.maxi', 'Jour / Heure limite', tracking=True, help="Heure maxi d'envoi de la commande au fournisseur")
     is_fusion_order_id       = fields.Many2one('sale.order', 'Fusionnée dans', copy=False,readonly=True)
@@ -436,20 +437,46 @@ class SaleOrder(models.Model):
         return res
 
 
+    def _get_partner_controle(self):
+        # commercial_partner_id (standard Odoo) : société mère pour un contact enfant,
+        # le contact lui-même s'il n'a pas de parent ou s'il est coché « société »
+        return self.partner_id.commercial_partner_id or self.partner_id
+
+
+    @api.depends('partner_id', 'payment_mode_id')
+    def _compute_is_alerte_client(self):
+        for obj in self:
+            alertes = []
+            partner = obj._get_partner_controle()
+            if partner:
+                if not partner.property_account_position_id:
+                    alertes.append("Position fiscale non renseignée sur la fiche client (Bloquant)")
+                if not partner.is_frequence_facturation:
+                    alertes.append("Fréquence de facturation non renseignée sur la fiche client (Bloquant)")
+                if not partner.country_id:
+                    alertes.append("Pays non renseigné sur la fiche client")
+                if partner.country_id.code == 'FR' and not partner.siren:
+                    alertes.append("SIREN non renseigné sur la fiche client")
+                modes = obj.payment_mode_id | partner.customer_payment_mode_id
+                traite = any(m.payment_method_code == 'fr_lcr' or 'TRAITE' in (m.name or '').upper() for m in modes)
+                if traite and not partner.bank_ids:
+                    alertes.append("RIB non renseigné sur la fiche client (mode de paiement en traite)")
+            obj.is_alerte_client = "\n".join(alertes) or False
+
+
     def action_confirm(self):
         for obj in self:
             manquants = []
-            #if not obj.partner_id.bank_ids:
-            #    manquants.append("- RIB")
-            if not obj.partner_id.property_account_position_id:
+            partner = obj._get_partner_controle()
+            if not partner.property_account_position_id:
                 manquants.append("- Position fiscale")
-            if not obj.partner_id.is_frequence_facturation:
+            if not partner.is_frequence_facturation:
                 manquants.append("- Fréquence de facturation")
             if manquants:
                 raise ValidationError(
                     "Impossible de valider la commande.\n"
                     "Les informations suivantes sont manquantes sur la fiche client '%s' :\n%s"
-                    % (obj.partner_id.name, "\n".join(manquants))
+                    % (partner.name, "\n".join(manquants))
                 )
             obj.ajout_frais_de_port()
             for line in obj.order_line:

@@ -62,6 +62,15 @@
                     }
                 </style>
             </xpath>
+            <div name="button_box" position="after">
+                <div style="background:orange;font-weight: bold;" attrs="{'invisible':[('is_alerte_client','=',False)]}">
+                    <field
+                        name="is_alerte_client"
+                        readonly="1" nolabel="1"
+                        attrs="{'invisible': [('is_alerte_client', '=', False)]}"
+                    />
+                </div>
+            </div>
             <field name="partner_id" position="after">
                 <field name="is_encours_client"/>
                 <field 
