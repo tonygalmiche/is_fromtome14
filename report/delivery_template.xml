@@ -211,7 +211,6 @@
                                     <th class="text-left"><strong>Désignation</strong></th>
                                     <th class="text-center"><strong>PCB</strong></th>
                                     <th class="text-center"><strong>Colis commandés</strong></th>
-                                    <th class="text-center"><strong>Colis préparés</strong></th>
                                     <th class="text-center"><strong>Colis livrés</strong></th>
                                     <th class="text-center"><strong>Manquant</strong></th>
                                 </tr>
@@ -224,7 +223,6 @@
                                             <td class="text-left"><span t-field="sale_line.product_id.name"/></td>
                                             <td class="text-center"><span t-field="sale_line.product_id.is_nb_pieces_par_colis"/></td>
                                             <td class="text-center"><span t-field="sale_line.is_colis_cde_origine"/></td>
-                                            <td class="text-center"><span t-field="sale_line.is_colis_cde"/></td>
                                             <td class="text-center"><span t-field="sale_line.is_colis_liv"/></td>
                                             <td class="text-center"><span t-field="sale_line.is_colis_manquant"/></td>
                                         </tr>
