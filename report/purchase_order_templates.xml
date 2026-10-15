@@ -95,6 +95,11 @@
                 <!-- Tableau des livraisons pour les transporteurs -->
                 <t t-if="o.is_transporteur and o.is_livraison_ids">
                     <br/>
+                    <p t-if="o.is_date_enlevement">
+                        <strong>Enlèvement chez <span t-field="res_company.partner_id.name"/></strong>
+                        (<span t-field="res_company.partner_id.street"/> <span t-field="res_company.partner_id.zip"/> <span t-field="res_company.partner_id.city"/>)
+                        le <span t-field="o.is_date_enlevement" t-options='{"format": "EEEE d MMMM y"}'/>
+                    </p>
                     <h3>Livraisons clients associées</h3>
                     <table class="table table-sm o_main_table">
                         <thead>
@@ -104,12 +109,14 @@
                                 <th class="text-left"><strong>Adresse de livraison</strong></th>
                                 <th class="text-right"><strong>Nb colis commandés</strong></th>
                                 <th class="text-right"><strong>Poids net commandé</strong></th>
+                                <th class="text-right"><strong>Palettes</strong></th>
                                 <!-- <th class="text-right"><strong>Nb colis livrés</strong></th>
                                 <th class="text-right"><strong>Poids net livré</strong></th> -->
                             </tr>
                         </thead>
                         <tbody>
-                            <tr t-foreach="o.is_livraison_ids" t-as="picking">
+                            <tr t-foreach="o.order_line.filtered('is_picking_id')" t-as="line">
+                                <t t-set="picking" t-value="line.is_picking_id"/>
                                 <td class="text-left">
                                     <span t-field="picking.name"/>
                                 </td>
@@ -117,7 +124,7 @@
                                     <span t-field="picking.sale_id.name"/>
                                 </td>
                                 <td class="text-left">
-                                    <span t-field="picking.partner_id.name"/>
+                                    <span t-field="picking.partner_id.display_name"/>
                                     <span t-if="picking.partner_id.street">
                                         <br/>
                                         <span t-field="picking.partner_id.street"/>
@@ -132,6 +139,9 @@
                                 </td>
                                 <td class="text-right">
                                     <span t-field="picking.is_poids_net_cde_total"/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="line.product_qty"/>
                                 </td>
                                 <!-- <td class="text-right">
                                     <span t-field="picking.is_nb_colis"/>
@@ -158,6 +168,12 @@
                                     <td class="text-right"><strong>Total poids (kg):</strong></td>
                                     <td class="text-right">
                                         <span t-field="o.is_total_poids_livraisons"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-right"><strong>Total palettes:</strong></td>
+                                    <td class="text-right">
+                                        <span t-esc="sum(o.order_line.filtered('is_picking_id').mapped('product_qty'))"/>
                                     </td>
                                 </tr>
                             </table>

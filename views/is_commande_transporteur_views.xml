@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- is.commande.transporteur -->
+    <record id="is_commande_transporteur_form" model="ir.ui.view">
+        <field name="name">is_commande_transporteur_form</field>
+        <field name="model">is.commande.transporteur</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="generer_actualiser_action"
+                        type="object"
+                        string="Générer / Actualiser"
+                        class="oe_highlight"
+                    />
+                    <button
+                        name="voir_commandes_action"
+                        type="object"
+                        string="Voir les commandes"
+                    />
+                    <button
+                        name="voir_livraisons_action"
+                        type="object"
+                        string="Voir les livraisons"
+                    />
+                </header>
+                <sheet>
+                    <div style="background:orange;font-size:11pt" attrs="{'invisible':[('alerte','=',False)]}">
+                        <field name="alerte" readonly="1" nolabel="1"/>
+                    </div>
+                    <group>
+                        <field name="date_debut"/>
+                        <field name="date_fin"/>
+                        <field name="commentaire"/>
+                    </group>
+                    <field name="order_ids" nolabel="1">
+                        <tree>
+                            <button
+                                name="ouvrir_commande_action"
+                                type="object"
+                                icon="fa-search-plus"
+                                title="Accéder à la commande"
+                            />
+                            <button
+                                name="voir_livraisons_action"
+                                type="object"
+                                icon="fa-truck"
+                                title="Voir les livraisons de la commande"
+                            />
+                            <field name="name"/>
+                            <field name="partner_id"/>
+                            <field name="is_date_enlevement"/>
+                            <field name="is_total_colis_livraisons" sum="Total"/>
+                            <field name="is_total_poids_livraisons" sum="Total"/>
+                            <field name="amount_untaxed"            sum="Total"/>
+                            <field name="state"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="is_commande_transporteur_tree" model="ir.ui.view">
+        <field name="name">is_commande_transporteur_tree</field>
+        <field name="model">is.commande.transporteur</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="commentaire" optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <record id="is_commande_transporteur_search" model="ir.ui.view">
+        <field name="name">is_commande_transporteur_search</field>
+        <field name="model">is.commande.transporteur</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="commentaire"/>
+           </search>
+        </field>
+    </record>
+    <record  id="is_commande_transporteur_action" model="ir.actions.act_window">
+        <field name="name">Commandes transporteurs</field>
+        <field name="res_model">is.commande.transporteur</field>
+        <field name="limit">100</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+    </record>
+    <menuitem
+        id="is_commande_transporteur_menu"
+        name="Commandes transporteurs"
+        parent="purchase.menu_procurement_management"
+        sequence="920"
+        action="is_commande_transporteur_action"
+    />
+</odoo>

@@ -82,6 +82,7 @@ InfoSaône - Module Odoo 14 pour Fromtome
         'views/is_import_le_cellier_views.xml',
         'views/is_relance_facture_view.xml',
         'views/is_suivi_commande_hebdo_views.xml',
+        'views/is_commande_transporteur_views.xml',
         'views/is_analyse_rupture_views.xml',
         'views/is_preparation_transfert_entrepot_views.xml',
         'views/is_promo_fournisseur_view.xml',

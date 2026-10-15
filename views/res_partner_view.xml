@@ -74,10 +74,11 @@
         <field name="name">is_transporteur_tree_view</field>
         <field name="model">is.transporteur</field>
         <field name="arch" type="xml">
-            <tree editable="bottom">
+            <tree>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="transporteur_par_ordre"/>
+                <field name="partner_id"/>
             </tree>
         </field>
     </record>
@@ -91,6 +92,7 @@
                     <field name="sequence"/>
                     <field name="name"/>
                     <field name="transporteur_par_ordre"/>
+                    <field name="partner_id"/>
                 </group>
             </sheet>
         </form>
@@ -103,6 +105,7 @@
             <search>
                 <field name="name"/>
                 <field name="transporteur_par_ordre"/>
+                <field name="partner_id"/>
             </search>
         </field>
     </record>

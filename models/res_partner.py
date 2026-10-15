@@ -47,8 +47,9 @@ class IsTransporteur(models.Model):
             obj.transporteur_par_ordre = f"{sequence_str} - {obj.name}"
 
     sequence = fields.Integer('Séquence', default=10)
-    name = fields.Char('Transporteur', required=True)
+    name = fields.Char('Tournée transporteur', required=True)
     transporteur_par_ordre = fields.Char('Transporteur par ordre', compute='_compute_transporteur_par_ordre', store=True, readonly=True)
+    partner_id = fields.Many2one('res.partner', 'Transporteur', domain=[('is_transporteur','=',True)], help="Transporteur à qui passer la commande. Si vide, pas de commande transporteur pour cette tournée")
 
 
 class IsHeureMaxi(models.Model):
@@ -132,7 +133,7 @@ class ResPartner(models.Model):
     is_frequence_facturation    = fields.Selection(string='Fréquence facturation', selection=[('au_mois', 'Au mois'),('a_la_livraison', 'A la livraison')], tracking=True)
     is_modele_commande_id       = fields.Many2one('is.modele.commande', 'Modèle de commande', tracking=True)
     is_presentation_bl          = fields.Selection(string='Présentation BL', selection=[('standard', 'Standard'),('detaillee', 'Détaillée')], default="standard", tracking=True)
-    is_transporteur_id          = fields.Many2one('is.transporteur', 'Transporteur', tracking=True)
+    is_transporteur_id          = fields.Many2one('is.transporteur', 'Tournée transporteur', tracking=True)
     is_warehouse_id             = fields.Many2one('stock.warehouse', 'Entrepôt', tracking=True, help="Entrepôt à utiliser dans les réceptions ou les livraisons")
     is_frais_port_id            = fields.Many2one('product.product', 'Frais de port', tracking=True, domain=[('categ_id.name','=','TRANSPORT')], help="Utilisé pour ajouter automatiquement une ligne de frais de port sur les commandes")
     is_heure_envoi_id           = fields.Many2one('is.heure.maxi', 'Jour / Heure limite', tracking=True, help="Heure maxi d'envoi de la commande au fournisseur")

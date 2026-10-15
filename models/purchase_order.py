@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models                           # type: ignore
+from odoo.exceptions import ValidationError                    # type: ignore
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT          # type: ignore
 from odoo.tools.float_utils import float_compare, float_round  # type: ignore
 
@@ -74,6 +75,36 @@ class PurchaseOrder(models.Model):
             obj.is_enseigne_id = enseigne.id if enseigne else False
 
 
+    def ouvrir_commande_action(self):
+        "Ouvre le formulaire de la commande"
+        self.ensure_one()
+        return {
+            'name': 'Commande',
+            'view_mode': 'form',
+            'res_model': 'purchase.order',
+            'type': 'ir.actions.act_window',
+            'res_id': self.id,
+        }
+
+
+    def voir_livraisons_action(self):
+        "Liste des livraisons clients de la commande transporteur"
+        self.ensure_one()
+        return {
+            'name': 'Livraisons %s'%self.name,
+            'type': 'ir.actions.act_window',
+            'res_model': 'stock.picking',
+            'view_mode': 'tree,form',
+            'domain': [('id', 'in', self.is_livraison_ids.ids)],
+        }
+
+
+    @api.depends('order_line.is_picking_id')
+    def _compute_is_livraison_ids(self):
+        for obj in self:
+            obj.is_livraison_ids = obj.order_line.mapped('is_picking_id')
+
+
     @api.depends('is_livraison_ids', 'is_livraison_ids.state', 'is_livraison_ids.is_nb_colis', 'is_livraison_ids.is_poids_net', 'is_livraison_ids.is_nb_colis_cde_total', 'is_livraison_ids.is_poids_net_cde_total')
     def _compute_totaux_livraisons(self):
         """Calcul de la somme des colis et poids net des livraisons associées"""
@@ -102,13 +133,15 @@ class PurchaseOrder(models.Model):
     is_date_enlevement         = fields.Date('Date Enlèvement')
     is_adresse_livraison_id    = fields.Many2one('res.partner', 'Adresse Livraison') #, default=lambda self: self.env.user.company_id.partner_id.id)
     is_livraison_ids           = fields.Many2many(
-        'stock.picking', 
-        'is_purchase_order_livraison_client_rel', 
-        'purchase_order_id', 
-        'picking_id', 
+        'stock.picking',
+        'is_purchase_order_livraison_client_rel',
+        'purchase_order_id',
+        'picking_id',
         'Livraisons clients associées',
-        domain=[('state', 'not in', ['draft', 'done', 'cancel']), ('picking_type_code', '=', 'outgoing')]
+        compute='_compute_is_livraison_ids', store=True, readonly=True,
+        help="BL des lignes de la commande (champ 'BL' des lignes)"
     )
+    is_commande_transporteur_id = fields.Many2one('is.commande.transporteur', 'Commandes transporteurs', copy=False, index=True, readonly=True)
     is_transporteur            = fields.Boolean(related='partner_id.is_transporteur', store=False)
     is_total_colis_livraisons  = fields.Float(string='Total colis livraisons', digits=(14,2), compute='_compute_totaux_livraisons', readonly=True, store=True, help="Somme des colis des livraisons associées")
     is_total_poids_livraisons  = fields.Float(string='Total poids livraisons', digits='Stock Weight', compute='_compute_totaux_livraisons', readonly=True, store=True, help="Somme du poids net des livraisons associées")
@@ -329,14 +362,16 @@ class PurchaseOrderLine(models.Model):
         return round(nb_colis)
 
 
-    @api.depends('product_id','is_nb_colis','price_unit')
+    @api.depends('product_id','is_nb_colis','price_unit','is_picking_id')
     def _compute_is_alerte(self):
         for obj in self:
             alerte=[]
-            if obj.is_nb_colis!=round(obj.is_nb_colis):
-                alerte.append("Colis incomplet")
-            if obj.is_nb_colis==0:
-                alerte.append("Colis à 0")
+            #** Pas de colis sur les lignes des commandes transporteurs (1 ligne par BL)
+            if not obj.is_picking_id:
+                if obj.is_nb_colis!=round(obj.is_nb_colis):
+                    alerte.append("Colis incomplet")
+                if obj.is_nb_colis==0:
+                    alerte.append("Colis à 0")
             if obj.price_unit==0:
                 alerte.append("Prix à 0")
             obj.is_alerte="\n".join(alerte)
@@ -363,6 +398,7 @@ class PurchaseOrderLine(models.Model):
     is_nb_colis            = fields.Float(string='Nb Colis', digits=(14,2))
     is_poids_net           = fields.Float(string='Poids net', digits='Stock Weight', compute='_compute_is_nb_pieces_par_colis', readonly=True, store=True, help="Poids net total (Kg)")
     is_alerte              = fields.Text(string='Alerte', compute='_compute_is_alerte')
+    is_picking_id          = fields.Many2one('stock.picking', 'BL', copy=False, index=True, help="Livraison client transportée (commandes transporteurs)")
     is_client_id           = fields.Many2one('res.partner', 'Client', related='is_sale_order_line_id.order_id.partner_id')
     is_date_planned        = fields.Datetime(string="Date de réception", related='order_id.date_planned')
     is_date_enlevement     = fields.Date(related='order_id.is_date_enlevement')
@@ -377,6 +413,21 @@ class PurchaseOrderLine(models.Model):
             "Discount must be lower than 100%.",
         )
     ]
+
+
+    @api.constrains('is_picking_id')
+    def _check_is_picking_id(self):
+        "Un BL ne peut être que sur une seule commande transporteur (hors commandes annulées)"
+        for obj in self:
+            if obj.is_picking_id:
+                filtre=[
+                    ('id'             , '!=', obj.id),
+                    ('is_picking_id'  , '=' , obj.is_picking_id.id),
+                    ('order_id.state' , '!=', 'cancel'),
+                ]
+                lines = self.search(filtre, limit=1)
+                if lines:
+                    raise ValidationError("Le BL %s est déjà sur la commande transporteur %s"%(obj.is_picking_id.name, lines.order_id.name))
 
 
     # adding discount to depends

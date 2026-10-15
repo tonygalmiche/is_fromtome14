@@ -536,7 +536,7 @@ class Picking(models.Model):
     is_date_livraison = fields.Date('Date livraison client', help="Date d'arrivée chez le client prévue sur la commande", compute='_compute_is_date_livraison', store=True, readonly=False)
     is_date_reception = fields.Datetime('Date réception'   , help="Date de réception chez Fromtome indiquée sur la commande", related='purchase_id.date_planned')
     is_enseigne_id    = fields.Many2one('is.enseigne.commerciale', 'Enseigne', related='partner_id.is_enseigne_id')
-    is_transporteur_id = fields.Many2one('is.transporteur', 'Transporteur', compute='_compute_is_transporteur_id', store=True, readonly=False, tracking=True)
+    is_transporteur_id = fields.Many2one('is.transporteur', 'Tournée transporteur', compute='_compute_is_transporteur_id', store=True, readonly=False, tracking=True)
     is_transporteur_par_ordre = fields.Char('Transporteur par ordre', related='is_transporteur_id.transporteur_par_ordre', store=True, readonly=True)
     is_alerte          = fields.Text('Alerte', compute="_compute_is_alerte", readonly=True, store=False)
     is_preparation_transfert_id = fields.Many2one('is.preparation.transfert.entrepot', 'Préparation transfert', tracking=True)
@@ -559,6 +559,12 @@ class Picking(models.Model):
     def _compute_is_transporteur_id(self):
         for obj in self:
             obj.is_transporteur_id = obj.sale_id.is_transporteur_id.id or obj.partner_id.is_transporteur_id.id
+
+
+    def get_nb_palettes(self):
+        "Nombre de palettes du BL (une palette demie compte pour 0,5)"
+        self.ensure_one()
+        return self.is_palette_europe + self.is_palette_perdue + 0.5*self.is_palette_demie
 
 
     def ouvrir_picking_action(self):
