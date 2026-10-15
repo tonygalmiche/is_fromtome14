@@ -110,14 +110,14 @@
         </field>
     </record>
     <record id="is_transporteur_action" model="ir.actions.act_window" >
-        <field name="name">Transporteur</field>
+        <field name="name">Tournée transporteur</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">is.transporteur</field>
         <field name="view_mode">tree,form</field>
     </record>
     <menuitem 
-        id="is_transporteur_menu" 
-        name="Transporteur" 
+        id="is_transporteur_menu"
+        name="Tournée transporteur"
         parent="sale.menu_sale_config" 
         sequence="910"
         action="is_transporteur_action"
