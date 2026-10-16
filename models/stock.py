@@ -146,6 +146,19 @@ class StockMove(models.Model):
             obj.is_description_cde=description
 
 
+    def _compute_is_description_prepa(self):
+        """Description de la commande en français si elle n'a pas été modifiée"""
+        for obj in self:
+            description = obj.is_description_cde
+            line = obj.sale_line_id
+            lang = line.order_id.partner_id.lang
+            if line and obj.product_id and lang and lang != 'fr_FR':
+                product = obj.product_id
+                if line.name == product.with_context(lang=lang).get_product_multiline_description_sale():
+                    description = product.with_context(lang='fr_FR').get_product_multiline_description_sale()
+            obj.is_description_prepa = description
+
+
 
     @api.depends('product_id','name')
     def _compute_is_ref_fournisseur(self):
@@ -183,6 +196,7 @@ class StockMove(models.Model):
     is_nb_colis_cde_from_sale = fields.Float('Nb Colis commandé', digits=(14,2), compute='_compute_is_nb_colis_cde_from_sale', readonly=True, store=True, help="Nombre de colis de la ligne de commande client")
     is_poids_net_cde_from_sale = fields.Float('Poids net commandé', digits=(14,4), compute='_compute_is_poids_net_cde_from_sale', readonly=True, store=True, help="Poids net de la ligne de commande client")
     is_description_cde = fields.Text('Description commande', compute=_compute_is_description_cde)
+    is_description_prepa = fields.Text('Description préparation', compute=_compute_is_description_prepa)
     is_ref_fournisseur = fields.Char(string='Réf fournisseur', compute='_compute_is_ref_fournisseur', readonly=True, store=True)
     is_fournisseur_id          = fields.Many2one('res.partner', 'Fournisseur', readonly=True)
     is_emplacement_fournisseur = fields.Integer(string="Emplacement", help="Emplacement palette fournisseur", readonly=True)

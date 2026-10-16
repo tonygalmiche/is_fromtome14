@@ -527,7 +527,8 @@ else:
                 <field name="is_poids_net_colis"         optional="hide"/>
             </xpath> 
             <xpath expr="//page[@name='operations']/field/tree/field[@name='description_picking']" position="after">
-                <field name="is_description_cde" optional="show"/>
+                <field name="is_description_prepa" optional="show"/>
+                <field name="is_description_cde" optional="hide"/>
                 <field name="is_ref_fournisseur" optional="show"/>
                 <field name="is_bio_id" optional="hide"/>
             </xpath> 

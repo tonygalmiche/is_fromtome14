@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-
         <template id="report_picking_inherit" inherit_id="stock.report_picking">
-
             <xpath expr="//t[@t-foreach='docs']" position="attributes">
                 <attribute name="t-lang">'fr_FR'</attribute>
             </xpath>
-
             <div name="right_box" position="replace"/>
-
             <h1 t-field="o.name" position="replace"/>
-
             <div name="div_sched_date" position="replace">
                 <div class="col-auto" name="div_sched_date">
                     <strong>Date de livraison prévue:</strong>
@@ -22,21 +17,14 @@
                     <p t-field="o.is_transporteur_id"/>
                 </div>
             </div>
-
-
             <xpath expr="//table[1]" position="replace">
-
-
             <style>
                 .table{
                     font-size:10pt;
                 }
-
                 .table-sm th, .table-sm td {
                     padding: 0.1rem;
                 }
-
-
             </style>
                <table class="table table-sm mt48">
                     <thead>
@@ -45,182 +33,26 @@
                             <th class="text-left"> <strong>Désignation</strong></th>
                             <th class="text-left"> <strong>Réf</strong></th>
                             <th class="text-right"> <strong>Colis Cde</strong></th>
-                            <th class="text-center"> <strong>PCB</strong></th>
-                            <th class="text-center" colspan="2"><strong>Qt</strong></th>
-                            <th class="text-center"> <strong>QUANT.<br />PRÉPA</strong></th>
-                            <th class="text-center"> <strong>LOT</strong></th>
-                            <th class="text-center"> <strong>DLC/DDM</strong></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr t-foreach="o.move_ids_without_package" t-as="line">
                             <td style="width: 2mm"   class="text-center"><span t-field="line.is_emplacement_fournisseur"/></td>
                             <td style="width: 150mm" class="text-left">
-                                <div><strong><span t-field="line.is_description_cde"/></strong></div>
+                                <div><strong><span t-field="line.is_description_prepa"/></strong></div>
                             </td>
                             <td style="width: 10mm" class="text-left"><span t-field="line.is_ref_fournisseur"/></td>
                             <td style="width: 10mm" class="text-right"><b><span t-field="line.is_nb_colis_cde"/></b></td>
-                            <td style="width: 10mm" class="text-center"><span t-field="line.product_id.is_nb_pieces_par_colis"/></td>
-                            <td style="width: 7mm;border-right:none" class="text-right">
-                                <span t-if="o.state != 'done'" t-field="line.product_uom_qty"/>
-                                <span t-if="o.state == 'done'" t-field="line.quantity_done"/>
-                            </td>
-                            <td style="width: 3mm;border-left:none" class="text-left"><span t-field="line.product_uom"/></td>
-                            <td style="width: 10mm"></td>
-                            <td style="width: 30mm"></td>
-                            <td style="width: 10mm"></td>
                         </tr>
                     </tbody>
                     <thead>
                         <tr>
-                            <th colspan="2" class="text-left">  <strong>Total : </strong></th>
-                            <th class="text-center"><strong><span t-field="o.is_nb_colis"/></strong></th>
-                            <th colspan="7"> </th>
+                            <th colspan="3" class="text-left">  <strong>Total : </strong></th>
+                            <th class="text-right"><strong><span t-field="o.is_nb_colis"/></strong></th>
                         </tr>
                     </thead>
                 </table>
-
-
-                <!-- <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th><strong>ARTICLE</strong></th>
-                            <th><strong>QUANT.CDÉS</strong></th>
-                            <th><strong>QUANT.PRÉPA</strong></th>
-                            <th><strong>LOT</strong></th>
-                            <th><strong>DLC/DDM</strong></th>
-
-
-                            <th class="text-center"> <strong>Colis</strong></th>
-                            <th class="text-center"> <strong>PCB</strong></th>
-                            <th class="text-right"><strong>Pièces</strong></th>
-                            <th class="text-left"> <strong>Unité</strong></th>
-                            <th class="text-right"> <strong>Poids</strong></th>
-
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <t t-foreach="o.move_ids_without_package" t-as="move">
-                            <t t-foreach="move.move_line_ids.sorted(key=lambda ml: ml.location_id.id)" t-as="ml">
-                                <tr>
-                                    <td>
-                                        <span t-field="ml.product_id.display_name"/><br/>
-                                        <span t-field="ml.product_id.description_picking"/>
-                                    </td>
-                                    <td>
-                                        <span t-if="o.state != 'done'" t-field="ml.product_uom_qty"/>
-                                        <span t-if="o.state == 'done'" t-field="ml.qty_done"/>
-                                        <span t-field="ml.product_uom_id" groups="uom.group_uom"/>
-                                    </td>
-                                 </tr>
-                            </t>
-                        </t>
-                    </tbody>
-                </table> -->
             </xpath>
-
-
-
-
-
         </template>
-
-
-
-
-<!-- 
-        <template id="report_picking_inherit" inherit_id="stock.report_picking">
-             <xpath expr="//table[1]/thead/tr/th[1]" position="before">
-
-                <th t-if="o.sale_id.client_order_ref">
-                    <strong>Cmde Client</strong>
-                </th>
-                <th t-if="o.sale_id.confirmation_date">
-                    <strong>Date Cmde</strong>
-                </th>
-            </xpath>
-            <xpath expr="//table[1]/tbody/tr/td[1]" position="before">
-
-                <td t-if="o.sale_id.client_order_ref">
-                    <span t-field="o.sale_id.client_order_ref"/>
-                </td>
-                <td t-if="o.sale_id.confirmation_date">
-                    <span t-field="o.sale_id.confirmation_date"/>
-                </td>
-            </xpath>
-            <xpath expr="//table[2]" position="replace">
-
-                <table class="table table-sm" t-if="o.move_line_ids">
-                    <thead>
-                        <tr>
-                            <th>
-                                <strong>Article</strong>
-                            </th>
-                            <th>
-                                <strong>Quant. Cdés</strong>
-                            </th>
-                            <th>
-                                <strong>Quant. Prépa</strong>
-                            </th>
-                            <th width="30%" class="text-center">
-                                <strong>Lot</strong>
-                            </th>
-                            <th>
-                                <strong>DLC/DDM</strong>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <t t-foreach="o.move_ids_without_package" t-as="m">
-                            <tr>
-                                <td>
-                                    <span t-field="m.product_id.display_name"/>
-                                    <br/>
-                                    <span t-field="m.product_id.description_picking"/>
-                                    <t t-if="m.product_id.type_traçabilite">
-                                        -
-                                    </t>
-                                </td>
-                                <td>
-                                    <span t-field="m.product_uom_qty"/>
-                                </td>
-                                <td>
-
-                                </td>
-
-                                 <t t-set="lots" t-value="[]"/>
-                                    <t t-foreach="m.move_line_ids" t-as="ml">
-                                        <t t-esc="lots.append(ml.lot_id)"/>
-                                    </t>
-                                  <td width="30%" class=" text-center h6">
-
-                                    <t t-foreach="set(lots)" t-as="lot">
-                                        <p t-field="lot.name" style="margin:0 !important;"/>
-                                    </t>
-
-                                </td>
-                               <td>
-
-                                    <t t-foreach="set(lots)" t-as="lot">
-                                        <t t-if="lot.life_date">
-                                            <p t-esc="context_timestamp(lot.life_date).strftime('%Y-%m-%d')" t-options="{'widget': 'date'}" style="margin:0 !important;"/>
-                                        </t>
-                                        <t t-if="lot.use_date">
-                                            <p t-esc="context_timestamp(lot.use_date).strftime('%Y-%m-%d')" t-options="{'widget': 'date'}" style="margin:0 !important;"/>
-                                        </t>
-                                        <t t-if=" not lot.use_date and not lot.life_date">
-                                            <p/>
-                                        </t>
-                                    </t>
-                                </td>
-
-
-                            </tr>
-                        </t>
-                    </tbody>
-                </table>
-            </xpath>
-        </template> -->
-    </data> 
+    </data>
 </odoo>
