@@ -25,6 +25,12 @@
                 .table-sm th, .table-sm td {
                     padding: 0.1rem;
                 }
+                .table tbody td {
+                    background-color: white !important;
+                }
+                .table tbody tr.ligne_grise td {
+                    background-color: #e9ecef !important;
+                }
             </style>
                <table class="table table-sm mt48">
                     <thead>
@@ -36,7 +42,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr t-foreach="o.move_ids_without_package" t-as="line">
+                        <tr t-foreach="o.move_ids_without_package" t-as="line" t-att-class="'ligne_grise' if line_odd else None">
                             <td style="width: 2mm"   class="text-center"><span t-field="line.is_emplacement_fournisseur"/></td>
                             <td style="width: 150mm" class="text-left">
                                 <div><strong><span t-field="line.is_description_prepa"/></strong></div>
