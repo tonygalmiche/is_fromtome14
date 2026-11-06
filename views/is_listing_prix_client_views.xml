@@ -33,6 +33,11 @@
                         string="Générer le PDF (vignettes)"
                     />
                     <button
+                        name="generer_pdf_vignettes_par_lots_action"
+                        type="object"
+                        string="Générer le PDF (vignettes par lots)"
+                    />
+                    <button
                         name="generer_pdf_liste_action"
                         type="object"
                         string="Générer le PDF (liste)"
