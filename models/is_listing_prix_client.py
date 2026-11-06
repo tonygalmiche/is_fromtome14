@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, tools, _
+from odoo.exceptions import UserError
 import codecs
 import unicodedata
 import base64
 import sys
 import threading
 import time
+import logging
 import psutil
+
+_logger = logging.getLogger(__name__)
 
 
 @api.model
@@ -119,15 +123,46 @@ class IsListingPrixClient(models.Model):
         (annule et remplace le précédent) et indique dans le chatter la durée et
         la mémoire maxi utilisée"""
         report = self.env.ref(report_xmlid)
+        mo = 1024 * 1024
         for obj in self:
             mesure = MesureMemoire()
             mesure.start()
             debut = time.time()
+            erreur = False
             try:
                 pdf, _format = report._render_qweb_pdf(obj.ids)
+            except Exception as e:
+                _logger.exception("Échec de la génération du PDF '%s' du listing %s", report.name, obj.name)
+                erreur = "%s : %s" % (type(e).__name__, str(e)[:1000])
             finally:
                 mesure.arreter()
             duree = time.time() - debut
+
+            if erreur:
+                # L'exception est sortie du bloc except : la mémoire du HTML est libérée.
+                # Le message est enregistré dans une transaction séparée pour ne pas
+                # être annulé avec la transaction en erreur
+                body = """
+                    <b>Échec de la génération du PDF '%s'</b><br/>
+                    Articles : %s<br/>
+                    Durée : %.1f s<br/>
+                    Mémoire maxi Odoo : %.0f Mo (%.0f Mo au départ)<br/>
+                    Mémoire maxi wkhtmltopdf : %.0f Mo<br/>
+                    Erreur : %s
+                """ % (
+                    report.name,
+                    len(obj.product_ids),
+                    duree,
+                    mesure.odoo_max / mo,
+                    mesure.odoo_debut / mo,
+                    mesure.enfants_max / mo,
+                    tools.html_escape(erreur),
+                )
+                with self.pool.cursor() as cr:
+                    env = api.Environment(cr, self.env.uid, self.env.context)
+                    env[obj._name].browse(obj.id).message_post(body=body)
+                raise UserError("Échec de la génération du PDF '%s' après %.1f s (mémoire maxi Odoo : %.0f Mo) :\n%s" % (
+                    report.name, duree, mesure.odoo_max / mo, erreur))
 
             nom = "%s %s.pdf" % (report.name, obj.name)
             obj.attachment_ids.filtered(lambda a: a.name == nom).unlink()
@@ -141,7 +176,6 @@ class IsListingPrixClient(models.Model):
             })
             obj.attachment_ids = [(4, attachment.id)]
 
-            mo = 1024 * 1024
             body = """
                 <b>PDF '%s' généré</b><br/>
                 Articles : %s<br/>
