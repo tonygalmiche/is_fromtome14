@@ -3,7 +3,8 @@ from odoo import api, fields, models, tools, _
 from odoo.exceptions import UserError
 from odoo.tools.pdf import merge_pdf
 from PyPDF2 import PdfFileReader, PdfFileWriter
-from reportlab.pdfgen import canvas
+from PyPDF2.generic import NameObject, ArrayObject, DictionaryObject, DecodedStreamObject
+from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.lib.units import mm
 import codecs
 import unicodedata
@@ -201,22 +202,40 @@ class IsListingPrixClient(models.Model):
 
     def _numeroter_pages(self, pdf):
         """Ajoute 'Page: n / total' en bas de chaque page, à la place du pied de
-        page de wkhtmltopdf"""
+        page de wkhtmltopdf.
+        mergePage de PyPDF2 analyse tout le contenu de chaque page (environ 0,3 s
+        par page) : on ajoute plutôt le numéro dans un flux de contenu
+        supplémentaire, sans toucher au contenu existant. Ce dernier est encadré
+        par q/Q pour que le numéro soit placé dans le repère d'origine de la page"""
         reader = PdfFileReader(io.BytesIO(pdf), strict=False)
         writer = PdfFileWriter()
         total = reader.getNumPages()
+        police = writer._addObject(DictionaryObject({
+            NameObject('/Type')    : NameObject('/Font'),
+            NameObject('/Subtype') : NameObject('/Type1'),
+            NameObject('/BaseFont'): NameObject('/Helvetica'),
+        }))
+        debut = DecodedStreamObject()
+        debut.setData(b"q\n")
+        debut = writer._addObject(debut)
         for n in range(total):
             page = reader.getPage(n)
-            largeur = float(page.mediaBox.getWidth())
-            hauteur = float(page.mediaBox.getHeight())
-            buffer = io.BytesIO()
-            c = canvas.Canvas(buffer, pagesize=(largeur, hauteur))
-            c.setFont("Helvetica", 9)
-            c.setFillGray(0.42)
-            c.drawCentredString(largeur / 2, 5 * mm, "Page: %s / %s" % (n + 1, total))
-            c.save()
-            page.mergePage(PdfFileReader(io.BytesIO(buffer.getvalue())).getPage(0))
             writer.addPage(page)
+            texte = "Page: %s / %s" % (n + 1, total)
+            x = float(page.mediaBox.getWidth()) / 2 - stringWidth(texte, "Helvetica", 9) / 2
+            fin = DecodedStreamObject()
+            fin.setData(("\nQ\nq BT /FNumPage 9 Tf 0.42 g %.2f %.2f Td (%s) Tj ET Q\n" % (x, 5 * mm, texte)).encode())
+            fin = writer._addObject(fin)
+            contenu = page['/Contents']
+            if isinstance(contenu, ArrayObject):
+                contenu = list(contenu)
+            else:
+                contenu = [page.raw_get('/Contents')]
+            page[NameObject('/Contents')] = ArrayObject([debut] + contenu + [fin])
+            ressources = page['/Resources']
+            if '/Font' not in ressources:
+                ressources[NameObject('/Font')] = DictionaryObject()
+            ressources['/Font'][NameObject('/FNumPage')] = police
         resultat = io.BytesIO()
         writer.write(resultat)
         return resultat.getvalue()
