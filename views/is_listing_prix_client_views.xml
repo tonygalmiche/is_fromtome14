@@ -27,8 +27,20 @@
                         type="object"
                         string="Ajouter les articles de la liste de prix"
                     />
+                    <button
+                        name="generer_pdf_vignettes_action"
+                        type="object"
+                        string="Générer le PDF (vignettes)"
+                    />
+                    <button
+                        name="generer_pdf_liste_action"
+                        type="object"
+                        string="Générer le PDF (liste)"
+                    />
                 </header>
                 <sheet>
+                    <widget name="web_ribbon" title="Archivé" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <field name="active" invisible="1"/>
                     <group>
                         <group>
                             <field name="partner_id"/>
@@ -38,9 +50,11 @@
                          </group>
                          <group>
                             <field name="name"/>
+                            <field name="nb_articles"/>
                             <field name="afficher_prix"/>
                             <field name="prix_futur"/>
                             <field name="lang"/>
+                            <field name="attachment_ids" widget="many2many_binary" readonly="1"/>
                          </group>
                     </group>
                     <field name="product_ids" nolabel="1" >
@@ -57,6 +71,11 @@
                         </tree>
                     </field>
                 </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>
@@ -66,13 +85,14 @@
         <field name="arch" type="xml">
             <tree>
                 <field name="nom_listing"/>
-                <field name="partner_id"/>
-                <field name="enseigne_id"/>
-                <field name="pricelist_id"/>
-                <field name="afficher_prix"/>
-                <field name="prix_futur"/>
-                <field name="name"/>
-                <field name="lang"/>
+                <field name="nb_articles"   optional="show"/>
+                <field name="partner_id"    optional="show"/>
+                <field name="enseigne_id"   optional="show"/>
+                <field name="pricelist_id"  optional="hide"/>
+                <field name="afficher_prix" optional="hide"/>
+                <field name="prix_futur"    optional="hide"/>
+                <field name="name"          optional="hide"/>
+                <field name="lang"          optional="hide"/>
             </tree>
         </field>
     </record>
@@ -86,6 +106,7 @@
                 <field name="enseigne_id"/>
                 <field name="pricelist_id"/>
                 <field name="name"/>
+                <filter string="Archivés" name="inactive" domain="[('active', '=', False)]"/>
            </search>
         </field>
     </record>

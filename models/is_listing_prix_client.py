@@ -4,6 +4,9 @@ import codecs
 import unicodedata
 import base64
 import sys
+import threading
+import time
+import psutil
 
 
 @api.model
@@ -11,8 +14,46 @@ def _lang_get(self):
     return self.env['res.lang'].get_installed()
 
 
+class MesureMemoire(threading.Thread):
+    """Relève toutes les 0,2 s la mémoire (RSS) du processus Odoo et de ses
+    processus enfants (wkhtmltopdf) et garde le maximum de chacun"""
+
+    def __init__(self, intervalle=0.2):
+        super().__init__(daemon=True)
+        self.process = psutil.Process()
+        self.intervalle = intervalle
+        self.odoo_debut = self.process.memory_info().rss
+        self.odoo_max = self.odoo_debut
+        self.enfants_max = 0
+        self._arret = threading.Event()
+
+    def mesurer(self):
+        try:
+            self.odoo_max = max(self.odoo_max, self.process.memory_info().rss)
+            enfants = 0
+            for enfant in self.process.children(recursive=True):
+                try:
+                    enfants += enfant.memory_info().rss
+                except psutil.Error:
+                    pass
+            self.enfants_max = max(self.enfants_max, enfants)
+        except psutil.Error:
+            pass
+
+    def run(self):
+        while not self._arret.is_set():
+            self.mesurer()
+            self._arret.wait(self.intervalle)
+
+    def arreter(self):
+        self._arret.set()
+        self.join()
+        self.mesurer()
+
+
 class IsListingPrixClient(models.Model):
     _name = 'is.listing.prix.client'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Listing prix client"
     _order = 'nom_listing, name desc'
 
@@ -22,6 +63,7 @@ class IsListingPrixClient(models.Model):
     partner_id    = fields.Many2one('res.partner', 'Client')
     nom_listing   = fields.Char("Nom du listing")
     product_ids   = fields.Many2many('product.product', 'is_listing_prix_client_product_rel', 'doc_id', 'product_id', 'Articles')
+    nb_articles   = fields.Integer("Nombre d'articles", compute='_compute_nb_articles', store=True)
     afficher_prix = fields.Boolean("Afficher prix actuel", default=True)
     prix_futur = fields.Selection([
             ('cdf_quai'  , 'Cdf quai'),
@@ -31,6 +73,14 @@ class IsListingPrixClient(models.Model):
             ('ft'        , 'FT'),
         ], 'Prix futur à afficher', copy=False)
     lang = fields.Selection(_lang_get, string='Langue', default='fr_FR')
+    active = fields.Boolean("Actif", default=True, tracking=True)
+    attachment_ids = fields.Many2many('ir.attachment', 'is_listing_prix_client_attachment_rel', 'doc_id', 'file_id', 'Pièces jointes', copy=False)
+
+
+    @api.depends('product_ids')
+    def _compute_nb_articles(self):
+        for obj in self:
+            obj.nb_articles = len(obj.product_ids)
 
 
     @api.onchange('partner_id')
@@ -62,6 +112,61 @@ class IsListingPrixClient(models.Model):
                 'product_ids': [(6, 0, ids)]
             }
             obj.write(vals)
+
+
+    def _generer_pdf(self, report_xmlid):
+        """Génère le PDF du rapport indiqué, l'enregistre dans les pièces jointes
+        (annule et remplace le précédent) et indique dans le chatter la durée et
+        la mémoire maxi utilisée"""
+        report = self.env.ref(report_xmlid)
+        for obj in self:
+            mesure = MesureMemoire()
+            mesure.start()
+            debut = time.time()
+            try:
+                pdf, _format = report._render_qweb_pdf(obj.ids)
+            finally:
+                mesure.arreter()
+            duree = time.time() - debut
+
+            nom = "%s %s.pdf" % (report.name, obj.name)
+            obj.attachment_ids.filtered(lambda a: a.name == nom).unlink()
+            attachment = self.env['ir.attachment'].create({
+                'name'     : nom,
+                'type'     : 'binary',
+                'datas'    : base64.b64encode(pdf),
+                'res_model': obj._name,
+                'res_id'   : obj.id,
+                'mimetype' : 'application/pdf',
+            })
+            obj.attachment_ids = [(4, attachment.id)]
+
+            mo = 1024 * 1024
+            body = """
+                <b>PDF '%s' généré</b><br/>
+                Articles : %s<br/>
+                Durée : %.1f s<br/>
+                Mémoire maxi Odoo : %.0f Mo (%.0f Mo au départ)<br/>
+                Mémoire maxi wkhtmltopdf : %.0f Mo<br/>
+                Taille du PDF : %.1f Mo
+            """ % (
+                report.name,
+                len(obj.product_ids),
+                duree,
+                mesure.odoo_max / mo,
+                mesure.odoo_debut / mo,
+                mesure.enfants_max / mo,
+                len(pdf) / mo,
+            )
+            obj.message_post(body=body)
+
+
+    def generer_pdf_vignettes_action(self):
+        self._generer_pdf('is_fromtome14.listing_prix_client_action')
+
+
+    def generer_pdf_liste_action(self):
+        self._generer_pdf('is_fromtome14.listing_prix_client_liste_action')
 
 
     def get_html4(self):
