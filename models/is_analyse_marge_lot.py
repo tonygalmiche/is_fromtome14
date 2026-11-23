@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
+from odoo.tools import html_escape
 from datetime import timedelta
 import time
 from odoo.addons.is_fromtome14.models.account_move import _TYPE_AVOIR
@@ -81,6 +82,55 @@ class IsAnalyseMargeLot(models.Model):
     marge_brute_comptable  = fields.Float('Marge brute comptable', readonly=True, copy=False, help="Ventes facturées - Achats facturés")
     taux_marge_comptable   = fields.Float('Taux de marge comptable (%)', digits=(14,1), readonly=True, copy=False, help="Marge brute comptable / Ventes facturées")
     ecart_marge_brute      = fields.Float('Écart marge brute'    , readonly=True, copy=False, help="Marge brute lot - Marge brute comptable")
+    filtre_comptable       = fields.Html('Filtre des chiffres comptables', compute='_compute_filtres', sanitize=False)
+    filtre_lot             = fields.Html('Filtre des résultats sur les lots', compute='_compute_filtres', sanitize=False)
+
+
+    @api.depends('date_debut', 'date_fin', 'exclure_services', 'exclure_hors_lot', 'client', 'enseigne_id', 'user_id', 'product_id', 'invoice_id')
+    def _compute_filtres(self):
+        def liste(lignes):
+            return "<ul>%s</ul>"%''.join("<li>%s</li>"%ligne for ligne in lignes)
+        for obj in self:
+            date_debut = obj.date_debut and obj.date_debut.strftime('%d/%m/%Y') or ''
+            date_fin   = obj.date_fin   and obj.date_fin.strftime('%d/%m/%Y')   or ''
+            periode    = "du %s au %s"%(date_debut, date_fin)
+            options = []
+            if obj.exclure_services:
+                options.append("<b>Articles de type service</b> : exclus")
+            if obj.exclure_hors_lot:
+                options.append("<b>Articles non gérés par lot</b> : exclus")
+
+            #** Chiffres comptables *******************************************
+            filtres = [
+                "<b>État</b> : factures validées uniquement",
+                "<b>Type</b> : factures et avoirs, client et fournisseur",
+                "<b>Date de facture</b> : %s"%periode,
+            ]+options
+            obj.filtre_comptable = liste(filtres)+"Montants HT après remise :"+liste([
+                "<b>Ventes facturées</b> = factures client − avoirs client",
+                "<b>Achats facturés</b> = factures fournisseur − avoirs fournisseur",
+            ])
+
+            #** Résultats sur les lots ****************************************
+            filtres = [
+                "<b>Factures et avoirs client</b> : validés, datés %s"%periode,
+                "<b>Avoirs fournisseur</b> : validés, datés %s"%periode,
+                "<b>Rebuts</b> : faits %s"%periode,
+            ]+options
+            if obj.client:
+                filtres.append("<b>Client</b> : nom contenant « %s »"%html_escape(obj.client))
+            if obj.enseigne_id:
+                filtres.append("<b>Enseigne</b> : %s"%obj.enseigne_id.display_name)
+            if obj.user_id:
+                filtres.append("<b>Commercial</b> : %s"%obj.user_id.display_name)
+            if obj.product_id:
+                filtres.append("<b>Produit</b> : %s"%obj.product_id.display_name)
+            if obj.invoice_id:
+                filtres.append("<b>Facture client</b> : %s"%obj.invoice_id.display_name)
+            obj.filtre_lot = liste(filtres)+"Montants HT après remise :"+liste([
+                "<b>Montant vente lot</b> = factures client − avoirs client",
+                "<b>Montant achat lot</b> = coût d'achat des lots vendus (facture d'achat du lot) + rebuts − avoirs fournisseur",
+            ])
 
 
     @api.model

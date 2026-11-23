@@ -76,6 +76,20 @@
                                     <field name="rebut"/>
                                 </group>
                             </group>
+                            <!-- Filtres sur une même ligne, sous les 2 groupes -->
+                            <div class="row">
+                                <div class="col-6" style="padding-right:48px">
+                                    <div style="background-color:#eeeeee;padding:8px 8px 0 8px">
+                                        <field name="filtre_lot"/>
+                                    </div>
+                                </div>
+                                <div class="col-6" style="padding-left:0"
+                                     attrs="{'invisible': ['|', '|', '|', '|', ('client', '!=', False), ('enseigne_id', '!=', False), ('user_id', '!=', False), ('product_id', '!=', False), ('invoice_id', '!=', False)]}">
+                                    <div style="background-color:#eeeeee;padding:8px 8px 0 8px">
+                                        <field name="filtre_comptable"/>
+                                    </div>
+                                </div>
+                            </div>
                         </page>
                         <page string="Options">
                             <group>
